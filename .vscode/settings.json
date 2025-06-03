@@ -1,0 +1,6 @@
+{
+  "cSpell.words": ["djangorestframework", "mysqlclient", "simplejwt"],
+  "python.testing.pytestArgs": ["backendpramlearn"],
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true
+}
