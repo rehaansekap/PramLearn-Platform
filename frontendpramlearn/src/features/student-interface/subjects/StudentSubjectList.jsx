@@ -14,10 +14,10 @@ const StudentSubjectList = () => {
     subject.name.toLowerCase().includes(search.trim().toLowerCase())
   );
 
-  const handleQuickAccessMaterial = (materialId) => {
-    // Navigasi ke material viewer student
-    if (materialId) {
-      window.location.href = `/student/materials/${materialId}`;
+  const handleQuickAccessMaterial = (materialSlug) => {
+    // Navigasi menggunakan slug
+    if (materialSlug) {
+      window.location.href = `/student/materials/${materialSlug}`;
     }
   };
 

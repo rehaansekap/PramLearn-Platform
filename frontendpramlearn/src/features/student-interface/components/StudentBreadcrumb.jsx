@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Breadcrumb } from "antd";
-import { Link, useLocation, matchPath } from "react-router-dom";
-import { HomeOutlined, UserOutlined } from "@ant-design/icons";
+import { Link, useLocation } from "react-router-dom";
+import { HomeOutlined } from "@ant-design/icons";
 import api from "../../../api";
 
 const StudentBreadcrumb = () => {
@@ -11,8 +11,6 @@ const StudentBreadcrumb = () => {
   useEffect(() => {
     const generateBreadcrumbs = async () => {
       const pathSnippets = location.pathname.split("/").filter((i) => i);
-
-      // Base student breadcrumb
       const baseCrumbs = [
         {
           path: "/student",
@@ -21,12 +19,43 @@ const StudentBreadcrumb = () => {
         },
       ];
 
-      // Static routes
-      if (pathSnippets.length === 1 && pathSnippets[0] === "student") {
-        setDynamicCrumbs(baseCrumbs);
+      // Handle material routes: /student/materials/:materialSlug
+      if (pathSnippets[1] === "materials" && pathSnippets[2]) {
+        const materialSlug = pathSnippets[2];
+        try {
+          const materialRes = await api.get(`materials/?slug=${materialSlug}`);
+          const material = materialRes.data.find((m) => m.slug === materialSlug);
+          
+          if (material && material.subject) {
+            const subjectRes = await api.get(`subjects/${material.subject}/`);
+            setDynamicCrumbs([
+              ...baseCrumbs,
+              { path: "/student/subjects", breadcrumbName: "My Subjects" },
+              {
+                path: `/student/subjects/${subjectRes.data.slug}`,
+                breadcrumbName: subjectRes.data.name,
+              },
+              {
+                path: location.pathname,
+                breadcrumbName: "Material",
+              },
+            ]);
+            return;
+          }
+        } catch (error) {
+          console.error("Failed to fetch material/subject data:", error);
+        }
+        
+        // Fallback jika gagal fetch
+        setDynamicCrumbs([
+          ...baseCrumbs,
+          { path: "/student/subjects", breadcrumbName: "My Subjects" },
+          { path: location.pathname, breadcrumbName: "Material" },
+        ]);
         return;
       }
 
+      // Handle subjects routes: /student/subjects
       if (pathSnippets[1] === "subjects") {
         if (pathSnippets.length === 2) {
           setDynamicCrumbs([
@@ -58,6 +87,7 @@ const StudentBreadcrumb = () => {
 
       // Other static routes
       const routeMap = {
+        dashboard: "Dashboard",
         assessments: "Assessments",
         progress: "Progress",
         group: "My Group",

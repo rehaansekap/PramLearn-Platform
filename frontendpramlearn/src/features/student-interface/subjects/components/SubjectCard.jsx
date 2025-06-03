@@ -1,6 +1,10 @@
 import React from "react";
 import { Card, Progress, Typography, Tag, Tooltip, Button } from "antd";
-import { BookOutlined, UserOutlined, FileTextOutlined } from "@ant-design/icons";
+import {
+  BookOutlined,
+  UserOutlined,
+  FileTextOutlined,
+} from "@ant-design/icons";
 
 const { Title, Text } = Typography;
 
@@ -29,7 +33,9 @@ const SubjectCard = ({
     bodyStyle={{ padding: 20 }}
   >
     <div style={{ display: "flex", alignItems: "center", marginBottom: 8 }}>
-      <BookOutlined style={{ fontSize: 28, color: "#11418b", marginRight: 16 }} />
+      <BookOutlined
+        style={{ fontSize: 28, color: "#11418b", marginRight: 16 }}
+      />
       <div>
         <Title level={4} style={{ margin: 0 }}>
           {subject.name}
@@ -70,9 +76,10 @@ const SubjectCard = ({
         style={{ marginLeft: "auto" }}
         onClick={(e) => {
           e.stopPropagation();
-          onQuickAccessMaterial(subject.last_material_id);
+          // Ganti dari materialId ke materialSlug
+          onQuickAccessMaterial(subject.last_material_slug);
         }}
-        disabled={!subject.last_material_id}
+        disabled={!subject.last_material_slug}
       >
         Quick Access
       </Button>

@@ -64,7 +64,7 @@ const SubjectDetailStudent = ({ subject, onBack }) => {
               <Button
                 type="link"
                 onClick={() =>
-                  (window.location.href = `/student/materials/${item.id}`)
+                  (window.location.href = `/student/materials/${item.slug}`)
                 }
               >
                 Buka

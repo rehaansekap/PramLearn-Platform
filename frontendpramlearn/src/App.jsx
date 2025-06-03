@@ -29,6 +29,7 @@ import StudentSubjects from "./features/student-interface/subjects/StudentSubjec
 import StudentAssessments from "./features/student-interface/assessments/StudentAssessments";
 import StudentProgress from "./features/student-interface/progress/StudentProgress";
 import StudentGroup from "./features/student-interface/group/StudentGroup";
+import StudentMaterialViewer from "./features/student-interface/materials/StudentMaterialViewer";
 
 const RedirectIfAuthenticated = ({ children }) => {
   const { token, loading } = useContext(AuthContext);
@@ -63,6 +64,10 @@ const AppRoutes = () => {
             <Route index element={<StudentDashboard />} />
             <Route path="subjects" element={<StudentSubjects />} />
             <Route path="subjects/:subjectId" element={<StudentSubjects />} />
+            <Route
+              path="materials/:materialSlug"
+              element={<StudentMaterialViewer />}
+            />
             <Route path="assessments" element={<StudentAssessments />} />
             <Route
               path="assessments/quiz/:quizId"
