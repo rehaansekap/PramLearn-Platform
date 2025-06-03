@@ -16,7 +16,7 @@ from pramlearnapp.views import (RoleViewSet, UserViewSet, RegisterView, LoginVie
                                 AvailableAndRelatedStudentListView, AvailableStudentListView, ClassStudentViewSet, StudentViewSet,
                                 ClassDetailPage, ClassStudentDetail, StudentMotivationProfileView, UploadARCSCSVView, SubjectDetailView,
                                 AutoGroupStudentsView, AssignQuizToGroupsView, GroupQuizViewSet, SubmitAssignmentView, RelatedUsersForTeacherView,
-                                MaterialAttendanceListView, update_attendance, bulk_create_attendance, QuizRankingView)
+                                MaterialAttendanceListView, update_attendance, bulk_create_attendance, QuizRankingView, StudentDashboardView)
 
 from pramlearnapp.views.teacher.relatedUsersView import CurrentUserView
 
@@ -48,6 +48,8 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/student/dashboard/', StudentDashboardView.as_view(),
+         name='student-dashboard'),
     path('api/available-students/', AvailableStudentListView.as_view(),
          name='available-students'),
     path('api/available-and-related-students/<int:class_id>/',

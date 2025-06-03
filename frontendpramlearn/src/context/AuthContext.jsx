@@ -14,6 +14,7 @@ const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [user, setUser] = useState(null);
   const activityTimeout = useRef(null); // Tambahkan baris ini
+  const [loading, setLoading] = useState(true);
 
   // Update activity dengan WebSocket notification
   const updateActivity = useCallback(async () => {
@@ -76,21 +77,27 @@ const AuthProvider = ({ children }) => {
   }, [token, user]);
 
   useEffect(() => {
+    setLoading(true); // <-- Tambahkan ini agar loading benar di setiap perubahan token
     if (token) {
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       api
         .get("users/me/")
         .then(async (res) => {
           setUser(res.data);
+          setLoading(false); // <-- Tambahkan ini setelah user berhasil di-set
           // Set online saat login
           await api.patch(`users/me/`, {
             is_online: true,
             last_activity: new Date().toISOString(),
           });
         })
-        .catch(() => setUser(null));
+        .catch(() => {
+          setUser(null);
+          setLoading(false); // <-- Tambahkan ini juga pada catch
+        });
     } else {
       setUser(null);
+      setLoading(false); // <-- Tambahkan ini juga jika tidak ada token
     }
   }, [token]);
 
@@ -218,7 +225,7 @@ const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ token, user, login, logout, updateActivity }}
+      value={{ token, user, login, logout, updateActivity, loading }} // <--- tambahkan loading di sini!
     >
       {children}
     </AuthContext.Provider>

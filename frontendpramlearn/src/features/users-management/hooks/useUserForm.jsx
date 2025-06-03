@@ -14,7 +14,7 @@ const useUserForm = (userId, onSuccess) => {
     class_ids: [],
     isStaff: false,
     isSuperuser: false,
-    isActive: false,
+    isActive: true,
   });
   const [roles, setRoles] = useState([]);
   const [classes, setClasses] = useState([]);
@@ -98,7 +98,7 @@ const useUserForm = (userId, onSuccess) => {
       // Map frontend camelCase to backend snake_case
       const payload = {
         ...formData,
-        is_active: formData.isActive,
+        is_active: true,
         is_staff: formData.isStaff,
         is_superuser: formData.isSuperuser,
       };
@@ -165,7 +165,7 @@ const useUserForm = (userId, onSuccess) => {
       class_ids: [],
       isStaff: false,
       isSuperuser: false,
-      isActive: false,
+      isActive: true,
     });
   };
 

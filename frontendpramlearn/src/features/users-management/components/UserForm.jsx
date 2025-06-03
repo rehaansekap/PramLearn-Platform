@@ -25,10 +25,12 @@ const UserForm = ({ userId, onSuccess, isSubmitting, setIsSubmitting }) => {
   const isStudentRole = Number(formData.role) === 3;
 
   const handleClassChange = (value) => {
+    // Pastikan value selalu array
+    const classIdsArray = Array.isArray(value) ? value : [value];
     handleChange({
       target: {
         name: "class_ids",
-        value: value,
+        value: classIdsArray,
       },
     });
   };

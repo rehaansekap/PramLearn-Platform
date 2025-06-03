@@ -1,0 +1,714 @@
+Collecting workspace informationBerdasarkan analisis dokumentasi dan struktur project Anda, saya sarankan pendekatan **iteratif dan bertahap** untuk implementasi Student Interface. Berikut strategi terbaik:
+
+---
+
+## 🎯 **Strategi Implementasi yang Disarankan**
+
+### **Phase 1: Foundation & Basic Structure** 
+**Request per chat: 1-2 komponen dasar**
+
+1. **Chat 1**: Setup routing dan StudentLayout
+   - StudentLayout.jsx + routing structure
+   - Basic navigation untuk student
+
+2. **Chat 2**: Student Dashboard
+   - StudentDashboard.jsx dengan overview cards
+   - Welcome section dan quick stats
+
+### **Phase 2: Core Learning Features**
+**Request per chat: 1 fitur lengkap**
+
+3. **Chat 3**: My Subjects
+   - SubjectList.jsx untuk student
+   - Integration dengan existing API
+
+4. **Chat 4**: Material Viewer
+   - MaterialViewer.jsx untuk PDF/Video
+   - Progress tracking
+
+5. **Chat 5**: Material Access
+   - Material browsing dan navigation
+   - Bookmark dan notes (jika ada)
+
+### **Phase 3: Assessment Features**
+**Request per chat: 1 assessment type**
+
+6. **Chat 6**: Quiz Taking Interface
+   - QuizInterface.jsx
+   - Timer, navigation, submission
+
+7. **Chat 7**: Assignment Submission
+   - AssignmentSubmission.jsx
+   - File upload dan text answers
+
+8. **Chat 8**: Results & Grades
+   - Grade viewer dan result display
+   - Performance analytics
+
+### **Phase 4: Progress & Collaboration**
+**Request per chat: 1 fitur**
+
+9. **Chat 9**: Progress Overview
+   - Grade analytics dan attendance
+   - Achievement system
+
+10. **Chat 10**: Group Collaboration
+    - Group info dan activities
+    - Group rankings
+
+---
+
+## 📋 **Format Request yang Efektif**
+
+### **Template Request:**
+```
+Saya ingin implement [FITUR SPESIFIK] untuk Student Interface. 
+
+Tolong buatkan:
+1. Component utama: [NamaComponent.jsx]
+2. Hook yang diperlukan (jika ada): [useNamaHook.js]
+3. Integration dengan API existing
+4. Styling yang konsisten dengan design system
+
+Fokus pada:
+- [Requirement spesifik 1]
+- [Requirement spesifik 2]
+- [Integration point yang penting]
+```
+
+### **Contoh Request Konkret:**
+```
+Saya ingin implement Student Dashboard untuk homepage siswa.
+
+Tolong buatkan:
+1. Component StudentDashboard.jsx
+2. Hook useStudentDashboard.js (untuk fetch data)
+3. Integration dengan existing API
+4. Styling konsisten dengan admin dashboard
+
+Fokus pada:
+- Welcome card dengan nama siswa
+- Quick stats (subjects, pending assignments, progress)
+- Recent activities
+- Quick action buttons
+- Responsive design
+```
+
+---
+
+## ✅ **Keuntungan Pendekatan Bertahap**
+
+### **1. Manageable Scope**
+- Setiap chat fokus pada 1 fitur spesifik
+- Lebih mudah di-review dan test
+- Menghindari overwhelm
+
+### **2. Iterative Improvement** 
+- Bisa feedback dan revisi per fitur
+- Testing lebih mudah
+- Debugging lebih fokus
+
+### **3. Consistent Integration**
+- Memastikan setiap fitur terintegrasi dengan baik
+- API integration yang tepat
+- Styling yang konsisten
+
+### **4. Progress Tracking**
+- Bisa track progress secara jelas
+- Milestone yang terukur
+- Motivasi development
+
+---
+
+## 🚀 **Rekomendasi Urutan Prioritas**
+
+### **Critical Path (Harus ada):**
+1. **StudentLayout + Routing** ⭐⭐⭐
+2. **Student Dashboard** ⭐⭐⭐  
+3. **My Subjects** ⭐⭐⭐
+4. **Material Viewer** ⭐⭐⭐
+5. **Quiz Interface** ⭐⭐
+6. **Assignment Submission** ⭐⭐
+
+### **Enhancement (Nice to have):**
+7. Progress Analytics ⭐
+8. Group Collaboration ⭐
+9. Achievement System ⭐
+
+---
+
+## 💡 **Tips untuk Chat yang Efektif**
+
+### **DO:**
+- ✅ Request 1 fitur lengkap per chat
+- ✅ Sebutkan integration points yang spesifik
+- ✅ Minta contoh penggunaan dan testing
+- ✅ Tanyakan best practices untuk fitur tersebut
+
+### **DON'T:**
+- ❌ Request seluruh student interface sekaligus
+- ❌ Minta multiple fitur unrelated dalam 1 chat
+- ❌ Skip testing dan integration details
+
+---
+
+**Jadi recommendation saya: Mulai dari Chat 1 dengan StudentLayout + Routing, lalu lanjut bertahap sesuai urutan prioritas di atas.**
+
+**Apakah Anda siap memulai dengan Phase 1 - Chat 1: StudentLayout dan Routing setup?**
+
+
+Collecting workspace informationBerdasarkan analisis workspace dan rancangan di steps.txt, berikut **10 prompt berkelanjutan** yang akan menciptakan Student Interface yang konsisten, sempurna, dan terintegrasi dengan backend existing:
+
+---
+
+## 🎯 **CHAT 1: Foundation & Routing Setup**
+
+```
+Saya ingin implement StudentLayout dan routing untuk Student Interface PramLearn.
+
+Tolong buatkan:
+1. StudentLayout.jsx - layout khusus untuk student dengan sidebar navigation
+2. Routing structure di App.jsx untuk /student routes
+3. StudentNavigation.jsx - sidebar navigation component
+4. Integration dengan AuthContext existing
+
+Fokus pada:
+- Design konsisten dengan existing admin/teacher layout dari ClassManagement dan SubjectManagement
+- Navigation menu: Dashboard, My Subjects, Assessments, Progress, Group
+- Responsive design untuk mobile (collapsible sidebar)
+- Role-based access control (hanya role 3/student)
+- Breadcrumb navigation
+- Loading states dan error handling
+
+Style requirements:
+- Gunakan color scheme yang sama (#11418b untuk primary)
+- Konsisten dengan Ant Design theme existing
+- Mobile-first responsive design
+- Sidebar collapsible untuk mobile
+
+API Integration:
+- Gunakan AuthContext existing untuk user data
+- Implement route protection untuk student role
+- Handle redirect jika bukan student
+
+Backend Check:
+- Apakah endpoint authentication sudah support role-based routing?
+- Apakah perlu endpoint khusus /api/student/profile/ untuk data student?
+- Check existing role enum: 1=admin, 2=teacher, 3=student di CustomUser model
+```
+
+---
+
+## 🎯 **CHAT 2: Student Dashboard**
+
+```
+Saya ingin implement Student Dashboard sebagai homepage untuk siswa.
+
+Tolong buatkan:
+1. StudentDashboard.jsx - main dashboard component
+2. WelcomeCard.jsx - welcome section dengan user info
+3. QuickStatsCard.jsx - statistik cepat siswa
+4. RecentActivitiesCard.jsx - aktivitas terbaru
+5. useStudentDashboard.js - custom hook untuk data fetching
+
+Fokus pada:
+- Welcome card dengan nama siswa dan avatar (konsisten dengan existing user management)
+- Quick stats: Total subjects, pending assignments, quiz available, overall progress
+- Recent activities: Last opened materials, recent quiz results, upcoming deadlines
+- Quick action buttons: Access subjects, view assignments, check grades
+- Notification center untuk announcements
+- Today's schedule jika ada
+
+Data yang dibutuhkan:
+- Student info dari AuthContext
+- Subjects yang diikuti siswa (dari class-student relationship)
+- Assignment/quiz yang pending
+- Recent activities
+- Overall progress statistics
+
+API Integration:
+- Gunakan existing API pattern dari api.js
+- Endpoints needed: /api/student/dashboard/, /api/student/subjects/enrolled/, /api/student/assignments/pending/
+- Implement loading states dengan skeleton (konsisten dengan existing components)
+- Error handling dengan fallback UI
+
+Backend Check:
+- Apakah endpoint /api/student/dashboard/ sudah ada?
+- Perlu tambah endpoint untuk enrolled subjects: /api/student/subjects/enrolled/
+- Perlu endpoint pending assignments: /api/student/assignments/pending/
+- Check existing ClassStudent model di backendpramlearn/pramlearnapp/models/classes.py
+
+Style:
+- Grid layout dengan cards (seperti existing management interfaces)
+- Responsive untuk mobile/desktop
+- Loading skeletons konsisten dengan ClassManagement/SubjectManagement
+- Empty states yang informatif
+```
+
+---
+
+## 🎯 **CHAT 3: My Subjects (Student View)**
+
+```
+Saya ingin implement My Subjects untuk student - daftar mata pelajaran yang diikuti siswa.
+
+Tolong buatkan:
+1. StudentSubjectList.jsx - list subjects untuk student
+2. SubjectCard.jsx - card component untuk setiap subject
+3. SubjectDetailStudent.jsx - detail view untuk subject tertentu
+4. useStudentSubjects.js - hook untuk fetch subjects data
+
+Fokus pada:
+- List subjects yang diikuti student berdasarkan ClassStudent relationship
+- Subject card dengan: nama, teacher, progress bar, recent materials, material count
+- Material list per subject dengan completion status
+- Quick access ke materials terbaru
+- Search dan filter functionality
+- Progress visualization per subject
+
+Data requirements:
+- Student's enrolled subjects dari ClassStudent model
+- Material progress per subject (perlu StudentMaterialProgress model)
+- Teacher information dari Subject relationship
+- Last accessed materials
+- Completion percentages
+
+API Integration:
+- Endpoint: /api/student/subjects/ (filter by current student via ClassStudent)
+- Progress tracking: /api/student/materials/progress/
+- Integrate dengan existing Subject dan Material models
+- Consistent error handling seperti SubjectManagement
+
+Backend Check:
+- Apakah perlu model baru StudentMaterialProgress untuk tracking?
+- Check existing Subject model relationship dengan ClassStudent
+- Perlu endpoint /api/student/subjects/ yang filter by student
+- Perlu endpoint /api/student/materials/:id/progress/ untuk tracking
+
+Style:
+- Card-based layout seperti existing management interfaces
+- Progress bars dengan color coding (green/orange/red)
+- Hover effects dan animations
+- Mobile responsive grid
+- Loading states konsisten dengan existing patterns
+```
+
+---
+
+## 🎯 **CHAT 4: Material Viewer Student**
+
+```
+Saya ingin implement Material Viewer untuk student mengakses konten pembelajaran.
+
+Tolong buatkan:
+1. StudentMaterialViewer.jsx - main viewer component for students
+2. StudentPDFViewer.jsx - PDF viewer dengan progress tracking
+3. StudentVideoPlayer.jsx - YouTube video dengan resume feature
+4. MaterialProgressTracker.jsx - track completion dan time spent
+5. useStudentMaterialAccess.js - hook untuk material access dan progress
+
+Fokus pada:
+- PDF viewer dengan zoom, navigation, auto-save progress
+- YouTube video embed dengan resume from last position
+- Google Forms embed support
+- Progress tracking otomatis (time spent, completion percentage)
+- Bookmark dan notes functionality (basic)
+- Mobile-friendly interface
+
+Features:
+- Auto-save progress setiap 10 detik atau saat user scroll/watch
+- Completion status berdasarkan time spent atau scroll percentage
+- Last position resume untuk video dan PDF
+- Simple bookmark functionality
+- Responsive design untuk semua screen sizes
+
+API Integration:
+- Material content dari existing Material API
+- Progress tracking: POST /api/student/materials/:id/progress/
+- Bookmark: POST /api/student/materials/:id/bookmark/
+- Resume position: GET/PUT /api/student/materials/:id/position/
+
+Backend Check:
+- Perlu model StudentMaterialAccess untuk tracking:
+  - student, material, last_position, time_spent, completion_percentage, bookmarks
+- Perlu model StudentMaterialBookmark untuk bookmarks
+- Endpoints needed: 
+  - POST /api/student/materials/:id/access/ (record access)
+  - PUT /api/student/materials/:id/progress/ (update progress)
+  - GET/POST /api/student/materials/:id/bookmarks/
+
+Style:
+- Full-screen viewer mode option
+- Clean, distraction-free interface
+- Progress indicator di bottom bar
+- Mobile gesture support (swipe, pinch-zoom)
+- Consistent dengan existing material management UI
+```
+
+---
+
+## 🎯 **CHAT 5: Assessment Center - Quiz Interface**
+
+```
+Saya ingin implement Quiz Taking Interface untuk student mengerjakan quiz.
+
+Tolong buatkan:
+1. StudentQuizList.jsx - list available quizzes untuk student
+2. QuizTakingInterface.jsx - interface untuk mengerjakan quiz
+3. QuizTimer.jsx - countdown timer component
+4. QuizNavigation.jsx - question navigation sidebar
+5. useStudentQuizAttempt.js - hook untuk quiz attempt management
+
+Fokus pada:
+- List quiz yang available untuk student berdasarkan group assignment
+- Quiz taking interface dengan timer dan auto-save
+- Question navigation (previous/next, jump to question, flag for review)
+- Auto-submit saat timer habis
+- Real-time answer saving setiap perubahan
+- Mobile-friendly interface dengan touch support
+
+Features:
+- Quiz attempt tracking (start time, end time, answers)
+- Auto-save answers setiap 5 detik
+- Timer dengan visual countdown dan warning
+- Question flagging untuk review
+- Submit confirmation dialog
+- Results display setelah submit dengan ranking
+
+API Integration:
+- Available quizzes: GET /api/student/quizzes/available/ (dari GroupQuiz assignment)
+- Quiz attempt: POST /api/student/quiz/:id/attempt/
+- Submit answers: PUT /api/student/quiz-attempt/:id/answers/
+- Submit quiz: POST /api/student/quiz-attempt/:id/submit/
+- Get results: GET /api/student/quiz-attempt/:id/results/
+
+Backend Check:
+- Check existing GroupQuiz model untuk assignment ke student
+- Perlu model StudentQuizAttempt:
+  - student, quiz, start_time, end_time, submitted_at, score
+- Perlu model StudentQuizAnswer:
+  - attempt, question, selected_answer, is_correct
+- Endpoints yang perlu ditambah:
+  - /api/student/quizzes/available/ (filter by student's groups)
+  - /api/student/quiz/:id/attempt/ (create attempt)
+  - /api/student/quiz-attempt/:id/submit/ (final submit)
+
+Style:
+- Clean, focus-friendly interface
+- Timer di top-right corner yang sticky
+- Question navigation sidebar (collapsible di mobile)
+- Answer selection dengan clear visual feedback
+- Mobile-responsive layout dengan touch-friendly buttons
+- Success/error feedback konsisten dengan existing UI
+```
+
+---
+
+## 🎯 **CHAT 6: Assignment Submission Interface**
+
+```
+Saya ingin implement Assignment Submission Interface untuk student mengumpulkan tugas.
+
+Tolong buatkan:
+1. StudentAssignmentList.jsx - list available assignments
+2. AssignmentSubmissionForm.jsx - form untuk submit assignment
+3. StudentFileUpload.jsx - file upload component dengan preview
+4. SubmissionHistory.jsx - history submissions student
+5. useStudentAssignmentSubmission.js - hook untuk submission management
+
+Fokus pada:
+- List assignments dengan due date countdown dan status
+- Multi-choice question answering untuk assignment questions
+- File upload support (multiple files, drag & drop)
+- Text answer input untuk essay questions
+- Draft saving functionality (auto-save setiap 30 detik)
+- Submission history dan teacher feedback viewing
+
+Features:
+- Drag & drop file upload dengan preview
+- Multiple file support dengan size validation
+- Draft auto-save sebelum final submit
+- Due date countdown dengan color coding
+- Submission status tracking (draft, submitted, graded)
+- Teacher feedback dan grade viewing
+
+API Integration:
+- Available assignments: GET /api/student/assignments/available/
+- Assignment questions: GET /api/student/assignment/:id/questions/
+- Submit assignment: POST /api/student/assignment/:id/submit/
+- Draft save: PUT /api/student/assignment/:id/draft/
+- Get feedback: GET /api/student/assignment/:id/submission/
+
+Backend Check:
+- Check existing Assignment dan AssignmentQuestion models
+- Perlu model StudentAssignmentSubmission (sudah ada di AssignmentSubmissionTable)
+- Perlu model StudentAssignmentAnswer:
+  - submission, question, answer_text, uploaded_files
+- Model StudentAssignmentDraft untuk auto-save:
+  - student, assignment, draft_answers, last_saved
+- Endpoints yang perlu:
+  - /api/student/assignments/available/ (filter available untuk student)
+  - /api/student/assignment/:id/draft/ (save/load draft)
+
+Style:
+- Form layout konsisten dengan existing AssignmentModal
+- File upload dengan drag-drop visual feedback
+- Due date dengan prominent countdown
+- Mobile-friendly file upload interface
+- Progress indicators untuk upload
+- Success/error messages konsisten dengan existing UI
+```
+
+---
+
+## 🎯 **CHAT 7: Grade & Results Viewer**
+
+```
+Saya ingin implement Grade & Results Viewer untuk student melihat nilai dan feedback.
+
+Tolong buatkan:
+1. StudentGradeOverview.jsx - overview semua grades
+2. QuizResultsDetail.jsx - detail hasil quiz dengan review
+3. AssignmentFeedback.jsx - feedback assignment dari teacher
+4. GradeChart.jsx - visualisasi progress grades
+5. useStudentGrades.js - hook untuk grades data
+
+Fokus pada:
+- Overview grades per subject dan overall GPA calculation
+- Detail quiz results dengan correct/incorrect answers dan explanations
+- Assignment feedback dengan teacher comments dan rubric
+- Grade trends dan performance analytics over time
+- Subject-wise performance comparison
+- Mobile-friendly charts dan tables
+
+Features:
+- Grade filtering by subject, date range, assessment type
+- Performance trends visualization dengan line charts
+- Detailed quiz review dengan question-by-question analysis
+- Assignment feedback dengan file annotations (jika ada)
+- Download grade reports (PDF/Excel)
+- Achievement badges untuk milestones
+
+API Integration:
+- Student grades: GET /api/student/grades/
+- Quiz results detail: GET /api/student/quiz-attempt/:id/review/
+- Assignment feedback: GET /api/student/assignment-submission/:id/feedback/
+- Grade analytics: GET /api/student/analytics/grade-trends/
+- Subject performance: GET /api/student/subjects/:id/performance/
+
+Backend Check:
+- Check existing grade calculation di QuizAttempt dan AssignmentSubmission
+- Perlu endpoint agregasi: /api/student/grades/ yang combine quiz + assignment
+- Perlu StudentGradeAnalytics model atau computed endpoints:
+  - Grade trends over time
+  - Subject-wise performance
+  - Achievement tracking
+- Endpoints yang perlu:
+  - /api/student/analytics/grade-trends/
+  - /api/student/subjects/:id/performance/
+
+Style:
+- Table layout konsisten dengan existing tables
+- Charts menggunakan recharts atau antd charts
+- Color coding untuk grades (green ≥80, orange 60-79, red <60)
+- Mobile-responsive tables dengan horizontal scroll
+- Loading states untuk charts dan tables
+- Empty states yang informatif
+```
+
+---
+
+## 🎯 **CHAT 8: Progress Analytics Dashboard**
+
+```
+Saya ingin implement Progress Analytics untuk student tracking kemajuan belajar.
+
+Tolong buatkan:
+1. StudentProgressOverview.jsx - main analytics dashboard
+2. SubjectProgressChart.jsx - progress per subject dengan charts
+3. AttendanceVisualization.jsx - attendance visualization
+4. LearningAnalytics.jsx - learning behavior analytics
+5. useStudentAnalytics.js - hook untuk analytics data
+
+Fokus pada:
+- Overall learning progress dengan completion percentages
+- Subject-wise progress tracking dengan visual charts
+- Attendance patterns dan trends over time
+- Learning behavior analytics (time spent, access patterns)
+- Achievement system dengan badges dan milestones
+- Comparative performance (optional, anonymized)
+
+Features:
+- Progress visualization dengan donut/bar charts
+- Attendance calendar heatmap
+- Time spent analysis per subject/material
+- Learning streak tracking
+- Goal setting dan achievement tracking
+- Weekly/monthly progress reports
+
+API Integration:
+- Overall progress: GET /api/student/analytics/overview/
+- Subject progress: GET /api/student/analytics/subjects/
+- Attendance data: GET /api/student/attendance/
+- Learning behavior: GET /api/student/analytics/behavior/
+- Achievements: GET /api/student/achievements/
+
+Backend Check:
+- Check existing StudentAttendance model di backendpramlearn/pramlearnapp/models/attedance.py
+- Perlu model StudentLearningAnalytics:
+  - student, date, time_spent, materials_accessed, subjects_studied
+- Perlu model StudentAchievement:
+  - student, achievement_type, earned_date, badge_icon
+- Endpoints yang perlu:
+  - /api/student/analytics/overview/ (aggregate all data)
+  - /api/student/analytics/behavior/ (learning patterns)
+  - /api/student/achievements/ (badges dan milestones)
+
+Style:
+- Dashboard layout dengan cards dan charts
+- Responsive charts untuk mobile
+- Color-coded progress indicators
+- Interactive charts dengan hover details
+- Achievement badges dengan attractive design
+- Loading states untuk semua charts
+```
+
+---
+
+## 🎯 **CHAT 9: Group Collaboration Interface**
+
+```
+Saya ingin implement Group Collaboration Interface untuk student berinteraksi dengan kelompok.
+
+Tolong buatkan:
+1. StudentGroupDashboard.jsx - overview group information
+2. GroupMembersView.jsx - view group members dan profiles
+3. GroupQuizResults.jsx - group quiz results dan rankings
+4. GroupActivities.jsx - group activities dan achievements
+5. useStudentGroup.js - hook untuk group data
+
+Fokus pada:
+- My group information dengan member list dan profiles
+- Group quiz results dengan individual dan group rankings
+- Group activities history dan collaborative achievements
+- Group performance comparison dengan other groups
+- Basic group communication (optional)
+- Group goal tracking dan milestones
+
+Features:
+- Group member profiles dengan ARCS motivation info
+- Quiz ranking dalam group dan antar group
+- Group achievement system
+- Activity timeline untuk group
+- Performance analytics untuk group
+- Group study sessions tracking (optional)
+
+API Integration:
+- My group info: GET /api/student/group/
+- Group members: GET /api/student/group/members/
+- Group quiz results: GET /api/student/group/quiz-results/
+- Group activities: GET /api/student/group/activities/
+- Group rankings: GET /api/student/group/rankings/
+
+Backend Check:
+- Check existing Group model dan GroupMember di material management
+- Check existing GroupQuiz dan GroupQuizAssignment
+- Perlu model GroupActivity untuk tracking:
+  - group, activity_type, description, timestamp, participants
+- Perlu endpoint agregasi untuk group data:
+  - /api/student/group/ (current student's group)
+  - /api/student/group/rankings/ (quiz rankings)
+
+Style:
+- Card-based layout untuk group info
+- Member cards dengan avatars dan motivation profiles
+- Ranking tables dengan leaderboard style
+- Activity timeline dengan icons
+- Charts untuk group performance
+- Mobile-friendly layout
+```
+
+---
+
+## 🎯 **CHAT 10: Notification & Communication System**
+
+```
+Saya ingin implement Notification & Communication System untuk student interface.
+
+Tolong buatkan:
+1. StudentNotificationCenter.jsx - notification management
+2. AnnouncementList.jsx - pengumuman dari teacher/admin
+3. NotificationBell.jsx - notification bell dengan badge
+4. CommunicationHub.jsx - basic communication features
+5. useStudentNotifications.js - hook untuk notifications
+
+Fokus pada:
+- Real-time notifications untuk deadlines, grades, announcements
+- Notification center dengan categorization
+- Announcement system dari teachers
+- Due date reminders dan urgent notifications
+- Notification preferences dan settings
+- Basic messaging system (optional)
+
+Features:
+- Real-time notification dengan WebSocket
+- Notification categorization (grades, deadlines, announcements)
+- Mark as read/unread functionality
+- Notification history dengan search
+- Push notification support (basic)
+- Email digest preferences
+
+API Integration:
+- Notifications: GET /api/student/notifications/
+- Mark read: PUT /api/student/notifications/:id/read/
+- Announcements: GET /api/student/announcements/
+- Notification settings: GET/PUT /api/student/notification-settings/
+
+Backend Check:
+- Perlu model StudentNotification:
+  - student, title, message, type, is_read, created_at, related_object
+- Perlu model Announcement:
+  - author, title, content, target_audience, created_at
+- WebSocket integration untuk real-time notifications
+- Endpoints yang perlu:
+  - /api/student/notifications/ (CRUD operations)
+  - /api/student/announcements/ (read-only)
+
+Style:
+- Notification bell dengan badge counter
+- Dropdown notification list
+- Categorized notification center
+- Timeline view untuk announcements
+- Mobile-friendly notification interface
+- Consistent dengan existing UI patterns
+
+Integration:
+- WebSocket connection untuk real-time updates
+- Integration dengan existing AuthContext
+- Notification triggers dari quiz submissions, grade updates, etc.
+```
+
+---
+
+## 📋 **Summary Backend Requirements**
+
+### **Models Baru yang Diperlukan:**
+1. **StudentMaterialAccess** - tracking material access dan progress
+2. **StudentQuizAttempt** - quiz attempts dan scores
+3. **StudentQuizAnswer** - individual quiz answers
+4. **StudentAssignmentDraft** - auto-save draft submissions
+5. **StudentLearningAnalytics** - learning behavior tracking
+6. **StudentAchievement** - achievement dan badges
+7. **StudentNotification** - notification system
+8. **GroupActivity** - group activity tracking
+
+### **Endpoints Baru yang Diperlukan:**
+- `/api/student/dashboard/` - dashboard data
+- `/api/student/subjects/enrolled/` - enrolled subjects
+- `/api/student/materials/:id/progress/` - material progress
+- `/api/student/quizzes/available/` - available quizzes
+- `/api/student/analytics/overview/` - analytics data
+- `/api/student/group/` - group information
+- `/api/student/notifications/` - notifications
+
+Setiap chat akan mengecek backend requirements dan memberikan exact file locations yang perlu dimodifikasi!
