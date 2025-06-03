@@ -1,15 +1,6 @@
 import React from "react";
-import { Card, Typography } from "antd";
+import StudentSubjectList from "./StudentSubjectList";
 
-const { Title } = Typography;
-
-const StudentSubjects = () => {
-  return (
-    <Card>
-      <Title level={2}>My Subjects</Title>
-      <p>My Subjects page will be implemented in the next chat.</p>
-    </Card>
-  );
-};
+const StudentSubjects = () => <StudentSubjectList />;
 
 export default StudentSubjects;
