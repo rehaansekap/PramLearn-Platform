@@ -30,6 +30,7 @@ from pramlearnapp.views.teacher.assignmentViewSet import (
 from pramlearnapp.views.teacher.relatedUsersView import RelatedUsersForTeacherView, CurrentUserView
 from pramlearnapp.views.student.studentDashboardView import StudentDashboardView
 from pramlearnapp.views.student.studentSubjectsView import StudentSubjectsView
+from pramlearnapp.views.student.quizViewSet import StudentAvailableQuizzesView, StudentQuizDetailView, StudentQuizAttemptView, StudentQuizAnswersView, StudentQuizSubmitView, StudentQuizResultsView
 
 __all__ = [
     # Admin
@@ -45,5 +46,5 @@ __all__ = [
     "ClassDetailPage", "ClassWithStudentsViewSet", "SubjectClassViewSet", "SubjectClassDetail",
     "AssignmentViewSet", "AssignmentSubmissionViewSet", "AssignmentQuestionViewSet", "AssignmentAnswerViewSet",
     "SubmitAssignmentView", "RelatedUsersForTeacherView", "CurrentUserView", "QuizRankingView", "StudentDashboardView",
-    "StudentSubjectsView",
+    "StudentSubjectsView", "StudentAvailableQuizzesView", "StudentQuizDetailView", "StudentQuizAttemptView", "StudentQuizAnswersView", "StudentQuizSubmitView", "StudentQuizResultsView"
 ]

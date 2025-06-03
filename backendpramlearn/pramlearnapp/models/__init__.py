@@ -2,7 +2,7 @@ from .user import Role, CustomUser, StudentMotivationProfile
 from .classes import Class, ClassStudent
 from .subject import Subject, SubjectClass
 from .group import Group, GroupMember, GroupQuiz, GroupQuizSubmission, GroupQuizResult
-from .quiz import Quiz, Question
+from .quiz import Quiz, Question, StudentQuizAttempt, StudentQuizAnswer
 from .assignment import Assignment, AssignmentSubmission, AssignmentQuestion, AssignmentAnswer
 from .material import Material, File, MaterialYoutubeVideo
 from .attedance import StudentAttendance
@@ -30,4 +30,6 @@ __all__ = [
     "File",
     "MaterialYoutubeVideo",
     "StudentAttendance"
+    "StudentQuizAttempt",
+    "StudentQuizAnswer",
 ]
