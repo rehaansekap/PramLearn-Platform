@@ -21,6 +21,7 @@ import {
   LogoutOutlined,
   UserOutlined,
   LoadingOutlined,
+  TrophyOutlined, // Add this import
 } from "@ant-design/icons";
 import Swal from "sweetalert2";
 import StudentBreadcrumb from "../components/StudentBreadcrumb";
@@ -93,40 +94,49 @@ const StudentLayout = () => {
 
   const menuItems = [
     {
-      key: "dashboard",
+      key: "/student",
       icon: <DashboardOutlined />,
       label: <Link to="/student">Dashboard</Link>,
     },
     {
-      key: "subjects",
+      key: "/student/subjects",
       icon: <BookOutlined />,
       label: <Link to="/student/subjects">My Subjects</Link>,
     },
     {
-      key: "assessments",
+      key: "/student/assessments",
       icon: <FileTextOutlined />,
       label: <Link to="/student/assessments">Assessments</Link>,
     },
     {
-      key: "progress",
-      icon: <BarChartOutlined />,
-      label: <Link to="/student/progress">Progress</Link>,
+      key: "/student/assignments",
+      icon: <FileTextOutlined />,
+      label: <Link to="/student/assignments">Assignments</Link>,
     },
     {
-      key: "group",
-      icon: <TeamOutlined />,
-      label: <Link to="/student/group">My Group</Link>,
+      key: "/student/grades",
+      icon: <TrophyOutlined />,
+      label: <Link to="/student/grades">Grades & Results</Link>,
+    },
+    {
+      key: "/student/progress",
+      icon: <BarChartOutlined />,
+      label: <Link to="/student/progress">My Progress</Link>,
     },
   ];
 
   // Get selected menu key from current path
   const getMenuKeyFromPath = (pathname) => {
-    if (pathname === "/student" || pathname === "/student/") return "dashboard";
-    if (pathname.startsWith("/student/subjects")) return "subjects";
-    if (pathname.startsWith("/student/assessments")) return "assessments";
-    if (pathname.startsWith("/student/progress")) return "progress";
-    if (pathname.startsWith("/student/group")) return "group";
-    return "dashboard";
+    // Handle exact matches first
+    if (pathname === "/student" || pathname === "/student/") return "/student";
+    if (pathname.startsWith("/student/subjects")) return "/student/subjects";
+    if (pathname.startsWith("/student/assessments"))
+      return "/student/assessments";
+    if (pathname.startsWith("/student/assignments"))
+      return "/student/assignments";
+    if (pathname.startsWith("/student/grades")) return "/student/grades";
+    if (pathname.startsWith("/student/progress")) return "/student/progress";
+    return "/student";
   };
 
   const selectedMenuKey = getMenuKeyFromPath(location.pathname);

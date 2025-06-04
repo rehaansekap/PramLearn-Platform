@@ -34,6 +34,7 @@ import StudentQuizList from "./features/student-interface/assessments/StudentQui
 import QuizTakingInterface from "./features/student-interface/assessments/components/QuizTakingInterface";
 import QuizResultsPage from "./features/student-interface/assessments/components/QuizResultsPage";
 import StudentAssignments from "./features/student-interface/assignments/StudentAssignments";
+import StudentGradeOverview from "./features/student-interface/grades/StudentGradeOverview";
 
 const RedirectIfAuthenticated = ({ children }) => {
   const { token, loading } = useContext(AuthContext);
@@ -79,11 +80,12 @@ const AppRoutes = () => {
             />{" "}
             {/* Changed from :quizId to :quizSlug */}
             <Route
-            path="quiz/:quizSlug/results"
+              path="quiz/:quizSlug/results"
               element={<QuizResultsPage />}
             />{" "}
             {/* Changed from :quizId to :quizSlug */}
             <Route path="assignments" element={<StudentAssignments />} />
+            <Route path="grades" element={<StudentGradeOverview />} />
             <Route path="progress" element={<StudentProgress />} />
             <Route path="group" element={<StudentGroup />} />
           </Route>

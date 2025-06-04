@@ -18,7 +18,8 @@ from pramlearnapp.views import (RoleViewSet, UserViewSet, RegisterView, LoginVie
                                 AutoGroupStudentsView, AssignQuizToGroupsView, GroupQuizViewSet, SubmitAssignmentView, RelatedUsersForTeacherView,
                                 MaterialAttendanceListView, update_attendance, bulk_create_attendance, QuizRankingView, StudentDashboardView, StudentSubjectsView,
                                 StudentAvailableQuizzesView, StudentQuizDetailView, StudentQuizAttemptView, StudentQuizAnswersView, StudentQuizSubmitView, StudentQuizResultsView,
-                                StudentAvailableAssignmentsView, StudentAssignmentQuestionsView, StudentAssignmentDraftView, StudentAssignmentSubmitView, StudentAssignmentSubmissionsView
+                                StudentAvailableAssignmentsView, StudentAssignmentQuestionsView, StudentAssignmentDraftView, StudentAssignmentSubmitView, StudentAssignmentSubmissionsView,
+                                StudentGradesView, StudentGradeAnalyticsView, QuizAttemptReviewView, AssignmentSubmissionFeedbackView,
                                 )
 
 from pramlearnapp.views.teacher.relatedUsersView import CurrentUserView
@@ -84,6 +85,13 @@ urlpatterns = [
     path('api/student/assignment/<int:assignment_id>/submissions/',
          StudentAssignmentSubmissionsView.as_view(),
          name='student-assignment-submissions'),
+    path('api/student/grades/', StudentGradesView.as_view(), name='student-grades'),
+    path('api/student/analytics/grade-trends/',
+         StudentGradeAnalyticsView.as_view(), name='student-grade-analytics'),
+    path('api/student/quiz-attempt/<int:attempt_id>/review/',
+         QuizAttemptReviewView.as_view(), name='quiz-attempt-review'),
+    path('api/student/assignment-submission/<int:submission_id>/feedback/',
+         AssignmentSubmissionFeedbackView.as_view(), name='assignment-submission-feedback'),
     path('api/available-and-related-students/<int:class_id>/',
          AvailableAndRelatedStudentListView.as_view(), name='available-and-related-students'),
     path('api/subjects/<int:subject_id>/materials/',

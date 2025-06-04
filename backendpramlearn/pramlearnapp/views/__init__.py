@@ -36,6 +36,8 @@ from pramlearnapp.views.teacher.relatedUsersView import RelatedUsersForTeacherVi
 from pramlearnapp.views.student.studentDashboardView import StudentDashboardView
 from pramlearnapp.views.student.studentSubjectsView import StudentSubjectsView
 from pramlearnapp.views.student.quizViewSet import StudentAvailableQuizzesView, StudentQuizDetailView, StudentQuizAttemptView, StudentQuizAnswersView, StudentQuizSubmitView, StudentQuizResultsView
+from pramlearnapp.views.student.studentGradesView import StudentGradesView, StudentGradeAnalyticsView, QuizAttemptReviewView, AssignmentSubmissionFeedbackView
+#     Custom permissions that allow access to a view based on the model's permissions
 
 __all__ = [
     # Admin
@@ -46,6 +48,7 @@ __all__ = [
     "MaterialAttendanceListView", "update_attendance", "bulk_create_attendance",
     "StudentAvailableAssignmentsView", "StudentAssignmentQuestionsView", "StudentAssignmentDraftView",
     "StudentAssignmentSubmitView", "StudentAssignmentSubmissionsView",
+    "StudentGradesView", "StudentGradeAnalyticsView", "QuizAttemptReviewView", "AssignmentSubmissionFeedbackView",
     # Teacher
     "TeacherViewSet", "SubjectViewSet", "SubjectDetailView", "QuizViewSet", "MaterialViewSet", "MaterialDetailView",
     "AssignQuizToGroupsView", "GroupViewSet", "GroupMemberViewSet", "GroupQuizViewSet", "GroupQuizSubmissionViewSet",
