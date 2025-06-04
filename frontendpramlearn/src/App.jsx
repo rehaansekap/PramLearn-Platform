@@ -35,6 +35,7 @@ import StudentAssignments from "./features/student-interface/assignments/Student
 import StudentGradeOverview from "./features/student-interface/grades/StudentGradeOverview";
 import StudentAnalytics from "./features/student-interface/analytics/StudentAnalytics";
 import StudentGroupDashboard from "./features/student-interface/group/StudentGroupDashboard";
+import StudentNotificationCenter from "./features/student-interface/notifications/StudentNotificationCenter";
 
 const RedirectIfAuthenticated = ({ children }) => {
   const { token, loading } = useContext(AuthContext);
@@ -89,6 +90,10 @@ const AppRoutes = () => {
             <Route path="analytics" element={<StudentAnalytics />} />{" "}
             {/* Add this */}
             <Route path="group" element={<StudentGroupDashboard />} />
+            <Route
+              path="notifications"
+              element={<StudentNotificationCenter />}
+            />
           </Route>
 
           {/* Admin/Teacher Routes */}

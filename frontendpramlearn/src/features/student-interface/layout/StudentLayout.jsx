@@ -11,7 +11,7 @@ import {
   Bars3Icon,
   XMarkIcon,
 } from "@heroicons/react/24/solid";
-import { Button, Layout, Menu, theme, Drawer, Avatar, Spin } from "antd";
+import { Button, Layout, Menu, theme, Drawer, Avatar, Spin, Space } from "antd";
 import {
   DashboardOutlined,
   BookOutlined,
@@ -25,6 +25,7 @@ import {
 } from "@ant-design/icons";
 import Swal from "sweetalert2";
 import StudentBreadcrumb from "../components/StudentBreadcrumb";
+import NotificationBell from "../notifications/components/NotificationBell";
 
 const { Header, Sider, Content } = Layout;
 
@@ -280,116 +281,149 @@ const StudentLayout = () => {
   );
 
   return (
-    <Layout style={{ minHeight: "100vh" }}>
-      {/* Desktop Sidebar */}
-      {!isMobile && (
-        <Sider
-          theme="dark"
-          collapsible
-          collapsed={collapsed}
-          onCollapse={setCollapsed}
-          style={{
-            background: "#001529",
-            position: "fixed",
-            height: "100vh",
-            left: 0,
-            top: 0,
-            bottom: 0,
-            zIndex: 100,
-          }}
-          width={250}
-          collapsedWidth={80}
-        >
-          {sidebarContent}
-        </Sider>
-      )}
-
-      {/* Mobile Drawer */}
-      {isMobile && (
-        <Drawer
-          title="Student Menu"
-          placement="left"
-          closable={true}
-          onClose={() => setMobileDrawerOpen(false)}
-          open={mobileDrawerOpen}
-          width={250}
-          bodyStyle={{ padding: 0, background: "#001529" }}
-          headerStyle={{
-            background: "#001529",
-            borderBottom: "1px solid #303030",
-          }}
-          style={{ background: "#001529" }}
-        >
-          {sidebarContent}
-        </Drawer>
-      )}
-
-      {/* Main Layout */}
-      <Layout
-        style={{
-          marginLeft: isMobile ? 0 : collapsed ? 80 : 250,
-          transition: "margin-left 0.2s",
-        }}
+    <>
+      <Header
+        style={
+          {
+            /* existing styles */
+          }
+        }
       >
-        {/* Mobile Header */}
-        {isMobile && (
-          <Header
-            style={{
-              background: "#11418b",
-              padding: "0 16px",
-              position: "fixed",
-              width: "100%",
-              top: 0,
-              zIndex: 99,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <Button
-              type="text"
-              icon={<Bars3Icon className="h-6 w-6" style={{ color: "#fff" }} />}
-              onClick={() => setMobileDrawerOpen(true)}
-              style={{ color: "#fff" }}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <div style={{ color: "#fff", fontWeight: 600, fontSize: "16px" }}>
+            Student Portal
+          </div>
+          <Space>
+            <NotificationBell
+              onOpenCenter={() => navigate("/student/notifications")}
             />
-            <div style={{ color: "#fff", fontWeight: 600, fontSize: "16px" }}>
-              Student Portal
-            </div>
             <Avatar
               size={32}
               icon={<UserOutlined />}
               style={{ backgroundColor: "#ffffff20" }}
             />
-          </Header>
+          </Space>
+        </div>
+      </Header>
+      <Layout style={{ minHeight: "100vh" }}>
+        {/* Desktop Sidebar */}
+        {!isMobile && (
+          <Sider
+            theme="dark"
+            collapsible
+            collapsed={collapsed}
+            onCollapse={setCollapsed}
+            style={{
+              background: "#001529",
+              position: "fixed",
+              height: "100vh",
+              left: 0,
+              top: 0,
+              bottom: 0,
+              zIndex: 100,
+            }}
+            width={250}
+            collapsedWidth={80}
+          >
+            {sidebarContent}
+          </Sider>
         )}
 
-        {/* Breadcrumb */}
-        <Content
-          style={{
-            margin: isMobile ? "64px 12px 0px 8px" : "12px 12px 0px 8px",
-            paddingLeft: 24,
-            paddingRight: 24,
-            background: colorBgContainer,
-            borderRadius: borderRadiusLG,
-          }}
-        >
-          <StudentBreadcrumb />
-        </Content>
+        {/* Mobile Drawer */}
+        {isMobile && (
+          <Drawer
+            title="Student Menu"
+            placement="left"
+            closable={true}
+            onClose={() => setMobileDrawerOpen(false)}
+            open={mobileDrawerOpen}
+            width={250}
+            bodyStyle={{ padding: 0, background: "#001529" }}
+            headerStyle={{
+              background: "#001529",
+              borderBottom: "1px solid #303030",
+            }}
+            style={{ background: "#001529" }}
+          >
+            {sidebarContent}
+          </Drawer>
+        )}
 
-        {/* Main Content */}
-        <Content
+        {/* Main Layout */}
+        <Layout
           style={{
-            margin: "12px 12px 8px 8px",
-            padding: 24,
-            minHeight: "calc(100vh - 112px)",
-            background: colorBgContainer,
-            borderRadius: borderRadiusLG,
+            marginLeft: isMobile ? 0 : collapsed ? 80 : 250,
+            transition: "margin-left 0.2s",
           }}
         >
-          <Outlet />
-        </Content>
+          {/* Mobile Header */}
+          {isMobile && (
+            <Header
+              style={{
+                background: "#11418b",
+                padding: "0 16px",
+                position: "fixed",
+                width: "100%",
+                top: 0,
+                zIndex: 99,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <Button
+                type="text"
+                icon={
+                  <Bars3Icon className="h-6 w-6" style={{ color: "#fff" }} />
+                }
+                onClick={() => setMobileDrawerOpen(true)}
+                style={{ color: "#fff" }}
+              />
+              <div style={{ color: "#fff", fontWeight: 600, fontSize: "16px" }}>
+                Student Portal
+              </div>
+              <Avatar
+                size={32}
+                icon={<UserOutlined />}
+                style={{ backgroundColor: "#ffffff20" }}
+              />
+            </Header>
+          )}
+
+          {/* Breadcrumb */}
+          <Content
+            style={{
+              margin: isMobile ? "64px 12px 0px 8px" : "12px 12px 0px 8px",
+              paddingLeft: 24,
+              paddingRight: 24,
+              background: colorBgContainer,
+              borderRadius: borderRadiusLG,
+            }}
+          >
+            <StudentBreadcrumb />
+          </Content>
+
+          {/* Main Content */}
+          <Content
+            style={{
+              margin: "12px 12px 8px 8px",
+              padding: 24,
+              minHeight: "calc(100vh - 112px)",
+              background: colorBgContainer,
+              borderRadius: borderRadiusLG,
+            }}
+          >
+            <Outlet />
+          </Content>
+        </Layout>
       </Layout>
-    </Layout>
+    </>
   );
 };
 
