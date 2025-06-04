@@ -27,7 +27,6 @@ import "./App.css";
 import StudentDashboard from "./features/student-interface/dashboard/StudentDashboard";
 import StudentSubjects from "./features/student-interface/subjects/StudentSubjects";
 import StudentAssessments from "./features/student-interface/assessments/StudentAssessments";
-import StudentProgress from "./features/student-interface/progress/StudentProgress";
 import StudentGroup from "./features/student-interface/group/StudentGroup";
 import StudentMaterialViewer from "./features/student-interface/materials/StudentMaterialViewer";
 import StudentQuizList from "./features/student-interface/assessments/StudentQuizList";
@@ -35,6 +34,7 @@ import QuizTakingInterface from "./features/student-interface/assessments/compon
 import QuizResultsPage from "./features/student-interface/assessments/components/QuizResultsPage";
 import StudentAssignments from "./features/student-interface/assignments/StudentAssignments";
 import StudentGradeOverview from "./features/student-interface/grades/StudentGradeOverview";
+import StudentAnalytics from "./features/student-interface/analytics/StudentAnalytics";
 
 const RedirectIfAuthenticated = ({ children }) => {
   const { token, loading } = useContext(AuthContext);
@@ -85,8 +85,9 @@ const AppRoutes = () => {
             />{" "}
             {/* Changed from :quizId to :quizSlug */}
             <Route path="assignments" element={<StudentAssignments />} />
-            <Route path="grades" element={<StudentGradeOverview />} />
-            <Route path="progress" element={<StudentProgress />} />
+            <Route path="grades" element={<StudentGradeOverview />} />{" "}
+            <Route path="analytics" element={<StudentAnalytics />} />{" "}
+            {/* Add this */}
             <Route path="group" element={<StudentGroup />} />
           </Route>
 

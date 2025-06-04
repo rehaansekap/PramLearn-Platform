@@ -123,6 +123,11 @@ const StudentLayout = () => {
       icon: <BarChartOutlined />,
       label: <Link to="/student/progress">My Progress</Link>,
     },
+    {
+      key: "/student/analytics",
+      icon: <BarChartOutlined />,
+      label: <Link to="/student/analytics">Learning Analytics</Link>,
+    },
   ];
 
   // Get selected menu key from current path
