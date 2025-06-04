@@ -1,0 +1,142 @@
+/* Group Dashboard Styles */
+.group-dashboard {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+/* Member Cards */
+.member-card {
+  transition: all 0.3s ease;
+  border-radius: 12px;
+}
+
+.member-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.member-card.current-user {
+  border: 2px solid #1890ff;
+  background: linear-gradient(135deg, #f6ffed 0%, #ffffff 100%);
+}
+
+/* Activity Timeline */
+.activity-timeline .ant-timeline-item-head {
+  background-color: transparent;
+}
+
+.activity-card {
+  transition: all 0.2s ease;
+  border-radius: 8px;
+}
+
+.activity-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Quiz Results */
+.quiz-results-table .ant-table-tbody > tr.current-group-row {
+  background-color: #f6ffed !important;
+}
+
+.quiz-results-table .ant-table-tbody > tr.current-group-row:hover {
+  background-color: #f6ffed !important;
+}
+
+/* Rank Styles */
+.rank-gold {
+  color: #faad14;
+  font-weight: bold;
+}
+
+.rank-silver {
+  color: #52c41a;
+  font-weight: bold;
+}
+
+.rank-bronze {
+  color: #ff7a45;
+  font-weight: bold;
+}
+
+/* Performance Chart */
+.performance-stat {
+  text-align: center;
+  padding: 16px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 100%);
+}
+
+/* Achievement Badges */
+.achievement-unlocked {
+  background: linear-gradient(135deg, #f6ffed 0%, #ffffff 100%);
+  border: 1px solid #52c41a;
+  animation: achievement-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes achievement-glow {
+  from {
+    box-shadow: 0 0 5px rgba(82, 196, 26, 0.3);
+  }
+  to {
+    box-shadow: 0 0 15px rgba(82, 196, 26, 0.6);
+  }
+}
+
+.achievement-locked {
+  background-color: #fafafa;
+  border: 1px solid #d9d9d9;
+  opacity: 0.7;
+}
+
+/* Group Header */
+.group-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.group-header .ant-statistic-title {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.group-header .ant-statistic-content {
+  color: white;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .group-dashboard {
+    padding: 8px;
+  }
+
+  .member-card {
+    margin-bottom: 12px;
+  }
+
+  .group-stats {
+    text-align: center;
+  }
+}
+
+/* Loading States */
+.group-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  flex-direction: column;
+}
+
+/* Empty States */
+.group-empty {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.group-empty .ant-empty-img-simple {
+  margin-bottom: 16px;
+}
