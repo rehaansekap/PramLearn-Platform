@@ -21,9 +21,8 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const originalRequest = error.config;
     if (error.response && error.response.status === 401) {
-      localStorage.removeItem("token"); // Hapus token expired
+      localStorage.removeItem("token");
       window.location.href = "/login";
       return Promise.reject(error);
     }

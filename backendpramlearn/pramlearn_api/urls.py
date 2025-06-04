@@ -17,7 +17,9 @@ from pramlearnapp.views import (RoleViewSet, UserViewSet, RegisterView, LoginVie
                                 ClassDetailPage, ClassStudentDetail, StudentMotivationProfileView, UploadARCSCSVView, SubjectDetailView,
                                 AutoGroupStudentsView, AssignQuizToGroupsView, GroupQuizViewSet, SubmitAssignmentView, RelatedUsersForTeacherView,
                                 MaterialAttendanceListView, update_attendance, bulk_create_attendance, QuizRankingView, StudentDashboardView, StudentSubjectsView,
-                                StudentAvailableQuizzesView, StudentQuizDetailView, StudentQuizAttemptView, StudentQuizAnswersView, StudentQuizSubmitView, StudentQuizResultsView)
+                                StudentAvailableQuizzesView, StudentQuizDetailView, StudentQuizAttemptView, StudentQuizAnswersView, StudentQuizSubmitView, StudentQuizResultsView,
+                                StudentAvailableAssignmentsView, StudentAssignmentQuestionsView, StudentAssignmentDraftView, StudentAssignmentSubmitView, StudentAssignmentSubmissionsView
+                                )
 
 from pramlearnapp.views.teacher.relatedUsersView import CurrentUserView
 
@@ -67,6 +69,21 @@ urlpatterns = [
          StudentQuizAnswersView.as_view(), name='student-quiz-answers'),
     path('api/student/quiz-attempt/<int:attempt_id>/submit/',
          StudentQuizSubmitView.as_view(), name='student-quiz-submit'),
+    path('api/student/assignments/available/',
+         StudentAvailableAssignmentsView.as_view(),
+         name='student-available-assignments'),
+    path('api/student/assignment/<int:assignment_id>/questions/',
+         StudentAssignmentQuestionsView.as_view(),
+         name='student-assignment-questions'),
+    path('api/student/assignment/<int:assignment_id>/draft/',
+         StudentAssignmentDraftView.as_view(),
+         name='student-assignment-draft'),
+    path('api/student/assignment/<int:assignment_id>/submit/',
+         StudentAssignmentSubmitView.as_view(),
+         name='student-assignment-submit'),
+    path('api/student/assignment/<int:assignment_id>/submissions/',
+         StudentAssignmentSubmissionsView.as_view(),
+         name='student-assignment-submissions'),
     path('api/available-and-related-students/<int:class_id>/',
          AvailableAndRelatedStudentListView.as_view(), name='available-and-related-students'),
     path('api/subjects/<int:subject_id>/materials/',

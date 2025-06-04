@@ -78,8 +78,7 @@ class StudentSubjectsView(APIView):
                 "progress": progress,
                 "material_count": len(material_list),
                 "last_material_title": material_list[0]["title"] if material_list else None,
-                    "last_material_slug": material_list[0]["slug"] if material_list else None,  # Ganti dari id ke slug
-
+                "last_material_slug": material_list[0]["slug"] if material_list else None,  # Ganti dari id ke slug
                 "materials": material_list,
             })
 

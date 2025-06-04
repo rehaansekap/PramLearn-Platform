@@ -7,6 +7,11 @@ from pramlearnapp.views.student.classStudentViewSet import ClassStudentViewSet, 
 from pramlearnapp.views.student.studentMotivationProfileView import StudentMotivationProfileView, UploadARCSCSVView
 from pramlearnapp.views.student.studentViewSet import StudentViewSet
 from pramlearnapp.views.student.attendanceView import MaterialAttendanceListView, update_attendance, bulk_create_attendance
+from pramlearnapp.views.student.studentAssignmentViewSet import (
+    StudentAvailableAssignmentsView, StudentAssignmentQuestionsView,
+    StudentAssignmentDraftView, StudentAssignmentSubmitView,
+    StudentAssignmentSubmissionsView
+)
 
 from pramlearnapp.views.teacher.teacherViewSet import TeacherViewSet
 from pramlearnapp.views.teacher.subjectViewSet import SubjectViewSet, SubjectDetailView
@@ -39,6 +44,8 @@ __all__ = [
     "AvailableStudentListView", "AvailableAndRelatedStudentListView", "ClassStudentViewSet", "ClassStudentDetail",
     "StudentMotivationProfileView", "UploadARCSCSVView", "StudentViewSet",
     "MaterialAttendanceListView", "update_attendance", "bulk_create_attendance",
+    "StudentAvailableAssignmentsView", "StudentAssignmentQuestionsView", "StudentAssignmentDraftView",
+    "StudentAssignmentSubmitView", "StudentAssignmentSubmissionsView",
     # Teacher
     "TeacherViewSet", "SubjectViewSet", "SubjectDetailView", "QuizViewSet", "MaterialViewSet", "MaterialDetailView",
     "AssignQuizToGroupsView", "GroupViewSet", "GroupMemberViewSet", "GroupQuizViewSet", "GroupQuizSubmissionViewSet",

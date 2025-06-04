@@ -8,6 +8,10 @@ from pramlearnapp.serializers.student.classDetailSerializer import ClassDetailSe
 from pramlearnapp.serializers.student.motivationProfileSerializer import StudentMotivationProfileSerializer
 from pramlearnapp.serializers.student.studentSerializer import StudentSerializer, AvailableStudentSerializer
 from pramlearnapp.serializers.student.attendanceSerializer import StudentAttendanceSerializer
+from pramlearnapp.serializers.student.studentAssignmentSerializer import (
+    StudentAssignmentSerializer, StudentAssignmentSubmissionSerializer,
+    StudentAssignmentDraftSerializer
+)
 
 from pramlearnapp.serializers.teacher.teacherSerializer import TeacherSerializer
 from pramlearnapp.serializers.teacher.subjectSerializer import SubjectSerializer, SubjectDetailSerializer, SubjectClassSerializer
@@ -34,7 +38,8 @@ __all__ = [
     # Student
     "ClassStudentSerializer", "ClassSerializer", "ClassDetailSerializer",
     "StudentMotivationProfileSerializer", "StudentSerializer", "AvailableStudentSerializer",
-    "StudentAttendanceSerializer",
+    "StudentAttendanceSerializer", "StudentAssignmentSerializer", "StudentAssignmentSubmissionSerializer",
+    "StudentAssignmentDraftSerializer",
     # Teacher
     "TeacherSerializer", "SubjectSerializer", "SubjectDetailSerializer", "SubjectClassSerializer",
     "QuizSerializer", "QuestionSerializer", "MaterialSerializer", "MaterialDetailSerializer",
