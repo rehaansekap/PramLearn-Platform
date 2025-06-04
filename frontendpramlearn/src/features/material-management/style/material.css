@@ -215,6 +215,18 @@
     padding: 16px;
     margin: 12px 0;
   }
+
+  .user-table-responsive .ant-table {
+    font-size: 12px;
+  }
+
+  .user-table-responsive .ant-table-thead > tr > th {
+    font-size: 12px;
+  }
+
+  .user-table-responsive .ant-table-tbody > tr > td {
+    font-size: 12px;
+  }
 }
 
 @media (max-width: 1280px) {

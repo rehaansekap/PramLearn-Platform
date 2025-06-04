@@ -17,6 +17,15 @@ const GroupsTab = ({
 }) => {
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [membersModalVisible, setMembersModalVisible] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // Add group formation hook
   const { groupMessage, groupProcessing, handleAutoGroup } = useGroupFormation(
@@ -145,14 +154,18 @@ const GroupsTab = ({
         }}
       >
         <TeamOutlined
-          style={{ fontSize: 32, color: "#11418b", marginBottom: 12 }}
+          style={{
+            fontSize: isMobile ? 24 : 32,
+            color: "#11418b",
+            marginBottom: isMobile ? 8 : 12,
+          }}
         />
         <div style={{ marginBottom: 16 }}>
           <Typography.Title
-            level={4}
+            level={isMobile ? 5 : 4}
             style={{
               marginBottom: 8,
-              fontSize: "20px",
+              fontSize: isMobile ? "16px" : "20px",
               fontWeight: 700,
               color: "#11418b",
             }}
@@ -161,37 +174,14 @@ const GroupsTab = ({
           </Typography.Title>
           <Typography.Text
             type="secondary"
-            style={{ fontSize: "14px", color: "#666" }}
+            style={{
+              fontSize: isMobile ? "12px" : "14px",
+              color: "#666",
+            }}
           >
             Kelompok yang terbentuk dalam materi ini
           </Typography.Text>
         </div>
-
-        {/* Groups Table */}
-        {safeGroups.length === 0 ? (
-          <Empty
-            description={
-              <div style={{ marginTop: 20 }}>
-                <p style={{ fontSize: "16px", marginBottom: "8px" }}>
-                  Belum ada kelompok yang terbentuk
-                </p>
-                <p style={{ fontSize: "14px", color: "#666" }}>
-                  Gunakan fitur pembentukan kelompok di bawah untuk membuat
-                  kelompok
-                </p>
-              </div>
-            }
-          />
-        ) : (
-          <div style={{ marginBottom: 16 }}>
-            <Tag color="blue" style={{ fontSize: "14px", padding: "4px 8px" }}>
-              Total: {safeGroups.length} Kelompok
-            </Tag>
-            <Tag color="green" style={{ fontSize: "14px", padding: "4px 8px" }}>
-              Quiz Aktif: {quizzes?.length || 0}
-            </Tag>
-          </div>
-        )}
       </div>
 
       {safeGroups.length > 0 && (
@@ -208,6 +198,8 @@ const GroupsTab = ({
             style: { textAlign: "center" },
           }}
           style={{ width: "100%" }}
+          scroll={{ x: isMobile ? 600 : undefined }} // Tambahkan scroll horizontal untuk mobile
+          size="middle"
         />
       )}
 
@@ -218,6 +210,7 @@ const GroupsTab = ({
           onCreateHeterogen={() => handleAutoGroup("heterogen")}
           loading={groupProcessing}
           message={groupMessage}
+          isMobile={isMobile}
         />
       </div>
 

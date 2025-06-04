@@ -9,6 +9,7 @@ const GroupFormationSection = ({
   onCreateHeterogen,
   loading,
   message,
+  isMobile,
 }) => {
   return (
     <Card
@@ -57,55 +58,49 @@ const GroupFormationSection = ({
 
       {/* Buttons - Sesuaikan dengan QuizzesTab */}
       <div
-        style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          marginBottom: 16,
+          flexDirection: isMobile ? "column" : "row", // Responsif untuk mobile
+          gap: isMobile ? 12 : 24, // Jarak antar tombol
+        }}
       >
-        <Space size="middle" wrap>
-          <Button
-            type="primary"
-            icon={<TeamOutlined />}
-            onClick={onCreateHomogen}
-            loading={loading}
-            style={{
-              height: 40, // Sama dengan QuizzesTab
-              fontSize: 16, // Sama dengan QuizzesTab
-              fontWeight: 600, // Sama dengan QuizzesTab
-              borderRadius: 8, // Sama dengan QuizzesTab
-              padding: "0 24px", // Sama dengan QuizzesTab
-              minWidth: 140, // Sama dengan QuizzesTab
-              backgroundColor: "#1677ff",
-              borderColor: "#1677ff",
-              boxShadow: "none", // Sama dengan QuizzesTab
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            Bentuk Kelompok Homogen
-          </Button>
+        <Button
+          type="primary"
+          icon={<TeamOutlined />}
+          onClick={onCreateHomogen}
+          loading={loading}
+          style={{
+            height: 40,
+            fontSize: 16,
+            fontWeight: 600,
+            borderRadius: 8,
+            padding: "0 24px",
+            minWidth: isMobile ? "100%" : 140, // Full width di mobile
+            backgroundColor: "#52c41a",
+            borderColor: "#52c41a",
+          }}
+        >
+          Bentuk Kelompok Homogen
+        </Button>
 
-          <Button
-            type="primary"
-            icon={<TeamOutlined />}
-            onClick={onCreateHeterogen}
-            loading={loading}
-            style={{
-              height: 40, // Sama dengan QuizzesTab
-              fontSize: 16, // Sama dengan QuizzesTab
-              fontWeight: 600, // Sama dengan QuizzesTab
-              borderRadius: 8, // Sama dengan QuizzesTab
-              padding: "0 24px", // Sama dengan QuizzesTab
-              minWidth: 140, // Sama dengan QuizzesTab
-              backgroundColor: "#52c41a",
-              borderColor: "#52c41a",
-              boxShadow: "none", // Sama dengan QuizzesTab
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            Bentuk Kelompok Heterogen
-          </Button>
-        </Space>
+        <Button
+          type="primary"
+          icon={<TeamOutlined />}
+          onClick={onCreateHeterogen}
+          loading={loading}
+          style={{
+            height: 40,
+            fontSize: 16,
+            fontWeight: 600,
+            borderRadius: 8,
+            padding: "0 24px",
+            minWidth: isMobile ? "100%" : 140, // Full width di mobile
+          }}
+        >
+          Bentuk Kelompok Heterogen
+        </Button>
       </div>
 
       {/* Message */}

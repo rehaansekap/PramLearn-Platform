@@ -251,7 +251,6 @@ const QuizRankingModal = ({ open, onClose, quiz, materialId }) => {
       ),
       width: 100,
       align: "center",
-      responsive: ["md"],
     },
     {
       title: "Status",
@@ -268,7 +267,6 @@ const QuizRankingModal = ({ open, onClose, quiz, materialId }) => {
       },
       width: 130,
       align: "center",
-      responsive: ["md"],
     },
   ];
 
@@ -279,28 +277,35 @@ const QuizRankingModal = ({ open, onClose, quiz, materialId }) => {
       open={open}
       onCancel={onClose}
       footer={null}
-      width={900}
+      width={window.innerWidth <= 768 ? "95%" : 900} // Responsif untuk mobile
       title={
-        <div style={{ textAlign: "center", padding: "8px 0" }}>
-          <div>
-            <TrophyOutlined
-              style={{ fontSize: "40px", color: "#FFD700", marginRight: 8 }}
-            />
-          </div>
-          <div
+        <div style={{ textAlign: "center", marginBottom: 16 }}>
+          <TrophyOutlined
             style={{
-              fontSize: "20px",
+              fontSize: window.innerWidth <= 768 ? 32 : 40,
+              color: "#FFD700",
+              marginBottom: 8,
+            }}
+          />
+          <h3
+            style={{
+              fontSize: window.innerWidth <= 768 ? "18px" : "20px",
               fontWeight: 700,
               color: "#11418b",
-              marginBottom: 2,
-              marginTop: 4,
+              marginBottom: 4,
             }}
           >
             {quiz?.title || "Quiz"}
-          </div>
-          <div style={{ fontSize: "13px", color: "#666", marginBottom: 12 }}>
+          </h3>
+          <p
+            style={{
+              fontSize: window.innerWidth <= 768 ? "12px" : "14px",
+              color: "#666",
+              marginBottom: 12,
+            }}
+          >
             {quiz?.questions?.length || 0} soal &nbsp;•&nbsp; Real-time ranking
-          </div>
+          </p>
           <Button
             icon={<ReloadOutlined />}
             onClick={handleRefresh}
@@ -311,6 +316,7 @@ const QuizRankingModal = ({ open, onClose, quiz, materialId }) => {
               background: "#f5f5f5",
               color: "#11418b",
               border: "none",
+              width: window.innerWidth <= 768 ? "100%" : "auto", // Full width di mobile
             }}
           >
             Refresh
@@ -323,62 +329,105 @@ const QuizRankingModal = ({ open, onClose, quiz, materialId }) => {
       <div style={{ marginBottom: 16 }}>
         <Card
           size="small"
-          style={{ background: "#f8f9fa", border: "1px solid #e9ecef" }}
+          style={{
+            background: "#f8f9fa",
+            border: "1px solid #e9ecef",
+            borderRadius: 8,
+            padding: window.innerWidth <= 768 ? 12 : 16, // Padding responsif
+            marginBottom: 16,
+          }}
         >
           <div
             style={{
               display: "flex",
+              flexDirection: window.innerWidth <= 768 ? "column" : "row", // Responsif untuk mobile
               justifyContent: "space-between",
               alignItems: "center",
-              flexWrap: "wrap",
-              gap: 12,
+              gap: window.innerWidth <= 768 ? 8 : 16, // Jarak antar elemen
             }}
           >
-            <div style={{ display: "flex", alignItems: "center" }}>
+            {/* Last Update */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginBottom: window.innerWidth <= 768 ? 8 : 0,
+              }}
+            >
               <ClockCircleOutlined
                 style={{ color: "#1890ff", marginRight: 8 }}
               />
-              <span style={{ fontSize: "14px", color: "#666" }}>
+              <span
+                style={{
+                  fontSize: window.innerWidth <= 768 ? "12px" : "14px",
+                  color: "#666",
+                }}
+              >
                 Last Update:{" "}
                 {lastUpdate
                   ? dayjs(lastUpdate).format("DD/MM/YYYY HH:mm:ss")
                   : "-"}
               </span>
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-              <div style={{ fontSize: "14px" }}>
+
+            {/* Statistik */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-around",
+                flexWrap: "wrap",
+                gap: window.innerWidth <= 768 ? 8 : 16,
+                fontSize: window.innerWidth <= 768 ? "12px" : "14px",
+              }}
+            >
+              <div style={{ textAlign: "center" }}>
                 <strong>
                   {rankings.filter((r) => r.status === "completed").length}
-                </strong>{" "}
-                selesai
+                </strong>
+                <p style={{ margin: 0, color: "#666" }}>Selesai</p>
               </div>
-              <div style={{ fontSize: "14px" }}>
+              <div style={{ textAlign: "center" }}>
                 <strong>
                   {rankings.filter((r) => r.status === "in_progress").length}
-                </strong>{" "}
-                sedang mengerjakan
+                </strong>
+                <p style={{ margin: 0, color: "#666" }}>Sedang Mengerjakan</p>
               </div>
-              <div style={{ fontSize: "14px" }}>
-                <strong>{rankings.length}</strong> total kelompok
+              <div style={{ textAlign: "center" }}>
+                <strong>{rankings.length}</strong>
+                <p style={{ margin: 0, color: "#666" }}>Total Kelompok</p>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                <WifiOutlined
-                  style={{
-                    color: wsConnected
-                      ? "#52c41a"
-                      : wsConnecting
-                      ? "#faad14"
-                      : "#ff4d4f",
-                  }}
-                />
-                <span style={{ fontSize: "12px", color: "#666" }}>
-                  {wsConnected
-                    ? "Real-time"
+            </div>
+
+            {/* Real-time Status */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 4,
+                marginTop: window.innerWidth <= 768 ? 8 : 0,
+              }}
+            >
+              <WifiOutlined
+                style={{
+                  color: wsConnected
+                    ? "#52c41a"
                     : wsConnecting
-                    ? "Connecting..."
-                    : "Offline"}
-                </span>
-              </div>
+                    ? "#faad14"
+                    : "#ff4d4f",
+                }}
+              />
+              <span
+                style={{
+                  fontSize: window.innerWidth <= 768 ? "10px" : "12px",
+                  color: "#666",
+                }}
+              >
+                {wsConnected
+                  ? "Real-time"
+                  : wsConnecting
+                  ? "Connecting..."
+                  : "Offline"}
+              </span>
             </div>
           </div>
         </Card>
@@ -433,7 +482,7 @@ const QuizRankingModal = ({ open, onClose, quiz, materialId }) => {
           loading={loading || refreshing}
           style={{ width: "100%" }}
           className="ranking-table"
-          scroll={{ x: 600 }}
+          scroll={{ x: window.innerWidth <= 768 ? 600 : undefined }} // Tambahkan scroll horizontal untuk mobile
           size="middle"
         />
       )}

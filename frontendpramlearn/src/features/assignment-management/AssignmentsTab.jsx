@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Table,
   Button,
@@ -39,6 +39,15 @@ const AssignmentsTab = ({
   submissionsLoading = false, // Tambahkan prop loading untuk submissions
 }) => {
   const [actionLoading, setActionLoading] = useState({});
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const confirmDeleteAssignment = async (assignmentId) => {
     const result = await Swal.fire({
@@ -256,24 +265,33 @@ const AssignmentsTab = ({
           width: "100%",
           textAlign: "center",
           marginBottom: 24,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
         }}
       >
         <FileTextOutlined
-          style={{ fontSize: 28, color: "#11418b", marginBottom: 8 }}
+          style={{
+            fontSize: isMobile ? 24 : 32,
+            color: "#11418b",
+            marginBottom: isMobile ? 8 : 12,
+          }}
         />
         <h3
           className="text-lg font-semibold text-gray-800 mb-1"
-          style={{ marginBottom: 4 }}
+          style={{
+            marginBottom: 4,
+            fontSize: isMobile ? "16px" : "20px",
+          }}
         >
           Daftar Assignment
         </h3>
-        <p className="text-sm text-gray-600" style={{ marginBottom: 16 }}>
+        <p
+          className="text-sm text-gray-600"
+          style={{
+            marginBottom: 16,
+            fontSize: isMobile ? "12px" : "14px",
+          }}
+        >
           Kelola assignment untuk materi ini
         </p>
-
         <Button
           type="primary"
           icon={<PlusOutlined />}
@@ -284,16 +302,10 @@ const AssignmentsTab = ({
             fontWeight: 600,
             borderRadius: 8,
             padding: "0 24px",
-            minWidth: 140,
-            background: "#1677ff",
-            borderColor: "#1677ff",
-            boxShadow: "none",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            minWidth: isMobile ? "100%" : 140,
           }}
         >
-          Buat Assignment
+          Buat Assignment Baru
         </Button>
       </div>
 
@@ -341,7 +353,7 @@ const AssignmentsTab = ({
           }}
           style={{ width: "100%" }}
           className="user-table-responsive"
-          scroll={{ x: 600 }}
+          scroll={{ x: isMobile ? 600 : undefined }} // Tambahkan scroll horizontal untuk mobile
           size="middle"
         />
       )}
@@ -355,6 +367,7 @@ const AssignmentsTab = ({
             questions={assignmentQuestions}
             selectedAssignment={selectedAssignment}
             loading={submissionsLoading} // Pass loading state
+            isMobile={isMobile}
           />
         </div>
       )}

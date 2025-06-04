@@ -39,6 +39,15 @@ const QuizzesTab = ({
   const [selectedQuizForRanking, setSelectedQuizForRanking] = useState(null);
   const [actionLoading, setActionLoading] = useState({}); // Loading untuk actions individual
   const [refreshing, setRefreshing] = useState(false); // Loading untuk refresh manual
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // Hitung ulang assignedGroups setiap kali groupQuizAssignments berubah
   const quizzesWithAssignedGroups = React.useMemo(() => {
@@ -209,24 +218,41 @@ const QuizzesTab = ({
           width: "100%",
           textAlign: "center",
           marginBottom: 24,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
         }}
       >
         <AppstoreAddOutlined
-          style={{ fontSize: 28, color: "#11418b", marginBottom: 8 }}
+          style={{
+            fontSize: isMobile ? 24 : 32,
+            color: "#11418b",
+            marginBottom: isMobile ? 8 : 12,
+          }}
         />
         <h3
           className="text-lg font-semibold text-gray-800 mb-1"
-          style={{ marginBottom: 4 }}
+          style={{
+            marginBottom: 4,
+            fontSize: isMobile ? "16px" : "20px",
+          }}
         >
           Quiz Management
         </h3>
-        <p className="text-sm text-gray-600" style={{ marginBottom: 16 }}>
+        <p
+          className="text-sm text-gray-600"
+          style={{
+            marginBottom: 16,
+            fontSize: isMobile ? "12px" : "14px",
+          }}
+        >
           Kelola quiz dan lihat ranking kelompok
         </p>
-        <div style={{ display: "flex", gap: 12 }}>
+        <div
+          style={{
+            display: "flex",
+            gap: 12,
+            flexDirection: isMobile ? "column" : "row",
+            justifyContent: "center",
+          }}
+        >
           <Button
             type="primary"
             icon={<PlusOutlined />}
@@ -237,13 +263,7 @@ const QuizzesTab = ({
               fontWeight: 600,
               borderRadius: 8,
               padding: "0 24px",
-              minWidth: 140,
-              background: "#1677ff",
-              borderColor: "#1677ff",
-              boxShadow: "none",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              minWidth: isMobile ? "100%" : 140,
             }}
           >
             Buat Quiz Baru
@@ -258,10 +278,7 @@ const QuizzesTab = ({
               fontWeight: 600,
               borderRadius: 8,
               padding: "0 24px",
-              minWidth: 100,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              minWidth: isMobile ? "100%" : 140,
             }}
           >
             Refresh
@@ -313,7 +330,7 @@ const QuizzesTab = ({
           }}
           style={{ width: "100%" }}
           className="user-table-responsive"
-          scroll={{ x: 600 }}
+          scroll={{ x: isMobile ? 600 : undefined }} // Tambahkan scroll horizontal untuk mobile
           size="middle"
         />
       )}

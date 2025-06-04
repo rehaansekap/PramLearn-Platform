@@ -16,6 +16,7 @@ const AssignmentSubmissionTable = ({
   selectedAssignment,
   onReload,
   loading = false, // Tambahkan prop loading
+  isMobile,
 }) => {
   const [selectedSubmission, setSelectedSubmission] = useState(null);
   const [detailLoading, setDetailLoading] = useState({}); // Loading untuk detail modal individual
@@ -220,7 +221,7 @@ const AssignmentSubmissionTable = ({
             key: submission.id,
           }))}
           columns={columns}
-          loading={loading} // Tambahkan loading ke table
+          loading={loading}
           pagination={{
             pageSize: 10,
             showSizeChanger: false,
@@ -232,7 +233,7 @@ const AssignmentSubmissionTable = ({
           style={{
             width: "100%",
           }}
-          scroll={{ x: 600 }}
+          scroll={{ x: isMobile ? 600 : undefined }} // Tambahkan scroll horizontal untuk mobile
           size="middle"
         />
       )}

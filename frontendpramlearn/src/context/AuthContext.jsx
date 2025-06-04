@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import api from "../api";
 import { useOnlineStatus } from "./OnlineStatusContext";
+import AppLoading from "../components/AppLoading";
 
 const AuthContext = createContext();
 
@@ -230,6 +231,10 @@ const AuthProvider = ({ children }) => {
       clearTimeout(activityTimeout.current);
     }
   };
+
+  if (loading) {
+    return <AppLoading />;
+  }
 
   return (
     <AuthContext.Provider

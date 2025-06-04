@@ -435,7 +435,7 @@ const GroupQuizResults = ({ quizResults, rankings, loading }) => {
         )}
       </Modal>
 
-      <style jsx>{`
+      <style>{`
         .current-group-row {
           background-color: #f6ffed !important;
         }

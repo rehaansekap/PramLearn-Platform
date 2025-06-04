@@ -1,4 +1,4 @@
-import React, { useState, useContext, useCallback } from "react";
+import React, { useState, useContext, useCallback, useEffect } from "react";
 import {
   Table,
   Select,
@@ -9,6 +9,8 @@ import {
   Space,
   Dropdown,
   Menu,
+  Row,
+  Col,
 } from "antd";
 import {
   UserOutlined,
@@ -28,6 +30,7 @@ import api from "../../../api";
 const { Option } = Select;
 
 const StudentsTab = ({ studentDetails, classId, loading, materialId }) => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const { user } = useContext(AuthContext);
   const { isUserOnline } = useOnlineStatus();
   const [updating, setUpdating] = useState({});
@@ -57,6 +60,14 @@ const StudentsTab = ({ studentDetails, classId, loading, materialId }) => {
     materialId,
     handleAttendanceUpdate
   );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const getAttendanceColor = (status) => {
     switch (status) {
@@ -217,7 +228,6 @@ const StudentsTab = ({ studentDetails, classId, loading, materialId }) => {
         return fullName || "-";
       },
       ellipsis: true,
-      responsive: ["md"],
     },
     {
       title: "Email",
@@ -258,7 +268,6 @@ const StudentsTab = ({ studentDetails, classId, loading, materialId }) => {
       },
       width: 140,
       align: "center",
-      responsive: ["md"],
     },
     {
       title: "Kehadiran",
@@ -338,91 +347,68 @@ const StudentsTab = ({ studentDetails, classId, loading, materialId }) => {
   return (
     <div>
       {/* Header dengan icon dan tombol create */}
-      <div
-        style={{
-          width: "100%",
-          textAlign: "center",
-          marginBottom: 24,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <UserOutlined
-          style={{ fontSize: 32, color: "#11418b", marginBottom: 12 }}
-        />
-        <h3
-          style={{
-            marginBottom: 8,
-            fontSize: "20px",
-            fontWeight: 700,
-            color: "#11418b",
-          }}
-        >
-          Daftar Siswa & Kehadiran
-        </h3>
-        <p
-          style={{
-            marginBottom: 20,
-            fontSize: "14px",
-            color: "#666",
-          }}
-        >
-          Total: {studentDetails.length} siswa
-        </p>
-        <div
-          style={{
-            display: "flex",
-            gap: 12,
-            justifyContent: "center",
-            marginBottom: 0,
-          }}
-        >
-          <Button
-            type="primary"
-            icon={<ReloadOutlined />}
-            onClick={refetchAttendance}
-            loading={attendanceLoading}
-            style={{
-              height: 40,
-              fontSize: 16,
-              fontWeight: 600,
-              borderRadius: 8,
-              padding: "0 24px",
-              minWidth: 140,
-              background: "#1677ff",
-              borderColor: "#1677ff",
-              boxShadow: "none",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            Refresh
-          </Button>
-          <Button
-            type="primary"
-            icon={<TeamOutlined />}
-            onClick={handleBulkCreateAttendance}
-            loading={attendanceLoading}
-            style={{
-              height: 40,
-              fontSize: 16,
-              fontWeight: 600,
-              borderRadius: 8,
-              padding: "0 24px",
-              minWidth: 140,
-              background: "#1677ff",
-              borderColor: "#1677ff",
-              boxShadow: "none",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            Inisialisasi Kehadiran
-          </Button>
-        </div>
+      <div style={{ width: "100%", marginBottom: 24 }}>
+        <Row gutter={[16, 16]} align="middle" justify="center">
+          <Col xs={24} style={{ textAlign: "center" }}>
+            <UserOutlined
+              style={{ fontSize: 32, color: "#11418b", marginBottom: 8 }}
+            />
+            <h3
+              style={{
+                fontSize: isMobile ? "16px" : "20px",
+                fontWeight: 700,
+                color: "#11418b",
+                margin: "8px 0 4px 0",
+              }}
+            >
+              Daftar Siswa & Kehadiran
+            </h3>
+            <p
+              style={{
+                fontSize: isMobile ? "12px" : "14px",
+                color: "#666",
+                margin: "0 0 16px 0",
+              }}
+            >
+              Total: {studentDetails.length} siswa
+            </p>
+            <div
+              style={{
+                display: "flex",
+                gap: 12,
+                flexWrap: "wrap",
+                justifyContent: "center",
+                flexDirection: isMobile ? "column" : "row", // Tambahkan ini
+                alignItems: "center", // Agar tombol tetap rata tengah di mobile
+              }}
+            >
+              <Button
+                type="primary"
+                icon={<ReloadOutlined />}
+                onClick={refetchAttendance}
+                loading={attendanceLoading}
+                style={{
+                  minWidth: isMobile ? 180 : 140, // Lebar tombol lebih besar di mobile
+                  width: isMobile ? "100%" : undefined, // Full width di mobile
+                }}
+              >
+                Refresh
+              </Button>
+              <Button
+                type="primary"
+                icon={<TeamOutlined />}
+                onClick={handleBulkCreateAttendance}
+                loading={attendanceLoading}
+                style={{
+                  minWidth: isMobile ? 180 : 140,
+                  width: isMobile ? "100%" : undefined,
+                }}
+              >
+                Inisialisasi Kehadiran
+              </Button>
+            </div>
+          </Col>
+        </Row>
       </div>
 
       {/* Table Siswa */}
@@ -441,7 +427,7 @@ const StudentsTab = ({ studentDetails, classId, loading, materialId }) => {
         }}
         className="user-table-responsive"
         style={{ width: "100%" }}
-        scroll={{ x: 600 }}
+        scroll={{ x: isMobile ? 600 : undefined }} // Tambahkan scroll horizontal untuk mobile
         size="middle"
       />
 

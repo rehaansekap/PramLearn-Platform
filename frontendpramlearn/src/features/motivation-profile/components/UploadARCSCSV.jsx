@@ -205,12 +205,16 @@ const UploadARCSCSV = () => {
         </Text>
         <div
           style={{
-            backgroundColor: "#fff",
-            padding: "12px",
-            borderRadius: "4px",
-            border: "1px solid #e8e8e8",
+            background: "#fafbfc",
+            border: "1px solid #e6e6e6",
+            borderRadius: 8,
+            padding: 12,
+            marginTop: 8,
+            overflowX: "auto", // agar bisa scroll horizontal di mobile
             fontFamily: "monospace",
-            fontSize: "12px",
+            fontSize: 13,
+            maxWidth: "100%",
+            whiteSpace: "pre", // agar format CSV tetap rapi
           }}
         >
           <div>username,attention,relevance,confidence,satisfaction</div>

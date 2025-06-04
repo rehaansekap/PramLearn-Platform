@@ -126,7 +126,7 @@ const AssignmentSubmissionDetailModal = ({
       open={open}
       onCancel={onClose}
       footer={null}
-      width={900}
+      width={window.innerWidth <= 768 ? "95%" : 900} // Responsif untuk mobile
       centered
       className="assignment-submission-detail-modal"
       destroyOnClose
@@ -142,24 +142,27 @@ const AssignmentSubmissionDetailModal = ({
         }}
       >
         <FileTextOutlined
-          style={{ fontSize: 28, color: "#11418b", marginBottom: 8 }}
+          style={{
+            fontSize: window.innerWidth <= 768 ? 24 : 28,
+            color: "#11418b",
+            marginBottom: 8,
+          }}
         />
         <h3
-          className="text-lg font-semibold text-gray-800 mb-1"
           style={{
             marginBottom: 4,
-            fontSize: "20px",
+            fontSize: window.innerWidth <= 768 ? "18px" : "20px",
             fontWeight: 700,
             color: "#11418b",
+            textAlign: "center",
           }}
         >
           Detail Pengerjaan Assignment
         </h3>
         <p
-          className="text-sm text-gray-600"
           style={{
             marginBottom: 0,
-            fontSize: "14px",
+            fontSize: window.innerWidth <= 768 ? "12px" : "14px",
             color: "#666",
             textAlign: "center",
           }}
@@ -185,21 +188,23 @@ const AssignmentSubmissionDetailModal = ({
               background: "#f8f9fa",
               border: "1px solid #e9ecef",
               borderRadius: "8px",
-              padding: "16px",
+              padding: window.innerWidth <= 768 ? "12px" : "16px", // Padding responsif
               marginBottom: "20px",
             }}
           >
             <div
               style={{
                 display: "flex",
+                flexDirection: window.innerWidth <= 768 ? "column" : "row", // Responsif untuk mobile
                 justifyContent: "space-between",
                 alignItems: "center",
+                gap: window.innerWidth <= 768 ? 8 : 16, // Jarak antar elemen
               }}
             >
               <div>
                 <div
                   style={{
-                    fontSize: "16px",
+                    fontSize: window.innerWidth <= 768 ? "14px" : "16px",
                     fontWeight: 600,
                     color: "#11418b",
                     marginBottom: 4,
@@ -207,7 +212,12 @@ const AssignmentSubmissionDetailModal = ({
                 >
                   Assignment: {getAssignmentTitle()}
                 </div>
-                <div style={{ fontSize: "14px", color: "#666" }}>
+                <div
+                  style={{
+                    fontSize: window.innerWidth <= 768 ? "12px" : "14px",
+                    color: "#666",
+                  }}
+                >
                   Nilai:{" "}
                   {submission?.grade !== null ? (
                     <Tag
@@ -226,8 +236,17 @@ const AssignmentSubmissionDetailModal = ({
                   )}
                 </div>
               </div>
-              <div style={{ textAlign: "right" }}>
-                <div style={{ fontSize: "14px", color: "#666" }}>
+              <div
+                style={{
+                  textAlign: window.innerWidth <= 768 ? "left" : "right",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: window.innerWidth <= 768 ? "12px" : "14px",
+                    color: "#666",
+                  }}
+                >
                   Tanggal Submit:{" "}
                   {submission?.submission_date
                     ? new Date(submission.submission_date).toLocaleString(
@@ -249,8 +268,10 @@ const AssignmentSubmissionDetailModal = ({
             columns={columns}
             pagination={false}
             className="assignment-table user-table-responsive"
-            style={{ width: "100%" }}
-            scroll={{ x: 600 }}
+            style={{
+              width: "100%",
+            }}
+            scroll={{ x: window.innerWidth <= 768 ? 600 : undefined }} // Tambahkan scroll horizontal untuk mobile
             size="middle"
           />
         </>

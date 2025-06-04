@@ -1,24 +1,44 @@
-import React, { useContext, useEffect, useState } from "react";
-import { Outlet, useNavigate, useLocation, Link } from "react-router-dom";
-import { Layout, Menu, Button, Drawer, theme, Breadcrumb, Card } from "antd";
+import React, { useState, useContext, useEffect } from "react";
+import { Link, useNavigate, useLocation, Outlet } from "react-router-dom";
+import { AuthContext } from "../../../context/AuthContext";
 import {
-  MenuOutlined,
-  CloseOutlined,
   DashboardOutlined,
   BookOutlined,
   FileTextOutlined,
-  TrophyOutlined,
   BarChartOutlined,
   TeamOutlined,
-  BellOutlined,
   LogoutOutlined,
+  UserOutlined,
+  LoadingOutlined,
+  TrophyOutlined,
+  MenuOutlined,
+  CloseOutlined,
+  BellOutlined,
+  SearchOutlined,
+  DownOutlined,
 } from "@ant-design/icons";
-import { AuthContext } from "../../../context/AuthContext";
+import {
+  Button,
+  Layout,
+  Menu,
+  theme,
+  Drawer,
+  Spin,
+  Card,
+  Avatar,
+  Space,
+  Input,
+  Dropdown,
+  Typography,
+  Badge,
+} from "antd";
 import Swal from "sweetalert2";
 import StudentBreadcrumb from "../components/StudentBreadcrumb";
-import StudentNotFound from "../../../components/StudentNotFound"; // Import StudentNotFound
+import NotificationBell from "../notifications/components/NotificationBell";
+import PageLoading from "../../../components/PageLoading";
 
-const { Header, Content, Sider } = Layout;
+const { Header, Sider, Content } = Layout;
+const { Text } = Typography;
 
 const StudentLayout = () => {
   const [collapsed, setCollapsed] = useState(true);
@@ -55,8 +75,11 @@ const StudentLayout = () => {
       if (!mobile) {
         setMobileDrawerOpen(false);
       }
+      // Auto-collapse pada layar kecil
+      if (mobile) {
+        setCollapsed(true);
+      }
     };
-
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
@@ -108,12 +131,17 @@ const StudentLayout = () => {
     {
       key: "/student/grades",
       icon: <TrophyOutlined />,
-      label: <Link to="/student/grades">My Grades</Link>,
+      label: <Link to="/student/grades">Grades & Results</Link>,
     },
     {
       key: "/student/progress",
       icon: <BarChartOutlined />,
-      label: <Link to="/student/progress">Progress</Link>,
+      label: <Link to="/student/progress">My Progress</Link>,
+    },
+    {
+      key: "/student/analytics",
+      icon: <BarChartOutlined />,
+      label: <Link to="/student/analytics">Learning Analytics</Link>,
     },
     {
       key: "/student/group",
@@ -122,8 +150,37 @@ const StudentLayout = () => {
     },
   ];
 
+  // Profile dropdown menu
+  const profileMenu = {
+    items: [
+      {
+        key: "profile",
+        icon: <UserOutlined />,
+        label: "Profile",
+        onClick: () => navigate("/student/profile"),
+      },
+      {
+        key: "settings",
+        icon: <BarChartOutlined />,
+        label: "Settings",
+        onClick: () => navigate("/student/settings"),
+      },
+      {
+        type: "divider",
+      },
+      {
+        key: "logout",
+        icon: <LogoutOutlined />,
+        label: "Logout",
+        onClick: handleLogout,
+        danger: true,
+      },
+    ],
+  };
+
   // Get selected menu key from current path
   const getMenuKeyFromPath = (pathname) => {
+    // Handle exact matches first
     if (pathname === "/student" || pathname === "/student/") return "/student";
     if (pathname.startsWith("/student/subjects")) return "/student/subjects";
     if (pathname.startsWith("/student/assessments"))
@@ -133,6 +190,7 @@ const StudentLayout = () => {
     if (pathname.startsWith("/student/grades")) return "/student/grades";
     if (pathname.startsWith("/student/progress")) return "/student/progress";
     if (pathname.startsWith("/student/group")) return "/student/group";
+    if (pathname.startsWith("/student/analytics")) return "/student/analytics";
     return "/student";
   };
 
@@ -178,21 +236,22 @@ const StudentLayout = () => {
     );
   }
 
-  // Sidebar content - MODIFIKASI LAYOUT UNTUK PINDAHKAN LOGOUT
+  // Sidebar content dengan perbaikan layout
   const sidebarContent = (
     <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
       {/* Header Profile */}
       <div
         style={{
-          padding: "24px 16px",
+          padding: collapsed ? "16px 8px" : "24px 16px",
           borderBottom: "1px solid #303030",
           textAlign: "center",
+          transition: "padding 0.2s",
         }}
       >
         <div
           style={{
-            width: 64,
-            height: 64,
+            width: collapsed ? 40 : 64,
+            height: collapsed ? 40 : 64,
             borderRadius: "50%",
             background: "linear-gradient(135deg, #1890ff 0%, #52c41a 100%)",
             display: "flex",
@@ -200,31 +259,52 @@ const StudentLayout = () => {
             justifyContent: "center",
             margin: "0 auto 12px",
             color: "#fff",
-            fontSize: "24px",
+            fontSize: collapsed ? "18px" : "24px",
             fontWeight: "bold",
+            transition: "all 0.2s",
           }}
         >
           {user?.username?.charAt(0)?.toUpperCase() || "S"}
         </div>
-        <div style={{ color: "#fff", fontWeight: 600, fontSize: "16px" }}>
-          {user?.username || "Student"}
-        </div>
-        <div style={{ color: "#bfbfbf", fontSize: "12px" }}>Student</div>
+        {!collapsed && (
+          <>
+            <div style={{ color: "#fff", fontWeight: 600, fontSize: "16px" }}>
+              {user?.username || "Student"}
+            </div>
+            <div style={{ color: "#bfbfbf", fontSize: "12px" }}>
+              Student Portal
+            </div>
+          </>
+        )}
       </div>
 
       {/* Menu Items */}
-      <div style={{ flex: 1, overflowY: "auto" }}>
+      <div style={{ flex: 1, overflowY: "auto", padding: "8px 0" }}>
         <Menu
           theme="dark"
           mode="inline"
           selectedKeys={[selectedMenuKey]}
-          style={{ borderRight: 0, background: "transparent" }}
+          inlineCollapsed={collapsed}
+          style={{
+            borderRight: 0,
+            background: "transparent",
+            fontSize: "14px",
+          }}
           items={menuItems.map((item) => ({
             ...item,
+            style: {
+              marginBottom: "4px",
+              borderRadius: collapsed ? "0" : "8px",
+              marginLeft: collapsed ? "0" : "8px",
+              marginRight: collapsed ? "0" : "8px",
+            },
             label: (
               <span
                 onClick={() => {
                   if (isMobile) setMobileDrawerOpen(false);
+                }}
+                style={{
+                  fontWeight: selectedMenuKey === item.key ? 600 : 400,
                 }}
               >
                 {item.label}
@@ -234,10 +314,10 @@ const StudentLayout = () => {
         />
       </div>
 
-      {/* Logout Button - DIPINDAH KE ATAS TOGGLE BUTTON */}
+      {/* Logout Button */}
       <div
         style={{
-          padding: "16px",
+          padding: collapsed ? "12px 8px" : "16px",
           borderTop: "1px solid #303030",
         }}
       >
@@ -246,21 +326,28 @@ const StudentLayout = () => {
           danger
           icon={<LogoutOutlined />}
           onClick={handleLogout}
-          block
+          block={!collapsed}
+          size={collapsed ? "small" : "middle"}
           style={{
-            height: "40px",
+            height: collapsed ? "36px" : "40px",
             fontWeight: 600,
+            fontSize: collapsed ? "12px" : "14px",
+            ...(collapsed && {
+              width: "36px",
+              padding: 0,
+            }),
           }}
+          title={collapsed ? "Logout" : undefined}
         >
-          Logout
+          {!collapsed && "Logout"}
         </Button>
       </div>
 
-      {/* Toggle Button untuk Desktop - DIPINDAH KE PALING BAWAH */}
+      {/* Toggle Button untuk Desktop */}
       {!isMobile && (
         <div
           style={{
-            padding: "8px 16px",
+            padding: collapsed ? "8px" : "8px 16px",
             borderTop: "1px solid #303030",
           }}
         >
@@ -272,160 +359,486 @@ const StudentLayout = () => {
               width: "100%",
               color: "#fff",
               borderColor: "transparent",
+              fontSize: "12px",
+              height: "32px",
             }}
+            title={collapsed ? "Expand Sidebar" : "Collapse Sidebar"}
           >
-            {collapsed ? "Expand" : "Collapse"}
+            {!collapsed && (collapsed ? "Expand" : "Collapse")}
           </Button>
         </div>
       )}
     </div>
   );
 
+  if (!user || !token) {
+    return <PageLoading message="Memuat data user..." />;
+  }
+
   return (
-    <Layout style={{ minHeight: "100vh" }}>
-      {/* Desktop Sidebar */}
-      {!isMobile && (
-        <Sider
-          trigger={null}
-          collapsible
-          collapsed={collapsed}
-          width={280}
-          style={{
-            background: "#11418b",
-            position: "fixed",
-            height: "100vh",
-            left: 0,
-            top: 0,
-            zIndex: 100,
-          }}
-        >
-          {sidebarContent}
-        </Sider>
-      )}
-
-      {/* Mobile Drawer */}
-      <Drawer
-        title={
-          <div style={{ textAlign: "center", color: "#fff" }}>
-            <div style={{ fontSize: "18px", fontWeight: "bold" }}>
-              PramLearn
-            </div>
-            <div style={{ fontSize: "12px", opacity: 0.8 }}>Student Portal</div>
-          </div>
-        }
-        placement="left"
-        open={mobileDrawerOpen}
-        onClose={() => setMobileDrawerOpen(false)}
-        headerStyle={{
-          background: "#11418b",
-          borderBottom: "1px solid #303030",
-        }}
-        bodyStyle={{
-          background: "#11418b",
-          padding: 0,
-        }}
-        width={280}
-      >
-        {sidebarContent}
-      </Drawer>
-
-      {/* Main Layout */}
-      <Layout
+    <>
+      {/* Fixed Header dengan gradient yang lebih soft */}
+      <Header
         style={{
-          marginLeft: isMobile ? 0 : collapsed ? 80 : 280,
-          transition: "margin-left 0.2s",
+          background:
+            "linear-gradient(135deg, #001529 0%, #3a3f5c 60%, #43cea2 100%)",
+          padding: isMobile ? "0 16px" : "0 24px",
+          position: "fixed",
+          width: "100vw",
+          left: 0,
+          right: 0,
+          top: 0,
+          zIndex: 1000,
+          boxShadow: "0 4px 12px rgba(30, 58, 138, 0.15)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+          height: 64,
+          boxSizing: "border-box",
         }}
       >
-        {/* Header */}
-        <Header
+        {/* Left Side - Brand & Mobile Menu */}
+        <div
           style={{
-            padding: 0,
-            background: colorBgContainer,
-            borderBottom: "1px solid #f0f0f0",
-            position: "sticky",
-            top: 0,
-            zIndex: 10,
-            boxShadow: "0 2px 8px #f0f1f2",
+            display: "flex",
+            alignItems: "center",
+            gap: isMobile ? 8 : 16,
           }}
         >
-          <div
-            style={{
-              padding: "0 24px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center" }}>
-              {isMobile && (
-                <Button
-                  type="text"
-                  icon={<MenuOutlined />}
-                  onClick={() => setMobileDrawerOpen(true)}
-                  style={{ marginRight: 16 }}
-                />
-              )}
-              <h2
+          {isMobile && (
+            <Button
+              type="text"
+              icon={<MenuOutlined />}
+              onClick={() => setMobileDrawerOpen(true)}
+              style={{
+                color: "#fff",
+                fontSize: "16px",
+                padding: 0,
+                width: 32,
+                height: 32,
+              }}
+            />
+          )}
+
+          {/* Brand & Logo */}
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: "8px",
+                background: "linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+              }}
+            >
+              <span
                 style={{
-                  margin: 0,
-                  color: "#11418b",
-                  fontWeight: "bold",
+                  fontSize: "20px",
+                  fontWeight: "800",
+                  background:
+                    "linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
                 }}
               >
-                PramLearn - Student Portal
-              </h2>
+                P
+              </span>
             </div>
-
-            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-              <Button
-                type="text"
-                icon={<BellOutlined />}
-                onClick={() => navigate("/student/notifications")}
-              />
-              <div style={{ fontSize: "14px", color: "#666" }}>
-                Welcome, <strong>{user?.username}</strong>
+            <div>
+              <div
+                style={{
+                  color: "#fff",
+                  fontSize: "18px",
+                  fontWeight: "700",
+                  lineHeight: "20px",
+                  textShadow: "0 1px 2px rgba(0, 0, 0, 0.1)",
+                }}
+              >
+                PramLearn
+              </div>
+              <div
+                style={{
+                  color: "rgba(255, 255, 255, 0.8)",
+                  fontSize: "11px",
+                  fontWeight: "500",
+                  lineHeight: "12px",
+                }}
+              >
+                Student Portal
               </div>
             </div>
           </div>
-        </Header>
+        </div>
 
-        {/* Content */}
-        <Content
+        {/* Right Side - Notifications & Profile */}
+        <Space size={isMobile ? 8 : 16}>
+          {/* Notifications */}
+          <Button
+            type="text"
+            icon={<BellOutlined />}
+            style={{
+              color: "#fff",
+              fontSize: "16px",
+              border: "1px solid rgba(255, 255, 255, 0.2)",
+              borderRadius: "8px",
+              width: isMobile ? 32 : "40px",
+              height: isMobile ? 32 : "40px",
+              padding: 0,
+            }}
+            onClick={() => navigate("/student/notifications")}
+          />
+
+          {/* Profile Dropdown */}
+          <Dropdown
+            menu={profileMenu}
+            trigger={["click"]}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              style={{
+                padding: isMobile ? "4px 4px" : "4px 12px",
+                height: isMobile ? 32 : "40px",
+                border: "1px solid rgba(255, 255, 255, 0.2)",
+                borderRadius: "8px",
+                color: "#fff",
+                display: "flex",
+                alignItems: "center",
+                gap: isMobile ? 4 : 8,
+              }}
+            >
+              <Avatar
+                size={isMobile ? 22 : 28}
+                style={{
+                  background:
+                    "linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%)",
+                  color: "#1e3a8a",
+                  fontWeight: "bold",
+                  fontSize: isMobile ? 10 : "12px",
+                }}
+              >
+                {user?.username?.charAt(0)?.toUpperCase() || "S"}
+              </Avatar>
+              {!isMobile && (
+                <div style={{ textAlign: "left" }}>
+                  <div
+                    style={{
+                      fontWeight: 600,
+                      fontSize: "13px",
+                      lineHeight: "16px",
+                      color: "#fff",
+                    }}
+                  >
+                    {user?.username || user?.first_name || "Student"}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: "11px",
+                      lineHeight: "12px",
+                      color: "rgba(255, 255, 255, 0.8)",
+                    }}
+                  >
+                    Student
+                  </div>
+                </div>
+              )}
+              <DownOutlined
+                style={{ fontSize: "10px", color: "rgba(255, 255, 255, 0.8)" }}
+              />
+            </Button>
+          </Dropdown>
+        </Space>
+      </Header>
+
+      <Layout style={{ minHeight: "100vh", paddingTop: 64 }}>
+        {/* Desktop Sidebar */}
+        {!isMobile && (
+          <Sider
+            trigger={null}
+            collapsible
+            collapsed={collapsed}
+            width={280}
+            collapsedWidth={72}
+            style={{
+              background: "#001529", // Tetap menggunakan warna yang ada pada student
+              position: "fixed",
+              height: "calc(100vh - 64px)",
+              left: 0,
+              top: 64,
+              zIndex: 100,
+              boxShadow: "2px 0 8px rgba(0,0,0,0.15)",
+            }}
+          >
+            {sidebarContent}
+          </Sider>
+        )}
+
+        {/* Mobile Drawer - IMPROVED UI/UX */}
+        <Drawer
+          title={null}
+          placement="left"
+          open={mobileDrawerOpen}
+          onClose={() => setMobileDrawerOpen(false)}
+          closable={false}
+          headerStyle={{ display: "none" }}
+          bodyStyle={{
+            background: "#001529",
+            padding: 0,
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
+          }}
+          width={300}
+        >
+          {/* Custom Drawer Header */}
+          <div
+            style={{
+              background: "linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)",
+              padding: "16px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <div
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: "8px",
+                  background:
+                    "linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: "20px",
+                    fontWeight: "800",
+                    background:
+                      "linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text",
+                  }}
+                >
+                  P
+                </span>
+              </div>
+              <div>
+                <div
+                  style={{
+                    color: "#fff",
+                    fontSize: "16px",
+                    fontWeight: "700",
+                    lineHeight: "18px",
+                  }}
+                >
+                  PramLearn
+                </div>
+                <div
+                  style={{
+                    color: "rgba(255, 255, 255, 0.8)",
+                    fontSize: "11px",
+                    fontWeight: "500",
+                    lineHeight: "14px",
+                  }}
+                >
+                  Student Portal
+                </div>
+              </div>
+            </div>
+            <Button
+              type="text"
+              icon={<CloseOutlined />}
+              onClick={() => setMobileDrawerOpen(false)}
+              style={{
+                color: "#fff",
+                fontSize: 16,
+                padding: 0,
+                width: 32,
+                height: 32,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            />
+          </div>
+
+          {/* Hapus Search in drawer */}
+          {/* User Profile Card */}
+          <div
+            style={{
+              padding: "20px 16px",
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              background: "rgba(255, 255, 255, 0.05)",
+              margin: "0 16px 16px",
+              borderRadius: 12,
+              marginTop: 16,
+            }}
+          >
+            <Avatar
+              size={48}
+              style={{
+                background: "linear-gradient(135deg, #1890ff 0%, #52c41a 100%)",
+                color: "#fff",
+                fontWeight: "bold",
+                fontSize: "18px",
+              }}
+            >
+              {user?.username?.charAt(0)?.toUpperCase() || "S"}
+            </Avatar>
+            <div>
+              <div
+                style={{
+                  color: "#fff",
+                  fontWeight: 600,
+                  fontSize: "15px",
+                  marginBottom: 2,
+                }}
+              >
+                {user?.username || user?.first_name || "Student"}
+              </div>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <Badge status="success" />
+                <span
+                  style={{
+                    color: "rgba(255, 255, 255, 0.8)",
+                    fontSize: "12px",
+                    marginLeft: 5,
+                  }}
+                >
+                  Online - Student
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* MENU NAVIGATION */}
+          <div style={{ padding: "0 16px", marginBottom: 8 }}>
+            <Text
+              style={{
+                color: "rgba(255, 255, 255, 0.5)",
+                fontSize: 12,
+                fontWeight: 500,
+              }}
+            >
+              STUDENT NAVIGATION
+            </Text>
+          </div>
+
+          {/* Enhanced Menu */}
+          <div style={{ flex: 1, overflowY: "auto", padding: "0 16px" }}>
+            <Menu
+              theme="dark"
+              mode="inline"
+              selectedKeys={[selectedMenuKey]}
+              style={{
+                borderRight: 0,
+                background: "transparent",
+                fontSize: "14px",
+              }}
+              items={menuItems.map((item) => ({
+                ...item,
+                style: {
+                  marginBottom: 4,
+                  borderRadius: 8,
+                  height: 44,
+                },
+                onClick: () => {
+                  setMobileDrawerOpen(false);
+                },
+              }))}
+            />
+          </div>
+
+          {/* Logout Button */}
+          <div
+            style={{
+              padding: "16px",
+              marginTop: "auto",
+              borderTop: "1px solid rgba(255, 255, 255, 0.1)",
+            }}
+          >
+            <Button
+              type="primary"
+              danger
+              size="large"
+              icon={<LogoutOutlined />}
+              onClick={handleLogout}
+              block
+              style={{
+                height: 46,
+                fontSize: 16,
+                fontWeight: 600,
+                borderRadius: 8,
+              }}
+            >
+              Logout
+            </Button>
+          </div>
+        </Drawer>
+
+        {/* Main Layout */}
+        <Layout
           style={{
-            margin: 0,
-            padding: 24,
-            minHeight: "calc(100vh - 64px)",
-            background: "#f5f5f5",
+            marginLeft: isMobile ? 0 : collapsed ? 0 : 0,
+            transition: "margin-left 0.2s",
           }}
         >
-          <StudentBreadcrumb />
-          <Card
+          {/* Content */}
+          <Content
             style={{
-              background: colorBgContainer,
-              borderRadius: borderRadiusLG,
-              minHeight: "calc(100vh - 160px)",
+              margin: 0,
+              paddingTop: 16,
+              paddingLeft: isMobile ? 16 : 24,
+              paddingRight: isMobile ? 16 : 24,
+              minHeight: "calc(100vh - 80px)",
+              background: "#f5f5f5",
             }}
-            bodyStyle={{ padding: 0 }}
           >
-            {/* Gunakan StudentNotFound untuk 404 routes dalam student area */}
-            {location.pathname !== "/student" &&
-            !location.pathname.startsWith("/student/subjects") &&
-            !location.pathname.startsWith("/student/materials") &&
-            !location.pathname.startsWith("/student/assessments") &&
-            !location.pathname.startsWith("/student/quiz") &&
-            !location.pathname.startsWith("/student/assignments") &&
-            !location.pathname.startsWith("/student/grades") &&
-            !location.pathname.startsWith("/student/progress") &&
-            !location.pathname.startsWith("/student/group") &&
-            !location.pathname.startsWith("/student/notifications") ? (
-              <StudentNotFound />
-            ) : (
+            <Card
+              style={{
+                background: colorBgContainer,
+                borderRadius: borderRadiusLG,
+                boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+                marginBottom: 12,
+              }}
+              bodyStyle={{
+                paddingBottom: 0,
+                paddingTop: 10,
+                paddingLeft: 16,
+                paddingRight: 16,
+              }}
+            >
+              <StudentBreadcrumb />
+            </Card>
+            <Card
+              style={{
+                background: colorBgContainer,
+                borderRadius: borderRadiusLG,
+                minHeight: "calc(100vh - 160px)",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+              }}
+              bodyStyle={{ padding: isMobile ? 16 : 24 }}
+            >
               <Outlet />
-            )}
-          </Card>
-        </Content>
+            </Card>
+          </Content>
+        </Layout>
       </Layout>
-    </Layout>
+    </>
   );
 };
 
