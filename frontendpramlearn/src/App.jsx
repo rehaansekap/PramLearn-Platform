@@ -1,29 +1,26 @@
-import { useContext } from "react";
+import React, { useContext } from "react";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
 } from "react-router-dom";
-import { AuthProvider, AuthContext } from "./context/AuthContext";
-import AppLayout from "./features/navigation/components/SideBar";
-import StudentLayout from "./features/student-interface/layout/StudentLayout";
-import Home from "./pages/Home";
-import UserManagement from "./features/users-management/UserManagement";
-import ClassManagement from "./features/class-management/ClassManagement";
-import ClassDetailPage from "./features/class-management/ClassDetailPage";
-import SubjectManagement from "./features/subject-management/SubjectManagement";
-import SubjectDetailPage from "./features/subject-management/SubjectDetailPage";
-import MaterialDetailPage from "./features/material-management/MaterialDetailPage";
+import { AuthContext } from "./context/AuthContext";
+import { ConfigProvider } from "antd";
 import Login from "./features/authentication/Login";
-import Register from "./features/authentication/Register";
 import PrivateRoute from "./features/navigation/components/PrivateRoute";
 import StudentPrivateRoute from "./features/student-interface/components/StudentPrivateRoute";
-import ManagementPage from "./pages/ManagementPage";
-import { OnlineStatusProvider } from "./context/OnlineStatusContext";
-import "./App.css";
+import Sidebar from "./features/navigation/components/SideBar";
+import StudentLayout from "./features/student-interface/layout/StudentLayout";
+import NotFound from "./pages/NotFound";
 
-// Student Interface Components (akan dibuat di chat selanjutnya)
+// Management Components
+import Home from "./pages/Home";
+import ManagementPage from "./pages/ManagementPage"; // Import ManagementPage
+import SubjectDetailPage from "./features/subject-management/SubjectDetailPage";
+import MaterialDetailPage from "./features/material-management/MaterialDetailPage";
+
+// Student Interface Components
 import StudentDashboard from "./features/student-interface/dashboard/StudentDashboard";
 import StudentSubjects from "./features/student-interface/subjects/StudentSubjects";
 import StudentAssessments from "./features/student-interface/assessments/StudentAssessments";
@@ -37,17 +34,92 @@ import StudentAnalytics from "./features/student-interface/analytics/StudentAnal
 import StudentGroupDashboard from "./features/student-interface/group/StudentGroupDashboard";
 import StudentNotificationCenter from "./features/student-interface/notifications/StudentNotificationCenter";
 
+// Anti Design theme configuration
+const antdTheme = {
+  token: {
+    colorPrimary: "#11418b",
+    colorInfo: "#11418b",
+    colorSuccess: "#52c41a",
+    borderRadius: 8,
+    wireframe: false,
+  },
+  components: {
+    Button: {
+      borderRadius: 8,
+      controlHeight: 40,
+    },
+    Input: {
+      borderRadius: 8,
+      controlHeight: 40,
+    },
+    Card: {
+      borderRadius: 12,
+    },
+  },
+};
+
+// Helper function untuk mendapatkan role path
+const getRolePath = (roleId) => {
+  switch (roleId) {
+    case 1:
+      return "admin";
+    case 2:
+      return "teacher";
+    case 3:
+      return "student";
+    default:
+      return "user";
+  }
+};
+
+// Redirect component untuk user yang sudah login
 const RedirectIfAuthenticated = ({ children }) => {
-  const { token, loading } = useContext(AuthContext);
-  if (loading) return null; // Atau tampilkan spinner jika perlu
-  return token ? <Navigate to="/" replace /> : children;
+  const { token, user, loading } = useContext(AuthContext);
+
+  if (loading) return null; // Loading state
+
+  if (token && user) {
+    const rolePath = getRolePath(user.role);
+    // Redirect berdasarkan role
+    if (user.role === 3) {
+      return <Navigate to="/student" replace />;
+    } else if (user.role === 1 || user.role === 2) {
+      return <Navigate to={`/${rolePath}`} replace />;
+    }
+  }
+
+  return children;
 };
 
 const AppRoutes = () => {
-  const { token } = useContext(AuthContext);
+  const { token, user, loading } = useContext(AuthContext);
+
+  // Loading state
+  if (loading) {
+    return (
+      <div
+        style={{
+          height: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        }}
+      >
+        <div style={{ textAlign: "center", color: "#fff" }}>
+          <div style={{ fontSize: 24, marginBottom: 16 }}>PramLearn</div>
+          <div>Memuat aplikasi...</div>
+        </div>
+      </div>
+    );
+  }
+
+  // Get role path untuk user saat ini
+  const userRolePath = user ? getRolePath(user.role) : null;
 
   return (
     <Routes>
+      {/* Login Route - Landing Page */}
       <Route
         path="/login"
         element={
@@ -56,6 +128,23 @@ const AppRoutes = () => {
           </RedirectIfAuthenticated>
         }
       />
+
+      {/* Root redirect berdasarkan role */}
+      <Route
+        path="/"
+        element={
+          token && user ? (
+            user.role === 3 ? (
+              <Navigate to="/student" replace />
+            ) : (
+              <Navigate to={`/${userRolePath}`} replace />
+            )
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        }
+      />
+
       {token ? (
         <>
           {/* Student Routes */}
@@ -75,110 +164,96 @@ const AppRoutes = () => {
               element={<StudentMaterialViewer />}
             />
             <Route path="assessments" element={<StudentQuizList />} />
-            <Route
-              path="quiz/:quizSlug"
-              element={<QuizTakingInterface />}
-            />{" "}
-            {/* Changed from :quizId to :quizSlug */}
+            <Route path="quiz/:quizSlug" element={<QuizTakingInterface />} />
             <Route
               path="quiz/:quizSlug/results"
               element={<QuizResultsPage />}
-            />{" "}
-            {/* Changed from :quizId to :quizSlug */}
+            />
             <Route path="assignments" element={<StudentAssignments />} />
-            <Route path="grades" element={<StudentGradeOverview />} />{" "}
-            <Route path="analytics" element={<StudentAnalytics />} />{" "}
-            {/* Add this */}
+            <Route path="grades" element={<StudentGradeOverview />} />
+            <Route path="progress" element={<StudentAnalytics />} />
             <Route path="group" element={<StudentGroupDashboard />} />
             <Route
               path="notifications"
               element={<StudentNotificationCenter />}
             />
+            {/* Student 404 Route */}
+            <Route path="*" element={<NotFound />} />
           </Route>
 
-          {/* Admin/Teacher Routes */}
+          {/* Admin Routes */}
           <Route
-            path="*"
+            path="/admin/*"
             element={
-              <AppLayout>
-                <Routes>
-                  <Route
-                    path="/"
-                    element={
-                      <PrivateRoute>
-                        <Home />
-                      </PrivateRoute>
-                    }
-                  />
-                  <Route
-                    path="/management"
-                    element={
-                      <PrivateRoute>
-                        <ManagementPage />
-                      </PrivateRoute>
-                    }
-                  />
-                  <Route
-                    path="/management/subject/:subjectSlug"
-                    element={
-                      <PrivateRoute>
-                        <SubjectDetailPage />
-                      </PrivateRoute>
-                    }
-                  />
-                  <Route
-                    path="/management/subject/:subjectId"
-                    element={
-                      <PrivateRoute>
-                        <SubjectDetailPage />
-                      </PrivateRoute>
-                    }
-                  />
-                  <Route
-                    path="/management/class/:classSlug"
-                    element={
-                      <PrivateRoute>
-                        <ClassDetailPage />
-                      </PrivateRoute>
-                    }
-                  />
-                  <Route
-                    path="/management/class/:classId"
-                    element={
-                      <PrivateRoute>
-                        <ClassDetailPage />
-                      </PrivateRoute>
-                    }
-                  />
-                  <Route
-                    path="/material/:materialSlug"
-                    element={
-                      <PrivateRoute>
-                        <MaterialDetailPage />
-                      </PrivateRoute>
-                    }
-                  />
-                </Routes>
-              </AppLayout>
+              <PrivateRoute allowedRoles={[1]}>
+                <Sidebar />
+              </PrivateRoute>
+            }
+          >
+            <Route index element={<Home />} />
+            <Route path="management" element={<ManagementPage />} />
+            {/* PERBAIKI ROUTE INI */}
+            <Route
+              path="management/material/:materialSlug"
+              element={<MaterialDetailPage />}
+            />
+            <Route
+              path="management/subject/:subjectSlug"
+              element={<SubjectDetailPage />}
+            />
+            <Route path="*" element={<NotFound />} />
+          </Route>
+
+          {/* Teacher Routes */}
+          <Route
+            path="/teacher/*"
+            element={
+              <PrivateRoute allowedRoles={[2]}>
+                <Sidebar />
+              </PrivateRoute>
+            }
+          >
+            <Route index element={<Home />} />
+            <Route path="management" element={<ManagementPage />} />
+            {/* PERBAIKI ROUTE INI JUGA */}
+            <Route
+              path="management/material/:materialSlug"
+              element={<MaterialDetailPage />}
+            />
+            <Route
+              path="management/subject/:subjectSlug"
+              element={<SubjectDetailPage />}
+            />
+            <Route path="*" element={<NotFound />} />
+          </Route>
+
+          {/* Legacy Management Routes - Redirect to role-based routes */}
+          <Route
+            path="/management/*"
+            element={
+              token && user ? (
+                <Navigate to={`/${userRolePath}/management`} replace />
+              ) : (
+                <Navigate to="/login" replace />
+              )
             }
           />
         </>
-      ) : (
-        <Route path="*" element={<Login />} />
-      )}
+      ) : null}
+
+      {/* Global 404 Route - harus di paling bawah */}
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 };
 
 function App() {
   return (
-    <AuthProvider>
-      <OnlineStatusProvider>
-        <Router>
-          <AppRoutes />
-        </Router>
-      </OnlineStatusProvider>
-    </AuthProvider>
+    <ConfigProvider theme={antdTheme}>
+      <Router>
+        <AppRoutes />
+      </Router>
+    </ConfigProvider>
   );
 }
 

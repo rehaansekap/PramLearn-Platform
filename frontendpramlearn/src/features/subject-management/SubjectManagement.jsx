@@ -62,6 +62,19 @@ const SubjectManagement = ({ classId }) => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  const getRolePath = (roleId) => {
+    switch (roleId) {
+      case 1:
+        return "admin";
+      case 2:
+        return "teacher";
+      default:
+        return "management";
+    }
+  };
+
+  const userRolePath = user ? getRolePath(user.role) : "management";
+
   const filteredSubjects = subjects.filter((subject) => {
     const matchName = subject.name
       .toLowerCase()
@@ -278,6 +291,10 @@ const SubjectManagement = ({ classId }) => {
     }
   };
 
+  const handleViewDetail = (subjectSlug) => {
+    navigate(`/${userRolePath}/management/subject/${subjectSlug}`);
+  };
+
   // Loading state untuk keseluruhan halaman
   const isPageLoading = loading; // Pastikan loading dari useFetchSubjects sudah benar
   const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
@@ -458,9 +475,7 @@ const SubjectManagement = ({ classId }) => {
               await deleteSubject(subjectId);
               fetchSubjects();
             }}
-            handleViewDetail={(subjectSlug) =>
-              navigate(`/management/subject/${subjectSlug}`)
-            }
+            handleViewDetail={handleViewDetail} // Gunakan fungsi yang sudah diupdate
             rowSelection={
               user?.role !== 2
                 ? {
@@ -470,7 +485,7 @@ const SubjectManagement = ({ classId }) => {
                 : null
             }
             visibleColumns={visibleColumns}
-            loading={false} // Table loading dihandle oleh parent
+            loading={false}
             modalLoading={modalLoading}
           />
 

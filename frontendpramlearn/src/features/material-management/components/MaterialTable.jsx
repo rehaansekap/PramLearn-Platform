@@ -21,10 +21,11 @@ const MaterialTable = ({
   rowsPerPage,
   loading = false,
   modalLoading = false,
+  userRolePath,
 }) => {
   const { user } = useContext(AuthContext);
   const [actionLoading, setActionLoading] = useState({});
-  const navigate = useNavigate(); // Tambahkan ini
+  const navigate = useNavigate();
 
   // Handle edit dengan loading
   const handleEditWithLoading = async (materialId) => {
@@ -94,11 +95,14 @@ const MaterialTable = ({
     }
   };
 
+  // Handle view detail dengan loading - PERBAIKAN DI SINI
   const handleViewWithLoading = async (materialSlug) => {
     const viewKey = `view_${materialSlug}`;
     setActionLoading((prev) => ({ ...prev, [viewKey]: true }));
+
     try {
-      navigate(`/material/${materialSlug}`);
+      // GUNAKAN materialSlug bukan materialId
+      navigate(`/${userRolePath}/management/material/${materialSlug}`);
     } catch (error) {
       console.error("Error viewing material detail:", error);
     } finally {
@@ -121,7 +125,7 @@ const MaterialTable = ({
         <Space size="small">
           <Button
             icon={<EyeOutlined />}
-            onClick={() => handleViewWithLoading(record.slug)}
+            onClick={() => handleViewWithLoading(record.slug)} // Pastikan menggunakan record.slug
             loading={actionLoading[`view_${record.slug}`]}
             style={{
               backgroundColor: "#1890ff",
@@ -130,28 +134,34 @@ const MaterialTable = ({
           >
             {actionLoading[`view_${record.slug}`] ? "Loading..." : "Detail"}
           </Button>
-          <Button
-            icon={<EditOutlined />}
-            onClick={() => handleEditWithLoading(record.id)}
-            loading={actionLoading[`edit_${record.id}`] || modalLoading}
-            style={{
-              backgroundColor: "#11418b",
-              color: "#fff",
-            }}
-          >
-            {actionLoading[`edit_${record.id}`] ? "Loading..." : "Edit"}
-          </Button>
-          <Button
-            icon={<DeleteOutlined />}
-            onClick={() => handleDeleteWithLoading(record.id, record)}
-            loading={actionLoading[`delete_${record.id}`]}
-            danger
-          >
-            {actionLoading[`delete_${record.id}`] ? "Deleting..." : "Delete"}
-          </Button>
+          {user?.role !== 2 && (
+            <>
+              <Button
+                icon={<EditOutlined />}
+                onClick={() => handleEditWithLoading(record.id)}
+                loading={actionLoading[`edit_${record.id}`] || modalLoading}
+                style={{
+                  backgroundColor: "#11418b",
+                  color: "#fff",
+                }}
+              >
+                {actionLoading[`edit_${record.id}`] ? "Loading..." : "Edit"}
+              </Button>
+              <Button
+                icon={<DeleteOutlined />}
+                onClick={() => handleDeleteWithLoading(record.id, record)}
+                loading={actionLoading[`delete_${record.id}`]}
+                danger
+              >
+                {actionLoading[`delete_${record.id}`]
+                  ? "Deleting..."
+                  : "Delete"}
+              </Button>
+            </>
+          )}
         </Space>
       ),
-      width: 240,
+      width: user?.role === 2 ? 120 : 240,
       align: "center",
     },
   ].filter(Boolean);

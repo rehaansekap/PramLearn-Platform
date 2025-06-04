@@ -1,198 +1,202 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Breadcrumb } from "antd";
 import { Link, useLocation, matchPath } from "react-router-dom";
+import { AuthContext } from "../../../context/AuthContext";
 import api from "../../../api";
-
-const breadcrumbNameMap = {
-  "/": "Home",
-  "/users": "User Management",
-  "/classes": "Class Management",
-  "/class/:classSlug": "Class Detail",
-  "/subjects": "Subject Management",
-  "/subject/:subjectSlug": "Subject Detail",
-  "/material/:materialSlug": "Material Detail",
-  "/management": "Management",
-};
 
 const AppBreadcrumb = () => {
   const location = useLocation();
-  const fromManagement =
-    location.state?.fromManagement ||
-    new URLSearchParams(location.search).get("from") === "management";
-  const [dynamicCrumbs, setDynamicCrumbs] = useState(null);
+  const [dynamicCrumbs, setDynamicCrumbs] = useState([]);
+  const { user } = useContext(AuthContext);
+
+  // Get role path
+  const getRolePath = (roleId) => {
+    switch (roleId) {
+      case 1:
+        return "admin";
+      case 2:
+        return "teacher";
+      case 3:
+        return "student";
+      default:
+        return "user";
+    }
+  };
+
+  const userRolePath = user ? getRolePath(user.role) : "user";
+  const roleDisplayName =
+    user?.role === 1 ? "Admin" : user?.role === 2 ? "Teacher" : "Management";
 
   useEffect(() => {
-    const fetchBreadcrumbs = async () => {
-      // Helper untuk prefix Management jika di /management
-      const withManagementPrefix = (crumbs) => {
-        if (fromManagement) {
-          return [
-            { path: "/", breadcrumbName: "Home" },
-            { path: "/management", breadcrumbName: "Management" },
-            ...crumbs,
-          ];
+    const fetchDynamicData = async () => {
+      // Subject Detail Page - NEW PATH: /admin/management/subject/:subjectSlug
+      const subjectMatch = matchPath(
+        { path: `/${userRolePath}/management/subject/:subjectSlug`, end: true },
+        location.pathname
+      );
+      if (subjectMatch) {
+        const { subjectSlug } = subjectMatch.params;
+        try {
+          const response = await api.get(`subjects/?slug=${subjectSlug}`);
+          const subject = response.data.find((s) => s.slug === subjectSlug);
+          if (subject) {
+            setDynamicCrumbs([
+              { path: "/", breadcrumbName: "Home" },
+              { path: `/${userRolePath}`, breadcrumbName: roleDisplayName },
+              {
+                path: `/${userRolePath}/management`,
+                breadcrumbName: "Management",
+              },
+              {
+                path: `/${userRolePath}/management/subject/${subjectSlug}`,
+                breadcrumbName: `${subject.name}`,
+              },
+            ]);
+            return;
+          }
+        } catch (error) {
+          console.error("Error fetching subject:", error);
         }
-        return [{ path: "/", breadcrumbName: "Home" }, ...crumbs];
-      };
-
-      const managementSubjectMatch = matchPath(
-        { path: "/management/subject/:subjectSlug", end: true },
-        location.pathname
-      );
-      if (managementSubjectMatch) {
-        const { subjectSlug } = managementSubjectMatch.params;
-        try {
-          const subjectRes = await api.get(`subjects/?slug=${subjectSlug}`);
-          const subjectData = subjectRes.data.find(
-            (s) => s.slug === subjectSlug
-          );
-          if (subjectData) {
-            setDynamicCrumbs([
-              { path: "/", breadcrumbName: "Home" },
-              { path: "/management", breadcrumbName: "Management" },
-              {
-                path: `/management/${subjectSlug}`,
-                breadcrumbName: `Subject Detail (${subjectData.name})`,
-              },
-            ]);
-            return;
-          }
-        } catch {}
       }
 
-      const managementClassMatch = matchPath(
-        { path: "/management/class/:classSlug", end: true },
-        location.pathname
-      );
-      if (managementClassMatch) {
-        const { classSlug } = managementClassMatch.params;
-        console.log("Breadcrumb received classSlug:", classSlug); // Log slug kelas
-        try {
-          const classRes = await api.get(`classes/?slug=${classSlug}`);
-          const classData = classRes.data.find((c) => c.slug === classSlug);
-          if (classData) {
-            setDynamicCrumbs([
-              { path: "/", breadcrumbName: "Home" },
-              { path: "/management", breadcrumbName: "Management" },
-              {
-                path: `/management/${classSlug}`,
-                breadcrumbName: `Class Detail (${classData.name})`,
-              },
-            ]);
-            return;
-          }
-        } catch {}
-      }
-
-      // Material Detail
+      // Material Detail Page - NEW PATH: /admin/management/material/:materialId
       const materialMatch = matchPath(
-        { path: "/material/:materialSlug", end: true },
+        { path: `/${userRolePath}/management/material/:materialSlug`, end: true },
         location.pathname
       );
       if (materialMatch) {
         const { materialSlug } = materialMatch.params;
         try {
-          const materialRes = await api.get(`materials/?slug=${materialSlug}`);
-          const material = materialRes.data.find(
-            (m) => m.slug === materialSlug
-          );
-          if (material && material.subject) {
-            const subjectRes = await api.get(`subjects/${material.subject}/`);
-            setDynamicCrumbs(
-              withManagementPrefix([
-                { path: "/management", breadcrumbName: "Management" },
-                {
-                  path: `/management/subject/${subjectRes.data.slug}`,
-                  breadcrumbName: `Subject Detail (${subjectRes.data.name})`,
-                },
-                {
-                  path: `/material/${materialSlug}`,
-                  breadcrumbName: `Material Detail (${materialSlug})`,
-                },
-              ])
-            );
+          const response = await api.get(`materials/?slug=${materialSlug}`);
+          const material = response.data.find((m) => m.slug === materialSlug);
+          if (material) {
+            // Fetch subject info untuk breadcrumb yang lebih lengkap
+            let subjectName = "Unknown Subject";
+            let subjectSlug = "";
+            if (material.subject) {
+              try {
+                const subjectResponse = await api.get(
+                  `subjects/${material.subject}/`
+                );
+                subjectName = subjectResponse.data.name;
+                subjectSlug = subjectResponse.data.slug;
+              } catch (error) {
+                console.error("Error fetching subject for material:", error);
+              }
+            }
+
+            setDynamicCrumbs([
+              { path: "/", breadcrumbName: "Home" },
+              { path: `/${userRolePath}`, breadcrumbName: roleDisplayName },
+              {
+                path: `/${userRolePath}/management`,
+                breadcrumbName: "Management",
+              },
+              {
+                path: `/${userRolePath}/management/subject/${subjectSlug}`,
+                breadcrumbName: subjectName,
+              },
+              {
+                path: `/${userRolePath}/management/material/${materialSlug}`,
+                breadcrumbName: `${material.title}`,
+              },
+            ]);
             return;
           }
-        } catch {}
+        } catch (error) {
+          console.error("Error fetching material:", error);
+        }
       }
 
-      // User Management (contoh, jika ada detail user)
-      const userMatch = matchPath(
-        { path: "/users/:userId", end: true },
-        location.pathname
-      );
-      if (userMatch) {
-        const { userId } = userMatch.params;
-        setDynamicCrumbs(
-          withManagementPrefix([
-            { path: "/users", breadcrumbName: "User Management" },
-            {
-              path: `/users/${userId}`,
-              breadcrumbName: `User Detail (${userId})`,
-            },
-          ])
-        );
-        return;
+      // Default breadcrumbs berdasarkan path
+      const pathSegments = location.pathname.split("/").filter(Boolean);
+      const crumbs = [{ path: "/", breadcrumbName: "Home" }];
+
+      if (pathSegments[0] === userRolePath) {
+        // Role home page
+        crumbs.push({
+          path: `/${userRolePath}`,
+          breadcrumbName: roleDisplayName,
+        });
+
+        // Management page
+        if (pathSegments[1] === "management") {
+          crumbs.push({
+            path: `/${userRolePath}/management`,
+            breadcrumbName: "Management",
+          });
+
+          // Handle nested paths under management
+          if (pathSegments[2] === "subject" && pathSegments[3]) {
+            // We're in a subject detail page, but breadcrumb will be handled by dynamic fetch above
+          } else if (pathSegments[2] === "material" && pathSegments[3]) {
+            // We're in a material detail page, but breadcrumb will be handled by dynamic fetch above
+          }
+        }
+        // Handle other paths at role level
+        else if (pathSegments.length > 1) {
+          const secondSegment = pathSegments[1];
+          const formattedSegment =
+            secondSegment.charAt(0).toUpperCase() + secondSegment.slice(1);
+          crumbs.push({
+            path: `/${userRolePath}/${secondSegment}`,
+            breadcrumbName: formattedSegment,
+          });
+        }
+      }
+      // Handle legacy /management paths
+      else if (pathSegments[0] === "management") {
+        crumbs.push({
+          path: `/${userRolePath}`,
+          breadcrumbName: roleDisplayName,
+        });
+        crumbs.push({
+          path: `/${userRolePath}/management`,
+          breadcrumbName: "Management",
+        });
       }
 
-      // Default: fallback ke path
-      setDynamicCrumbs(null);
+      setDynamicCrumbs(crumbs);
     };
 
-    fetchBreadcrumbs();
-  }, [location.pathname]);
+    fetchDynamicData();
+  }, [location.pathname, userRolePath, roleDisplayName]);
 
-  const toBreadcrumbItems = (crumbs) =>
-    crumbs.map((bc, idx) => ({
-      title:
-        idx < crumbs.length - 1 ? (
-          <Link to={bc.path}>{bc.breadcrumbName}</Link>
-        ) : (
-          bc.breadcrumbName
-        ),
-      key: bc.path,
-    }));
+  // Convert breadcrumb items to Ant Design format
+  const breadcrumbItems = dynamicCrumbs.map((crumb, index) => {
+    const isLast = index === dynamicCrumbs.length - 1;
 
-  if (dynamicCrumbs) {
-    return (
-      <Breadcrumb
-        style={{ margin: "16px 0" }}
-        items={toBreadcrumbItems(dynamicCrumbs)}
-      />
-    );
-  }
-
-  // fallback: breadcrumb default
-  const pathSnippets = location.pathname.split("/").filter((i) => i);
-  let url = "";
-  const breadcrumbs = [
-    {
-      path: "/",
-      breadcrumbName: "Home",
-    },
-    ...pathSnippets.map((_, idx) => {
-      url = `/${pathSnippets.slice(0, idx + 1).join("/")}`;
-      let matchedKey = Object.keys(breadcrumbNameMap).find((key) =>
-        matchPath({ path: key, end: true }, url)
-      );
-      let breadcrumbName = matchedKey
-        ? breadcrumbNameMap[matchedKey]
-        : url.replace("/", "");
-      if (matchedKey && matchedKey.includes(":")) {
-        breadcrumbName += ` (${pathSnippets[idx]})`;
-      }
-      return {
-        path: url,
-        breadcrumbName,
-      };
-    }),
-  ];
+    return {
+      key: index,
+      title: isLast ? (
+        <span style={{ color: "#666" }}>{crumb.breadcrumbName}</span>
+      ) : (
+        <Link
+          to={crumb.path}
+          style={{
+            color: "#11418b",
+            textDecoration: "none",
+          }}
+          onMouseEnter={(e) => (e.target.style.textDecoration = "underline")}
+          onMouseLeave={(e) => (e.target.style.textDecoration = "none")}
+        >
+          {crumb.breadcrumbName}
+        </Link>
+      ),
+    };
+  });
 
   return (
-    <Breadcrumb
-      style={{ margin: "16px 0" }}
-      items={toBreadcrumbItems(breadcrumbs)}
-    />
+    <div style={{ marginBottom: 16 }}>
+      <Breadcrumb
+        items={breadcrumbItems}
+        separator=">"
+        style={{
+          fontSize: "14px",
+          padding: "8px 0",
+        }}
+      />
+    </div>
   );
 };
 

@@ -1,33 +1,24 @@
-import React, { useState, useContext, useEffect } from "react";
-import { Link, useNavigate, useLocation, Outlet } from "react-router-dom";
-import { AuthContext } from "../../../context/AuthContext";
+import React, { useContext, useEffect, useState } from "react";
+import { Outlet, useNavigate, useLocation, Link } from "react-router-dom";
+import { Layout, Menu, Button, Drawer, theme, Breadcrumb, Card } from "antd";
 import {
-  HomeIcon,
-  BookOpenIcon,
-  ClipboardDocumentListIcon,
-  ChartBarIcon,
-  UserGroupIcon,
-  ArrowLeftOnRectangleIcon,
-  Bars3Icon,
-  XMarkIcon,
-} from "@heroicons/react/24/solid";
-import { Button, Layout, Menu, theme, Drawer, Avatar, Spin, Space } from "antd";
-import {
+  MenuOutlined,
+  CloseOutlined,
   DashboardOutlined,
   BookOutlined,
   FileTextOutlined,
+  TrophyOutlined,
   BarChartOutlined,
   TeamOutlined,
+  BellOutlined,
   LogoutOutlined,
-  UserOutlined,
-  LoadingOutlined,
-  TrophyOutlined, // Add this import
 } from "@ant-design/icons";
+import { AuthContext } from "../../../context/AuthContext";
 import Swal from "sweetalert2";
 import StudentBreadcrumb from "../components/StudentBreadcrumb";
-import NotificationBell from "../notifications/components/NotificationBell";
+import StudentNotFound from "../../../components/StudentNotFound"; // Import StudentNotFound
 
-const { Header, Sider, Content } = Layout;
+const { Header, Content, Sider } = Layout;
 
 const StudentLayout = () => {
   const [collapsed, setCollapsed] = useState(true);
@@ -117,17 +108,12 @@ const StudentLayout = () => {
     {
       key: "/student/grades",
       icon: <TrophyOutlined />,
-      label: <Link to="/student/grades">Grades & Results</Link>,
+      label: <Link to="/student/grades">My Grades</Link>,
     },
     {
       key: "/student/progress",
       icon: <BarChartOutlined />,
-      label: <Link to="/student/progress">My Progress</Link>,
-    },
-    {
-      key: "/student/analytics",
-      icon: <BarChartOutlined />,
-      label: <Link to="/student/analytics">Learning Analytics</Link>,
+      label: <Link to="/student/progress">Progress</Link>,
     },
     {
       key: "/student/group",
@@ -138,7 +124,6 @@ const StudentLayout = () => {
 
   // Get selected menu key from current path
   const getMenuKeyFromPath = (pathname) => {
-    // Handle exact matches first
     if (pathname === "/student" || pathname === "/student/") return "/student";
     if (pathname.startsWith("/student/subjects")) return "/student/subjects";
     if (pathname.startsWith("/student/assessments"))
@@ -147,6 +132,7 @@ const StudentLayout = () => {
       return "/student/assignments";
     if (pathname.startsWith("/student/grades")) return "/student/grades";
     if (pathname.startsWith("/student/progress")) return "/student/progress";
+    if (pathname.startsWith("/student/group")) return "/student/group";
     return "/student";
   };
 
@@ -192,75 +178,67 @@ const StudentLayout = () => {
     );
   }
 
-  // Sidebar content
+  // Sidebar content - MODIFIKASI LAYOUT UNTUK PINDAHKAN LOGOUT
   const sidebarContent = (
-    <div style={{ height: "100%" }}>
-      {/* Logo & User Info */}
+    <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
+      {/* Header Profile */}
       <div
         style={{
-          padding: "16px",
+          padding: "24px 16px",
           borderBottom: "1px solid #303030",
           textAlign: "center",
         }}
       >
-        <div style={{ marginBottom: "12px" }}>
-          <Avatar
-            size={collapsed && !isMobile ? 32 : 48}
-            icon={<UserOutlined />}
-            style={{ backgroundColor: "#11418b" }}
-          />
+        <div
+          style={{
+            width: 64,
+            height: 64,
+            borderRadius: "50%",
+            background: "linear-gradient(135deg, #1890ff 0%, #52c41a 100%)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            margin: "0 auto 12px",
+            color: "#fff",
+            fontSize: "24px",
+            fontWeight: "bold",
+          }}
+        >
+          {user?.username?.charAt(0)?.toUpperCase() || "S"}
         </div>
-        {(!collapsed || isMobile) && (
-          <div>
-            <div
-              style={{
-                color: "#ffffff",
-                fontSize: "16px",
-                fontWeight: 600,
-                marginBottom: "4px",
-              }}
-            >
-              {user.first_name || user.username}
-            </div>
-            <div
-              style={{
-                color: "#d9d9d9",
-                fontSize: "12px",
-              }}
-            >
-              Student Portal
-            </div>
-          </div>
-        )}
+        <div style={{ color: "#fff", fontWeight: 600, fontSize: "16px" }}>
+          {user?.username || "Student"}
+        </div>
+        <div style={{ color: "#bfbfbf", fontSize: "12px" }}>Student</div>
       </div>
 
-      {/* Navigation Menu */}
-      <Menu
-        theme="dark"
-        mode="inline"
-        selectedKeys={[selectedMenuKey]}
-        style={{ borderRight: 0, background: "transparent" }}
-        items={menuItems.map((item) => ({
-          ...item,
-          label: (
-            <span
-              onClick={() => {
-                if (isMobile) setMobileDrawerOpen(false);
-              }}
-            >
-              {item.label}
-            </span>
-          ),
-        }))}
-      />
+      {/* Menu Items */}
+      <div style={{ flex: 1, overflowY: "auto" }}>
+        <Menu
+          theme="dark"
+          mode="inline"
+          selectedKeys={[selectedMenuKey]}
+          style={{ borderRight: 0, background: "transparent" }}
+          items={menuItems.map((item) => ({
+            ...item,
+            label: (
+              <span
+                onClick={() => {
+                  if (isMobile) setMobileDrawerOpen(false);
+                }}
+              >
+                {item.label}
+              </span>
+            ),
+          }))}
+        />
+      </div>
 
-      {/* Logout Button */}
+      {/* Logout Button - DIPINDAH KE ATAS TOGGLE BUTTON */}
       <div
         style={{
-          position: "absolute",
-          bottom: "16px",
-          left: "16px",
-          right: "16px",
+          padding: "16px",
+          borderTop: "1px solid #303030",
         }}
       >
         <Button
@@ -274,156 +252,180 @@ const StudentLayout = () => {
             fontWeight: 600,
           }}
         >
-          {(!collapsed || isMobile) && "Logout"}
+          Logout
         </Button>
       </div>
+
+      {/* Toggle Button untuk Desktop - DIPINDAH KE PALING BAWAH */}
+      {!isMobile && (
+        <div
+          style={{
+            padding: "8px 16px",
+            borderTop: "1px solid #303030",
+          }}
+        >
+          <Button
+            type="text"
+            icon={collapsed ? <MenuOutlined /> : <CloseOutlined />}
+            onClick={() => setCollapsed(!collapsed)}
+            style={{
+              width: "100%",
+              color: "#fff",
+              borderColor: "transparent",
+            }}
+          >
+            {collapsed ? "Expand" : "Collapse"}
+          </Button>
+        </div>
+      )}
     </div>
   );
 
   return (
-    <>
-      <Header
-        style={
-          {
-            /* existing styles */
-          }
-        }
-      >
-        <div
+    <Layout style={{ minHeight: "100vh" }}>
+      {/* Desktop Sidebar */}
+      {!isMobile && (
+        <Sider
+          trigger={null}
+          collapsible
+          collapsed={collapsed}
+          width={280}
           style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
+            background: "#11418b",
+            position: "fixed",
+            height: "100vh",
+            left: 0,
+            top: 0,
+            zIndex: 100,
           }}
         >
-          <div style={{ color: "#fff", fontWeight: 600, fontSize: "16px" }}>
-            Student Portal
+          {sidebarContent}
+        </Sider>
+      )}
+
+      {/* Mobile Drawer */}
+      <Drawer
+        title={
+          <div style={{ textAlign: "center", color: "#fff" }}>
+            <div style={{ fontSize: "18px", fontWeight: "bold" }}>
+              PramLearn
+            </div>
+            <div style={{ fontSize: "12px", opacity: 0.8 }}>Student Portal</div>
           </div>
-          <Space>
-            <NotificationBell
-              onOpenCenter={() => navigate("/student/notifications")}
-            />
-            <Avatar
-              size={32}
-              icon={<UserOutlined />}
-              style={{ backgroundColor: "#ffffff20" }}
-            />
-          </Space>
-        </div>
-      </Header>
-      <Layout style={{ minHeight: "100vh" }}>
-        {/* Desktop Sidebar */}
-        {!isMobile && (
-          <Sider
-            theme="dark"
-            collapsible
-            collapsed={collapsed}
-            onCollapse={setCollapsed}
-            style={{
-              background: "#001529",
-              position: "fixed",
-              height: "100vh",
-              left: 0,
-              top: 0,
-              bottom: 0,
-              zIndex: 100,
-            }}
-            width={250}
-            collapsedWidth={80}
-          >
-            {sidebarContent}
-          </Sider>
-        )}
+        }
+        placement="left"
+        open={mobileDrawerOpen}
+        onClose={() => setMobileDrawerOpen(false)}
+        headerStyle={{
+          background: "#11418b",
+          borderBottom: "1px solid #303030",
+        }}
+        bodyStyle={{
+          background: "#11418b",
+          padding: 0,
+        }}
+        width={280}
+      >
+        {sidebarContent}
+      </Drawer>
 
-        {/* Mobile Drawer */}
-        {isMobile && (
-          <Drawer
-            title="Student Menu"
-            placement="left"
-            closable={true}
-            onClose={() => setMobileDrawerOpen(false)}
-            open={mobileDrawerOpen}
-            width={250}
-            bodyStyle={{ padding: 0, background: "#001529" }}
-            headerStyle={{
-              background: "#001529",
-              borderBottom: "1px solid #303030",
-            }}
-            style={{ background: "#001529" }}
-          >
-            {sidebarContent}
-          </Drawer>
-        )}
-
-        {/* Main Layout */}
-        <Layout
+      {/* Main Layout */}
+      <Layout
+        style={{
+          marginLeft: isMobile ? 0 : collapsed ? 80 : 280,
+          transition: "margin-left 0.2s",
+        }}
+      >
+        {/* Header */}
+        <Header
           style={{
-            marginLeft: isMobile ? 0 : collapsed ? 80 : 250,
-            transition: "margin-left 0.2s",
+            padding: 0,
+            background: colorBgContainer,
+            borderBottom: "1px solid #f0f0f0",
+            position: "sticky",
+            top: 0,
+            zIndex: 10,
+            boxShadow: "0 2px 8px #f0f1f2",
           }}
         >
-          {/* Mobile Header */}
-          {isMobile && (
-            <Header
-              style={{
-                background: "#11418b",
-                padding: "0 16px",
-                position: "fixed",
-                width: "100%",
-                top: 0,
-                zIndex: 99,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
+          <div
+            style={{
+              padding: "0 24px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center" }}>
+              {isMobile && (
+                <Button
+                  type="text"
+                  icon={<MenuOutlined />}
+                  onClick={() => setMobileDrawerOpen(true)}
+                  style={{ marginRight: 16 }}
+                />
+              )}
+              <h2
+                style={{
+                  margin: 0,
+                  color: "#11418b",
+                  fontWeight: "bold",
+                }}
+              >
+                PramLearn - Student Portal
+              </h2>
+            </div>
+
+            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
               <Button
                 type="text"
-                icon={
-                  <Bars3Icon className="h-6 w-6" style={{ color: "#fff" }} />
-                }
-                onClick={() => setMobileDrawerOpen(true)}
-                style={{ color: "#fff" }}
+                icon={<BellOutlined />}
+                onClick={() => navigate("/student/notifications")}
               />
-              <div style={{ color: "#fff", fontWeight: 600, fontSize: "16px" }}>
-                Student Portal
+              <div style={{ fontSize: "14px", color: "#666" }}>
+                Welcome, <strong>{user?.username}</strong>
               </div>
-              <Avatar
-                size={32}
-                icon={<UserOutlined />}
-                style={{ backgroundColor: "#ffffff20" }}
-              />
-            </Header>
-          )}
+            </div>
+          </div>
+        </Header>
 
-          {/* Breadcrumb */}
-          <Content
+        {/* Content */}
+        <Content
+          style={{
+            margin: 0,
+            padding: 24,
+            minHeight: "calc(100vh - 64px)",
+            background: "#f5f5f5",
+          }}
+        >
+          <StudentBreadcrumb />
+          <Card
             style={{
-              margin: isMobile ? "64px 12px 0px 8px" : "12px 12px 0px 8px",
-              paddingLeft: 24,
-              paddingRight: 24,
               background: colorBgContainer,
               borderRadius: borderRadiusLG,
+              minHeight: "calc(100vh - 160px)",
             }}
+            bodyStyle={{ padding: 0 }}
           >
-            <StudentBreadcrumb />
-          </Content>
-
-          {/* Main Content */}
-          <Content
-            style={{
-              margin: "12px 12px 8px 8px",
-              padding: 24,
-              minHeight: "calc(100vh - 112px)",
-              background: colorBgContainer,
-              borderRadius: borderRadiusLG,
-            }}
-          >
-            <Outlet />
-          </Content>
-        </Layout>
+            {/* Gunakan StudentNotFound untuk 404 routes dalam student area */}
+            {location.pathname !== "/student" &&
+            !location.pathname.startsWith("/student/subjects") &&
+            !location.pathname.startsWith("/student/materials") &&
+            !location.pathname.startsWith("/student/assessments") &&
+            !location.pathname.startsWith("/student/quiz") &&
+            !location.pathname.startsWith("/student/assignments") &&
+            !location.pathname.startsWith("/student/grades") &&
+            !location.pathname.startsWith("/student/progress") &&
+            !location.pathname.startsWith("/student/group") &&
+            !location.pathname.startsWith("/student/notifications") ? (
+              <StudentNotFound />
+            ) : (
+              <Outlet />
+            )}
+          </Card>
+        </Content>
       </Layout>
-    </>
+    </Layout>
   );
 };
 

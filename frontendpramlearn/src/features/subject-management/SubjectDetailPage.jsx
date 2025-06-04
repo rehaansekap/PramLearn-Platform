@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Card,
   Typography,
@@ -53,6 +54,18 @@ const SubjectDetailPage = () => {
   const [exportLoading, setExportLoading] = useState({});
   const [initialLoading, setInitialLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const navigate = useNavigate();
+  const getRolePath = (roleId) => {
+    switch (roleId) {
+      case 1:
+        return "admin";
+      case 2:
+        return "teacher";
+      default:
+        return "management";
+    }
+  };
+  const userRolePath = user ? getRolePath(user.role) : "management";
 
   // Handle window resize
   useEffect(() => {
@@ -546,6 +559,7 @@ const SubjectDetailPage = () => {
             rowsPerPage={rowsPerPage}
             loading={false} // Table loading dihandle oleh parent
             modalLoading={materialLoading}
+            userRolePath={userRolePath}
           />
 
           {/* Modal dengan loading overlay yang konsisten */}

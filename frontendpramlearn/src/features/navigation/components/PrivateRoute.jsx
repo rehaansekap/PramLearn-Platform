@@ -1,11 +1,12 @@
 import React, { useContext } from "react";
 import { AuthContext } from "../../../context/AuthContext";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { Spin } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 
-const PrivateRoute = ({ children }) => {
+const PrivateRoute = ({ children, allowedRoles = [1, 2] }) => {
   const { user, token, loading } = useContext(AuthContext);
+  const location = useLocation();
 
   if (loading) {
     return (
@@ -30,9 +31,23 @@ const PrivateRoute = ({ children }) => {
     return <Navigate to="/login" replace />;
   }
 
-  // Hanya izinkan admin/teacher (role 1/2)
-  if (user.role !== 1 && user.role !== 2) {
-    return <Navigate to="/student" replace />;
+  // Check if user role is allowed
+  if (!allowedRoles.includes(user.role)) {
+    // Redirect ke halaman yang sesuai dengan role user
+    const getRolePath = (roleId) => {
+      switch (roleId) {
+        case 1:
+          return "/admin";
+        case 2:
+          return "/teacher";
+        case 3:
+          return "/student";
+        default:
+          return "/login";
+      }
+    };
+
+    return <Navigate to={getRolePath(user.role)} replace />;
   }
 
   return children;

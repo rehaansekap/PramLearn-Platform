@@ -1,113 +1,116 @@
-import React, { useState, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useContext, useEffect } from "react";
+import { Link, useNavigate, useLocation, Outlet } from "react-router-dom";
 import { AuthContext } from "../../../context/AuthContext";
 import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  HomeIcon,
-  UserPlusIcon,
-  UsersIcon,
-  BookOpenIcon,
-  ArrowRightOnRectangleIcon,
-  ArrowLeftOnRectangleIcon,
-  UserIcon,
-} from "@heroicons/react/24/solid";
-import { Button, Layout, Menu, theme, Drawer } from "antd"; // Tambahkan Drawer
+  HomeOutlined,
+  SettingOutlined,
+  LogoutOutlined,
+} from "@ant-design/icons";
+import { Button, Layout, Menu, theme, Drawer } from "antd";
 import Swal from "sweetalert2";
 import reactLogo from "../../../assets/react.svg";
 import SidebarHeader from "./SidebarHeader";
 import AppBreadcrumb from "./AppBreadcrumb";
-import { useLocation } from "react-router-dom";
 
 const { Header, Sider, Content } = Layout;
 
-const Sidebar = ({ children }) => {
-  const [collapsed, setCollapsed] = useState(true);
+const SideBar = () => {
+  const [collapsed, setCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-  const [drawerVisible, setDrawerVisible] = useState(false); // State untuk Drawer
-  const { token, logout } = useContext(AuthContext);
+  const [drawerVisible, setDrawerVisible] = useState(false);
+  const { token, logout, user } = useContext(AuthContext);
   const navigate = useNavigate();
+  const location = useLocation();
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
-  const location = useLocation();
 
-  const handleResize = () => {
-    setIsMobile(window.innerWidth <= 768);
-    if (window.innerWidth > 768) setDrawerVisible(false);
+  // Responsive handler
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+      if (window.innerWidth > 768) setDrawerVisible(false);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const getRolePath = (roleId) => {
+    switch (roleId) {
+      case 1:
+        return "admin";
+      case 2:
+        return "teacher";
+      case 3:
+        return "student";
+      default:
+        return "user";
+    }
   };
 
-  React.useEffect(() => {
-    window.addEventListener("resize", handleResize);
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
+  const userRolePath = user ? getRolePath(user.role) : "management";
+  const getRoleDisplayName = (roleId) => {
+    switch (roleId) {
+      case 1:
+        return "Admin";
+      case 2:
+        return "Teacher";
+      case 3:
+        return "Student";
+      default:
+        return "User";
+    }
+  };
 
   const handleLogout = () => {
     Swal.fire({
-      title: "Are you sure?",
-      text: "You will be logged out!",
+      title: "Logout",
+      text: "Anda yakin ingin keluar?",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, logout!",
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Ya, Logout",
+      cancelButtonText: "Batal",
     }).then((result) => {
       if (result.isConfirmed) {
         logout();
         navigate("/login");
-        Swal.fire("Logged out!", "You have been logged out.", "success");
+        Swal.fire("Logout Berhasil!", "Anda telah keluar.", "success");
       }
     });
   };
 
-  const menuItems = token
-    ? [
-        {
-          key: "1",
-          icon: <HomeIcon className="h-5 w-5" />,
-          label: <Link to="/">Home</Link>,
-        },
-        {
-          key: "2",
-          icon: <UsersIcon className="h-5 w-5" />,
-          label: <Link to="/management">Management</Link>,
-        },
-      ]
-    : [
-        {
-          key: "1",
-          icon: <HomeIcon className="h-5 w-5" />,
-          label: <Link to="/">Home</Link>,
-        },
-        {
-          key: "2",
-          icon: <ArrowLeftOnRectangleIcon className="h-5 w-5" />,
-          label: <Link to="/login">Login</Link>,
-        },
-        {
-          key: "3",
-          icon: <UserPlusIcon className="h-5 w-5" />,
-          label: <Link to="/register">Register</Link>,
-        },
-      ];
+  // Sidebar menu: hanya Home dan Management
+  const menuItems = [
+    {
+      key: "1",
+      icon: <HomeOutlined />,
+      label: <Link to={`/${userRolePath}`}>Home</Link>,
+    },
+    {
+      key: "2",
+      icon: <SettingOutlined />,
+      label: <Link to={`/${userRolePath}/management`}>Management</Link>,
+    },
+  ];
 
   // Mapping path ke key menu
   const getMenuKeyFromPath = (pathname) => {
-    if (pathname.startsWith("/management")) return "2";
-    if (pathname === "/") return "1";
-    return "1"; // default ke Home
+    if (pathname === `/${userRolePath}` || pathname === `/${userRolePath}/`)
+      return "1";
+    if (pathname.startsWith(`/${userRolePath}/management`)) return "2";
+    return "1";
   };
 
   const selectedMenuKey = getMenuKeyFromPath(location.pathname);
 
-  // Komponen menu sidebar
+  // Sidebar menu component
   const sidebarMenu = (
     <Menu
       theme="dark"
       mode="inline"
-      selectedKeys={[selectedMenuKey]} // Ganti dari defaultSelectedKeys
+      selectedKeys={[selectedMenuKey]}
       items={menuItems.map((item) => ({
         ...item,
         icon: React.cloneElement(item.icon, {
@@ -165,14 +168,14 @@ const Sidebar = ({ children }) => {
               borderRadius: borderRadiusLG,
             }}
           >
-            {children}
+            <Outlet />
           </Content>
         </>
       ) : (
         <>
           <Sider
             trigger={null}
-            width={"20%"}
+            width={220}
             collapsible
             collapsed={collapsed}
             style={{
@@ -221,7 +224,7 @@ const Sidebar = ({ children }) => {
                 borderRadius: borderRadiusLG,
               }}
             >
-              {children}
+              <Outlet />
             </Content>
           </Layout>
         </>
@@ -230,4 +233,4 @@ const Sidebar = ({ children }) => {
   );
 };
 
-export default Sidebar;
+export default SideBar;

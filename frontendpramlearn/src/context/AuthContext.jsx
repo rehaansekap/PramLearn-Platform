@@ -154,14 +154,17 @@ const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (username, password) => {
+    console.log("🔐 Attempting login for:", username);
+
     try {
       const response = await api.post("login/", { username, password });
-      setToken(response.data.access);
-      localStorage.setItem("token", response.data.access);
-      api.defaults.headers.common[
-        "Authorization"
-      ] = `Bearer ${response.data.access}`;
+      const { access: token } = response.data;
 
+      setToken(token);
+      localStorage.setItem("token", token);
+      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+      // Fetch user data setelah set token
       const userRes = await api.get("users/me/");
       setUser(userRes.data);
 
@@ -171,8 +174,13 @@ const AuthProvider = ({ children }) => {
         last_activity: new Date().toISOString(),
       });
 
+      console.log("✅ Login successful for user:", userRes.data.username);
+      console.log("👤 User role:", userRes.data.role);
+
+      // Return user data untuk redirect handling di component
       return userRes.data;
     } catch (error) {
+      console.error("❌ Login failed:", error);
       throw error;
     }
   };
