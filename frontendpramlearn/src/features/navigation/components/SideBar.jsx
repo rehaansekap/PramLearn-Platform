@@ -105,7 +105,7 @@ const SideBar = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         logout();
-        navigate("/login");
+        // navigate("/login");
         Swal.fire(
           "Logout Berhasil!",
           "Anda telah keluar dari sistem.",
@@ -356,8 +356,12 @@ const SideBar = () => {
   );
 
   if (!user || !token) {
-  return <PageLoading message="Memuat data user..." />;
-}
+    return <PageLoading message="Memuat data user..." />;
+  }
+
+  if (!user || !token) {
+    return <Navigate to="/login" replace />;
+  }
 
   return (
     <>

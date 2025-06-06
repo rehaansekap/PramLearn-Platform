@@ -4,6 +4,8 @@ import { AuthContext } from "../context/AuthContext";
 import UserManagement from "../features/users-management/UserManagement";
 import ClassManagement from "../features/class-management/ClassManagement";
 import SubjectManagement from "../features/subject-management/SubjectManagement";
+import ScheduleManagement from "../features/schedule-management/ScheduleManagement";
+import StudentActivityMonitor from "../features/activity-monitor/StudentActivityMonitor";
 
 const { TabPane } = Tabs;
 
@@ -39,6 +41,12 @@ const ManagementPage = () => {
       {/* Subject Management - Admin dan Teacher */}
       <TabPane tab="Subject Management" key="subjects">
         <SubjectManagement />
+      </TabPane>
+      <TabPane tab="Schedule Management" key="schedules">
+        <ScheduleManagement />
+      </TabPane>
+      <TabPane tab="Student Activities" key="activities">
+        <StudentActivityMonitor />
       </TabPane>
     </Tabs>
   );

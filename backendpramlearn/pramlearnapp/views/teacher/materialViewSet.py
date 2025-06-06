@@ -1,9 +1,12 @@
 from rest_framework import viewsets, generics, permissions
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
 from django.http import Http404
-from pramlearnapp.models import Material, Subject
+from pramlearnapp.models import Material, Subject, StudentActivity
 from pramlearnapp.serializers import MaterialSerializer, MaterialDetailSerializer
 from rest_framework.response import Response
 from rest_framework import status
+from django.utils import timezone
 
 
 class MaterialViewSet(viewsets.ModelViewSet):
@@ -45,3 +48,24 @@ class MaterialDetailView(generics.RetrieveAPIView):
             print(f"Material with slug {slug} not found")
             raise Http404("Material not found")
         return super().get(request, *args, **kwargs)
+
+
+class MaterialAccessView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, material_id):
+        user = request.user
+        try:
+            material = Material.objects.get(pk=material_id)
+        except Material.DoesNotExist:
+            return Response({"detail": "Material not found."}, status=404)
+
+        # Catat aktivitas akses materi
+        StudentActivity.objects.create(
+            student=user,
+            title=f"Mengakses Materi: {material.title}",
+            # description=f"Kamu membuka materi '{material.title}'."
+            activity_type="material",
+            timestamp=timezone.now(),
+        )
+        return Response({"detail": "Material access recorded."}, status=200)

@@ -1,76 +1,81 @@
 import React from "react";
-import { Row, Col, Alert, Skeleton } from "antd";
+import { Row, Col, Space } from "antd";
 import useStudentDashboard from "./hooks/useStudentDashboard";
 import WelcomeCard from "./components/WelcomeCard";
 import QuickStatsCard from "./components/QuickStatsCard";
 import RecentActivitiesCard from "./components/RecentActivitiesCard";
+import QuickActionsCard from "./components/QuickActionsCard";
+import UpcomingDeadlinesCard from "./components/UpcomingDeadlinesCard";
+import LearningStreakCard from "./components/LearningStreakCard";
+import TodayScheduleCard from "./components/TodayScheduleCard";
 
 const StudentDashboard = () => {
   const { dashboard, loading, error, user } = useStudentDashboard();
 
   return (
-    <div style={{ maxWidth: 1100, margin: "0 auto", padding: 16 }}>
-      {error && (
-        <Alert
-          message="Gagal memuat dashboard"
-          description={
-            error.message || "Terjadi kesalahan saat mengambil data dashboard."
-          }
-          type="error"
-          showIcon
-          style={{ marginBottom: 16 }}
-        />
-      )}
-
-      <WelcomeCard user={user} />
-
-      <QuickStatsCard
-        stats={{
-          subjects: dashboard?.stats?.subjects,
-          pending_assignments: dashboard?.stats?.pending_assignments,
-          available_quizzes: dashboard?.stats?.available_quizzes,
-          progress: dashboard?.stats?.progress,
+    <div
+      style={{
+        minHeight: "100vh",
+        padding: "24px",
+      }}
+    >
+      <div
+        style={{
+          maxWidth: "1400px",
+          margin: "0 auto",
         }}
-        loading={loading}
-      />
-
-      <Row gutter={16}>
-        <Col xs={24} md={16}>
-          <RecentActivitiesCard
-            activities={dashboard?.recent_activities || []}
-            loading={loading}
-          />
-        </Col>
-        <Col xs={24} md={8}>
-          {/* Notification Center/Today's Schedule placeholder */}
-          <Skeleton active loading={loading} paragraph={{ rows: 4 }}>
-            <div
-              style={{
-                background: "#f6faff",
-                borderRadius: 12,
-                padding: 16,
-                minHeight: 180,
+      >
+        {/* Header & Quick Stats */}
+        <div style={{ marginBottom: 24 }}>
+          <Space direction="vertical" size="middle" style={{ width: "100%" }}>
+            <WelcomeCard user={user} />
+            <QuickStatsCard
+              stats={{
+                subjects: dashboard?.subjects_count,
+                pending_assignments: dashboard?.pending_assignments,
+                available_quizzes: dashboard?.available_quizzes,
+                progress: dashboard?.progress,
               }}
-            >
-              <h4 style={{ color: "#11418b", marginBottom: 8 }}>
-                Jadwal Hari Ini
-              </h4>
-              <ul style={{ paddingLeft: 16 }}>
-                {dashboard?.today_schedule?.length > 0 ? (
-                  dashboard.today_schedule.map((item, idx) => (
-                    <li key={idx} style={{ marginBottom: 8 }}>
-                      <span style={{ fontWeight: 500 }}>{item.time}</span> -{" "}
-                      {item.activity}
-                    </li>
-                  ))
-                ) : (
-                  <li>Tidak ada jadwal hari ini</li>
-                )}
-              </ul>
-            </div>
-          </Skeleton>
-        </Col>
-      </Row>
+              loading={loading}
+            />
+          </Space>
+        </div>
+
+        {/* Main Content */}
+        <Row gutter={[24, 24]}>
+          {/* Kiri: Aktivitas Terbaru, Day Learning Streak */}
+          <Col xs={24} xl={16}>
+            <Space direction="vertical" size="small" style={{ width: "100%" }}>
+              <RecentActivitiesCard
+                activities={dashboard?.recent_activities || []}
+                loading={loading}
+              />
+              <LearningStreakCard
+                streakData={dashboard?.learning_streak}
+                loading={loading}
+              />
+            </Space>
+          </Col>
+
+          {/* Kanan: Quick Actions, Upcoming Deadlines, Today's Schedule */}
+          <Col xs={24} xl={8}>
+            <Space direction="vertical" size="large" style={{ width: "100%" }}>
+              <QuickActionsCard
+                quickActions={dashboard?.quick_actions}
+                loading={loading}
+              />
+              <UpcomingDeadlinesCard
+                deadlines={dashboard?.upcoming_deadlines}
+                loading={loading}
+              />
+              <TodayScheduleCard
+                schedule={dashboard?.today_schedule}
+                loading={loading}
+              />
+            </Space>
+          </Col>
+        </Row>
+      </div>
     </div>
   );
 };

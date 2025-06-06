@@ -3,33 +3,39 @@ import api from "../../../../api";
 import { AuthContext } from "../../../../context/AuthContext";
 
 const useStudentDashboard = () => {
-  const { user } = useContext(AuthContext);
+  const { user, token } = useContext(AuthContext);
   const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    let mounted = true;
-    const fetchDashboard = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await api.get("/student/dashboard/");
-        console.log("Dashboard data:", res.data);
-        if (mounted) setDashboard(res.data);
-      } catch (err) {
-        setError(err);
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    };
-    fetchDashboard();
-    return () => {
-      mounted = false;
-    };
-  }, []);
+  const fetchDashboard = async () => {
+    if (!user || !token) return;
 
-  return { dashboard, loading, error, user };
+    try {
+      setLoading(true);
+      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      const response = await api.get("student/dashboard/");
+      setDashboard(response.data);
+      setError(null);
+    } catch (err) {
+      setError(err);
+      console.error("Error fetching student dashboard:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDashboard();
+  }, [user, token]);
+
+  return {
+    dashboard,
+    loading,
+    error,
+    user,
+    refetch: fetchDashboard,
+  };
 };
 
 export default useStudentDashboard;

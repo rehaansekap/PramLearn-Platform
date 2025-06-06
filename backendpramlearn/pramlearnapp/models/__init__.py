@@ -4,8 +4,11 @@ from .subject import Subject, SubjectClass
 from .group import Group, GroupMember, GroupQuiz, GroupQuizSubmission, GroupQuizResult
 from .quiz import Quiz, Question, StudentQuizAttempt, StudentQuizAnswer
 from .assignment import Assignment, AssignmentSubmission, AssignmentQuestion, AssignmentAnswer, StudentAssignmentDraft
-from .material import Material, File, MaterialYoutubeVideo
+from .material import Material, File, MaterialYoutubeVideo, StudentMaterialProgress, StudentMaterialBookmark, StudentMaterialActivity
 from .attedance import StudentAttendance
+from .studentActivity import StudentActivity
+from .schedule import Schedule
+from .announcement import Announcement
 
 __all__ = [
     "Role",
@@ -30,7 +33,13 @@ __all__ = [
     "Material",
     "File",
     "MaterialYoutubeVideo",
-    "StudentAttendance"
+    "StudentMaterialProgress",
+    "StudentMaterialBookmark",
+    "StudentMaterialActivity",
+    "StudentAttendance",
     "StudentQuizAttempt",
     "StudentQuizAnswer",
+    "StudentActivity",
+    "Schedule",
+    "Announcement",
 ]

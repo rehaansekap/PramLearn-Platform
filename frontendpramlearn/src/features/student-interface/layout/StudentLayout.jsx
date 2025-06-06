@@ -375,6 +375,10 @@ const StudentLayout = () => {
     return <PageLoading message="Memuat data user..." />;
   }
 
+  if (!user || !token) {
+    return <Navigate to="/login" replace />;
+  }
+
   return (
     <>
       {/* Fixed Header dengan gradient yang lebih soft */}
@@ -598,7 +602,8 @@ const StudentLayout = () => {
           {/* Custom Drawer Header */}
           <div
             style={{
-              background: "linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)",
+              background:
+                "linear-gradient(135deg, #001529 0%, #3a3f5c 60%, #43cea2 100%)", // Ubah gradient di sini
               padding: "16px",
               display: "flex",
               justifyContent: "space-between",
@@ -816,7 +821,7 @@ const StudentLayout = () => {
                 marginBottom: 12,
               }}
               bodyStyle={{
-                paddingBottom: 0,
+                paddingBottom: 10,
                 paddingTop: 10,
                 paddingLeft: 16,
                 paddingRight: 16,

@@ -13,13 +13,20 @@ const StudentPDFViewer = ({
   progress,
   onProgressUpdate,
   bookmarks,
+  onActivity, // Tambahkan ini
   onAddBookmark,
   onRemoveBookmark,
 }) => {
   const [currentPdf, setCurrentPdf] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  const handlePdfOpen = (pdfUrl, index) => {
+  // PERBAIKAN: Tambahkan async
+  const handlePdfOpen = async (pdfUrl, index) => {
+    // Record aktivitas buka PDF
+    if (onActivity) {
+      await onActivity("pdf_opened", { position: index });
+    }
+
     // Update last position
     if (onProgressUpdate) {
       onProgressUpdate({
@@ -93,6 +100,7 @@ const StudentPDFViewer = ({
                 title={
                   isBookmarked(index) ? "Hapus bookmark" : "Tambah bookmark"
                 }
+                key="bookmark"
               >
                 <Button
                   type="text"
@@ -108,6 +116,7 @@ const StudentPDFViewer = ({
                 />
               </Tooltip>,
               <Button
+                key="open"
                 type="primary"
                 icon={<FullscreenOutlined />}
                 onClick={() => handlePdfOpen(file.file, index)}

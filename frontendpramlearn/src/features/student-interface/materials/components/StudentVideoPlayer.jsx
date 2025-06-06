@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Card, List, Button, Typography, Tooltip, message, Alert } from "antd";
 import {
   PlayCircleOutlined,
@@ -13,9 +13,86 @@ const StudentVideoPlayer = ({
   progress,
   onProgressUpdate,
   bookmarks,
+  onActivity,
   onAddBookmark,
   onRemoveBookmark,
 }) => {
+  const playerRefs = useRef([]);
+  const lastProgressUpdate = useRef({});
+
+  // 🔧 PERBAIKAN: Pindahkan handleVideoPlay ke atas sebelum useEffect
+  const handleVideoPlay = useCallback(
+    async (video, index) => {
+      console.log(`🎬 Playing video at index ${index}:`, video.url);
+      console.log(`🎬 Video activity key will be: video_played_${index}`);
+
+      // Record aktivitas play video
+      if (onActivity) {
+        await onActivity("video_played", {
+          position: index,
+          videoUrl: video.url, // Tambahkan untuk debugging
+        });
+      }
+
+      // Update last video position
+      if (onProgressUpdate) {
+        onProgressUpdate({
+          ...progress,
+          last_position: index,
+          last_video_position: 0, // Reset video position
+        });
+      }
+    },
+    [onActivity, onProgressUpdate, progress]
+  );
+
+  // 🔧 PERBAIKAN: Pindahkan handleVideoProgress ke atas
+  const handleVideoProgress = useCallback(
+    (currentTime, duration, index) => {
+      if (onActivity && duration > 0) {
+        const progressPercent = (currentTime / duration) * 100;
+        onActivity("video_progress", {
+          currentTime,
+          duration,
+          position: index,
+          progressPercent,
+        });
+      }
+    },
+    [onActivity]
+  );
+
+  // Load YouTube IFrame API
+  useEffect(() => {
+    if (!window.YT) {
+      const tag = document.createElement("script");
+      tag.src = "https://www.youtube.com/iframe_api";
+      document.body.appendChild(tag);
+    }
+  }, []);
+
+  // Setup player after API ready - sekarang handleVideoPlay sudah defined
+  useEffect(() => {
+    window.onYouTubeIframeAPIReady = () => {
+      youtubeVideos.forEach((video, index) => {
+        const playerId = `yt-player-${index}`;
+        const iframe = document.getElementById(playerId);
+        if (iframe) {
+          new window.YT.Player(playerId, {
+            events: {
+              onStateChange: (event) => {
+                if (event.data === window.YT.PlayerState.PLAYING) {
+                  // ✅ Sekarang handleVideoPlay sudah available
+                  handleVideoPlay(video, index);
+                }
+              },
+            },
+          });
+        }
+      });
+    };
+  }, [youtubeVideos, handleVideoPlay]); // Tambahkan handleVideoPlay ke dependencies
+
   const getYouTubeEmbedUrl = (url) => {
     if (!url) return null;
 
@@ -45,16 +122,26 @@ const StudentVideoPlayer = ({
     return null;
   };
 
-  const handleVideoPlay = (video, index) => {
-    // Update last video position
-    if (onProgressUpdate) {
-      onProgressUpdate({
-        ...progress,
-        last_position: index,
-        last_video_position: 0, // Reset video position
-      });
-    }
-  };
+  const handleVideoTimeUpdate = useCallback(
+    (event, index) => {
+      const video = event.target;
+      const currentTime = video.currentTime;
+      const duration = video.duration;
+
+      if (duration > 0) {
+        // Update progress setiap 10 detik
+        const now = Date.now();
+        if (
+          !lastProgressUpdate.current[index] ||
+          now - lastProgressUpdate.current[index] > 10000
+        ) {
+          handleVideoProgress(currentTime, duration, index);
+          lastProgressUpdate.current[index] = now;
+        }
+      }
+    },
+    [handleVideoProgress]
+  );
 
   const handleAddBookmark = async (video, index) => {
     try {
@@ -118,6 +205,7 @@ const StudentVideoPlayer = ({
         renderItem={(video, index) => {
           const embedUrl = getYouTubeEmbedUrl(video.url);
           const videoId = extractYouTubeVideoId(video.url);
+          const playerId = `yt-player-${index}`;
 
           return (
             <List.Item
@@ -127,6 +215,7 @@ const StudentVideoPlayer = ({
                   title={
                     isBookmarked(index) ? "Hapus bookmark" : "Tambah bookmark"
                   }
+                  key="bookmark"
                 >
                   <Button
                     type="text"
@@ -186,7 +275,8 @@ const StudentVideoPlayer = ({
                       }}
                     >
                       <iframe
-                        src={embedUrl}
+                        id={playerId}
+                        src={`${embedUrl}&enablejsapi=1`}
                         frameBorder="0"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen
@@ -197,7 +287,6 @@ const StudentVideoPlayer = ({
                           width: "100%",
                           height: "100%",
                         }}
-                        onLoad={() => handleVideoPlay(video, index)}
                         title={`YouTube Video ${index + 1}`}
                       />
                     </div>

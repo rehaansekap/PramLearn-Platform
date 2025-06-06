@@ -27,27 +27,25 @@ const PrivateRoute = ({ children, allowedRoles = [1, 2] }) => {
     );
   }
 
+  if (loading) {
+    return null; // Atau tampilkan loading spinner
+  }
+
   if (!token || !user) {
     return <Navigate to="/login" replace />;
   }
 
-  // Check if user role is allowed
-  if (!allowedRoles.includes(user.role)) {
-    // Redirect ke halaman yang sesuai dengan role user
-    const getRolePath = (roleId) => {
-      switch (roleId) {
-        case 1:
-          return "/admin";
-        case 2:
-          return "/teacher";
-        case 3:
-          return "/student";
-        default:
-          return "/login";
-      }
-    };
-
-    return <Navigate to={getRolePath(user.role)} replace />;
+  if (allowedRoles && !allowedRoles.includes(user.role)) {
+    switch (user.role) {
+      case 1:
+        return <Navigate to="/admin" replace />;
+      case 2:
+        return <Navigate to="/teacher" replace />;
+      case 3:
+        return <Navigate to="/student" replace />;
+      default:
+        return <Navigate to="/login" replace />;
+    }
   }
 
   return children;

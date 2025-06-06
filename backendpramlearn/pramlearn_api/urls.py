@@ -19,12 +19,16 @@ from pramlearnapp.views import (RoleViewSet, UserViewSet, RegisterView, LoginVie
                                 MaterialAttendanceListView, update_attendance, bulk_create_attendance, QuizRankingView, StudentDashboardView, StudentSubjectsView,
                                 StudentAvailableQuizzesView, StudentQuizDetailView, StudentQuizAttemptView, StudentQuizAnswersView, StudentQuizSubmitView, StudentQuizResultsView,
                                 StudentAvailableAssignmentsView, StudentAssignmentQuestionsView, StudentAssignmentDraftView, StudentAssignmentSubmitView, StudentAssignmentSubmissionsView,
-                                StudentGradesView, StudentGradeAnalyticsView, QuizAttemptReviewView, AssignmentSubmissionFeedbackView,
+                                StudentGradesView, StudentGradeAnalyticsView, QuizAttemptReviewView, AssignmentSubmissionFeedbackView, ScheduleViewSet, StudentActivityViewSet,
+                                MaterialAccessView, StudentUpcomingDeadlinesView, StudentQuickActionsView, StudentMaterialProgressView, StudentMaterialBookmarkView, StudentMaterialAccessView,
+                                StudentMaterialActivityView
                                 )
-
 from pramlearnapp.views.teacher.relatedUsersView import CurrentUserView
 
 router = DefaultRouter()
+router.register(r'student-activities', StudentActivityViewSet,
+                basename='studentactivity')
+router.register(r'schedules', ScheduleViewSet, basename='schedule')
 router.register(r'roles', RoleViewSet)
 router.register(r'users', UserViewSet)
 router.register(r'teachers', TeacherViewSet, basename='teacher')
@@ -44,6 +48,9 @@ router.register(r'groups', GroupViewSet)
 router.register(r'group-members', GroupMemberViewSet)
 router.register(r'students', StudentViewSet, basename='student')
 router.register(r'group-quizzes', GroupQuizViewSet, basename='groupquiz')
+path('student/materials/<int:material_id>/access/',
+     MaterialAccessView.as_view(), name='material-access'),
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -92,6 +99,25 @@ urlpatterns = [
          QuizAttemptReviewView.as_view(), name='quiz-attempt-review'),
     path('api/student/assignment-submission/<int:submission_id>/feedback/',
          AssignmentSubmissionFeedbackView.as_view(), name='assignment-submission-feedback'),
+    path('api/student/materials/<int:material_id>/access/',
+         MaterialAccessView.as_view(), name='material-access'),
+    path('api/student/upcoming-deadlines/',
+         StudentUpcomingDeadlinesView.as_view(),
+         name='student-upcoming-deadlines'),
+    path('api/student/quick-actions/', StudentQuickActionsView.as_view(),
+         name='student-quick-actions'),
+    path('api/student/materials/<int:material_id>/progress/',
+         StudentMaterialProgressView.as_view(), name='student-material-progress'),
+    path('api/student/materials/<int:material_id>/bookmarks/',
+         StudentMaterialBookmarkView.as_view(), name='student-material-bookmarks'),
+    path('api/student/materials/<int:material_id>/bookmarks/<int:bookmark_id>/',
+         StudentMaterialBookmarkView.as_view(), name='student-material-bookmark-detail'),
+    path('api/student/materials/<int:material_id>/access/',
+         StudentMaterialAccessView.as_view(), name='student-material-access'),
+    path('api/student/materials/<int:material_id>/activities/',
+         StudentMaterialActivityView.as_view()),
+
+
     path('api/available-and-related-students/<int:class_id>/',
          AvailableAndRelatedStudentListView.as_view(), name='available-and-related-students'),
     path('api/subjects/<int:subject_id>/materials/',

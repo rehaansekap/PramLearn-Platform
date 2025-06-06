@@ -8,7 +8,7 @@ from pramlearnapp.permissions import IsStudentUser
 from pramlearnapp.models import (
     Assignment, AssignmentQuestion, AssignmentSubmission,
     AssignmentAnswer, ClassStudent, SubjectClass, Material,
-    StudentAssignmentDraft
+    StudentAssignmentDraft, StudentActivity
 )
 from pramlearnapp.serializers.student.studentAssignmentSerializer import (
     StudentAssignmentSerializer, StudentAssignmentSubmissionSerializer,
@@ -16,6 +16,7 @@ from pramlearnapp.serializers.student.studentAssignmentSerializer import (
 )
 import json
 from django.core.files.storage import default_storage
+from pramlearnapp.utils.log_student_activity import log_student_activity
 
 
 class StudentAvailableAssignmentsView(APIView):
@@ -357,6 +358,13 @@ class StudentAssignmentSubmissionsView(APIView):
             ).prefetch_related(
                 'answers__question'
             ).order_by('-submission_date')
+            StudentActivity.objects.create(
+                student=request.user,
+                title=f"Mengumpulkan Assignment: {assignment.title}",
+                # description="Kamu telah mengumpulkan assignment.",
+                activity_type="assignment",
+                timestamp=timezone.now(),
+            )
 
             serializer = StudentAssignmentSubmissionSerializer(
                 submissions, many=True

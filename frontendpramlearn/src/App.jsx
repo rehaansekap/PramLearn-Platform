@@ -151,7 +151,7 @@ const AppRoutes = () => {
           <Route
             path="/student/*"
             element={
-              <StudentPrivateRoute>
+              <StudentPrivateRoute allowedRoles={[3]}>
                 <StudentLayout />
               </StudentPrivateRoute>
             }

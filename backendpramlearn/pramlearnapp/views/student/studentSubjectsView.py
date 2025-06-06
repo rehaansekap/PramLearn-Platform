@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from pramlearnapp.permissions import IsStudentUser
-from pramlearnapp.models import ClassStudent, Subject, SubjectClass, Material, CustomUser
+from pramlearnapp.models import ClassStudent, Subject, SubjectClass, Material, CustomUser, StudentMaterialProgress
 from django.db.models import Prefetch
 
 
@@ -40,36 +40,55 @@ class StudentSubjectsView(APIView):
 
         data = []
         for subject in subjects:
-            # Ambil teacher dari SubjectClass (ambil salah satu)
-            teacher_name = "-"
-            subject_class = SubjectClass.objects.filter(
-                subject=subject, class_id__in=class_ids
-            ).first()
-            if subject_class and subject_class.teacher:
-                teacher = subject_class.teacher
-                teacher_name = f"{teacher.first_name} {teacher.last_name}".strip(
-                ) or teacher.username
+            materials = Material.objects.filter(subject=subject)
+            total_materials = materials.count()
+            if total_materials == 0:
+                continue
 
-            # Ambil semua material yang terkait subject ini
-            materials = list(Material.objects.filter(
-                subject=subject).order_by("-id"))
             completed_count = 0
+            last_accessed_material = None
             material_list = []
+
             for m in materials:
-                completed = False  # TODO: Integrasi dengan StudentMaterialProgress jika sudah ada
+                # Cek progress material untuk student ini
+                try:
+                    progress = StudentMaterialProgress.objects.get(
+                        student=user,
+                        material=m
+                    )
+                    completed = progress.is_completed
+                    last_accessed = progress.updated_at
+                except StudentMaterialProgress.DoesNotExist:
+                    completed = False
+                    last_accessed = None
+
                 material_list.append({
                     "id": m.id,
                     "title": m.title,
-                    "slug": m.slug,  # Tambahkan slug
+                    "slug": m.slug,
                     "description": getattr(m, "content", "")[:60] if hasattr(m, "content") else "",
                     "completed": completed,
-                    "last_accessed": None,  # TODO: Integrasi dengan progress
+                    "last_accessed": last_accessed.isoformat() if last_accessed else None,
                 })
+
                 if completed:
                     completed_count += 1
 
+                # Track material terakhir diakses
+                if last_accessed and (not last_accessed_material or last_accessed > last_accessed_material['last_accessed']):
+                    last_accessed_material = {
+                        'title': m.title,
+                        'slug': m.slug,
+                        'last_accessed': last_accessed
+                    }
+
+            # Hitung progress subject
             progress = int((completed_count / len(material_list))
                            * 100) if material_list else 0
+
+            # Ambil nama guru dari subject (pastikan ada relasi teacher pada model Subject)
+            teacher_name = subject.teacher.get_full_name() if hasattr(
+                subject, "teacher") and subject.teacher else None
 
             data.append({
                 "id": subject.id,
@@ -77,8 +96,8 @@ class StudentSubjectsView(APIView):
                 "teacher_name": teacher_name,
                 "progress": progress,
                 "material_count": len(material_list),
-                "last_material_title": material_list[0]["title"] if material_list else None,
-                "last_material_slug": material_list[0]["slug"] if material_list else None,  # Ganti dari id ke slug
+                "last_material_title": last_accessed_material['title'] if last_accessed_material else None,
+                "last_material_slug": last_accessed_material['slug'] if last_accessed_material else None,
                 "materials": material_list,
             })
 

@@ -230,6 +230,8 @@ const AuthProvider = ({ children }) => {
     if (activityTimeout.current) {
       clearTimeout(activityTimeout.current);
     }
+    // Redirect ke /login setelah logout
+    window.location.href = "/login";
   };
 
   if (loading) {

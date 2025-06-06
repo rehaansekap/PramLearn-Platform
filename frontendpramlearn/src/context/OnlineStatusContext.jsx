@@ -105,15 +105,10 @@ export const OnlineStatusProvider = ({ children }) => {
 
     // Cleanup
     return () => {
-      if (reconnectTimeout) {
-        clearTimeout(reconnectTimeout);
-      }
-      if (ws && ws.readyState === WebSocket.OPEN) {
+      if (reconnectTimeout) clearTimeout(reconnectTimeout);
+      if (ws && ws.readyState === WebSocket.OPEN)
         ws.close(1000, "Component unmounting");
-      }
-      if (window.userStatusSocket) {
-        window.userStatusSocket = null;
-      }
+      if (window.userStatusSocket) window.userStatusSocket = null;
     };
   }, [connectionAttempts, maxReconnectAttempts]);
 

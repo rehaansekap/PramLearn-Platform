@@ -1,6 +1,8 @@
 from pramlearnapp.serializers.admin.authSerializer import LoginSerializer
 from pramlearnapp.serializers.admin.userSerializer import UserSerializer
 from pramlearnapp.serializers.admin.roleSerializer import RoleSerializer
+from pramlearnapp.serializers.admin.scheduleSerializer import TodayScheduleSerializer, ScheduleModelSerializer
+from pramlearnapp.serializers.admin.announcementSerializer import AnnouncementSerializer
 
 from pramlearnapp.serializers.student.classStudentSerializer import ClassStudentSerializer
 from pramlearnapp.serializers.student.classSerializer import ClassSerializer
@@ -11,6 +13,10 @@ from pramlearnapp.serializers.student.attendanceSerializer import StudentAttenda
 from pramlearnapp.serializers.student.studentAssignmentSerializer import (
     StudentAssignmentSerializer, StudentAssignmentSubmissionSerializer,
     StudentAssignmentDraftSerializer
+)
+from pramlearnapp.serializers.student.studentActivitySerializer import StudentActivitySerializer
+from pramlearnapp.serializers.student.materialProgressSerializer import (
+    StudentMaterialProgressSerializer, StudentMaterialBookmarkSerializer
 )
 
 from pramlearnapp.serializers.teacher.teacherSerializer import TeacherSerializer
@@ -34,12 +40,13 @@ from pramlearnapp.serializers.user.roleSerializer import RoleSerializer as UserR
 
 __all__ = [
     # Admin
-    "LoginSerializer", "UserSerializer", "RoleSerializer",
+    "LoginSerializer", "UserSerializer", "RoleSerializer", "TodayScheduleSerializer", "ScheduleModelSerializer", "AnnouncementSerializer",
     # Student
     "ClassStudentSerializer", "ClassSerializer", "ClassDetailSerializer",
     "StudentMotivationProfileSerializer", "StudentSerializer", "AvailableStudentSerializer",
     "StudentAttendanceSerializer", "StudentAssignmentSerializer", "StudentAssignmentSubmissionSerializer",
-    "StudentAssignmentDraftSerializer",
+    "StudentAssignmentDraftSerializer", "StudentActivitySerializer", "StudentMaterialProgressSerializer",
+    "StudentMaterialBookmarkSerializer",
     # Teacher
     "TeacherSerializer", "SubjectSerializer", "SubjectDetailSerializer", "SubjectClassSerializer",
     "QuizSerializer", "QuestionSerializer", "MaterialSerializer", "MaterialDetailSerializer",

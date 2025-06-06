@@ -20,6 +20,9 @@ class Assignment(models.Model):
     def __str__(self):
         return self.title
 
+    class Meta:
+        ordering = ['due_date']
+
 
 class AssignmentQuestion(models.Model):
     """

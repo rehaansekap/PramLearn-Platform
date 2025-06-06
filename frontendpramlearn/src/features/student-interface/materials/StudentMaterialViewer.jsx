@@ -12,6 +12,7 @@ import useStudentMaterialAccess from "./hooks/useStudentMaterialAccess";
 import StudentPDFViewer from "./components/StudentPDFViewer";
 import StudentVideoPlayer from "./components/StudentVideoPlayer";
 import MaterialProgressTracker from "./components/MaterialProgressTracker";
+import ProgressDebugger from "./components/ProgressDebugger";
 import api from "../../../api";
 
 const { TabPane } = Tabs;
@@ -21,17 +22,32 @@ const StudentMaterialViewer = () => {
   const { materialSlug } = useParams();
   const {
     material,
+    materialId,
     progress,
     bookmarks,
     loading,
     error,
     updateProgress,
+    recordActivity, // Gunakan ini
     addBookmark,
     removeBookmark,
   } = useStudentMaterialAccess(materialSlug);
 
   const [activeTab, setActiveTab] = useState("1");
   const [subjectData, setSubjectData] = useState(null);
+
+  // Tambahkan useEffect untuk debugging
+  useEffect(() => {
+    if (material && materialId) {
+      console.log("📊 Material loaded:", {
+        materialId,
+        title: material.title,
+        pdfCount: material.pdf_files?.length || 0,
+        videoCount: material.youtube_videos?.filter((v) => v.url)?.length || 0,
+        currentProgress: progress.completion_percentage,
+      });
+    }
+  }, [material, materialId, progress.completion_percentage]);
 
   // Fetch subject data untuk info
   useEffect(() => {
@@ -170,7 +186,8 @@ const StudentMaterialViewer = () => {
             <StudentPDFViewer
               pdfFiles={material.pdf_files}
               progress={progress}
-              onProgressUpdate={updateProgress}
+              updateProgress={updateProgress}
+              onActivity={recordActivity} // Pass ini
               bookmarks={bookmarks}
               onAddBookmark={addBookmark}
               onRemoveBookmark={removeBookmark}
@@ -189,9 +206,10 @@ const StudentMaterialViewer = () => {
             key="2"
           >
             <StudentVideoPlayer
-              youtubeVideos={material.youtube_videos}
+              youtubeVideos={material.youtube_videos} // Ubah dari videoUrls ke youtubeVideos
               progress={progress}
-              onProgressUpdate={updateProgress}
+              updateProgress={updateProgress}
+              onActivity={recordActivity}
               bookmarks={bookmarks}
               onAddBookmark={addBookmark}
               onRemoveBookmark={removeBookmark}
@@ -263,6 +281,13 @@ const StudentMaterialViewer = () => {
                   </div>
                 </div>
               )}
+              {/* {process.env.NODE_ENV === "development" && (
+                <ProgressDebugger
+                  progress={progress}
+                  recordActivity={recordActivity}
+                  materialId={materialId}
+                />
+              )} */}
             </Card>
           </TabPane>
         )}
@@ -271,7 +296,7 @@ const StudentMaterialViewer = () => {
       {/* Progress Tracker */}
       <MaterialProgressTracker
         progress={progress}
-        onProgressUpdate={updateProgress}
+        updateProgress={updateProgress}
         isActive={true}
       />
     </div>

@@ -1,27 +1,26 @@
 import React, { useEffect, useRef } from "react";
-import { Progress, Card, Statistic, Typography } from "antd";
+import { Progress, Card, Typography } from "antd"; // Hapus Statistic yang tidak dipakai
 import { ClockCircleOutlined, CheckCircleOutlined } from "@ant-design/icons";
 
 const { Text } = Typography;
 
 const MaterialProgressTracker = ({
   progress,
-  onProgressUpdate,
+  updateProgress,
   isActive = true,
 }) => {
   const timeRef = useRef(0);
   const intervalRef = useRef(null);
 
-  // Auto-save progress every 10 seconds
   useEffect(() => {
-    if (!isActive || !onProgressUpdate) return;
+    if (!isActive || !updateProgress) return;
 
     intervalRef.current = setInterval(() => {
       timeRef.current += 10;
-      onProgressUpdate({
-        time_spent: (progress.time_spent || 0) + 10,
-        completion_percentage: progress.completion_percentage || 0,
-        last_position: progress.last_position || 0,
+      // HANYA kirim time_spent dan last_position
+      updateProgress({
+        time_spent: 10, // Increment 10 detik
+        last_position: 0, // Opsional
       });
     }, 10000);
 
@@ -30,7 +29,7 @@ const MaterialProgressTracker = ({
         clearInterval(intervalRef.current);
       }
     };
-  }, [isActive, onProgressUpdate, progress.time_spent]);
+  }, [isActive, updateProgress]);
 
   const formatTime = (seconds) => {
     const hours = Math.floor(seconds / 3600);
@@ -70,10 +69,10 @@ const MaterialProgressTracker = ({
       </div>
 
       <Progress
-        percent={progress.completion_percentage || 0}
+        percent={Math.round(progress.completion_percentage || 0)}
         strokeColor={getProgressColor(progress.completion_percentage || 0)}
         size="small"
-        showInfo={false}
+        showInfo={true}
         style={{ marginBottom: 8 }}
       />
 
@@ -95,12 +94,16 @@ const MaterialProgressTracker = ({
           <CheckCircleOutlined
             style={{
               color:
-                progress.completion_percentage >= 80 ? "#52c41a" : "#d9d9d9",
+                (progress.completion_percentage || 0) >= 80
+                  ? "#52c41a"
+                  : "#d9d9d9",
               fontSize: 12,
             }}
           />
           <Text style={{ fontSize: 12, fontWeight: 500 }}>
-            {Math.round(progress.completion_percentage || 0)}%
+            {(progress.completion_percentage || 0) >= 100
+              ? "Selesai"
+              : "Progress"}
           </Text>
         </div>
       </div>
