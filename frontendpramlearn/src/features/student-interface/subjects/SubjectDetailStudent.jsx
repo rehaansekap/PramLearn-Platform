@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Card, Typography, Progress, List, Tag, Button, Spin } from "antd";
 import { ArrowLeftOutlined, FileTextOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 
 const { Title, Text } = Typography;
 
@@ -12,6 +13,7 @@ const getProgressColor = (percent) => {
 
 const SubjectDetailStudent = ({ subject, onBack }) => {
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   // Dummy: Replace with fetch materials by subject.id if needed
   const materials = subject.materials || [];
@@ -63,9 +65,7 @@ const SubjectDetailStudent = ({ subject, onBack }) => {
             actions={[
               <Button
                 type="link"
-                onClick={() =>
-                  (window.location.href = `/student/materials/${item.slug}`)
-                }
+                onClick={() => navigate(`/student/materials/${item.slug}`)} // Gunakan navigate!
               >
                 Buka
               </Button>,

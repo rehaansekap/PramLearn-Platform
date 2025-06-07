@@ -16,13 +16,12 @@ const MaterialProgressTracker = ({
     if (!isActive || !updateProgress) return;
 
     intervalRef.current = setInterval(() => {
-      timeRef.current += 10;
-      // HANYA kirim time_spent dan last_position
-      updateProgress({
-        time_spent: 10, // Increment 10 detik
-        last_position: 0, // Opsional
-      });
-    }, 10000);
+      timeRef.current += 1;
+      updateProgress((prev) => ({
+        ...prev,
+        time_spent: (prev.time_spent || 0) + 1,
+      }));
+    }, 1000); // 1000 ms = 1 detik
 
     return () => {
       if (intervalRef.current) {

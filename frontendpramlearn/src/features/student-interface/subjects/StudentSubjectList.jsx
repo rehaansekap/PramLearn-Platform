@@ -4,20 +4,21 @@ import useStudentSubjects from "./hooks/useStudentSubjects";
 import SubjectCard from "./components/SubjectCard";
 import SubjectDetailStudent from "./SubjectDetailStudent";
 import { LoadingOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 
 const StudentSubjectList = () => {
   const { subjects, loading, error } = useStudentSubjects();
   const [search, setSearch] = useState("");
   const [selectedSubject, setSelectedSubject] = useState(null);
+  const navigate = useNavigate();
 
   const filteredSubjects = subjects.filter((subject) =>
     subject.name.toLowerCase().includes(search.trim().toLowerCase())
   );
 
   const handleQuickAccessMaterial = (materialSlug) => {
-    // Navigasi menggunakan slug
     if (materialSlug) {
-      window.location.href = `/student/materials/${materialSlug}`;
+      navigate(`/student/materials/${materialSlug}`); // Gunakan navigate!
     }
   };
 

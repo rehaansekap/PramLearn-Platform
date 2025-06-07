@@ -93,8 +93,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'pramlearn_db',
-        'USER': 'pramlearn_user',
-        'PASSWORD': '123',  # Ganti dengan password yang Anda buat
+        'USER': 'rehanseekap',
+        'PASSWORD': '123123123',  # Ganti dengan password yang Anda buat
         'HOST': 'localhost',
         'PORT': '5432',
     }
