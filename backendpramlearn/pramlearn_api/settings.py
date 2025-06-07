@@ -1,6 +1,14 @@
 from pathlib import Path
 from datetime import timedelta
 import os
+from dotenv import load_dotenv
+
+
+load_dotenv()  # Ini akan membaca file .env jika ada
+
+DEBUG = os.getenv("DEBUG", "False") == "True"
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
