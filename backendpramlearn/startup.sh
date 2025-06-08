@@ -47,4 +47,4 @@ echo "🌐 Starting Gunicorn with ASGI support..."
 # Start Gunicorn with ASGI for WebSocket support
 gunicorn --bind=0.0.0.0:8000 --worker-class uvicorn.workers.UvicornWorker --timeout 600 --workers 1 pramlearn_api.asgi:application
 
-echo "✅ Startup script completed"
+echo "✅ Startup script completedd"
