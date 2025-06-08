@@ -13,44 +13,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.12"
-
-      - name: Install dependencies
-        run: |
-          cd backendpramlearn
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Copy production environment
-        run: |
-          cd backendpramlearn
-          cp .env.production .env
-
-      - name: Run migrations
-        run: |
-          cd backendpramlearn
-          python manage.py migrate --noinput
-
-      - name: Collect static files
-        run: |
-          cd backendpramlearn
-          python manage.py collectstatic --noinput
-
-      - name: Create deployment package
-        run: |
-          cd backendpramlearn
-          # Create a clean deployment directory
-          mkdir -p ../deployment-package
-          # Copy all necessary files EXCEPT the nested backendpramlearn folder
-          cp -r . ../deployment-package/
-          # Remove the nested backendpramlearn folder if it exists
-          rm -rf ../deployment-package/backendpramlearn
-          # List contents to verify
-          ls -la ../deployment-package/
-
       - name: Azure Login
         uses: azure/login@v1
         with:
@@ -61,7 +23,7 @@ jobs:
         with:
           app-name: pramlearn-backend
           slot-name: production
-          package: deployment-package
+          package: backendpramlearn
 
       - name: Azure Logout
         run: az logout
