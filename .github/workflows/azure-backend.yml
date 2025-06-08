@@ -13,6 +13,32 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          cd backendpramlearn
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Copy production environment
+        run: |
+          cd backendpramlearn
+          cp .env.production .env
+
+      - name: Run migrations
+        run: |
+          cd backendpramlearn
+          python manage.py migrate --noinput
+
+      - name: Collect static files
+        run: |
+          cd backendpramlearn
+          python manage.py collectstatic --noinput
+
       - name: Azure Login
         uses: azure/login@v1
         with:
