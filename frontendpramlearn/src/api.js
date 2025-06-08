@@ -1,9 +1,14 @@
 // frontendpramlearn/src/api.js
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL;
+const WS_URL = import.meta.env.VITE_WS_URL;
+
 const api = axios.create({
-  baseURL: "http://localhost:8000/api/",
+  baseURL: API_URL,
 });
+
+export { api, WS_URL };
 
 api.interceptors.request.use(
   (config) => {
