@@ -8,7 +8,7 @@ LOGFILE="$LOGDIR/production.log"
 mkdir -p $LOGDIR
 
 echo "===============================================" | tee -a $LOGFILE
-echo "Starting Production Server with WebSocket Support" | tee -a $LOGFILE
+echo "Starting Production Server with WebSocket Supportt" | tee -a $LOGFILE
 echo "$(date)" | tee -a $LOGFILE
 echo "===============================================" | tee -a $LOGFILE
 
