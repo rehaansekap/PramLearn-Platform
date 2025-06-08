@@ -9,8 +9,13 @@ load_dotenv()  # Ini akan membaca file .env jika ada
 DEBUG = os.getenv("DEBUG", "False") == "True"
 SECRET_KEY = os.getenv(
     "SECRET_KEY", "django-insecure-4kh_a6m4m)l@eeg0%3#0#@!m)efo%otu@jp^z2qucjr9pt@y@9")
-ALLOWED_HOSTS = [host.strip() for host in os.getenv(
-    "ALLOWED_HOSTS", "localhost,127.0.0.1,0.0.0.0").split(",")]
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "0.0.0.0",
+    "pramlearn-backend.azurewebsites.net",
+    "api.pramlearn.tech"
+]
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -146,7 +151,9 @@ AUTH_USER_MODEL = 'pramlearnapp.CustomUser'
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "https://pramlearnstorage.z23.web.core.windows.net",
-    "https://pramlearn-backend.azurewebsites.net",
+    "https://www.pramlearn.tech",     # Custom domain frontend
+    "https://pramlearn.tech",         # Root domain
+    "https://api.pramlearn.tech",     # Custom domain backend
 ]
 
 if not DEBUG:
@@ -271,6 +278,7 @@ LOGGING = {
 
 CSRF_TRUSTED_ORIGINS = [
     "https://pramlearn-backend.azurewebsites.net",
-    "https://pramlearnstorage.z23.web.core.windows.net",
-    "http://localhost:5173",
+    "https://api.pramlearn.tech",     # Custom domain backend
+    "https://www.pramlearn.tech",     # Custom domain frontend
+    "https://pramlearn.tech",         # Root domain
 ]
