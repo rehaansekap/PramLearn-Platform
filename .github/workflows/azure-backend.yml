@@ -30,7 +30,6 @@ jobs:
 
       - name: Jalankan run_production.sh (opsional, untuk test build di CI)
         run: |
-          cd backendpramlearn
           chmod +x run_production.sh
           ./run_production.sh
 
