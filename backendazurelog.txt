@@ -1,0 +1,237 @@
+2025-06-08T02:36:02.7750302Z Deploy Async
+2025-06-08T02:36:04.8024375Z Run rsync from: /tmp/zipdeploy/extracted/ to: /home/site/wwwroot/ in 8 parallel threads
+2025-06-08T02:36:05.6135791Z Delete options: clean=False, use manifest=True, directory to ignore=
+2025-06-08T02:36:05.6136095Z Prev manifest = /home/site/deployments/ae7989da-abbf-459b-a280-e54fdc591850/manifest and next /home/site/deployments/6d056bea-ba6c-4eff-b893-1ac8f54f190d/manifest
+2025-06-08T02:36:05.6136115Z Cleaning up /tmp//filelist.txt and /tmp//splits
+2025-06-08T02:36:05.6136133Z Creating a list of all files at /tmp//filelist.txt
+2025-06-08T02:36:05.6136147Z No directory to exclude.
+2025-06-08T02:36:05.6136162Z Created /tmp//filelist.txt. Total number of files to be synced = 501.
+2025-06-08T02:36:05.6136177Z Created batches from the list of files. Processing 63 files in each thread
+2025-06-08T02:36:05.6136217Z Running rsync for filelist /tmp//splits/split.aa from /tmp/zipdeploy/extracted/ to /home/site/wwwroot/
+2025-06-08T02:36:05.6136233Z Running rsync for filelist /tmp//splits/split.ab from /tmp/zipdeploy/extracted/ to /home/site/wwwroot/
+2025-06-08T02:36:05.6136249Z Running rsync for filelist /tmp//splits/split.ac from /tmp/zipdeploy/extracted/ to /home/site/wwwroot/
+2025-06-08T02:36:05.6136264Z Running rsync for filelist /tmp//splits/split.ad from /tmp/zipdeploy/extracted/ to /home/site/wwwroot/
+2025-06-08T02:36:06.1603797Z Running rsync for filelist /tmp//splits/split.ae from /tmp/zipdeploy/extracted/ to /home/site/wwwroot/
+2025-06-08T02:36:06.201393Z Running rsync for filelist /tmp//splits/split.af from /tmp/zipdeploy/extracted/ to /home/site/wwwroot/
+2025-06-08T02:36:06.2146975Z Running rsync for filelist /tmp//splits/split.ag from /tmp/zipdeploy/extracted/ to /home/site/wwwroot/
+2025-06-08T02:36:06.2239165Z Running rsync for filelist /tmp//splits/split.ah from /tmp/zipdeploy/extracted/ to /home/site/wwwroot/
+2025-06-08T02:36:09.6815719Z
+2025-06-08T02:36:09.7392489Z Number of files: 70 (reg: 63, dir: 7)
+2025-06-08T02:36:09.7681726Z Number of created files: 0
+2025-06-08T02:36:09.8408351Z Number of deleted files: 0
+2025-06-08T02:36:09.8783988Z Number of regular files transferred: 63
+2025-06-08T02:36:09.9147307Z Total file size: 546.50K bytes
+2025-06-08T02:36:09.993666Z Total transferred file size: 546.50K bytes
+2025-06-08T02:36:10.0114612Z Literal data: 546.50K bytes
+2025-06-08T02:36:10.0349058Z Matched data: 0 bytes
+2025-06-08T02:36:10.0662572Z File list size: 0
+2025-06-08T02:36:10.0806559Z File list generation time: 0.049 seconds
+2025-06-08T02:36:10.1066112Z File list transfer time: 0.000 seconds
+2025-06-08T02:36:10.1394936Z Total bytes sent: 136.54K
+2025-06-08T02:36:10.1669994Z Total bytes received: 1.23K
+2025-06-08T02:36:10.2037281Z
+2025-06-08T02:36:10.2247475Z sent 136.54K bytes  received 1.23K bytes  30.62K bytes/sec
+2025-06-08T02:36:10.2629124Z total size is 546.50K  speedup is 3.97
+2025-06-08T02:36:10.2981319Z Attempt 1: Rsync for filelist /tmp//splits/split.af completed with exit code 0
+2025-06-08T02:36:10.34338Z
+2025-06-08T02:36:10.3656836Z Number of files: 74 (reg: 63, dir: 11)
+2025-06-08T02:36:10.4035578Z Number of created files: 0
+2025-06-08T02:36:10.4506957Z Number of deleted files: 0
+2025-06-08T02:36:10.5002472Z Number of regular files transferred: 63
+2025-06-08T02:36:10.5306652Z Total file size: 249.01K bytes
+2025-06-08T02:36:10.5440416Z Total transferred file size: 249.01K bytes
+2025-06-08T02:36:10.573377Z Literal data: 249.01K bytes
+2025-06-08T02:36:10.601102Z Matched data: 0 bytes
+2025-06-08T02:36:10.6379821Z File list size: 0
+2025-06-08T02:36:10.6579869Z File list generation time: 0.197 seconds
+2025-06-08T02:36:10.6766956Z File list transfer time: 0.000 seconds
+2025-06-08T02:36:10.6844287Z Total bytes sent: 70.19K
+2025-06-08T02:36:10.7103069Z Total bytes received: 1.24K
+2025-06-08T02:36:10.743718Z
+2025-06-08T02:36:10.7521795Z sent 70.19K bytes  received 1.24K bytes  12.99K bytes/sec
+2025-06-08T02:36:10.7830439Z total size is 249.01K  speedup is 3.49
+2025-06-08T02:36:10.8198223Z Attempt 1: Rsync for filelist /tmp//splits/split.ad completed with exit code 0
+2025-06-08T02:36:10.8520904Z
+2025-06-08T02:36:10.8801021Z Number of files: 75 (reg: 63, dir: 12)
+2025-06-08T02:36:10.8915659Z Number of created files: 0
+2025-06-08T02:36:10.9211137Z Number of deleted files: 0
+2025-06-08T02:36:10.9483587Z Number of regular files transferred: 63
+2025-06-08T02:36:10.9594453Z Total file size: 171.97K bytes
+2025-06-08T02:36:10.9973189Z Total transferred file size: 171.97K bytes
+2025-06-08T02:36:11.0543184Z Literal data: 171.97K bytes
+2025-06-08T02:36:11.0895476Z Matched data: 0 bytes
+2025-06-08T02:36:11.1334684Z File list size: 0
+2025-06-08T02:36:11.1425072Z File list generation time: 0.257 seconds
+2025-06-08T02:36:11.1517666Z File list transfer time: 0.000 seconds
+2025-06-08T02:36:11.1878161Z Total bytes sent: 51.10K
+2025-06-08T02:36:11.2203411Z Total bytes received: 1.24K
+2025-06-08T02:36:11.2544614Z
+2025-06-08T02:36:11.326642Z sent 51.10K bytes  received 1.24K bytes  9.52K bytes/sec
+2025-06-08T02:36:11.3439599Z total size is 171.97K  speedup is 3.29
+2025-06-08T02:36:11.3746709Z Attempt 1: Rsync for filelist /tmp//splits/split.ac completed with exit code 0
+2025-06-08T02:36:11.3816318Z
+2025-06-08T02:36:11.3913947Z Number of files: 78 (reg: 63, dir: 15)
+2025-06-08T02:36:11.4030812Z Number of created files: 0
+2025-06-08T02:36:11.4275928Z Number of deleted files: 0
+2025-06-08T02:36:11.4378274Z Number of regular files transferred: 63
+2025-06-08T02:36:11.4556796Z Total file size: 138.09K bytes
+2025-06-08T02:36:11.4695239Z Total transferred file size: 138.09K bytes
+2025-06-08T02:36:11.4796097Z Literal data: 138.09K bytes
+2025-06-08T02:36:11.5025875Z Matched data: 0 bytes
+2025-06-08T02:36:11.5214308Z File list size: 0
+2025-06-08T02:36:11.5512362Z File list generation time: 0.169 seconds
+2025-06-08T02:36:11.5703953Z File list transfer time: 0.000 seconds
+2025-06-08T02:36:11.6163008Z Total bytes sent: 37.68K
+2025-06-08T02:36:11.6452498Z Total bytes received: 1.25K
+2025-06-08T02:36:11.6757787Z
+2025-06-08T02:36:11.7260803Z sent 37.68K bytes  received 1.25K bytes  7.08K bytes/sec
+2025-06-08T02:36:11.7555833Z total size is 138.09K  speedup is 3.55
+2025-06-08T02:36:11.8163847Z Attempt 1: Rsync for filelist /tmp//splits/split.ab completed with exit code 0
+2025-06-08T02:36:11.8559709Z
+2025-06-08T02:36:11.8782172Z Number of files: 79 (reg: 63, dir: 16)
+2025-06-08T02:36:11.9092463Z Number of created files: 0
+2025-06-08T02:36:11.9304263Z Number of deleted files: 0
+2025-06-08T02:36:11.9374691Z Number of regular files transferred: 63
+2025-06-08T02:36:11.9466331Z Total file size: 522.88K bytes
+2025-06-08T02:36:11.9568316Z Total transferred file size: 522.88K bytes
+2025-06-08T02:36:11.9768762Z Literal data: 522.88K bytes
+2025-06-08T02:36:12.0098414Z Matched data: 0 bytes
+2025-06-08T02:36:12.0569147Z File list size: 0
+2025-06-08T02:36:12.0770023Z File list generation time: 0.139 seconds
+2025-06-08T02:36:12.1039742Z File list transfer time: 0.000 seconds
+2025-06-08T02:36:12.1430079Z Total bytes sent: 125.90K
+2025-06-08T02:36:12.1605508Z Total bytes received: 1.25K
+2025-06-08T02:36:12.226547Z
+2025-06-08T02:36:12.2518913Z sent 125.90K bytes  received 1.25K bytes  23.12K bytes/sec
+2025-06-08T02:36:12.2621997Z total size is 522.88K  speedup is 4.11
+2025-06-08T02:36:12.289867Z Attempt 1: Rsync for filelist /tmp//splits/split.ag completed with exit code 0
+2025-06-08T02:36:12.307646Z
+2025-06-08T02:36:12.3242516Z Number of files: 80 (reg: 63, dir: 17)
+2025-06-08T02:36:12.3304328Z Number of created files: 0
+2025-06-08T02:36:12.3406579Z Number of deleted files: 0
+2025-06-08T02:36:12.3505299Z Number of regular files transferred: 63
+2025-06-08T02:36:12.3686098Z Total file size: 2.50M bytes
+2025-06-08T02:36:12.3875424Z Total transferred file size: 2.50M bytes
+2025-06-08T02:36:12.3978562Z Literal data: 2.50M bytes
+2025-06-08T02:36:12.407856Z Matched data: 0 bytes
+2025-06-08T02:36:12.4264865Z File list size: 0
+2025-06-08T02:36:12.4584131Z File list generation time: 0.155 seconds
+2025-06-08T02:36:12.4768027Z File list transfer time: 0.000 seconds
+2025-06-08T02:36:12.4976161Z Total bytes sent: 776.47K
+2025-06-08T02:36:12.5182569Z Total bytes received: 1.26K
+2025-06-08T02:36:12.5657828Z
+2025-06-08T02:36:12.5732051Z sent 776.47K bytes  received 1.26K bytes  141.41K bytes/sec
+2025-06-08T02:36:12.608134Z total size is 2.50M  speedup is 3.21
+2025-06-08T02:36:12.6257932Z Attempt 1: Rsync for filelist /tmp//splits/split.ae completed with exit code 0
+2025-06-08T02:36:12.6451221Z
+2025-06-08T02:36:12.6581183Z Number of files: 71 (reg: 60, dir: 11)
+2025-06-08T02:36:12.694835Z Number of created files: 0
+2025-06-08T02:36:12.7378084Z Number of deleted files: 0
+2025-06-08T02:36:12.7536893Z Number of regular files transferred: 60
+2025-06-08T02:36:12.7626698Z Total file size: 23.70M bytes
+2025-06-08T02:36:12.7714619Z Total transferred file size: 23.70M bytes
+2025-06-08T02:36:12.7896039Z Literal data: 23.70M bytes
+2025-06-08T02:36:12.8097068Z Matched data: 0 bytes
+2025-06-08T02:36:12.8536995Z File list size: 0
+2025-06-08T02:36:12.873188Z File list generation time: 0.056 seconds
+2025-06-08T02:36:12.9007742Z File list transfer time: 0.000 seconds
+2025-06-08T02:36:12.9293542Z Total bytes sent: 2.39M
+2025-06-08T02:36:12.9488414Z Total bytes received: 1.19K
+2025-06-08T02:36:12.9797684Z
+2025-06-08T02:36:13.0384259Z sent 2.39M bytes  received 1.19K bytes  318.81K bytes/sec
+2025-06-08T02:36:13.0490904Z total size is 23.70M  speedup is 9.91
+2025-06-08T02:36:13.0774604Z Attempt 1: Rsync for filelist /tmp//splits/split.ah completed with exit code 0
+2025-06-08T02:36:24.9093941Z .......
+2025-06-08T02:36:24.9113169Z
+2025-06-08T02:36:24.941113Z Number of files: 78 (reg: 63, dir: 15)
+2025-06-08T02:36:24.9592077Z Number of created files: 0
+2025-06-08T02:36:24.9622785Z Number of deleted files: 0
+2025-06-08T02:36:24.9887253Z Number of regular files transferred: 63
+2025-06-08T02:36:25.008583Z Total file size: 189.70M bytes
+2025-06-08T02:36:25.0270908Z Total transferred file size: 189.70M bytes
+2025-06-08T02:36:25.0302324Z Literal data: 189.70M bytes
+2025-06-08T02:36:25.0398274Z Matched data: 0 bytes
+2025-06-08T02:36:25.07714Z File list size: 0
+2025-06-08T02:36:25.1155516Z File list generation time: 0.171 seconds
+2025-06-08T02:36:25.1328221Z File list transfer time: 0.000 seconds
+2025-06-08T02:36:25.1527233Z Total bytes sent: 153.36M
+2025-06-08T02:36:25.1724974Z Total bytes received: 1.25K
+2025-06-08T02:36:25.1915422Z
+2025-06-08T02:36:25.2113074Z sent 153.36M bytes  received 1.25K bytes  7.86M bytes/sec
+2025-06-08T02:36:25.238511Z total size is 189.70M  speedup is 1.24
+2025-06-08T02:36:25.257709Z Attempt 1: Rsync for filelist /tmp//splits/split.aa completed with exit code 0
+2025-06-08T02:36:25.2607303Z Deleting files not present in /tmp/zipdeploy/extracted/ from /home/site/wwwroot/ based on manifest file /home/site/deployments/ae7989da-abbf-459b-a280-e54fdc591850/manifest
+2025-06-08T02:36:25.6968921Z Number of files deleted: 0. See /tmp//rsync_deletion_logs.txt for more details.
+2025-06-08T02:36:25.7091594Z create new manifest file at /home/site/deployments/6d056bea-ba6c-4eff-b893-1ac8f54f190d/manifest
+2025-06-08T02:36:25.7463049Z Completed successfully in 21 seconds
+2025-06-08T02:38:56.9960555Z    _____
+2025-06-08T02:38:56.9978069Z   /  _  \ __________ _________   ____
+2025-06-08T02:38:56.9978191Z  /  /_\  \\___   /  |  \_  __ \_/ __ \
+2025-06-08T02:38:56.997822Z /    |    \/    /|  |  /|  | \/\  ___/
+2025-06-08T02:38:56.9978279Z \____|__  /_____ \____/ |__|    \___  >
+2025-06-08T02:38:56.9978302Z         \/      \/                  \/
+2025-06-08T02:38:56.997834Z A P P   S E R V I C E   O N   L I N U X
+2025-06-08T02:38:56.9978365Z
+2025-06-08T02:38:56.9978389Z Documentation: http://aka.ms/webapp-linux
+2025-06-08T02:38:56.9978411Z Python 3.11.12
+2025-06-08T02:38:56.9978452Z Note: Any data outside '/home' is not persisted
+2025-06-08T02:38:57.4575002Z Starting OpenBSD Secure Shell server: sshd.
+2025-06-08T02:38:57.477597Z WEBSITES_INCLUDE_CLOUD_CERTS is not set to true.
+2025-06-08T02:38:57.5609169Z Updating certificates in /etc/ssl/certs...
+2025-06-08T02:39:06.5468459Z 2 added, 0 removed; done.
+2025-06-08T02:39:06.5470614Z Running hooks in /etc/ca-certificates/update.d...
+2025-06-08T02:39:06.5642317Z done.
+2025-06-08T02:39:06.5664332Z CA certificates copied and updated successfully.
+2025-06-08T02:39:06.7554875Z App Command Line not configured, will attempt auto-detect
+2025-06-08T02:39:07.2332278Z Starting periodic command scheduler: cron.
+2025-06-08T02:39:07.2338771Z Launching oryx with: create-script -appPath /home/site/wwwroot -output /opt/startup/startup.sh -virtualEnvName antenv -defaultApp /opt/defaultsite
+2025-06-08T02:39:07.6009802Z Could not find build manifest file at '/home/site/wwwroot/oryx-manifest.toml'
+2025-06-08T02:39:07.6022933Z Could not find operation ID in manifest. Generating an operation id...
+2025-06-08T02:39:07.6025207Z Build Operation ID: 69244f21-77dc-4b56-a10f-2990b8a65efa
+2025-06-08T02:39:10.1543126Z Oryx Version: 0.2.20250505.1, Commit: bec89959884a7663432d6e3c4d36acc30657cb85, ReleaseTagName: 20250505.1
+2025-06-08T02:39:10.1957969Z Detected an app based on Django
+2025-06-08T02:39:10.2231103Z Generating `gunicorn` command for 'pramlearn_api.wsgi'
+2025-06-08T02:39:10.2984039Z Writing output script to '/opt/startup/startup.sh'
+2025-06-08T02:39:10.5229446Z WARNING: Could not find virtual environment directory /home/site/wwwroot/antenv.
+2025-06-08T02:39:10.5238095Z WARNING: Could not find package directory /home/site/wwwroot/__oryx_packages__.
+2025-06-08T02:39:13.4217165Z [2025-06-08 02:39:13 +0000] [1023] [INFO] Starting gunicorn 23.0.0
+2025-06-08T02:39:13.4691823Z [2025-06-08 02:39:13 +0000] [1023] [INFO] Listening at: http://0.0.0.0:8000 (1023)
+2025-06-08T02:39:13.469404Z [2025-06-08 02:39:13 +0000] [1023] [INFO] Using worker: sync
+2025-06-08T02:39:13.4799184Z [2025-06-08 02:39:13 +0000] [1026] [INFO] Booting worker with pid: 1026
+2025-06-08T02:39:13.6273114Z [2025-06-08 02:39:13 +0000] [1026] [ERROR] Exception in worker process
+2025-06-08T02:39:13.6273649Z Traceback (most recent call last):
+2025-06-08T02:39:13.6273682Z   File "/opt/python/3.11.12/lib/python3.11/site-packages/gunicorn/arbiter.py", line 608, in spawn_worker
+2025-06-08T02:39:13.6273714Z     worker.init_process()
+2025-06-08T02:39:13.6273814Z   File "/opt/python/3.11.12/lib/python3.11/site-packages/gunicorn/workers/base.py", line 135, in init_process
+2025-06-08T02:39:13.6273839Z     self.load_wsgi()
+2025-06-08T02:39:13.6273865Z   File "/opt/python/3.11.12/lib/python3.11/site-packages/gunicorn/workers/base.py", line 147, in load_wsgi
+2025-06-08T02:39:13.6273885Z     self.wsgi = self.app.wsgi()
+2025-06-08T02:39:13.6273907Z                 ^^^^^^^^^^^^^^^
+2025-06-08T02:39:13.627393Z   File "/opt/python/3.11.12/lib/python3.11/site-packages/gunicorn/app/base.py", line 66, in wsgi
+2025-06-08T02:39:13.6273971Z     self.callable = self.load()
+2025-06-08T02:39:13.6273991Z                     ^^^^^^^^^^^
+2025-06-08T02:39:13.6274014Z   File "/opt/python/3.11.12/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 57, in load
+2025-06-08T02:39:13.627939Z     return self.load_wsgiapp()
+2025-06-08T02:39:13.6279461Z            ^^^^^^^^^^^^^^^^^^^
+2025-06-08T02:39:13.6279488Z   File "/opt/python/3.11.12/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 47, in load_wsgiapp
+2025-06-08T02:39:13.6279548Z     return util.import_app(self.app_uri)
+2025-06-08T02:39:13.627957Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-06-08T02:39:13.6279594Z   File "/opt/python/3.11.12/lib/python3.11/site-packages/gunicorn/util.py", line 370, in import_app
+2025-06-08T02:39:13.6279616Z     mod = importlib.import_module(module)
+2025-06-08T02:39:13.6279638Z           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-06-08T02:39:13.6279662Z   File "/opt/python/3.11.12/lib/python3.11/importlib/__init__.py", line 126, in import_module
+2025-06-08T02:39:13.6279701Z     return _bootstrap._gcd_import(name[level:], package, level)
+2025-06-08T02:39:13.6279759Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-06-08T02:39:13.6279782Z   File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+2025-06-08T02:39:13.6279805Z   File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+2025-06-08T02:39:13.6279851Z   File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+2025-06-08T02:39:13.6279893Z   File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+2025-06-08T02:39:13.6279951Z   File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+2025-06-08T02:39:13.6279981Z   File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+2025-06-08T02:39:13.6280005Z   File "/home/site/wwwroot/pramlearn_api/wsgi.py", line 12, in <module>
+2025-06-08T02:39:13.6280027Z     from django.core.wsgi import get_wsgi_application
+2025-06-08T02:39:13.6280067Z ModuleNotFoundError: No module named 'django'
+2025-06-08T02:39:13.6280427Z [2025-06-08 02:39:13 +0000] [1026] [INFO] Worker exiting (pid: 1026)
+2025-06-08T02:39:14.0575358Z [2025-06-08 02:39:14 +0000] [1023] [ERROR] Worker (pid:1026) exited with code 3
+2025-06-08T02:39:14.0582574Z [2025-06-08 02:39:14 +0000] [1023] [ERROR] Shutting down: Master
+2025-06-08T02:39:14.0583753Z [2025-06-08 02:39:14 +0000] [1023] [ERROR] Reason: Worker failed to boot.
