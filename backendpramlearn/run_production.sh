@@ -14,7 +14,7 @@ echo "===============================================" | tee -a $LOGFILE
 
 # Set environment variables untuk production
 export DJANGO_SETTINGS_MODULE=pramlearn_api.settings
-export REDIS_URL=redis://localhost:6379
+# export REDIS_URL=redis://localhost:6379
 
 # Collect static files
 echo "📦 Collecting static files..." | tee -a $LOGFILE

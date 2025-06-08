@@ -2,13 +2,16 @@ from pathlib import Path
 from datetime import timedelta
 import os
 from dotenv import load_dotenv
+import dj_database_url
 
 
 load_dotenv()  # Ini akan membaca file .env jika ada
 
 DEBUG = os.getenv("DEBUG", "False") == "True"
-SECRET_KEY = os.getenv("SECRET_KEY")
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
+SECRET_KEY = os.getenv(
+    "SECRET_KEY", "django-insecure-4kh_a6m4m)l@eeg0%3#0#@!m)efo%otu@jp^z2qucjr9pt@y@9")
+ALLOWED_HOSTS = [host.strip() for host in os.getenv(
+    "ALLOWED_HOSTS", "localhost,127.0.0.1,0.0.0.0").split(",")]
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -17,12 +20,12 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-4kh_a6m4m)l@eeg0%3#0#@!m)efo%otu@jp^z2qucjr9pt@y@9'
+# SECRET_KEY = 'django-insecure-4kh_a6m4m)l@eeg0%3#0#@!m)efo%otu@jp^z2qucjr9pt@y@9'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
+# ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
 
 
 # Application definition
@@ -41,26 +44,28 @@ INSTALLED_APPS = [
     'channels',  # Pastikan ini ada
 ]
 
-
-# WebSocket configuration
-ASGI_APPLICATION = 'pramlearn_api.asgi.application'
-# Channel layers - gunakan Redis untuk production
-if os.environ.get('REDIS_URL'):
+# Channel layers: Redis jika REDIS_URL ada, fallback ke InMemory
+if os.getenv('REDIS_URL'):
     CHANNEL_LAYERS = {
         'default': {
             'BACKEND': 'channels_redis.core.RedisChannelLayer',
             'CONFIG': {
-                "hosts": [os.environ.get('REDIS_URL', 'redis://localhost:6379')],
+                "hosts": [os.getenv('REDIS_URL')],
             },
         },
     }
 else:
-    # Development - InMemory
     CHANNEL_LAYERS = {
         'default': {
             'BACKEND': 'channels.layers.InMemoryChannelLayer',
         },
     }
+
+# Azure Storage (optional, aktifkan jika ingin pakai Azure Storage untuk static/media)
+AZURE_STORAGE_CONNECTION_STRING = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+# if AZURE_STORAGE_CONNECTION_STRING and not DEBUG:
+#     DEFAULT_FILE_STORAGE = "storages.backends.azure_storage.AzureStorage"
+#     STATICFILES_STORAGE = "storages.backends.azure_storage.AzureStorage"
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -93,20 +98,36 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'pramlearn_api.wsgi.application'
+ASGI_APPLICATION = 'pramlearn_api.asgi.application'
 
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'pramlearn_db',
-        'USER': 'rehanseekap',
-        'PASSWORD': '123123123',  # Ganti dengan password yang Anda buat
-        'HOST': 'localhost',
-        'PORT': '5432',
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'pramlearn_db',
+#         'USER': 'rehanseekap',
+#         'PASSWORD': '123123123',  # Ganti dengan password yang Anda buat
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#     }
+# }
+if os.getenv("DATABASE_URL"):
+    DATABASES = {
+        'default': dj_database_url.parse(os.getenv("DATABASE_URL"))
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'pramlearn_db',
+            'USER': 'rehanseekap',
+            'PASSWORD': '123123123',  # Ganti dengan password lokal Anda
+            'HOST': 'localhost',
+            'PORT': '5432',
+        }
+    }
 
 
 # Password validation
@@ -164,6 +185,13 @@ AUTH_USER_MODEL = 'pramlearnapp.CustomUser'
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
 ]
+if not DEBUG:
+    CORS_ALLOWED_ORIGINS += [
+        "https://pramlearn-frontend.azurestaticapps.net",
+        "https://www.pramlearn.com",
+        "https://pramlearn.com",
+        # Tambahkan domain frontend production lain jika ada
+    ]
 
 SIMPLE_JWT = {
     # Token akses berlaku selama 5 menit
