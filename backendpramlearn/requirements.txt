@@ -29,7 +29,6 @@ uvicorn[standard]==0.24.0  # Tambahkan ini untuk Gunicorn ASGI support
 
 # Production Server
 gunicorn==21.2.0
-python-dotenv==1.0.1
 
 # Development & Testing
 Faker==25.0.1
@@ -54,3 +53,5 @@ whitenoise==6.6.0
 
 # Environment variables
 python-dotenv==1.0.1
+
+dj-database-url==2.1.0
