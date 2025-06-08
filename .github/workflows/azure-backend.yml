@@ -24,10 +24,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Copy production environment
-        run: |
-          cd backendpramlearn
-          cp .env.production .env
+      # HAPUS STEP INI - karena env vars sudah di Azure
+      # - name: Copy production environment
+      #   run: |
+      #     cd backendpramlearn
+      #     cp .env.production .env
 
       - name: Run migrations
         run: |
