@@ -1,18 +1,17 @@
-name: Deploy Backend to Azure
+name: Deploy Django Backend to Azure Web App
+
 on:
   push:
     branches:
       - production
-    paths:
-      - "backendpramlearn/**"
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 30 # Tambah timeout
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -23,32 +22,24 @@ jobs:
         run: |
           cd backendpramlearn
           python -m pip install --upgrade pip
-          pip install -r requirements.txt --no-cache-dir  # Tambah --no-cache-dir
+          pip install -r requirements.txt
 
-      - name: Copy environment file
+      - name: Copy production environment
         run: |
           cd backendpramlearn
           cp .env.production .env
 
-      - name: Run Django commands
+      - name: Run migrations
         run: |
           cd backendpramlearn
           python manage.py migrate --noinput
-          python manage.py collectstatic --noinput
 
-      - name: Clean up before deployment
+      - name: Collect static files
         run: |
           cd backendpramlearn
-          # Hapus cache dan file temporary
-          find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
-          find . -name "*.pyc" -delete
-          find . -name "*.pyo" -delete
-          rm -rf .pytest_cache/
-          rm -rf .coverage
-          # Hapus dependencies development
-          pip uninstall -y pytest pytest-django ipython jupyter
+          python manage.py collectstatic --noinput
 
-      - name: Login to Azure
+      - name: Azure Login
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
@@ -56,7 +47,9 @@ jobs:
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: "pramlearn-backend"
-          slot-name: "production"
+          app-name: pramlearn-backend
+          slot-name: production
           package: backendpramlearn
-          timeout: 600000 # 10 menit timeout
+
+      - name: Azure Logout
+        run: az logout
