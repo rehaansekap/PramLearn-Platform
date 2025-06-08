@@ -14,7 +14,8 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
     "0.0.0.0",
     "pramlearn-backend.azurewebsites.net",
-    "api.pramlearn.tech"
+    "api.pramlearn.tech",
+    "app.pramlearn.tech",
 ]
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -154,6 +155,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://www.pramlearn.tech",     # Custom domain frontend
     "https://pramlearn.tech",         # Root domain
     "https://api.pramlearn.tech",     # Custom domain backend
+    "https://app.pramlearn.tech",
 ]
 
 if not DEBUG:
@@ -280,5 +282,6 @@ CSRF_TRUSTED_ORIGINS = [
     "https://pramlearn-backend.azurewebsites.net",
     "https://api.pramlearn.tech",     # Custom domain backend
     "https://www.pramlearn.tech",     # Custom domain frontend
-    "https://pramlearn.tech",         # Root domain
+    "https://pramlearn.tech",         # Root domain    # Backend API
+    "https://app.pramlearn.tech",
 ]
