@@ -156,6 +156,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://pramlearn.tech",         # Root domain
     "https://api.pramlearn.tech",     # Custom domain backend
     "https://app.pramlearn.tech",
+    "http://app.pramlearn.tech",
 ]
 
 if not DEBUG:
@@ -284,4 +285,5 @@ CSRF_TRUSTED_ORIGINS = [
     "https://www.pramlearn.tech",     # Custom domain frontend
     "https://pramlearn.tech",         # Root domain    # Backend API
     "https://app.pramlearn.tech",
+    "http://app.pramlearn.tech",
 ]
