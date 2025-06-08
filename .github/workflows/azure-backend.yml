@@ -28,6 +28,12 @@ jobs:
           cd backendpramlearn
           python manage.py collectstatic --noinput
 
+      - name: Jalankan run_production.sh (opsional, untuk test build di CI)
+        run: |
+          cd backendpramlearn
+          chmod +x run_production.sh
+          ./run_production.sh
+
       - name: Azure Login
         uses: azure/login@v1
         with:
