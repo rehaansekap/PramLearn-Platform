@@ -35,7 +35,7 @@ jobs:
         with:
           azcliversion: 2.30.0
           inlineScript: |
-            az storage blob upload-batch -d '$web' -s frontendpramlearn/dist --account-name pramlearnstorage --overwrite
+            az storage blob upload-batch -d '$web' -s frontendpramlearn/dist --account-name pramlearnstorage
 
       - name: Azure Logout
         run: az logout
