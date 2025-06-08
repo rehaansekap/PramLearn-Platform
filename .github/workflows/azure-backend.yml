@@ -30,8 +30,9 @@ jobs:
 
       - name: Jalankan run_production.sh (opsional, untuk test build di CI)
         run: |
+          cd /home/runner/work/pramlearn/pramlearn/backendpramlearn/
           chmod +x run_production.sh
-          ./run_production.sh
+          bash run_production.sh
 
       - name: Azure Login
         uses: azure/login@v1
