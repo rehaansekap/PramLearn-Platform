@@ -268,3 +268,9 @@ LOGGING = {
         },
     },
 }
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://pramlearn-backend.azurewebsites.net",
+    "https://pramlearnstorage.z23.web.core.windows.net",
+    "http://localhost:5173",
+]
