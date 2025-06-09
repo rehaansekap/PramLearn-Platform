@@ -14,6 +14,23 @@ DEPLOYMENT_FILES=(
     "frontendpramlearn/.env.production"
 )
 
+# Define files to ignore in dev branch (additional to deployment files)
+DEV_IGNORE_FILES=(
+    "*.bak"
+    "local_settings.py"
+    "db.sqlite3"
+    ".env"
+    "start-pramlearn.sh"
+    "stop-pramlearn.sh"
+    "pramlearn-service.sh"
+    "web.config"
+    "deploy.cmd"
+    "setup-git-aliases.sh"
+    "switch-branch.sh"
+    "manage-deployment-files.sh"
+    "check-deployment-status.sh"
+)
+
 if [ "$BRANCH" = "production" ]; then
     echo "📦 Setting up deployment files for PRODUCTION branch..."
     
@@ -65,164 +82,61 @@ elif [ "$BRANCH" = "main" ]; then
     echo "💡 Local files preserved, but won't be committed to main"
 
 elif [ "$BRANCH" = "dev" ]; then
-    echo "🔧 Setting up for DEV branch (using .gitignore.bak configuration)..."
+    echo "🔧 Setting up for DEV branch (like .gitignore.bak configuration)..."
     
     # Create backup of current .gitignore
     cp .gitignore .gitignore.backup
     
-    echo "📋 Replacing .gitignore with .gitignore.bak content..."
+    # Remove production and dev-specific sections if they exist
+    sed -i '/# Production deployment files (ignore in main branch)/,/^$/d' .gitignore
+    sed -i '/# Development branch specific ignores/,/^$/d' .gitignore
     
-    # Copy .gitignore.bak to .gitignore
-    if [ -f ".gitignore.bak" ]; then
-        cp .gitignore.bak .gitignore
-        echo "  ✅ .gitignore replaced with .gitignore.bak content"
-    else
-        echo "  ⚠️  .gitignore.bak not found, creating dev-specific .gitignore..."
-        
-        # Recreate .gitignore.bak content for dev branch
-        cat > .gitignore << 'EOF'
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
-
-# C extensions
-*.so
-
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-*.egg-info/
-.installed.cfg
-*.egg
-venv~
-venv~/
-.venv/
-
-# Django stuff:
-*.log
-media/
-staticfiles/
-# .env.*
-
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-.hypothesis/
-.pytest_cache/
-.
-
-# VSCode & IDE
-.vscode/
-.idea/
-*.sublime-workspace
-*.sublime-project
-
-# Node.js / React / Vite
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-dist/
-dist-ssr/
-*.local
-
-# MacOS & system files
-.DS_Store
-Thumbs.db
-
-# Misc
-*.swp
-*.swo
-*.tmp
-
-# Ignore documentation and planning files
-steps.txt
-hehe
-1.txt
-2.txt
-3.txt
-frontendactionlog.txt
-backendactionlog.txt
-backendazurelog.txt
-frontendazurelog.txt
-.deployment
-.gitignore.backup
-.lala
-EOF
+    # Add dev-specific ignores based on .gitignore.bak
+    if ! grep -q "# Development branch specific ignores" .gitignore; then
+        echo "" >> .gitignore
+        echo "# Development branch specific ignores" >> .gitignore
+        for file in "${DEV_IGNORE_FILES[@]}"; do
+            echo "$file" >> .gitignore
+        done
+        echo "" >> .gitignore
     fi
     
-    # Apply git changes - remove files that are NOW ignored but were previously tracked
-    FILES_TO_UNTRACK=(
-        "local_settings.py"
-        "db.sqlite3" 
-        ".env"
-        "start-pramlearn.sh"
-        "stop-pramlearn.sh"
-        "pramlearn-service.sh"
-        "web.config"
-        "deploy.cmd"
-        "setup-git-aliases.sh"
-        "switch-branch.sh"
-        "manage-deployment-files.sh"
-        "check-deployment-status.sh"
-    )
+    # Also add deployment files to ignore in dev
+    if ! grep -q "# Production deployment files (ignore in dev branch)" .gitignore; then
+        echo "# Production deployment files (ignore in dev branch)" >> .gitignore
+        for file in "${DEPLOYMENT_FILES[@]}"; do
+            echo "$file" >> .gitignore
+        done
+        echo "" >> .gitignore
+    fi
     
-    # Also untrack deployment files in dev
-    FILES_TO_UNTRACK+=("${DEPLOYMENT_FILES[@]}")
-    
-    for file in "${FILES_TO_UNTRACK[@]}"; do
-        if git ls-files --error-unmatch "$file" >/dev/null 2>&1; then
-            echo "  🗑️  Removing $file from git tracking"
-            git rm --cached "$file" 2>/dev/null || true
+    # Remove deployment files and dev-specific files from git tracking
+    ALL_IGNORE_FILES=("${DEPLOYMENT_FILES[@]}" "${DEV_IGNORE_FILES[@]}")
+    for file in "${ALL_IGNORE_FILES[@]}"; do
+        # Handle wildcard patterns
+        if [[ "$file" == *"*"* ]]; then
+            # For wildcard patterns, find matching files
+            find . -name "$file" -type f | while read -r found_file; do
+                if git ls-files --error-unmatch "$found_file" >/dev/null 2>&1; then
+                    echo "  🗑️  Removing $found_file from git tracking"
+                    git rm --cached "$found_file" 2>/dev/null || true
+                fi
+            done
+        else
+            # For specific files
+            if git ls-files --error-unmatch "$file" >/dev/null 2>&1; then
+                echo "  🗑️  Removing $file from git tracking"
+                git rm --cached "$file" 2>/dev/null || true
+            fi
         fi
     done
     
-    # Handle .bak files (remove them from tracking but they're NOT in .gitignore.bak)
-    find . -name "*.bak" -type f | while read -r bak_file; do
-        if git ls-files --error-unmatch "$bak_file" >/dev/null 2>&1; then
-            echo "  � Keeping $bak_file in tracking (not ignored in dev)"
-        fi
-    done
-    
-    echo "✅ Dev branch configuration applied (using .gitignore.bak)"
-    echo "💡 Now using same ignore rules as .gitignore.bak"
-    echo "� Key differences from main branch:"
-    echo "    - *.bak files are NOT ignored (can be tracked)"
-    echo "    - local_settings.py can be tracked"
-    echo "    - db.sqlite3 can be tracked"
-    echo "    - .env files can be tracked"
-    echo "    - Script files are NOT ignored"
+    echo "✅ Dev branch configuration applied (similar to .gitignore.bak)"
+    echo "💡 Development and deployment files will be ignored"
     
 else
     echo "ℹ️  Branch '$BRANCH' detected"
     echo "This script manages deployment files for 'main', 'dev', and 'production' branches"
-fi
-
-echo ""
-echo "📋 Current .gitignore status:"
-echo "  📄 Lines in .gitignore: $(wc -l < .gitignore)"
-if [ -f ".gitignore.bak" ]; then
-    echo "  📄 Lines in .gitignore.bak: $(wc -l < .gitignore.bak)"
 fi
 
 echo ""
