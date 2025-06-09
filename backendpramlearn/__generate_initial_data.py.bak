@@ -1,0 +1,398 @@
+# backendpramlearn/generate_initial_data.py
+
+import os
+import django
+import json
+import random
+from django.utils.text import slugify
+from faker import Faker
+from datetime import timezone
+import logging
+logging.getLogger('faker.factory').setLevel(logging.ERROR)
+
+# Set up Django settings
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'pramlearn_api.settings')
+django.setup()
+
+fake = Faker()
+
+
+def generate_roles():
+    roles = [
+        {"model": "pramlearnapp.role", "pk": 1, "fields": {"name": "Admin"}},
+        {"model": "pramlearnapp.role", "pk": 2, "fields": {"name": "Teacher"}},
+        {"model": "pramlearnapp.role", "pk": 3, "fields": {"name": "Student"}}
+    ]
+    return roles
+
+
+def generate_files(num_files):
+    files = []
+    for i in range(1, num_files + 1):
+        files.append({
+            "model": "pramlearnapp.file",
+            "pk": i,
+            "fields": {
+                "file": f"materials/files/file_{i}.pdf",  # Simulasi nama file
+                "uploaded_at": fake.date_time_this_year(tzinfo=timezone.utc).isoformat()
+            }
+        })
+    return files
+
+
+def generate_users(num_admins, num_teachers, num_students):
+    users = []
+    for i in range(1, num_admins + 1):
+        users.append({
+            "model": "pramlearnapp.customuser",
+            "pk": i,
+            "fields": {
+                "username": f"admin{i}",
+                "password": fake.password(),
+                "email": fake.email(),
+                "first_name": fake.first_name(),
+                "last_name": fake.last_name(),
+                "role": 1  # Admin role
+            }
+        })
+    for i in range(num_admins + 1, num_admins + num_teachers + 1):
+        users.append({
+            "model": "pramlearnapp.customuser",
+            "pk": i,
+            "fields": {
+                "username": f"teacher{i - num_admins}",
+                "password": fake.password(),
+                "email": fake.email(),
+                "first_name": fake.first_name(),
+                "last_name": fake.last_name(),
+                "role": 2  # Teacher role
+            }
+        })
+    for i in range(num_admins + num_teachers + 1, num_admins + num_teachers + num_students + 1):
+        users.append({
+            "model": "pramlearnapp.customuser",
+            "pk": i,
+            "fields": {
+                "username": f"student{i - num_admins - num_teachers}",
+                "password": fake.password(),
+                "email": fake.email(),
+                "first_name": fake.first_name(),
+                "last_name": fake.last_name(),
+                "role": 3  # Student role
+            }
+        })
+    return users
+
+
+def generate_classes(num_classes):
+    classes = []
+    for i in range(1, num_classes + 1):
+        name = f"Kelas {i}"
+        slug = slugify(name)
+        classes.append({
+            "model": "pramlearnapp.class",
+            "pk": i,
+            "fields": {
+                "name": name,
+                "slug": slug
+            }
+        })
+    return classes
+
+
+def generate_subject_classes(num_subject_classes, num_teachers, num_classes, num_subjects):
+    subject_classes = []
+    teacher_ids = list(range(6, 6 + num_teachers))
+    for i in range(1, num_subject_classes + 1):
+        subject_classes.append({
+            "model": "pramlearnapp.subjectclass",
+            "pk": i,
+            "fields": {
+                "teacher": random.choice(teacher_ids),
+                "class_id": random.randint(1, num_classes),
+                "subject": i
+            }
+        })
+    return subject_classes
+
+
+def generate_subjects(num_subjects):
+    subjects = []
+    for i in range(1, num_subjects + 1):
+        name = f"Subject {i}"
+        slug = slugify(name)
+        subjects.append({
+            "model": "pramlearnapp.subject",
+            "pk": i,
+            "fields": {
+                "name": name,
+                "slug": slug,
+                "subject_class": i
+            }
+        })
+    return subjects
+
+
+def generate_materials(num_materials, num_subjects, num_files):
+    materials = []
+    file_ids = list(range(1, num_files + 1))  # ID file yang tersedia
+    for i in range(1, num_materials + 1):
+        title = fake.sentence()
+        slug = slugify(title)
+        materials.append({
+            "model": "pramlearnapp.material",
+            "pk": i,
+            "fields": {
+                "title": title,
+                # Pilih 1-3 file secara acak
+                "pdf_files": random.sample(file_ids, random.randint(1, 3)),
+                # Random Google Form link
+                "google_form_embed": f"https://forms.gle/{fake.lexify(text='?????-?????-?????')}",
+                # Random YouTube embed link
+                "youtube_video_embed": f"https://www.youtube.com/embed/{fake.lexify(text='???????????')}",
+                "subject": random.randint(1, num_subjects),
+                "slug": slug
+            }
+        })
+    return materials
+
+
+def generate_assignments(num_assignments, num_materials):
+    assignments = []
+    for i in range(1, num_assignments + 1):
+        assignments.append({
+            "model": "pramlearnapp.assignment",
+            "pk": i,
+            "fields": {
+                "material": random.randint(1, num_materials),
+                "title": fake.sentence(),
+                "description": fake.text(),
+                "due_date": fake.date_time_this_year(tzinfo=timezone.utc).isoformat()
+            }
+        })
+    return assignments
+
+
+def generate_assignment_submissions(num_submissions, num_assignments, num_students):
+    submissions = []
+    for i in range(1, num_submissions + 1):
+        submissions.append({
+            "model": "pramlearnapp.assignmentsubmission",
+            "pk": i,
+            "fields": {
+                "assignment": random.randint(1, num_assignments),
+                "student": random.randint(1, num_students),
+                "submission_date": fake.date_time_this_year(tzinfo=timezone.utc).isoformat(),
+                "grade": random.uniform(0, 100)
+            }
+        })
+    return submissions
+
+
+def generate_quizzes(num_quizzes, num_materials):
+    quizzes = []
+    for i in range(1, num_quizzes + 1):
+        quizzes.append({
+            "model": "pramlearnapp.quiz",
+            "pk": i,
+            "fields": {
+                "material": random.randint(1, num_materials),
+                "title": fake.sentence(),
+                "content": fake.text(),
+                "is_group_quiz": random.choice([True, False])
+            }
+        })
+    return quizzes
+
+
+def generate_questions(num_questions, num_quizzes):
+    questions = []
+    for i in range(1, num_questions + 1):
+        questions.append({
+            "model": "pramlearnapp.question",
+            "pk": i,
+            "fields": {
+                "quiz": random.randint(1, num_quizzes),
+                "text": fake.sentence(),
+                "choice_a": fake.word(),
+                "choice_b": fake.word(),
+                "choice_c": fake.word(),
+                "choice_d": fake.word(),
+                "correct_choice": random.choice(['A', 'B', 'C', 'D'])
+            }
+        })
+    return questions
+
+
+def generate_quiz_results(num_results, num_quizzes, num_students):
+    results = []
+    for i in range(1, num_results + 1):
+        results.append({
+            "model": "pramlearnapp.quizresult",
+            "pk": i,
+            "fields": {
+                "quiz": random.randint(1, num_quizzes),
+                "student": random.randint(1, num_students),
+                "score": random.uniform(0, 100)
+            }
+        })
+    return results
+
+
+def generate_groups(num_groups, num_materials):
+    groups = []
+    for i in range(1, num_groups + 1):
+        groups.append({
+            "model": "pramlearnapp.group",
+            "pk": i,
+            "fields": {
+                "material": random.randint(1, num_materials),
+                "name": fake.word(),
+                "code": fake.unique.word()
+            }
+        })
+    return groups
+
+
+def generate_group_members(num_members, num_groups, num_students):
+    group_members = []
+    student_ids = list(range(26, 26 + num_students))
+    random.shuffle(student_ids)
+    for i, student_id in enumerate(student_ids[:num_members]):
+        group_members.append({
+            "model": "pramlearnapp.groupmember",
+            "pk": i + 1,
+            "fields": {
+                "group": random.randint(1, num_groups),
+                "student": student_id
+            }
+        })
+    return group_members
+
+
+def generate_group_quizzes(num_group_quizzes, num_groups, num_quizzes):
+    group_quizzes = []
+    for i in range(1, num_group_quizzes + 1):
+        group_quizzes.append({
+            "model": "pramlearnapp.groupquiz",
+            "pk": i,
+            "fields": {
+                "group": random.randint(1, num_groups),
+                "quiz": random.randint(1, num_quizzes),
+                "start_time": fake.date_time_this_year(tzinfo=timezone.utc).isoformat(),
+                "end_time": fake.date_time_this_year(tzinfo=timezone.utc).isoformat()
+            }
+        })
+    return group_quizzes
+
+
+def generate_group_quiz_submissions(num_submissions, num_group_quizzes, num_questions, num_students):
+    submissions = []
+    used_combinations = set()
+    for i in range(1, num_submissions + 1):
+        group_quiz_id = random.randint(1, num_group_quizzes)
+        question_id = random.randint(1, num_questions)
+        combination = (group_quiz_id, question_id)
+        while combination in used_combinations:
+            group_quiz_id = random.randint(1, num_group_quizzes)
+            question_id = random.randint(1, num_questions)
+            combination = (group_quiz_id, question_id)
+        used_combinations.add(combination)
+        submissions.append({
+            "model": "pramlearnapp.groupquizsubmission",
+            "pk": i,
+            "fields": {
+                "group_quiz": group_quiz_id,
+                "question": question_id,
+                "student": random.randint(1, num_students),
+                "selected_choice": random.choice(['A', 'B', 'C', 'D']),
+                "is_correct": random.choice([True, False])
+            }
+        })
+    return submissions
+
+
+def generate_group_quiz_results(num_results, num_group_quizzes):
+    results = []
+    for i in range(1, num_results + 1):
+        results.append({
+            "model": "pramlearnapp.groupquizresult",
+            "pk": i,
+            "fields": {
+                "group_quiz": random.randint(1, num_group_quizzes),
+                "score": random.uniform(0, 100)
+            }
+        })
+    return results
+
+
+def generate_class_students(num_class_students, num_classes, num_students):
+    class_students = []
+    student_ids = list(range(26, 26 + num_students))
+    random.shuffle(student_ids)
+    for i, student_id in enumerate(student_ids[:num_class_students]):
+        class_students.append({
+            "model": "pramlearnapp.classstudent",
+            "pk": i + 1,
+            "fields": {
+                "student": student_id,
+                "class_id": random.randint(1, num_classes)
+            }
+        })
+    return class_students
+
+
+def main():
+    num_admins = 5
+    num_teachers = 20
+    num_students = 100
+    num_classes = 10
+    num_subject_classes = 20
+    num_subjects = 20
+    num_materials = 50
+    num_files = 100
+    num_assignments = 40
+    num_submissions = 100
+    num_quizzes = 20
+    num_questions = 100
+    num_results = 100
+    num_groups = 10
+    num_members = 50
+    num_group_quizzes = 20
+    num_group_quiz_submissions = 100
+    num_group_quiz_results = 20
+    num_class_students = 100
+
+    data = []
+    data.extend(generate_roles())
+    data.extend(generate_users(num_admins, num_teachers, num_students))
+    data.extend(generate_classes(num_classes))
+    data.extend(generate_subjects(num_subjects))
+    data.extend(generate_subject_classes(num_subject_classes,
+                num_teachers, num_classes, num_subjects))
+    # Updated materials
+    data.extend(generate_materials(num_materials, num_subjects, num_files))
+    data.extend(generate_files(num_files))
+    data.extend(generate_assignments(num_assignments, num_materials))
+    data.extend(generate_assignment_submissions(
+        num_submissions, num_assignments, num_students))
+    data.extend(generate_quizzes(num_quizzes, num_materials))
+    data.extend(generate_questions(num_questions, num_quizzes))
+    data.extend(generate_quiz_results(num_results, num_quizzes, num_students))
+    data.extend(generate_groups(num_groups, num_materials))
+    data.extend(generate_group_members(num_members, num_groups, num_students))
+    data.extend(generate_group_quizzes(
+        num_group_quizzes, num_groups, num_quizzes))
+    data.extend(generate_group_quiz_submissions(
+        num_group_quiz_submissions, num_group_quizzes, num_questions, num_students))
+    data.extend(generate_group_quiz_results(
+        num_group_quiz_results, num_group_quizzes))
+    data.extend(generate_class_students(
+        num_class_students, num_classes, num_students))
+
+    with open('pramlearnapp/fixtures/initial_data.json', 'w') as f:
+        json.dump(data, f, indent=4)
+
+
+if __name__ == "__main__":
+    main()

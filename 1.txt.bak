@@ -1,0 +1,1252 @@
+➜  ~ az account show
+{
+  "environmentName": "AzureCloud",
+  "homeTenantId": "415e4111-97ea-49ab-8fe2-22a02494fb3c",
+  "id": "74d3fe07-70ee-4784-ba1b-b513c65b9577",
+  "isDefault": true,
+  "managedByTenants": [],
+  "name": "Azure for Students",
+  "state": "Enabled",
+  "tenantDefaultDomain": "upi.edu",
+  "tenantDisplayName": "upi.edu",
+  "tenantId": "415e4111-97ea-49ab-8fe2-22a02494fb3c",
+  "user": {
+    "name": "raihansp028@upi.edu",
+    "type": "user"
+  }
+}
+➜  ~ az group create --name "pramlearn-rg" --location "Southeast Asia"
+{
+  "id": "/subscriptions/74d3fe07-70ee-4784-ba1b-b513c65b9577/resourceGroups/pramlearn-rg",
+  "location": "southeastasia",
+  "managedBy": null,
+  "name": "pramlearn-rg",
+  "properties": {
+    "provisioningState": "Succeeded"
+  },
+  "tags": null,
+  "type": "Microsoft.Resources/resourceGroups"
+}
+➜  ~ az postgres flexible-server create \
+    --resource-group "pramlearn-rg" \
+    --name "pramlearn-db" \
+    --location "Southeast Asia" \
+    --admin-user "pramadmin" \
+    --admin-password "123123123" \
+    --sku-name "Standard_B1ms" \
+    --tier "Burstable" \
+    --storage-size 32 \
+    --version 14
+The default value of '--version' will be changed to '17' from '16' in next breaking change release(2.73.0) scheduled for May 2025.
+The default value of '--create-default-database' will be changed to 'Disabled' from 'Enabled' in next breaking change release(2.73.0) scheduled for May 2025.
+Update default value of "--sku-name" in next breaking change release(2.73.0) scheduled for May 2025. The default value will be changed from "Standard_D2s_v3" to a supported sku based on regional capabilities.
+Checking the existence of the resource group 'pramlearn-rg'...
+Resource group 'pramlearn-rg' exists ? : True 
+The default value for the PostgreSQL server major version will be updating to 17 in the near future.
+Detected current client IP : 180.245.152.243
+Do you want to enable access to client 180.245.152.243 (y/n): y
+Creating PostgreSQL Server 'pramlearn-db' in group 'pramlearn-rg'...
+Your server 'pramlearn-db' is using sku 'Standard_B1ms' (Paid Tier). Please refer to https://aka.ms/postgres-pricing for pricing details
+Configuring server firewall rule to accept connections from '180.245.152.243'...
+Creating PostgreSQL database 'flexibleserverdb'...
+Make a note of your password. If you forget, you would have to reset your password with "az postgres flexible-server update -n pramlearn-db -g pramlearn-rg -p <new-password>".
+Try using 'az postgres flexible-server connect' command to test out connection.
+{
+  "connectionString": "postgresql://pramadmin:123123123@pramlearn-db.postgres.database.azure.com/flexibleserverdb?sslmode=require",
+  "databaseName": "flexibleserverdb",
+  "firewallName": "FirewallIPAddress_2025-6-8_14-59-47",
+  "host": "pramlearn-db.postgres.database.azure.com",
+  "id": "/subscriptions/74d3fe07-70ee-4784-ba1b-b513c65b9577/resourceGroups/pramlearn-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/pramlearn-db",
+  "location": "Southeast Asia",
+  "password": "123123123",
+  "resourceGroup": "pramlearn-rg",
+  "skuname": "Standard_B1ms",
+  "username": "pramadmin",
+  "version": "14"
+}
+➜  ~ az postgres flexible-server db create \
+    --resource-group "pramlearn-rg" \
+    --server-name "pramlearn-db" \
+    --database-name "pramlearn_db"
+Creating database with utf8 charset and en_US.utf8 collation
+{
+  "charset": "UTF8",
+  "collation": "en_US.utf8",
+  "id": "/subscriptions/74d3fe07-70ee-4784-ba1b-b513c65b9577/resourceGroups/pramlearn-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/pramlearn-db/databases/pramlearn_db",
+  "name": "pramlearn_db",
+  "resourceGroup": "pramlearn-rg",
+  "systemData": null,
+  "type": "Microsoft.DBforPostgreSQL/flexibleServers/databases"
+}
+➜  ~ az postgres flexible-server firewall-rule create \
+    --resource-group "pramlearn-rg" \
+    --name "pramlearn-db" \
+    --rule-name "AllowAllAzureIps" \
+    --start-ip-address "0.0.0.0" \
+    --end-ip-address "0.0.0.0"
+{
+  "endIpAddress": "0.0.0.0",
+  "id": "/subscriptions/74d3fe07-70ee-4784-ba1b-b513c65b9577/resourceGroups/pramlearn-rg/providers/Microsoft.DBforPostgreSQL/flexibleServers/pramlearn-db/firewallRules/AllowAllAzureIps",
+  "name": "AllowAllAzureIps",
+  "resourceGroup": "pramlearn-rg",
+  "startIpAddress": "0.0.0.0",
+  "systemData": null,
+  "type": "Microsoft.DBforPostgreSQL/flexibleServers/firewallRules"
+}
+➜  ~ az redis create \
+    --resource-group "pramlearn-rg" \
+    --name "pramlearn-redis" \
+    --location "Southeast Asia" \
+    --sku "Basic" \
+    --vm-size "C0"
+{
+  "accessKeys": null,
+  "disableAccessKeyAuthentication": false,
+  "enableNonSslPort": false,
+  "hostName": "pramlearn-redis.redis.cache.windows.net",
+  "id": "/subscriptions/74d3fe07-70ee-4784-ba1b-b513c65b9577/resourceGroups/pramlearn-rg/providers/Microsoft.Cache/Redis/pramlearn-redis",
+  "identity": null,
+  "instances": [
+    {
+      "isMaster": true,
+      "isPrimary": true,
+      "nonSslPort": null,
+      "shardId": null,
+      "sslPort": 15000,
+      "zone": null
+    }
+  ],
+  "linkedServers": [],
+  "location": "Southeast Asia",
+  "minimumTlsVersion": "1.2",
+  "name": "pramlearn-redis",
+  "port": 6379,
+  "privateEndpointConnections": null,
+  "provisioningState": "Succeeded",
+  "publicNetworkAccess": "Enabled",
+  "redisConfiguration": {
+    "aadEnabled": null,
+    "additionalProperties": null,
+    "aofBackupEnabled": null,
+    "aofStorageConnectionString0": null,
+    "aofStorageConnectionString1": null,
+    "authnotrequired": null,
+    "maxclients": "256",
+    "maxfragmentationmemoryReserved": "30",
+    "maxmemoryDelta": "30",
+    "maxmemoryPolicy": null,
+    "maxmemoryReserved": "30",
+    "notifyKeyspaceEvents": null,
+    "preferredDataArchiveAuthMethod": null,
+    "preferredDataPersistenceAuthMethod": null,
+    "rdbBackupEnabled": null,
+    "rdbBackupFrequency": null,
+    "rdbBackupMaxSnapshotCount": null,
+    "rdbStorageConnectionString": null,
+    "storageSubscriptionId": null,
+    "zonalConfiguration": null
+  },
+  "redisVersion": "6.0",
+  "replicasPerMaster": null,
+  "replicasPerPrimary": null,
+  "resourceGroup": "pramlearn-rg",
+  "shardCount": null,
+  "sku": {
+    "capacity": 0,
+    "family": "C",
+    "name": "Basic"
+  },
+  "sslPort": 6380,
+  "staticIp": null,
+  "subnetId": null,
+  "tags": {},
+  "tenantSettings": {},
+  "type": "Microsoft.Cache/Redis",
+  "updateChannel": "Stable",
+  "zonalAllocationPolicy": null,
+  "zones": null
+}
+➜  ~ az storage account create \
+    --resource-group "pramlearn-rg" \
+    --name "pramlearnstorage" \
+    --location "Southeast Asia" \
+    --sku "Standard_LRS" \
+    --kind "StorageV2"
+{
+  "accessTier": "Hot",
+  "accountMigrationInProgress": null,
+  "allowBlobPublicAccess": false,
+  "allowCrossTenantReplication": false,
+  "allowSharedKeyAccess": null,
+  "allowedCopyScope": null,
+  "azureFilesIdentityBasedAuthentication": null,
+  "blobRestoreStatus": null,
+  "creationTime": "2025-06-08T08:25:23.672893+00:00",
+  "customDomain": null,
+  "defaultToOAuthAuthentication": null,
+  "dnsEndpointType": null,
+  "enableExtendedGroups": null,
+  "enableHttpsTrafficOnly": true,
+  "enableNfsV3": null,
+  "encryption": {
+    "encryptionIdentity": null,
+    "keySource": "Microsoft.Storage",
+    "keyVaultProperties": null,
+    "requireInfrastructureEncryption": null,
+    "services": {
+      "blob": {
+        "enabled": true,
+        "keyType": "Account",
+        "lastEnabledTime": "2025-06-08T08:25:23.750967+00:00"
+      },
+      "file": {
+        "enabled": true,
+        "keyType": "Account",
+        "lastEnabledTime": "2025-06-08T08:25:23.750967+00:00"
+      },
+      "queue": null,
+      "table": null
+    }
+  },
+  "extendedLocation": null,
+  "failoverInProgress": null,
+  "geoReplicationStats": null,
+  "id": "/subscriptions/74d3fe07-70ee-4784-ba1b-b513c65b9577/resourceGroups/pramlearn-rg/providers/Microsoft.Storage/storageAccounts/pramlearnstorage",
+  "identity": null,
+  "immutableStorageWithVersioning": null,
+  "isHnsEnabled": null,
+  "isLocalUserEnabled": null,
+  "isSftpEnabled": null,
+  "isSkuConversionBlocked": null,
+  "keyCreationTime": {
+    "key1": "2025-06-08T08:25:23.735342+00:00",
+    "key2": "2025-06-08T08:25:23.735342+00:00"
+  },
+  "keyPolicy": null,
+  "kind": "StorageV2",
+  "largeFileSharesState": null,
+  "lastGeoFailoverTime": null,
+  "location": "southeastasia",
+  "minimumTlsVersion": "TLS1_0",
+  "name": "pramlearnstorage",
+  "networkRuleSet": {
+    "bypass": "AzureServices",
+    "defaultAction": "Allow",
+    "ipRules": [],
+    "ipv6Rules": [],
+    "resourceAccessRules": null,
+    "virtualNetworkRules": []
+  },
+  "primaryEndpoints": {
+    "blob": "https://pramlearnstorage.blob.core.windows.net/",
+    "dfs": "https://pramlearnstorage.dfs.core.windows.net/",
+    "file": "https://pramlearnstorage.file.core.windows.net/",
+    "internetEndpoints": null,
+    "microsoftEndpoints": null,
+    "queue": "https://pramlearnstorage.queue.core.windows.net/",
+    "table": "https://pramlearnstorage.table.core.windows.net/",
+    "web": "https://pramlearnstorage.z23.web.core.windows.net/"
+  },
+  "primaryLocation": "southeastasia",
+  "privateEndpointConnections": [],
+  "provisioningState": "Succeeded",
+  "publicNetworkAccess": null,
+  "resourceGroup": "pramlearn-rg",
+  "routingPreference": null,
+  "sasPolicy": null,
+  "secondaryEndpoints": null,
+  "secondaryLocation": null,
+  "sku": {
+    "name": "Standard_LRS",
+    "tier": "Standard"
+  },
+  "statusOfPrimary": "available",
+  "statusOfSecondary": null,
+  "storageAccountSkuConversionStatus": null,
+  "tags": {},
+  "type": "Microsoft.Storage/storageAccounts"
+}
+➜  ~ az storage blob service-properties update \
+    --account-name "pramlearnstorage" \
+    --static-website \
+    --index-document "index.html" \
+    --404-document "index.html"
+
+There are no credentials provided in your command and environment, we will query for account key for your storage account.
+It is recommended to provide --connection-string, --account-key or --sas-token in your command as credentials.
+
+You also can add `--auth-mode login` in your command to use Azure Active Directory (Azure AD) for authorization if your login account is assigned required RBAC roles.
+For more information about RBAC roles in storage, visit https://learn.microsoft.com/azure/storage/common/storage-auth-aad-rbac-cli.
+
+In addition, setting the corresponding environment variables can avoid inputting credentials in your command. Please use --help to get more information about environment variable usage.
+{
+  "cors": [],
+  "deleteRetentionPolicy": {
+    "allowPermanentDelete": null,
+    "days": null,
+    "enabled": false
+  },
+  "hourMetrics": {
+    "enabled": false,
+    "includeApis": null,
+    "retentionPolicy": {
+      "allowPermanentDelete": null,
+      "days": null,
+      "enabled": false
+    },
+    "version": "1.0"
+  },
+  "logging": {
+    "delete": false,
+    "read": false,
+    "retentionPolicy": {
+      "allowPermanentDelete": null,
+      "days": null,
+      "enabled": false
+    },
+    "version": "1.0",
+    "write": false
+  },
+  "minuteMetrics": {
+    "enabled": false,
+    "includeApis": null,
+    "retentionPolicy": {
+      "allowPermanentDelete": null,
+      "days": null,
+      "enabled": false
+    },
+    "version": "1.0"
+  },
+  "staticWebsite": {
+    "defaultIndexDocumentPath": null,
+    "enabled": true,
+    "errorDocument_404Path": "index.html",
+    "indexDocument": "index.html"
+  },
+  "target_version": null
+}
+➜  ~ az resource list --resource-group "pramlearn-rg" --output table
+Name              ResourceGroup    Location       Type                                       Status
+----------------  ---------------  -------------  -----------------------------------------  --------
+pramlearn-db      pramlearn-rg     southeastasia  Microsoft.DBforPostgreSQL/flexibleServers
+pramlearn-redis   pramlearn-rg     southeastasia  Microsoft.Cache/Redis
+pramlearnstorage  pramlearn-rg     southeastasia  Microsoft.Storage/storageAccounts
+➜  ~ az appservice plan create \
+    --resource-group "pramlearn-rg" \
+    --name "pramlearn-plan" \
+    --location "Southeast Asia" \
+    --sku "F1" \
+    --is-linux
+{
+  "elasticScaleEnabled": false,
+  "extendedLocation": null,
+  "freeOfferExpirationTime": null,
+  "geoRegion": "Southeast Asia",
+  "hostingEnvironmentProfile": null,
+  "hyperV": false,
+  "id": "/subscriptions/74d3fe07-70ee-4784-ba1b-b513c65b9577/resourceGroups/pramlearn-rg/providers/Microsoft.Web/serverfarms/pramlearn-plan",
+  "isSpot": false,
+  "isXenon": false,
+  "kind": "linux",
+  "kubeEnvironmentProfile": null,
+  "location": "southeastasia",
+  "maximumElasticWorkerCount": 1,
+  "maximumNumberOfWorkers": 0,
+  "name": "pramlearn-plan",
+  "numberOfSites": 0,
+  "numberOfWorkers": 1,
+  "perSiteScaling": false,
+  "provisioningState": "Succeeded",
+  "reserved": true,
+  "resourceGroup": "pramlearn-rg",
+  "sku": {
+    "capabilities": null,
+    "capacity": 1,
+    "family": "U",
+    "locations": null,
+    "name": "U13",
+    "size": "U13",
+    "skuCapacity": null,
+    "tier": "LinuxFree"
+  },
+  "spotExpirationTime": null,
+  "status": "Ready",
+  "subscription": "74d3fe07-70ee-4784-ba1b-b513c65b9577",
+  "tags": null,
+  "targetWorkerCount": 0,
+  "targetWorkerSizeId": 0,
+  "type": "Microsoft.Web/serverfarms",
+  "workerTierName": null,
+  "zoneRedundant": false
+}
+➜  ~ az webapp create \
+    --resource-group "pramlearn-rg" \
+    --plan "pramlearn-plan" \
+    --name "pramlearn-backend" \
+    --runtime "PYTHON|3.12" \
+    --deployment-source-url "https://github.com/rehaansekap/pramlearn/" \
+    --deployment-source-branch "production"
+Linking to git repository 'https://github.com/rehaansekap/pramlearn/'
+location is not a known attribute of class <class 'azure.mgmt.web.v2023_12_01.models._models_py3.SiteSourceControl'> and will be ignored
+Link to git repository failed due to error 'Operation returned an invalid status 'Not Found'
+Content: {"Code":"NotFound","Message":"Cannot find SourceControlToken with name GitHub.","Target":null,"Details":[{"Message":"Cannot find SourceControlToken with name GitHub."},{"Code":"NotFound"},{"ErrorEntity":{"ExtendedCode":"51004","MessageTemplate":"Cannot find {0} with name {1}.","Parameters":["SourceControlToken","GitHub"],"Code":"NotFound","Message":"Cannot find SourceControlToken with name GitHub."}}],"Innererror":null}'
+{
+  "availabilityState": "Normal",
+  "clientAffinityEnabled": true,
+  "clientCertEnabled": false,
+  "clientCertExclusionPaths": null,
+  "clientCertMode": "Required",
+  "cloningInfo": null,
+  "containerSize": 0,
+  "customDomainVerificationId": "0AF928FB545DFFB0B75D7B408ABB0D92E11A4A936F609390B3B5A994E762AFAE",
+  "dailyMemoryTimeQuota": 0,
+  "daprConfig": null,
+  "defaultHostName": "pramlearn-backend.azurewebsites.net",
+  "enabled": true,
+  "enabledHostNames": [
+    "pramlearn-backend.azurewebsites.net",
+    "pramlearn-backend.scm.azurewebsites.net"
+  ],
+  "endToEndEncryptionEnabled": false,
+  "extendedLocation": null,
+  "ftpPublishingUrl": "ftps://waws-prod-sg1-089.ftp.azurewebsites.windows.net/site/wwwroot",
+  "hostNameSslStates": [
+    {
+      "certificateResourceId": null,
+      "hostType": "Standard",
+      "ipBasedSslResult": null,
+      "ipBasedSslState": "NotConfigured",
+      "name": "pramlearn-backend.azurewebsites.net",
+      "sslState": "Disabled",
+      "thumbprint": null,
+      "toUpdate": null,
+      "toUpdateIpBasedSsl": null,
+      "virtualIPv6": null,
+      "virtualIp": null
+    },
+    {
+      "certificateResourceId": null,
+      "hostType": "Repository",
+      "ipBasedSslResult": null,
+      "ipBasedSslState": "NotConfigured",
+      "name": "pramlearn-backend.scm.azurewebsites.net",
+      "sslState": "Disabled",
+      "thumbprint": null,
+      "toUpdate": null,
+      "toUpdateIpBasedSsl": null,
+      "virtualIPv6": null,
+      "virtualIp": null
+    }
+  ],
+  "hostNames": [
+    "pramlearn-backend.azurewebsites.net"
+  ],
+  "hostNamesDisabled": false,
+  "hostingEnvironmentProfile": null,
+  "httpsOnly": false,
+  "hyperV": false,
+  "id": "/subscriptions/74d3fe07-70ee-4784-ba1b-b513c65b9577/resourceGroups/pramlearn-rg/providers/Microsoft.Web/sites/pramlearn-backend",
+  "identity": null,
+  "inProgressOperationId": null,
+  "isDefaultContainer": null,
+  "isXenon": false,
+  "keyVaultReferenceIdentity": "SystemAssigned",
+  "kind": "app,linux",
+  "lastModifiedTimeUtc": "2025-06-08T08:29:03.533333",
+  "location": "Southeast Asia",
+  "managedEnvironmentId": null,
+  "maxNumberOfWorkers": null,
+  "name": "pramlearn-backend",
+  "outboundIpAddresses": "20.43.151.254,20.44.216.33,20.44.216.231,20.44.216.245,20.43.151.165,20.44.218.63,20.212.64.12",
+  "possibleOutboundIpAddresses": "20.43.151.254,20.44.216.33,20.44.216.231,20.44.216.245,20.43.151.165,20.44.218.63,20.44.218.159,20.44.219.174,20.44.220.16,20.44.220.187,20.44.220.192,20.44.220.205,20.44.221.109,20.44.221.182,20.44.221.185,20.44.221.230,20.44.222.35,20.44.222.48,20.44.222.53,20.44.222.69,20.44.222.109,20.44.222.129,20.44.222.147,20.44.222.174,20.212.64.12",
+  "publicNetworkAccess": null,
+  "redundancyMode": "None",
+  "repositorySiteName": "pramlearn-backend",
+  "reserved": true,
+  "resourceConfig": null,
+  "resourceGroup": "pramlearn-rg",
+  "scmSiteAlsoStopped": false,
+  "serverFarmId": "/subscriptions/74d3fe07-70ee-4784-ba1b-b513c65b9577/resourceGroups/pramlearn-rg/providers/Microsoft.Web/serverfarms/pramlearn-plan",
+  "siteConfig": {
+    "acrUseManagedIdentityCreds": false,
+    "acrUserManagedIdentityId": null,
+    "alwaysOn": false,
+    "antivirusScanEnabled": null,
+    "apiDefinition": null,
+    "apiManagementConfig": null,
+    "appCommandLine": null,
+    "appSettings": null,
+    "autoHealEnabled": null,
+    "autoHealRules": null,
+    "autoSwapSlotName": null,
+    "azureMonitorLogCategories": null,
+    "azureStorageAccounts": null,
+    "clusteringEnabled": false,
+    "connectionStrings": null,
+    "cors": null,
+    "customAppPoolIdentityAdminState": null,
+    "customAppPoolIdentityTenantState": null,
+    "defaultDocuments": null,
+    "detailedErrorLoggingEnabled": null,
+    "documentRoot": null,
+    "elasticWebAppScaleLimit": 0,
+    "experiments": null,
+    "fileChangeAuditEnabled": null,
+    "ftpsState": null,
+    "functionAppScaleLimit": null,
+    "functionsRuntimeScaleMonitoringEnabled": null,
+    "handlerMappings": null,
+    "healthCheckPath": null,
+    "http20Enabled": false,
+    "http20ProxyFlag": null,
+    "httpLoggingEnabled": null,
+    "ipSecurityRestrictions": [
+      {
+        "action": "Allow",
+        "description": "Allow all access",
+        "headers": null,
+        "ipAddress": "Any",
+        "name": "Allow all",
+        "priority": 2147483647,
+        "subnetMask": null,
+        "subnetTrafficTag": null,
+        "tag": null,
+        "vnetSubnetResourceId": null,
+        "vnetTrafficTag": null
+      }
+    ],
+    "ipSecurityRestrictionsDefaultAction": null,
+    "javaContainer": null,
+    "javaContainerVersion": null,
+    "javaVersion": null,
+    "keyVaultReferenceIdentity": null,
+    "limits": null,
+    "linuxFxVersion": "",
+    "loadBalancing": null,
+    "localMySqlEnabled": null,
+    "logsDirectorySizeLimit": null,
+    "machineKey": null,
+    "managedPipelineMode": null,
+    "managedServiceIdentityId": null,
+    "metadata": null,
+    "minTlsCipherSuite": null,
+    "minTlsVersion": null,
+    "minimumElasticInstanceCount": 0,
+    "netFrameworkVersion": null,
+    "nodeVersion": null,
+    "numberOfWorkers": 1,
+    "phpVersion": null,
+    "powerShellVersion": null,
+    "preWarmedInstanceCount": null,
+    "publicNetworkAccess": null,
+    "publishingPassword": null,
+    "publishingUsername": null,
+    "push": null,
+    "pythonVersion": null,
+    "remoteDebuggingEnabled": null,
+    "remoteDebuggingVersion": null,
+    "requestTracingEnabled": null,
+    "requestTracingExpirationTime": null,
+    "routingRules": null,
+    "runtimeADUser": null,
+    "runtimeADUserPassword": null,
+    "sandboxType": null,
+    "scmIpSecurityRestrictions": [
+      {
+        "action": "Allow",
+        "description": "Allow all access",
+        "headers": null,
+        "ipAddress": "Any",
+        "name": "Allow all",
+        "priority": 2147483647,
+        "subnetMask": null,
+        "subnetTrafficTag": null,
+        "tag": null,
+        "vnetSubnetResourceId": null,
+        "vnetTrafficTag": null
+      }
+    ],
+    "scmIpSecurityRestrictionsDefaultAction": null,
+    "scmIpSecurityRestrictionsUseMain": null,
+    "scmMinTlsCipherSuite": null,
+    "scmMinTlsVersion": null,
+    "scmSupportedTlsCipherSuites": null,
+    "scmType": null,
+    "sitePort": null,
+    "sitePrivateLinkHostEnabled": null,
+    "storageType": null,
+    "supportedTlsCipherSuites": null,
+    "tracingOptions": null,
+    "use32BitWorkerProcess": null,
+    "virtualApplications": null,
+    "vnetName": null,
+    "vnetPrivatePortsCount": null,
+    "vnetRouteAllEnabled": null,
+    "webSocketsEnabled": null,
+    "websiteTimeZone": null,
+    "winAuthAdminState": null,
+    "winAuthTenantState": null,
+    "windowsConfiguredStacks": null,
+    "windowsFxVersion": null,
+    "xManagedServiceIdentityId": null
+  },
+  "slotSwapStatus": null,
+  "state": "Running",
+  "storageAccountRequired": false,
+  "suspendedTill": null,
+  "tags": null,
+  "targetSwapSlot": null,
+  "trafficManagerHostNames": null,
+  "type": "Microsoft.Web/sites",
+  "usageState": "Normal",
+  "virtualNetworkSubnetId": null,
+  "vnetContentShareEnabled": false,
+  "vnetImagePullEnabled": false,
+  "vnetRouteAllEnabled": false,
+  "workloadProfileName": null
+}
+➜  ~ az redis list-keys --resource-group "pramlearn-rg" --name "pramlearn-redis"
+{
+  "primaryKey": "0f5Wt2OSRUETTaZ8BtABwHHtIPJY9Pd9CAzCaBQ1bQM=",
+  "secondaryKey": "cH7Dg9PjCDUmXpuemhUkGwvrOAmFho23bAzCaIsPfcg="
+}
+➜  ~ az storage account show-connection-string --resource-group "pramlearn-rg" --name "pramlearnstorage"
+{
+  "connectionString": "DefaultEndpointsProtocol=https;EndpointSuffix=core.windows.net;AccountName=pramlearnstorage;AccountKey=RLnKC44zXWlniaWzBGbCxCuqYbKyFJPfbhiY/G6yB9gV+r68aRShyityHdjAHj1f4R+LsJu82cph+AStRl8czQ==;BlobEndpoint=https://pramlearnstorage.blob.core.windows.net/;FileEndpoint=https://pramlearnstorage.file.core.windows.net/;QueueEndpoint=https://pramlearnstorage.queue.core.windows.net/;TableEndpoint=https://pramlearnstorage.table.core.windows.net/"
+}
+➜  ~ # Set database environment variables
+az webapp config appsettings set \
+    --resource-group "pramlearn-rg" \
+    --name "pramlearn-backend" \
+    --settings \
+    DATABASE_URL="postgresql://pramadmin:123123123@pramlearn-db.postgres.database.azure.com/pramlearn_db?sslmode=require" \
+    REDIS_URL="redis://:0f5Wt2OSRUETTaZ8BtABwHHtIPJY9Pd9CAzCaBQ1bQM=@pramlearn-redis.redis.cache.windows.net:6380/0?ssl_cert_reqs=required" \
+    DEBUG="False" \
+    ALLOWED_HOSTS="pramlearn-backend.azurewebsites.net" \
+    SECRET_KEY="J35syL0l1789" \               
+    DJANGO_SETTINGS_MODULE="backendpramlearn.settings.production"
+[
+  {
+    "name": "DATABASE_URL",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "REDIS_URL",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "DEBUG",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "ALLOWED_HOSTS",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "SECRET_KEY",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "DJANGO_SETTINGS_MODULE",
+    "slotSetting": false,
+    "value": null
+  }
+]
+➜  ~ az ad sp create-for-rbac \
+    --name "pramlearn-github-actions" \
+    --role "Contributor" \
+    --scopes "/subscriptions/74d3fe07-70ee-4784-ba1b-b513c65b9577/resourceGroups/pramlearn-rg" \
+    --sdk-auth
+Option '--sdk-auth' has been deprecated and will be removed in a future release.
+Creating 'Contributor' role assignment under scope '/subscriptions/74d3fe07-70ee-4784-ba1b-b513c65b9577/resourceGroups/pramlearn-rg'
+The output includes credentials that you must protect. Be sure that you do not include these credentials in your code or check the credentials into your source control. For more information, see https://aka.ms/azadsp-cli
+{
+  "clientId": "97597955-6d02-4285-b039-4607b4cae870",
+  "clientSecret": "3gv8Q~Hp4ByldZiinOm5p93zc.Vf0va94K83edmQ",
+  "subscriptionId": "74d3fe07-70ee-4784-ba1b-b513c65b9577",
+  "tenantId": "415e4111-97ea-49ab-8fe2-22a02494fb3c",
+  "activeDirectoryEndpointUrl": "https://login.microsoftonline.com",
+  "resourceManagerEndpointUrl": "https://management.azure.com/",
+  "activeDirectoryGraphResourceId": "https://graph.windows.net/",
+  "sqlManagementEndpointUrl": "https://management.core.windows.net:8443/",
+  "galleryEndpointUrl": "https://gallery.azure.com/",
+  "managementEndpointUrl": "https://management.core.windows.net/"
+}
+➜  ~ az webapp config set \
+    --resource-group "pramlearn-rg" \
+    --name "pramlearn-backend" \
+    --startup-file "gunicorn --bind=0.0.0.0 --timeout 600 backendpramlearn.wsgi"
+
+{
+  "acrUseManagedIdentityCreds": false,
+  "acrUserManagedIdentityId": null,
+  "alwaysOn": false,
+  "apiDefinition": null,
+  "apiManagementConfig": null,
+  "appCommandLine": "gunicorn --bind=0.0.0.0 --timeout 600 backendpramlearn.wsgi",
+  "appSettings": null,
+  "autoHealEnabled": false,
+  "autoHealRules": null,
+  "autoSwapSlotName": null,
+  "azureStorageAccounts": {},
+  "connectionStrings": null,
+  "cors": null,
+  "defaultDocuments": [
+    "Default.htm",
+    "Default.html",
+    "Default.asp",
+    "index.htm",
+    "index.html",
+    "iisstart.htm",
+    "default.aspx",
+    "index.php",
+    "hostingstart.html"
+  ],
+  "detailedErrorLoggingEnabled": false,
+  "documentRoot": null,
+  "elasticWebAppScaleLimit": 0,
+  "experiments": {
+    "rampUpRules": []
+  },
+  "ftpsState": "FtpsOnly",
+  "functionAppScaleLimit": null,
+  "functionsRuntimeScaleMonitoringEnabled": false,
+  "handlerMappings": null,
+  "healthCheckPath": null,
+  "http20Enabled": true,
+  "httpLoggingEnabled": false,
+  "id": "/subscriptions/74d3fe07-70ee-4784-ba1b-b513c65b9577/resourceGroups/pramlearn-rg/providers/Microsoft.Web/sites/pramlearn-backend",
+  "ipSecurityRestrictions": [
+    {
+      "action": "Allow",
+      "description": "Allow all access",
+      "headers": null,
+      "ipAddress": "Any",
+      "name": "Allow all",
+      "priority": 2147483647,
+      "subnetMask": null,
+      "subnetTrafficTag": null,
+      "tag": null,
+      "vnetSubnetResourceId": null,
+      "vnetTrafficTag": null
+    }
+  ],
+  "ipSecurityRestrictionsDefaultAction": null,
+  "javaContainer": null,
+  "javaContainerVersion": null,
+  "javaVersion": null,
+  "keyVaultReferenceIdentity": null,
+  "kind": null,
+  "limits": null,
+  "linuxFxVersion": "PYTHON|3.12",
+  "loadBalancing": "LeastRequests",
+  "localMySqlEnabled": false,
+  "location": "Southeast Asia",
+  "logsDirectorySizeLimit": 35,
+  "machineKey": null,
+  "managedPipelineMode": "Integrated",
+  "managedServiceIdentityId": null,
+  "metadata": null,
+  "minTlsCipherSuite": null,
+  "minTlsVersion": "1.2",
+  "minimumElasticInstanceCount": 1,
+  "name": "pramlearn-backend",
+  "netFrameworkVersion": "v4.0",
+  "nodeVersion": "",
+  "numberOfWorkers": 1,
+  "phpVersion": "",
+  "powerShellVersion": "",
+  "preWarmedInstanceCount": 0,
+  "publicNetworkAccess": null,
+  "publishingUsername": "$pramlearn-backend",
+  "push": null,
+  "pythonVersion": "",
+  "remoteDebuggingEnabled": false,
+  "remoteDebuggingVersion": "VS2022",
+  "requestTracingEnabled": false,
+  "requestTracingExpirationTime": null,
+  "resourceGroup": "pramlearn-rg",
+  "scmIpSecurityRestrictions": [
+    {
+      "action": "Allow",
+      "description": "Allow all access",
+      "headers": null,
+      "ipAddress": "Any",
+      "name": "Allow all",
+      "priority": 2147483647,
+      "subnetMask": null,
+      "subnetTrafficTag": null,
+      "tag": null,
+      "vnetSubnetResourceId": null,
+      "vnetTrafficTag": null
+    }
+  ],
+  "scmIpSecurityRestrictionsDefaultAction": null,
+  "scmIpSecurityRestrictionsUseMain": false,
+  "scmMinTlsVersion": "1.2",
+  "scmType": "None",
+  "tracingOptions": null,
+  "type": "Microsoft.Web/sites",
+  "use32BitWorkerProcess": true,
+  "virtualApplications": [
+    {
+      "physicalPath": "site\\wwwroot",
+      "preloadEnabled": false,
+      "virtualDirectories": null,
+      "virtualPath": "/"
+    }
+  ],
+  "vnetName": "",
+  "vnetPrivatePortsCount": 0,
+  "vnetRouteAllEnabled": false,
+  "webSocketsEnabled": false,
+  "websiteTimeZone": null,
+  "windowsFxVersion": null,
+  "xManagedServiceIdentityId": null
+}
+➜  ~ az webapp config set \
+    --resource-group "pramlearn-rg" \
+    --name "pramlearn-backend" \
+    --linux-fx-version "PYTHON|3.12"
+{
+  "acrUseManagedIdentityCreds": false,
+  "acrUserManagedIdentityId": null,
+  "alwaysOn": false,
+  "apiDefinition": null,
+  "apiManagementConfig": null,
+  "appCommandLine": "gunicorn --bind=0.0.0.0 --timeout 600 backendpramlearn.wsgi",
+  "appSettings": null,
+  "autoHealEnabled": false,
+  "autoHealRules": null,
+  "autoSwapSlotName": null,
+  "azureStorageAccounts": {},
+  "connectionStrings": null,
+  "cors": null,
+  "defaultDocuments": [
+    "Default.htm",
+    "Default.html",
+    "Default.asp",
+    "index.htm",
+    "index.html",
+    "iisstart.htm",
+    "default.aspx",
+    "index.php",
+    "hostingstart.html"
+  ],
+  "detailedErrorLoggingEnabled": false,
+  "documentRoot": null,
+  "elasticWebAppScaleLimit": 0,
+  "experiments": {
+    "rampUpRules": []
+  },
+  "ftpsState": "FtpsOnly",
+  "functionAppScaleLimit": null,
+  "functionsRuntimeScaleMonitoringEnabled": false,
+  "handlerMappings": null,
+  "healthCheckPath": null,
+  "http20Enabled": true,
+  "httpLoggingEnabled": false,
+  "id": "/subscriptions/74d3fe07-70ee-4784-ba1b-b513c65b9577/resourceGroups/pramlearn-rg/providers/Microsoft.Web/sites/pramlearn-backend",
+  "ipSecurityRestrictions": [
+    {
+      "action": "Allow",
+      "description": "Allow all access",
+      "headers": null,
+      "ipAddress": "Any",
+      "name": "Allow all",
+      "priority": 2147483647,
+      "subnetMask": null,
+      "subnetTrafficTag": null,
+      "tag": null,
+      "vnetSubnetResourceId": null,
+      "vnetTrafficTag": null
+    }
+  ],
+  "ipSecurityRestrictionsDefaultAction": null,
+  "javaContainer": null,
+  "javaContainerVersion": null,
+  "javaVersion": null,
+  "keyVaultReferenceIdentity": null,
+  "kind": null,
+  "limits": null,
+  "linuxFxVersion": "PYTHON|3.12",
+  "loadBalancing": "LeastRequests",
+  "localMySqlEnabled": false,
+  "location": "Southeast Asia",
+  "logsDirectorySizeLimit": 35,
+  "machineKey": null,
+  "managedPipelineMode": "Integrated",
+  "managedServiceIdentityId": null,
+  "metadata": null,
+  "minTlsCipherSuite": null,
+  "minTlsVersion": "1.2",
+  "minimumElasticInstanceCount": 1,
+  "name": "pramlearn-backend",
+  "netFrameworkVersion": "v4.0",
+  "nodeVersion": "",
+  "numberOfWorkers": 1,
+  "phpVersion": "",
+  "powerShellVersion": "",
+  "preWarmedInstanceCount": 0,
+  "publicNetworkAccess": null,
+  "publishingUsername": "$pramlearn-backend",
+  "push": null,
+  "pythonVersion": "",
+  "remoteDebuggingEnabled": false,
+  "remoteDebuggingVersion": "VS2022",
+  "requestTracingEnabled": false,
+  "requestTracingExpirationTime": null,
+  "resourceGroup": "pramlearn-rg",
+  "scmIpSecurityRestrictions": [
+    {
+      "action": "Allow",
+      "description": "Allow all access",
+      "headers": null,
+      "ipAddress": "Any",
+      "name": "Allow all",
+      "priority": 2147483647,
+      "subnetMask": null,
+      "subnetTrafficTag": null,
+      "tag": null,
+      "vnetSubnetResourceId": null,
+      "vnetTrafficTag": null
+    }
+  ],
+  "scmIpSecurityRestrictionsDefaultAction": null,
+  "scmIpSecurityRestrictionsUseMain": false,
+  "scmMinTlsVersion": "1.2",
+  "scmType": "None",
+  "tracingOptions": null,
+  "type": "Microsoft.Web/sites",
+  "use32BitWorkerProcess": true,
+  "virtualApplications": [
+    {
+      "physicalPath": "site\\wwwroot",
+      "preloadEnabled": false,
+      "virtualDirectories": null,
+      "virtualPath": "/"
+    }
+  ],
+  "vnetName": "",
+  "vnetPrivatePortsCount": 0,
+  "vnetRouteAllEnabled": false,
+  "webSocketsEnabled": false,
+  "websiteTimeZone": null,
+  "windowsFxVersion": null,
+  "xManagedServiceIdentityId": null
+}
+➜  ~ >....                                                                                          
+    --name "pramlearn-backend" \  
+    --settings "REDIS_URL=redis://:0f5Wt2OSRUETTaZ8BtABwHHtIPJY9Pd9CAzCaBQ1bQM=@pramlearn-redis.redis.cache.windows.net:6380/0?ssl_cert_reqs=required"
+    
+az webapp config appsettings set \                
+    --resource-group "pramlearn-rg" \
+    --name "pramlearn-backend" \  
+    --settings "DEBUG=False"         
+    
+az webapp config appsettings set \
+    --resource-group "pramlearn-rg" \
+    --name "pramlearn-backend" \  
+    --settings "ALLOWED_HOSTS=pramlearn-backend.azurewebsites.net"
+    
+az webapp config appsettings set \                                
+    --resource-group "pramlearn-rg" \
+    --name "pramlearn-backend" \  
+    --settings "SECRET_KEY=J35syL0l1789"
+    
+az webapp config appsettings set \      
+    --resource-group "pramlearn-rg" \
+    --name "pramlearn-backend" \
+    --settings "DJANGO_SETTINGS_MODULE=backendpramlearn.settings.production"
+[
+  {
+    "name": "DATABASE_URL",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "REDIS_URL",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "DEBUG",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "ALLOWED_HOSTS",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "SECRET_KEY",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "DJANGO_SETTINGS_MODULE",
+    "slotSetting": false,
+    "value": null
+  }
+]
+[
+  {
+    "name": "DATABASE_URL",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "REDIS_URL",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "DEBUG",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "ALLOWED_HOSTS",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "SECRET_KEY",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "DJANGO_SETTINGS_MODULE",
+    "slotSetting": false,
+    "value": null
+  }
+]
+[
+  {
+    "name": "DATABASE_URL",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "REDIS_URL",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "DEBUG",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "ALLOWED_HOSTS",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "SECRET_KEY",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "DJANGO_SETTINGS_MODULE",
+    "slotSetting": false,
+    "value": null
+  }
+]
+[
+  {
+    "name": "DATABASE_URL",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "REDIS_URL",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "DEBUG",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "ALLOWED_HOSTS",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "SECRET_KEY",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "DJANGO_SETTINGS_MODULE",
+    "slotSetting": false,
+    "value": null
+  }
+]
+[
+  {
+    "name": "DATABASE_URL",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "REDIS_URL",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "DEBUG",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "ALLOWED_HOSTS",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "SECRET_KEY",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "DJANGO_SETTINGS_MODULE",
+    "slotSetting": false,
+    "value": null
+  }
+]
+[
+  {
+    "name": "DATABASE_URL",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "REDIS_URL",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "DEBUG",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "ALLOWED_HOSTS",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "SECRET_KEY",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "DJANGO_SETTINGS_MODULE",
+    "slotSetting": false,
+    "value": null
+  }
+]
+➜  ~ az webapp config appsettings list \
+    --resource-group "pramlearn-rg" \
+    --name "pramlearn-backend" \
+    --query "[?name=='DATABASE_URL' || name=='REDIS_URL' || name=='DEBUG' || name=='SECRET_KEY']" \
+    --output table
+Name          Value                                                                                                                        SlotSetting
+------------  ---------------------------------------------------------------------------------------------------------------------------  -------------
+DATABASE_URL  postgresql://pramadmin:123123123@pramlearn-db.postgres.database.azure.com/pramlearn_db?sslmode=require                       False
+REDIS_URL     redis://:0f5Wt2OSRUETTaZ8BtABwHHtIPJY9Pd9CAzCaBQ1bQM=@pramlearn-redis.redis.cache.windows.net:6380/0?ssl_cert_reqs=required  False
+DEBUG         False                                                                                                                        False
+SECRET_KEY    J35syL0l1789                                                                                                                 False
+➜  ~ az webapp config appsettings list --resource-group "pramlearn-rg" --name "pramlearn-backend" --output table
+Name                    SlotSetting    Value
+----------------------  -------------  ---------------------------------------------------------------------------------------------------------------------------
+DATABASE_URL            False          postgresql://pramadmin:123123123@pramlearn-db.postgres.database.azure.com/pramlearn_db?sslmode=require
+REDIS_URL               False          redis://:0f5Wt2OSRUETTaZ8BtABwHHtIPJY9Pd9CAzCaBQ1bQM=@pramlearn-redis.redis.cache.windows.net:6380/0?ssl_cert_reqs=required
+DEBUG                   False          False
+ALLOWED_HOSTS           False          pramlearn-backend.azurewebsites.net
+SECRET_KEY              False          J35syL0l1789
+DJANGO_SETTINGS_MODULE  False          backendpramlearn.settings.production
+➜  ~ # Set semua environment variables sekaligus
+az webapp config appsettings set \
+  --resource-group "pramlearn-rg" \
+  --name "pramlearn-backend" \
+  --settings \
+    "DATABASE_URL=postgresql://pramadmin:123123123@pramlearn-db.postgres.database.azure.com:5432/pramlearn_db?sslmode=require" \
+    "REDIS_URL=rediss://:0f5Wt2OSRUETTaZ8BtABwHHtIPJY9Pd9CAzCaBQ1bQM=@pramlearn-redis.redis.cache.windows.net:6380/0" \
+    "DEBUG=False" \
+    "ALLOWED_HOSTS=pramlearn-backend.azurewebsites.net" \
+    "SECRET_KEY=J35syL0l1789" \
+    "DJANGO_SETTINGS_MODULE=pramlearn_api.settings" \
+    "SCM_DO_BUILD_DURING_DEPLOYMENT=true" \
+    "WEBSITE_WEBDEPLOY_USE_SCM=false"
+[
+  {
+    "name": "DATABASE_URL",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "REDIS_URL",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "DEBUG",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "ALLOWED_HOSTS",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "SECRET_KEY",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "DJANGO_SETTINGS_MODULE",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "WEBSITE_WEBDEPLOY_USE_SCM",
+    "slotSetting": false,
+    "value": null
+  }
+]
+➜  ~ az ad sp create-for-rbac --name "pramlearn-github-actions" --role contributor --scopes /subscriptions/$(az account show --query id --output tsv)/resourceGroups/pramlearn-rg --sdk-auth
+Option '--sdk-auth' has been deprecated and will be removed in a future release.
+Found an existing application instance: (id) 7dacb7c4-f365-4c07-9257-2864519fb2d1. We will patch it.
+Creating 'contributor' role assignment under scope '/subscriptions/74d3fe07-70ee-4784-ba1b-b513c65b9577/resourceGroups/pramlearn-rg'
+  Role assignment already exists.
+
+The output includes credentials that you must protect. Be sure that you do not include these credentials in your code or check the credentials into your source control. For more information, see https://aka.ms/azadsp-cli
+{
+  "clientId": "97597955-6d02-4285-b039-4607b4cae870",
+  "clientSecret": "vu18Q~REYpFpUgFiZyG9LbYk-zO4lKjheZKKZaEp",
+  "subscriptionId": "74d3fe07-70ee-4784-ba1b-b513c65b9577",
+  "tenantId": "415e4111-97ea-49ab-8fe2-22a02494fb3c",
+  "activeDirectoryEndpointUrl": "https://login.microsoftonline.com",
+  "resourceManagerEndpointUrl": "https://management.azure.com/",
+  "activeDirectoryGraphResourceId": "https://graph.windows.net/",
+  "sqlManagementEndpointUrl": "https://management.core.windows.net:8443/",
+  "galleryEndpointUrl": "https://gallery.azure.com/",
+  "managementEndpointUrl": "https://management.core.windows.net/"
+}
+➜  ~ 

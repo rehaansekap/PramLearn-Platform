@@ -1,0 +1,10 @@
+{
+  "name": "pramlearn-frontend",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "npx serve dist -s -l 8080"
+  },
+  "dependencies": {
+    "serve": "^14.2.0"
+  }
+}
