@@ -61,7 +61,6 @@ pnpm-debug.log*
 lerna-debug.log*
 dist/
 dist-ssr/
-*.local
 
 # MacOS & system files
 .DS_Store
