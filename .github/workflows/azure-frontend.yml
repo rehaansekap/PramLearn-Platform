@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - production
-    paths:
-      - "frontendpramlearn/**"
+    # paths:
+    #   - "frontendpramlearn/**"
 
 jobs:
   build-and-deploy:
