@@ -1,14 +1,22 @@
 from pathlib import Path
 from datetime import timedelta
-import os
 from dotenv import load_dotenv
-
+import os
+import dj_database_url
 
 load_dotenv()  # Ini akan membaca file .env jika ada
 
 DEBUG = os.getenv("DEBUG", "False") == "True"
-SECRET_KEY = os.getenv("SECRET_KEY")
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
+SECRET_KEY = os.getenv(
+    "SECRET_KEY", "django-insecure-4kh_a6m4m)l@eeg0%3#0#@!m)efo%otu@jp^z2qucjr9pt@y@9")
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "0.0.0.0",
+    "pramlearn-backend.azurewebsites.net",
+    "api.pramlearn.tech",
+    "app.pramlearn.tech",
+]
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -16,17 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-4kh_a6m4m)l@eeg0%3#0#@!m)efo%otu@jp^z2qucjr9pt@y@9'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
-
-
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -38,40 +36,39 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
-    'channels',  # Pastikan ini ada
+    'channels',
 ]
 
-
-# WebSocket configuration
-ASGI_APPLICATION = 'pramlearn_api.asgi.application'
-# Channel layers - gunakan Redis untuk production
-if os.environ.get('REDIS_URL'):
+# Channel layers: Redis jika REDIS_URL ada, fallback ke InMemory
+if os.getenv('REDIS_URL'):
     CHANNEL_LAYERS = {
-        'default': {
-            'BACKEND': 'channels_redis.core.RedisChannelLayer',
-            'CONFIG': {
-                "hosts": [os.environ.get('REDIS_URL', 'redis://localhost:6379')],
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [os.getenv('REDIS_URL')],
             },
         },
     }
 else:
-    # Development - InMemory
     CHANNEL_LAYERS = {
-        'default': {
-            'BACKEND': 'channels.layers.InMemoryChannelLayer',
-        },
+        "default": {
+            "BACKEND": "channels.layers.InMemoryChannelLayer"
+        }
     }
+
+# Azure Storage (optional, aktifkan jika ingin pakai Azure Storage untuk static/media)
+AZURE_STORAGE_CONNECTION_STRING = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'pramlearn_api.urls'
@@ -93,25 +90,26 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'pramlearn_api.wsgi.application'
-
+ASGI_APPLICATION = 'pramlearn_api.asgi.application'
 
 # Database
-# https://docs.djangoproject.com/en/4.0/ref/settings/#databases
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'pramlearn_db',
-        'USER': 'rehanseekap',
-        'PASSWORD': '123123123',  # Ganti dengan password yang Anda buat
-        'HOST': 'localhost',
-        'PORT': '5432',
+if os.getenv("DATABASE_URL"):
+    DATABASES = {
+        'default': dj_database_url.parse(os.getenv("DATABASE_URL"))
     }
-}
-
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'pramlearn_db',
+            'USER': 'rehanseekap',
+            'PASSWORD': '123123123',
+            'HOST': 'localhost',
+            'PORT': '5432',
+        }
+    }
 
 # Password validation
-# https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -127,27 +125,17 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
-# https://docs.djangoproject.com/en/4.0/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.0/howto/static-files/
-
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Default primary key field type
-# https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
@@ -163,36 +151,41 @@ AUTH_USER_MODEL = 'pramlearnapp.CustomUser'
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "https://pramlearnstorage.z23.web.core.windows.net",
+    "https://www.pramlearn.tech",     # Custom domain frontend
+    "https://pramlearn.tech",         # Root domain
+    "https://api.pramlearn.tech",     # Custom domain backend
+    "https://app.pramlearn.tech",
+    "http://app.pramlearn.tech",
 ]
 
+if not DEBUG:
+    CORS_ALLOWED_ORIGINS.append(
+        "https://pramlearnstorage.z23.web.core.windows.net")
+
+CORS_ALLOW_CREDENTIALS = True
+
 SIMPLE_JWT = {
-    # Token akses berlaku selama 5 menit
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=4),
-    # Token refresh berlaku selama 1 hari
     'REFRESH_TOKEN_LIFETIME': timedelta(hours=4),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': False,
-
     'ALGORITHM': 'HS256',
     'SIGNING_KEY': SECRET_KEY,
     'VERIFYING_KEY': None,
     'AUDIENCE': None,
     'ISSUER': None,
-
     'AUTH_HEADER_TYPES': ('Bearer',),
     'USER_ID_FIELD': 'id',
     'USER_ID_CLAIM': 'user_id',
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
     'TOKEN_TYPE_CLAIM': 'token_type',
-
     'JTI_CLAIM': 'jti',
-
     'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
     'SLIDING_TOKEN_LIFETIME': timedelta(days=1),
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
-
 
 # LOGGING = {
 #     'version': 1,
@@ -285,3 +278,12 @@ LOGGING = {
         },
     },
 }
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://pramlearn-backend.azurewebsites.net",
+    "https://api.pramlearn.tech",     # Custom domain backend
+    "https://www.pramlearn.tech",     # Custom domain frontend
+    "https://pramlearn.tech",         # Root domain    # Backend API
+    "https://app.pramlearn.tech",
+    "http://app.pramlearn.tech",
+]

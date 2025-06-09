@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { WS_URL } from "../api";
 
 const OnlineStatusContext = createContext();
 
@@ -28,7 +29,7 @@ export const OnlineStatusProvider = ({ children }) => {
             connectionAttempts + 1
           })`
         );
-        ws = new WebSocket("ws://localhost:8000/ws/user-status/");
+        ws = new WebSocket(`${WS_URL}/user-status/`);
 
         ws.onopen = () => {
           console.log("✅ WebSocket connected successfully!");

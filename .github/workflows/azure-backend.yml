@@ -1,0 +1,55 @@
+name: Deploy Django Backend to Azure Web App
+
+on:
+  push:
+    branches:
+      - production
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          cd backendpramlearn
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Copy production environment
+        run: |
+          cd backendpramlearn
+          cp .env.production .env
+
+      - name: Run migrations
+        run: |
+          cd backendpramlearn
+          python manage.py migrate --noinput
+
+      - name: Collect static files
+        run: |
+          cd backendpramlearn
+          python manage.py collectstatic --noinput
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: pramlearn-backend
+          slot-name: production
+          package: backendpramlearn
+
+      - name: Azure Logout
+        run: az logout

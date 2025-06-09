@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useContext } from "react";
 import { AuthContext } from "../../../../context/AuthContext";
 import { notification } from "antd";
+import { WS_URL } from "../../../../api";
 
 const useNotificationWebSocket = (onNotificationReceived) => {
   const { user, token } = useContext(AuthContext);
@@ -13,7 +14,7 @@ const useNotificationWebSocket = (onNotificationReceived) => {
     if (!user || !token) return;
 
     try {
-      const wsUrl = `ws://localhost:8000/ws/notifications/${user.id}/?token=${token}`;
+      const wsUrl = `${WS_URL}/notifications/${user.id}/?token=${token}`;
       wsRef.current = new WebSocket(wsUrl);
 
       wsRef.current.onopen = () => {

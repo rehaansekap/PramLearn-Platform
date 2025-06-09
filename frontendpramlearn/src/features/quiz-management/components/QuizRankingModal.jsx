@@ -20,6 +20,7 @@ import {
 } from "@ant-design/icons";
 import api from "../../../api";
 import dayjs from "dayjs";
+import { WS_URL } from "../../../api";
 
 const QuizRankingModal = ({ open, onClose, quiz, materialId }) => {
   const [rankings, setRankings] = useState([]);
@@ -50,7 +51,7 @@ const QuizRankingModal = ({ open, onClose, quiz, materialId }) => {
   const connectWebSocket = () => {
     try {
       setWsConnecting(true);
-      const wsUrl = `ws://localhost:8000/ws/quiz-ranking/${quiz.id}/${materialId}/`;
+      const wsUrl = `${WS_URL}/quiz-ranking/${quiz.id}/${materialId}/`;
       console.log("🔗 Connecting to WebSocket:", wsUrl);
 
       wsRef.current = new WebSocket(wsUrl);

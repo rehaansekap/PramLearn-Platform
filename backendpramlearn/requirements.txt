@@ -1,56 +1,125 @@
-# Core Django & API
-Django==5.0.8
-djangorestframework==3.15.2
-django-cors-headers==4.4.0
-djangorestframework-simplejwt==5.3.0
-
-# Database & Crypto - GANTI PyMySQL dengan psycopg2
-psycopg2-binary==2.9.9
-# PyMySQL==1.1.0  # Hapus atau comment ini
-cryptography==42.0.5
-
-# File Processing
-Pillow==10.4.0
-openpyxl==3.1.2
-
-# Data Science & ML (untuk ARCS analysis) - Python 3.12 compatible
-pandas==2.2.2
-scikit-learn==1.4.2
-matplotlib==3.8.4
-seaborn==0.13.2
-numpy==1.26.4
-
-# Real-time WebSocket
+anyio==4.9.0
+asgiref==3.8.1
+asttokens==3.0.0
+attrs==25.3.0
+autobahn==24.4.2
+Automat==25.4.16
+backcall==0.2.0
+beautifulsoup4==4.13.4
+bleach==6.2.0
+certifi==2025.4.26
+cffi==1.17.1
 channels==4.0.0
 channels-redis==4.2.0
-redis==5.0.7
+charset-normalizer==3.4.2
+click==8.2.1
+constantly==23.10.4
+contourpy==1.3.2
+cryptography==42.0.5
+cycler==0.12.1
 daphne==4.1.2
-uvicorn[standard]==0.24.0  # Tambahkan ini untuk Gunicorn ASGI support
-
-# Production Server
-gunicorn==21.2.0
-dotenv==1.0.1  # Untuk environment variables
-
-# Development & Testing
+decorator==5.2.1
+defusedxml==0.7.1
+dj-database-url==2.1.0
+Django==5.0.8
+django-cors-headers==4.4.0
+django-extensions==3.2.3
+djangorestframework==3.15.2
+djangorestframework-simplejwt==5.3.0
+docopt==0.6.2
+et_xmlfile==2.0.0
+executing==2.2.0
 Faker==25.0.1
+fastjsonschema==2.21.1
+fonttools==4.58.2
+gunicorn==21.2.0
+h11==0.16.0
+httptools==0.6.4
+hyperlink==21.0.0
+idna==3.10
+incremental==24.7.2
+iniconfig==2.1.0
+ipython==8.12.3
+jedi==0.19.2
+Jinja2==3.1.6
+joblib==1.5.1
+jsonfield==3.1.0
+jsonschema==4.24.0
+jsonschema-specifications==2025.4.1
+jupyter_client==8.6.3
+jupyter_core==5.8.1
+jupyterlab_pygments==0.3.0
+kiwisolver==1.4.8
+MarkupSafe==3.0.2
+matplotlib==3.8.4
+matplotlib-inline==0.1.7
+mistune==3.1.3
+msgpack==1.1.0
+nbclient==0.10.2
+nbconvert==7.16.6
+nbformat==5.10.4
+numpy==1.26.4
+openpyxl==3.1.2
+packaging==25.0
+pandas==2.2.2
+pandocfilters==1.5.1
+parso==0.8.4
+pexpect==4.9.0
+pickleshare==0.7.5
+pillow==10.4.0
+pipreqs==0.5.0
+platformdirs==4.3.8
+pluggy==1.6.0
+prompt_toolkit==3.0.51
+psycopg2-binary==2.9.9
+ptyprocess==0.7.0
+pure_eval==0.2.3
+pyasn1==0.6.1
+pyasn1_modules==0.4.2
+pycparser==2.22
+Pygments==2.19.1
+PyJWT==2.10.1
+pyOpenSSL==25.1.0
+pyparsing==3.2.3
 pytest==8.1.1
 pytest-django==4.8.0
-
-# Additional utilities
-python-slugify==8.0.4
-python-decouple==3.8
-
-# Django additional utilities (untuk ARCS motivation profiling)
-django-extensions==3.2.3
-
-# Date utilities
 python-dateutil==2.9.0
-
-# JSON handling untuk WebSocket
-jsonfield==3.1.0
-
-# CORS handling untuk production
-whitenoise==6.6.0
-
-# Environment variables
+python-decouple==3.8
 python-dotenv==1.0.1
+python-slugify==8.0.4
+pytz==2025.2
+PyYAML==6.0.2
+pyzmq==26.4.0
+redis==5.0.7
+referencing==0.36.2
+requests==2.32.3
+rpds-py==0.25.1
+scikit-learn==1.4.2
+scipy==1.15.3
+seaborn==0.13.2
+service-identity==24.2.0
+setuptools==80.9.0
+six==1.17.0
+sniffio==1.3.1
+soupsieve==2.7
+sqlparse==0.5.3
+stack-data==0.6.3
+text-unidecode==1.3
+threadpoolctl==3.6.0
+tinycss2==1.4.0
+tornado==6.5.1
+traitlets==5.14.3
+Twisted==25.5.0
+txaio==23.1.1
+typing_extensions==4.14.0
+tzdata==2025.2
+urllib3==2.4.0
+uvicorn==0.24.0
+uvloop==0.21.0
+watchfiles==1.0.5
+wcwidth==0.2.13
+webencodings==0.5.1
+websockets==15.0.1
+whitenoise==6.6.0
+yarg==0.1.9
+zope.interface==7.2

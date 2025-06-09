@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { WS_URL } from "../../../api";
 
 const useAttendanceWebSocket = (materialId, onAttendanceUpdate) => {
   const ws = useRef(null);
@@ -7,7 +8,7 @@ const useAttendanceWebSocket = (materialId, onAttendanceUpdate) => {
     if (!materialId) return;
 
     // Create WebSocket connection
-    const wsUrl = `ws://localhost:8000/ws/attendance/${materialId}/`;
+    const wsUrl = `${WS_URL}/attendance/${materialId}/`;
     ws.current = new WebSocket(wsUrl);
 
     ws.current.onopen = () => {

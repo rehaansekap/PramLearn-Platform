@@ -12,8 +12,8 @@ echo "===============================================" | tee -a $LOGFILE
 
 # PostgreSQL connection details
 DB_NAME="pramlearn_db"
-DB_USER="pramlearn_user"
-DB_PASSWORD="123"  # Sesuaikan dengan password Anda
+DB_USER="pramadmin"
+DB_PASSWORD="123123123"  # Sesuaikan dengan password Anda
 DB_HOST="localhost"
 DB_PORT="5432"
 POSTGRES_USER="postgres"  # Default postgres superuser
