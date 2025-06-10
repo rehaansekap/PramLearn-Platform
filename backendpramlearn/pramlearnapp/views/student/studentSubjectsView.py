@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from pramlearnapp.permissions import IsStudentUser
-from pramlearnapp.models import ClassStudent, Subject, SubjectClass, Material, CustomUser, StudentMaterialProgress
+from pramlearnapp.models import ClassStudent, Subject, SubjectClass, Material, CustomUser, StudentMaterialProgress, Schedule
 from django.db.models import Prefetch
 
 
@@ -50,17 +50,18 @@ class StudentSubjectsView(APIView):
             material_list = []
 
             for m in materials:
-                # Cek progress material untuk student ini
                 try:
-                    progress = StudentMaterialProgress.objects.get(
+                    progress_obj = StudentMaterialProgress.objects.get(
                         student=user,
                         material=m
                     )
-                    completed = progress.is_completed
-                    last_accessed = progress.updated_at
+                    completed = progress_obj.is_completed
+                    last_accessed = progress_obj.updated_at
+                    progress_percent = progress_obj.completion_percentage
                 except StudentMaterialProgress.DoesNotExist:
                     completed = False
                     last_accessed = None
+                    progress_percent = 0
 
                 material_list.append({
                     "id": m.id,
@@ -68,6 +69,7 @@ class StudentSubjectsView(APIView):
                     "slug": m.slug,
                     "description": getattr(m, "content", "")[:60] if hasattr(m, "content") else "",
                     "completed": completed,
+                    "progress": int(progress_percent),
                     "last_accessed": last_accessed.isoformat() if last_accessed else None,
                 })
 
@@ -87,8 +89,26 @@ class StudentSubjectsView(APIView):
                            * 100) if material_list else 0
 
             # Ambil nama guru dari subject (pastikan ada relasi teacher pada model Subject)
-            teacher_name = subject.teacher.get_full_name() if hasattr(
-                subject, "teacher") and subject.teacher else None
+            subject_class = SubjectClass.objects.filter(
+                subject=subject).first()
+            teacher_name = None
+            if subject_class and subject_class.teacher:
+                teacher_name = subject_class.teacher.get_full_name(
+                ).strip() or subject_class.teacher.username
+
+            # Ambil jadwal untuk subject dan kelas student
+            schedules = []
+            subject_class = SubjectClass.objects.filter(
+                subject=subject).first()
+            if subject_class:
+                class_obj = subject_class.class_id
+                subject_schedules = Schedule.objects.filter(
+                    subject=subject, class_obj=class_obj)
+                for sched in subject_schedules:
+                    schedules.append({
+                        "day_of_week": sched.get_day_of_week_display(),
+                        "time": str(sched.time)[:5],  # Format HH:MM
+                    })
 
             data.append({
                 "id": subject.id,
@@ -99,6 +119,7 @@ class StudentSubjectsView(APIView):
                 "last_material_title": last_accessed_material['title'] if last_accessed_material else None,
                 "last_material_slug": last_accessed_material['slug'] if last_accessed_material else None,
                 "materials": material_list,
+                "schedules": schedules,
             })
 
         return Response(data)
