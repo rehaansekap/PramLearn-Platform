@@ -11,9 +11,9 @@ def test_postgresql_service():
         # Try to connect to postgres database with postgres user
         conn = psycopg2.connect(
             host="localhost",
-            database="postgres",  # Default database
-            user="postgres",
-            password="123",  # Ganti dengan password postgres Anda
+            database="pramlearn_db",  # Default database
+            user="pramadmin",
+            password="123123123",  # Ganti dengan password postgres Anda
             port="5432"
         )
         print("✓ PostgreSQL service is running")
@@ -26,25 +26,25 @@ def test_postgresql_service():
 
 
 def test_user_exists():
-    """Test if pramlearn_user exists"""
-    print("\n🔍 Testing if pramlearn_user exists...")
+    """Test if pramadmin exists"""
+    print("\n🔍 Testing if pramadmin exists...")
     try:
         conn = psycopg2.connect(
             host="localhost",
-            database="postgres",
-            user="postgres",
-            password="123",  # Ganti dengan password postgres Anda
+            database="pramlearn_db",
+            user="pramadmin",
+            password="123123123",  # Ganti dengan password postgres Anda
             port="5432"
         )
         cursor = conn.cursor()
-        cursor.execute("SELECT 1 FROM pg_roles WHERE rolname='pramlearn_user'")
+        cursor.execute("SELECT 1 FROM pg_roles WHERE rolname='pramadmin'")
         result = cursor.fetchone()
 
         if result:
-            print("✓ pramlearn_user exists")
+            print("✓ pramadmin exists")
             return True
         else:
-            print("❌ pramlearn_user does NOT exist")
+            print("❌ pramadmin does NOT exist")
             return False
     except Exception as e:
         print(f"❌ Error checking user: {e}")
@@ -60,9 +60,9 @@ def test_database_exists():
     try:
         conn = psycopg2.connect(
             host="localhost",
-            database="postgres",
-            user="postgres",
-            password="123",  # Ganti dengan password postgres Anda
+            database="pramlearn_db",
+            user="pramadmin",
+            password="123123123",  # Ganti dengan password postgres Anda
             port="5432"
         )
         cursor = conn.cursor()
@@ -85,26 +85,26 @@ def test_database_exists():
 
 
 def test_user_connection():
-    """Test direct PostgreSQL connection with pramlearn_user"""
-    print("\n🔍 Testing pramlearn_user connection...")
+    """Test direct PostgreSQL connection with pramadmin"""
+    print("\n🔍 Testing pramadmin connection...")
     try:
         conn = psycopg2.connect(
             host="localhost",
             database="pramlearn_db",
-            user="pramlearn_user",
-            password="123",
+            user="pramadmin",
+            password="123123123",
             port="5432"
         )
         cursor = conn.cursor()
         cursor.execute("SELECT version();")
         version = cursor.fetchone()
-        print(f"✓ pramlearn_user connection successful!")
+        print(f"✓ pramadmin connection successful!")
         print(f"  Version: {version[0][:50]}...")
         cursor.close()
         conn.close()
         return True
     except Exception as e:
-        print(f"❌ pramlearn_user connection failed: {e}")
+        print(f"❌ pramadmin connection failed: {e}")
         return False
 
 
@@ -153,11 +153,11 @@ def main():
         print("Run the following commands in psql as postgres user:")
         print("=" * 50)
         if not user_exists:
-            print("CREATE USER pramlearn_user WITH PASSWORD '123';")
+            print("CREATE USER pramadmin WITH PASSWORD '123123123';")
         if not db_exists:
-            print("CREATE DATABASE pramlearn_db OWNER pramlearn_user;")
-        print("GRANT ALL PRIVILEGES ON DATABASE pramlearn_db TO pramlearn_user;")
-        print("ALTER USER pramlearn_user CREATEDB;")
+            print("CREATE DATABASE pramlearn_db OWNER pramadmin;")
+        print("GRANT ALL PRIVILEGES ON DATABASE pramlearn_db TO pramadmin;")
+        print("ALTER USER pramadmin CREATEDB;")
         print("=" * 50)
         return
 

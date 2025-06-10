@@ -17,11 +17,12 @@ DB_PASSWORD="123123123"  # Sesuaikan dengan password Anda
 DB_HOST="localhost"
 DB_PORT="5432"
 POSTGRES_USER="postgres"  # Default postgres superuser
+POSTGRES_PASSWORD="123123123"
 
 # Check if PostgreSQL is running
 echo "Step 0: Checking PostgreSQL service..." | tee -a $LOGFILE
 # Untuk Windows, cek service PostgreSQL
-powershell -Command "Get-Service -Name 'postgresql*' | Where-Object {$_.Status -eq 'Running'}" | tee -a $LOGFILE
+powershell -Command "Get-Service -Name 'postgresql*' | Where-Object { \$_.Status -eq 'Running' }" | tee -a $LOGFILE
 
 # Drop and create database (Windows style)
 echo "Step 1: Dropping and creating PostgreSQL database..." | tee -a $LOGFILE
@@ -54,7 +55,9 @@ fi
 
 # Grant privileges
 psql -U $POSTGRES_USER -h $DB_HOST -p $DB_PORT -c "GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $DB_USER;" 2>&1 | tee -a $LOGFILE
+psql -U $POSTGRES_USER -h $DB_HOST -p $DB_PORT -d $DB_NAME -c "GRANT ALL ON SCHEMA public TO $DB_USER;" 2>&1 | tee -a $LOGFILE
 psql -U $POSTGRES_USER -h $DB_HOST -p $DB_PORT -c "ALTER USER $DB_USER CREATEDB;" 2>&1 | tee -a $LOGFILE
+
 
 echo "✓ Database setup completed" | tee -a $LOGFILE
 
