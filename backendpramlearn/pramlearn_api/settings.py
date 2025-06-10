@@ -102,7 +102,7 @@ else:
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': 'pramlearn_db',
-            'USER': 'pramadmin',
+            'USER': 'postgres',
             'PASSWORD': '123123123',
             'HOST': 'localhost',
             'PORT': '5432',

@@ -61,13 +61,16 @@ const AppBreadcrumb = () => {
 
       // Material Detail Page - NEW PATH: /admin/management/material/:materialId
       const materialMatch = matchPath(
-        { path: `/${userRolePath}/management/material/:materialSlug`, end: true },
+        {
+          path: `/${userRolePath}/management/material/:materialSlug`,
+          end: true,
+        },
         location.pathname
       );
       if (materialMatch) {
         const { materialSlug } = materialMatch.params;
         try {
-          const response = await api.get(`materials/?slug=${materialSlug}`);
+          const response = await api.get(`materials/${materialSlug}/`);
           const material = response.data.find((m) => m.slug === materialSlug);
           if (material) {
             // Fetch subject info untuk breadcrumb yang lebih lengkap

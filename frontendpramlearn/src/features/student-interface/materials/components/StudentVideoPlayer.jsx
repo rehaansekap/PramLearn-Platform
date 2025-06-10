@@ -1,36 +1,44 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { Card, List, Button, Typography, Tooltip, message, Alert } from "antd";
+import {
+  Card,
+  List,
+  Button,
+  Typography,
+  message,
+  Alert,
+  Row,
+  Col,
+  Tag,
+  Space,
+  Empty,
+} from "antd";
 import {
   PlayCircleOutlined,
-  StarOutlined,
-  StarFilled,
+  YoutubeOutlined,
+  ClockCircleOutlined,
 } from "@ant-design/icons";
 
-const { Text } = Typography;
+const { Text, Title } = Typography;
 
 const StudentVideoPlayer = ({
   youtubeVideos,
   progress,
   onProgressUpdate,
-  bookmarks,
   onActivity,
-  onAddBookmark,
-  onRemoveBookmark,
 }) => {
   const playerRefs = useRef([]);
   const lastProgressUpdate = useRef({});
 
-  // 🔧 PERBAIKAN: Pindahkan handleVideoPlay ke atas sebelum useEffect
+  // Handle video play callback
   const handleVideoPlay = useCallback(
     async (video, index) => {
       console.log(`🎬 Playing video at index ${index}:`, video.url);
-      console.log(`🎬 Video activity key will be: video_played_${index}`);
 
       // Record aktivitas play video
       if (onActivity) {
         await onActivity("video_played", {
           position: index,
-          videoUrl: video.url, // Tambahkan untuk debugging
+          videoUrl: video.url,
         });
       }
 
@@ -39,14 +47,13 @@ const StudentVideoPlayer = ({
         onProgressUpdate({
           ...progress,
           last_position: index,
-          last_video_position: 0, // Reset video position
+          last_video_position: 0,
         });
       }
     },
     [onActivity, onProgressUpdate, progress]
   );
 
-  // 🔧 PERBAIKAN: Pindahkan handleVideoProgress ke atas
   const handleVideoProgress = useCallback(
     (currentTime, duration, index) => {
       if (onActivity && duration > 0) {
@@ -71,7 +78,7 @@ const StudentVideoPlayer = ({
     }
   }, []);
 
-  // Setup player after API ready - sekarang handleVideoPlay sudah defined
+  // Setup player after API ready
   useEffect(() => {
     window.onYouTubeIframeAPIReady = () => {
       youtubeVideos.forEach((video, index) => {
@@ -82,7 +89,6 @@ const StudentVideoPlayer = ({
             events: {
               onStateChange: (event) => {
                 if (event.data === window.YT.PlayerState.PLAYING) {
-                  // ✅ Sekarang handleVideoPlay sudah available
                   handleVideoPlay(video, index);
                 }
               },
@@ -91,7 +97,7 @@ const StudentVideoPlayer = ({
         }
       });
     };
-  }, [youtubeVideos, handleVideoPlay]); // Tambahkan handleVideoPlay ke dependencies
+  }, [youtubeVideos, handleVideoPlay]);
 
   const getYouTubeEmbedUrl = (url) => {
     if (!url) return null;
@@ -99,13 +105,11 @@ const StudentVideoPlayer = ({
     const videoId = extractYouTubeVideoId(url);
     if (!videoId) return null;
 
-    // Add resume from last position if available
     const startTime = progress.last_video_position || 0;
     return `https://www.youtube.com/embed/${videoId}?start=${startTime}&autoplay=0&rel=0&modestbranding=1&showinfo=0`;
   };
 
   const extractYouTubeVideoId = (url) => {
-    // Multiple regex patterns untuk berbagai format YouTube URL
     const patterns = [
       /(?:youtube\.com\/watch\?v=)([^&\n?#]+)/,
       /(?:youtube\.com\/embed\/)([^&\n?#]+)/,
@@ -129,7 +133,6 @@ const StudentVideoPlayer = ({
       const duration = video.duration;
 
       if (duration > 0) {
-        // Update progress setiap 10 detik
         const now = Date.now();
         if (
           !lastProgressUpdate.current[index] ||
@@ -143,45 +146,8 @@ const StudentVideoPlayer = ({
     [handleVideoProgress]
   );
 
-  const handleAddBookmark = async (video, index) => {
-    try {
-      await onAddBookmark({
-        title: `Video: ${getVideoTitle(video.url)}`,
-        content_type: "video",
-        position: index,
-        description: `Bookmark untuk video YouTube`,
-      });
-      message.success("Bookmark berhasil ditambahkan");
-    } catch (error) {
-      message.error("Gagal menambahkan bookmark");
-    }
-  };
-
-  const handleRemoveBookmark = async (bookmarkId) => {
-    try {
-      await onRemoveBookmark(bookmarkId);
-      message.success("Bookmark berhasil dihapus");
-    } catch (error) {
-      message.error("Gagal menghapus bookmark");
-    }
-  };
-
-  const getVideoTitle = (url) => {
-    const videoId = extractYouTubeVideoId(url);
-    return videoId ? `YouTube Video (${videoId})` : "YouTube Video";
-  };
-
-  const isBookmarked = (index) => {
-    return bookmarks.some(
-      (b) => b.content_type === "video" && b.position === index
-    );
-  };
-
-  const getBookmarkId = (index) => {
-    const bookmark = bookmarks.find(
-      (b) => b.content_type === "video" && b.position === index
-    );
-    return bookmark?.id;
+  const getVideoTitle = (url, index) => {
+    return `YouTube Video ${index + 1}`;
   };
 
   const validVideos = youtubeVideos.filter(
@@ -190,80 +156,149 @@ const StudentVideoPlayer = ({
 
   if (!validVideos || validVideos.length === 0) {
     return (
-      <Card>
-        <div style={{ textAlign: "center", padding: "40px 0" }}>
-          <Text type="secondary">Tidak ada video tersedia</Text>
-        </div>
-      </Card>
+      <div style={{ textAlign: "center", padding: "60px 24px" }}>
+        <Empty
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          description={
+            <div>
+              <Text style={{ fontSize: 16, color: "#666" }}>
+                Tidak ada video tersedia
+              </Text>
+              <div style={{ marginTop: 12 }}>
+                <Text type="secondary" style={{ fontSize: 14 }}>
+                  Video pembelajaran akan tersedia setelah ditambahkan oleh guru
+                </Text>
+              </div>
+            </div>
+          }
+        />
+      </div>
     );
   }
 
   return (
-    <Card title="🎥 Video Pembelajaran" style={{ marginBottom: 16 }}>
-      <List
-        dataSource={validVideos}
-        renderItem={(video, index) => {
+    <div>
+      {/* Header Section */}
+      <div style={{ marginBottom: 24, textAlign: "center" }}>
+        <YoutubeOutlined
+          style={{
+            fontSize: 32,
+            color: "#11418b",
+            marginBottom: 12,
+          }}
+        />
+        <Title
+          level={4}
+          style={{
+            margin: 0,
+            marginBottom: 8,
+            color: "#11418b",
+            fontSize: "20px",
+            fontWeight: 700,
+          }}
+        >
+          Video Pembelajaran
+        </Title>
+        <Text type="secondary" style={{ fontSize: "14px", color: "#666" }}>
+          Tonton video pembelajaran untuk memahami materi dengan lebih baik
+        </Text>
+      </div>
+
+      {/* Video Cards Grid */}
+      <Row gutter={[16, 24]}>
+        {validVideos.map((video, index) => {
           const embedUrl = getYouTubeEmbedUrl(video.url);
           const videoId = extractYouTubeVideoId(video.url);
           const playerId = `yt-player-${index}`;
 
           return (
-            <List.Item
-              key={index}
-              actions={[
-                <Tooltip
-                  title={
-                    isBookmarked(index) ? "Hapus bookmark" : "Tambah bookmark"
-                  }
-                  key="bookmark"
+            <Col xs={24} sm={12} lg={12} key={index}>
+              <Card
+                hoverable
+                style={{
+                  borderRadius: 16,
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                  height: "100%",
+                  transition: "all 0.3s ease",
+                }}
+                bodyStyle={{ padding: "20px" }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "translateY(-4px)";
+                  e.currentTarget.style.boxShadow =
+                    "0 8px 24px rgba(255, 0, 0, 0.15)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
+                }}
+              >
+                {/* Header dengan gradient YouTube */}
+                <div
+                  style={{
+                    background:
+                      "linear-gradient(135deg, #ff0000 0%, #ff4444 100%)",
+                    padding: "16px",
+                    margin: "-20px -20px 16px -20px",
+                    color: "white",
+                    borderRadius: "16px 16px 0 0",
+                    position: "relative",
+                  }}
                 >
-                  <Button
-                    type="text"
-                    icon={
-                      isBookmarked(index) ? <StarFilled /> : <StarOutlined />
-                    }
-                    onClick={() => {
-                      if (isBookmarked(index)) {
-                        handleRemoveBookmark(getBookmarkId(index));
-                      } else {
-                        handleAddBookmark(video, index);
-                      }
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: -5,
+                      right: -5,
+                      width: 30,
+                      height: 30,
+                      borderRadius: "50%",
+                      background: "rgba(255, 255, 255, 0.1)",
                     }}
-                    style={{ color: isBookmarked(index) ? "#faad14" : "#666" }}
                   />
-                </Tooltip>,
-              ]}
-            >
-              <div style={{ width: "100%" }}>
-                <List.Item.Meta
-                  title={
-                    <Text strong style={{ color: "#11418b" }}>
-                      {getVideoTitle(video.url)}
-                    </Text>
-                  }
-                  description={
-                    <div>
-                      <Text type="secondary" style={{ fontSize: 12 }}>
-                        URL: {video.url}
-                      </Text>
-                      <br />
-                      {videoId && (
-                        <Text type="secondary" style={{ fontSize: 12 }}>
-                          Video ID: {videoId}
-                        </Text>
-                      )}
-                      {progress.last_position === index && (
-                        <div style={{ marginTop: 4 }}>
-                          <Text style={{ color: "#52c41a", fontSize: 12 }}>
-                            📍 Terakhir diakses
-                          </Text>
-                        </div>
-                      )}
-                    </div>
-                  }
-                />
 
-                <div style={{ marginTop: 12 }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "start",
+                    }}
+                  >
+                    <div style={{ flex: 1 }}>
+                      <YoutubeOutlined
+                        style={{ fontSize: 24, marginBottom: 8 }}
+                      />
+                      <Title
+                        level={5}
+                        style={{
+                          color: "white",
+                          margin: 0,
+                          fontSize: 16,
+                          fontWeight: 600,
+                        }}
+                      >
+                        {getVideoTitle(video.url, index)}
+                      </Title>
+                    </div>
+                  </div>
+
+                  {/* Video Info */}
+                  <Space style={{ marginTop: 8 }}>
+                    <PlayCircleOutlined style={{ fontSize: 12 }} />
+                    <Text
+                      style={{ color: "rgba(255,255,255,0.9)", fontSize: 12 }}
+                    >
+                      Video Pembelajaran
+                    </Text>
+                    {progress.last_position === index && (
+                      <Text style={{ color: "#52c41a", fontSize: 12 }}>
+                        📍 Terakhir diakses
+                      </Text>
+                    )}
+                  </Space>
+                </div>
+
+                {/* Video Player */}
+                <div style={{ marginBottom: 16 }}>
                   {embedUrl ? (
                     <div
                       style={{
@@ -288,6 +323,7 @@ const StudentVideoPlayer = ({
                           height: "100%",
                         }}
                         title={`YouTube Video ${index + 1}`}
+                        onTimeUpdate={(e) => handleVideoTimeUpdate(e, index)}
                       />
                     </div>
                   ) : (
@@ -300,12 +336,12 @@ const StudentVideoPlayer = ({
                     />
                   )}
                 </div>
-              </div>
-            </List.Item>
+              </Card>
+            </Col>
           );
-        }}
-      />
-    </Card>
+        })}
+      </Row>
+    </div>
   );
 };
 

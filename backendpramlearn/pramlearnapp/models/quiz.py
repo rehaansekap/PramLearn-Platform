@@ -12,12 +12,15 @@ class Quiz(models.Model):
     """
     Model yang merepresentasikan kuis.
     """
-    material = models.ForeignKey(Material, on_delete=models.CASCADE)
+    material = models.ForeignKey(
+        Material, on_delete=models.CASCADE, related_name='quizzes')
     title = models.CharField(max_length=255)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     # Menentukan apakah kuis dikerjakan berkelompok atau mandiri
     is_group_quiz = models.BooleanField(default=False)
+    # atau nama field lain seperti deadline, due_date
+    end_time = models.DateTimeField(null=True, blank=True)
     slug = models.SlugField(max_length=200, unique=True, blank=True)
 
     def __str__(self):

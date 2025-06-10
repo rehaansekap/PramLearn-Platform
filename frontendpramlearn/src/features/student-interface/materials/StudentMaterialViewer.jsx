@@ -1,18 +1,36 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Button, Spin, Alert, Tabs, Card, Typography } from "antd";
+import {
+  Button,
+  Spin,
+  Alert,
+  Tabs,
+  Card,
+  Typography,
+  Space,
+  Row,
+  Col,
+  Progress,
+  Breadcrumb,
+  Tag,
+} from "antd";
 import {
   ArrowLeftOutlined,
   LoadingOutlined,
   BookOutlined,
   FileTextOutlined,
   FormOutlined,
+  PlayCircleOutlined,
+  ClockCircleOutlined,
+  HomeOutlined,
+  TrophyOutlined,
 } from "@ant-design/icons";
 import useStudentMaterialAccess from "./hooks/useStudentMaterialAccess";
 import StudentPDFViewer from "./components/StudentPDFViewer";
 import StudentVideoPlayer from "./components/StudentVideoPlayer";
 import MaterialProgressTracker from "./components/MaterialProgressTracker";
-import ProgressDebugger from "./components/ProgressDebugger";
+import MaterialQuizList from "./components/MaterialQuizList";
+import MaterialAssignmentList from "./components/MaterialAssignmentList";
 import api from "../../../api";
 
 const { TabPane } = Tabs;
@@ -28,26 +46,14 @@ const StudentMaterialViewer = () => {
     loading,
     error,
     updateProgress,
-    recordActivity, // Gunakan ini
+    recordActivity,
     addBookmark,
     removeBookmark,
+    isActivityCompleted,
   } = useStudentMaterialAccess(materialSlug);
 
   const [activeTab, setActiveTab] = useState("1");
   const [subjectData, setSubjectData] = useState(null);
-
-  // Tambahkan useEffect untuk debugging
-  useEffect(() => {
-    if (material && materialId) {
-      console.log("📊 Material loaded:", {
-        materialId,
-        title: material.title,
-        pdfCount: material.pdf_files?.length || 0,
-        videoCount: material.youtube_videos?.filter((v) => v.url)?.length || 0,
-        currentProgress: progress.completion_percentage,
-      });
-    }
-  }, [material, materialId, progress.completion_percentage]);
 
   // Fetch subject data untuk info
   useEffect(() => {
@@ -88,32 +94,59 @@ const StudentMaterialViewer = () => {
 
   if (error) {
     return (
-      <Alert
-        message="Gagal memuat materi"
-        description={
-          error.message || "Terjadi kesalahan saat mengambil data materi."
-        }
-        type="error"
-        showIcon
-        style={{ margin: 16 }}
-        action={
-          <Button size="small" danger onClick={() => window.location.reload()}>
-            Coba Lagi
-          </Button>
-        }
-      />
+      <div
+        style={{
+          margin: "24px",
+          maxWidth: 1200,
+          marginLeft: "auto",
+          marginRight: "auto",
+        }}
+      >
+        <Alert
+          message="Gagal memuat materi"
+          description={
+            error.message || "Terjadi kesalahan saat mengambil data materi."
+          }
+          type="error"
+          showIcon
+          style={{ borderRadius: 12 }}
+          action={
+            <Space>
+              <Button
+                size="small"
+                danger
+                onClick={() => window.location.reload()}
+              >
+                Coba Lagi
+              </Button>
+              <Button size="small" onClick={handleBack}>
+                Kembali
+              </Button>
+            </Space>
+          }
+        />
+      </div>
     );
   }
 
   if (!material) {
     return (
-      <Alert
-        message="Materi tidak ditemukan"
-        description="Materi yang Anda cari tidak tersedia."
-        type="warning"
-        showIcon
-        style={{ margin: 16 }}
-      />
+      <div
+        style={{
+          margin: "24px",
+          maxWidth: 1200,
+          marginLeft: "auto",
+          marginRight: "auto",
+        }}
+      >
+        <Alert
+          message="Materi tidak ditemukan"
+          description="Materi yang Anda cari tidak tersedia."
+          type="warning"
+          showIcon
+          style={{ borderRadius: 12 }}
+        />
+      </div>
     );
   }
 
@@ -124,180 +157,385 @@ const StudentMaterialViewer = () => {
     material.google_form_embed_arcs_awal ||
     material.google_form_embed_arcs_akhir;
 
+  const getProgressColor = (percent) => {
+    if (percent >= 80) return "#52c41a";
+    if (percent >= 60) return "#faad14";
+    return "#ff4d4f";
+  };
+
   return (
-    <div style={{ maxWidth: 1200, margin: "0 auto", padding: 16 }}>
-      {/* Header - TANPA breadcrumb */}
-      <div style={{ marginBottom: 24 }}>
-        <Button
-          icon={<ArrowLeftOutlined />}
-          onClick={handleBack}
-          style={{ marginBottom: 16 }}
-        >
-          Kembali
-        </Button>
+    <div
+      style={{
+        maxWidth: 1200,
+        margin: "0 auto",
+        padding: "24px 16px",
+        minHeight: "calc(100vh - 64px)",
+      }}
+    >
+      {/* Breadcrumb - Konsisten dengan halaman lain */}
+      <Breadcrumb
+        style={{ marginBottom: 24 }}
+        items={[
+          {
+            href: "/student",
+            title: (
+              <Space>
+                <HomeOutlined />
+                <span>Dashboard</span>
+              </Space>
+            ),
+          },
+          {
+            href: "/student/subjects",
+            title: (
+              <Space>
+                <BookOutlined />
+                <span>My Subjects</span>
+              </Space>
+            ),
+          },
+          {
+            title: (
+              <Space>
+                <FileTextOutlined />
+                <span>{material.title}</span>
+              </Space>
+            ),
+          },
+        ]}
+      />
 
-        <Title level={2} style={{ color: "#11418b", margin: 0 }}>
-          {material.title}
-        </Title>
-
+      {/* Header Section - Konsisten dengan subjects */}
+      <div
+        style={{
+          background: "linear-gradient(135deg, #11418b 0%, #1890ff 100%)",
+          borderRadius: 16,
+          padding: "32px 24px",
+          marginBottom: 32,
+          color: "white",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
         <div
           style={{
-            marginTop: 8,
-            display: "flex",
-            gap: 16,
-            alignItems: "center",
-            flexWrap: "wrap",
+            position: "absolute",
+            top: -20,
+            right: -20,
+            width: 100,
+            height: 100,
+            borderRadius: "50%",
+            background: "rgba(255, 255, 255, 0.1)",
           }}
-        >
-          {subjectData && (
-            <Text type="secondary" style={{ fontSize: 14 }}>
-              📚 {subjectData.name}
-            </Text>
-          )}
-          <Text type="secondary">
-            Progress: {Math.round(progress.completion_percentage || 0)}%
-          </Text>
-          <Text type="secondary">
-            Waktu belajar: {Math.floor((progress.time_spent || 0) / 60)} menit
-          </Text>
-          {bookmarks.length > 0 && (
-            <Text type="secondary">{bookmarks.length} bookmark</Text>
-          )}
-        </div>
+        />
+        <div
+          style={{
+            position: "absolute",
+            bottom: -30,
+            left: -30,
+            width: 120,
+            height: 120,
+            borderRadius: "50%",
+            background: "rgba(255, 255, 255, 0.05)",
+          }}
+        />
+
+        <Row align="middle" style={{ position: "relative", zIndex: 1 }}>
+          <Col xs={24} md={18}>
+            <Button
+              icon={<ArrowLeftOutlined />}
+              onClick={handleBack}
+              style={{
+                background: "rgba(255, 255, 255, 0.15)",
+                border: "1px solid rgba(255, 255, 255, 0.3)",
+                color: "white",
+                borderRadius: 8,
+                marginBottom: 16,
+              }}
+            >
+              Kembali
+            </Button>
+
+            <Title
+              level={2}
+              style={{ color: "white", margin: 0, marginBottom: 8 }}
+            >
+              {material.title}
+            </Title>
+
+            <Space
+              size={16}
+              wrap
+              style={{
+                marginBottom: 16,
+                justifyContent: "center",
+                width: "100%",
+              }}
+            >
+              {subjectData && (
+                <Space size={8}>
+                  <BookOutlined />
+                  <Text
+                    style={{ color: "rgba(255,255,255,0.9)", fontWeight: 500 }}
+                  >
+                    Mata Pelajaran: <strong>{subjectData.name}</strong>
+                  </Text>
+                </Space>
+              )}
+              <Space size={8}>
+                <ClockCircleOutlined />
+                <Text style={{ color: "rgba(255,255,255,0.9)" }}>
+                  Waktu belajar: {Math.floor((progress.time_spent || 0) / 60)}{" "}
+                  menit
+                </Text>
+              </Space>
+            </Space>
+
+            {/* Progress Section */}
+            <div
+              style={{
+                marginBottom: 16,
+                justifyContent: "center",
+                width: "100%",
+              }}
+            >
+              <Space size={8} style={{ marginBottom: 8, marginRight: 16 }}>
+                <TrophyOutlined />
+                <Text
+                  style={{
+                    color: "rgba(255,255,255,0.9)",
+                    fontSize: 14,
+                    fontWeight: 500,
+                  }}
+                >
+                  Progress Pembelajaran
+                </Text>
+              </Space>
+              <Progress
+                percent={Math.round(progress.completion_percentage || 0)}
+                strokeColor={getProgressColor(
+                  progress.completion_percentage || 0
+                )}
+                trailColor="rgba(255, 255, 255, 0.2)"
+                showInfo={true}
+                style={{ maxWidth: 400 }}
+              />
+            </div>
+          </Col>
+          <Col xs={24} md={6} style={{ textAlign: "center" }}>
+            <div
+              style={{
+                background: "rgba(255, 255, 255, 0.15)",
+                borderRadius: 12,
+                padding: 16,
+                backdropFilter: "blur(10px)",
+              }}
+            >
+              <PlayCircleOutlined style={{ fontSize: 32, marginBottom: 8 }} />
+              <div style={{ fontSize: 14, opacity: 0.9 }}>
+                Pembelajaran Interaktif
+              </div>
+            </div>
+          </Col>
+        </Row>
       </div>
 
-      {/* Content Tabs */}
-      <Tabs
-        activeKey={activeTab}
-        onChange={setActiveTab}
-        size="large"
-        style={{ marginBottom: 24 }}
+      {/* Content Tabs - Redesigned */}
+      <Card
+        style={{
+          borderRadius: 16,
+          boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+          overflow: "hidden",
+        }}
+        bodyStyle={{ padding: 0 }}
       >
-        {hasPDFs && (
-          <TabPane
-            tab={
-              <span>
-                <FileTextOutlined />
-                PDF ({material.pdf_files.length})
-              </span>
-            }
-            key="1"
-          >
-            <StudentPDFViewer
-              pdfFiles={material.pdf_files}
-              progress={progress}
-              updateProgress={updateProgress}
-              onActivity={recordActivity} // Pass ini
-              bookmarks={bookmarks}
-              onAddBookmark={addBookmark}
-              onRemoveBookmark={removeBookmark}
-            />
-          </TabPane>
-        )}
+        <Tabs
+          activeKey={activeTab}
+          onChange={setActiveTab}
+          type="card"
+          size="large"
+          tabBarStyle={{
+            margin: 0,
+            background: "#fafafa",
+            borderBottom: "1px solid #f0f0f0",
+          }}
+          style={{ minHeight: "60vh" }}
+        >
+          {hasPDFs && (
+            <TabPane
+              tab={
+                <Space>
+                  <FileTextOutlined />
+                  <span>Dokumen PDF</span>
+                  <Tag color="blue">{material.pdf_files.length}</Tag>
+                </Space>
+              }
+              key="1"
+            >
+              <div style={{ padding: "24px" }}>
+                <StudentPDFViewer
+                  pdfFiles={material.pdf_files}
+                  progress={progress}
+                  updateProgress={updateProgress}
+                  onActivity={recordActivity}
+                />
+              </div>
+            </TabPane>
+          )}
 
-        {hasVideos && (
+          {hasVideos && (
+            <TabPane
+              tab={
+                <Space>
+                  <PlayCircleOutlined />
+                  <span>Video Pembelajaran</span>
+                  <Tag color="green">
+                    {material.youtube_videos.filter((v) => v.url).length}
+                  </Tag>
+                </Space>
+              }
+              key="2"
+            >
+              <div style={{ padding: "24px" }}>
+                <StudentVideoPlayer
+                  youtubeVideos={material.youtube_videos}
+                  progress={progress}
+                  updateProgress={updateProgress}
+                  onActivity={recordActivity}
+                />
+              </div>
+            </TabPane>
+          )}
+
           <TabPane
             tab={
-              <span>
+              <Space>
                 <BookOutlined />
-                Video ({material.youtube_videos.filter((v) => v.url).length})
-              </span>
+                <span>Quiz</span>
+                <Tag color="purple">{(material.quizzes || []).length}</Tag>
+              </Space>
             }
-            key="2"
+            key="quiz"
           >
-            <StudentVideoPlayer
-              youtubeVideos={material.youtube_videos} // Ubah dari videoUrls ke youtubeVideos
-              progress={progress}
-              updateProgress={updateProgress}
-              onActivity={recordActivity}
-              bookmarks={bookmarks}
-              onAddBookmark={addBookmark}
-              onRemoveBookmark={removeBookmark}
-            />
+            <div style={{ padding: "24px" }}>
+              <MaterialQuizList quizzes={material.quizzes || []} />
+            </div>
           </TabPane>
-        )}
 
-        {hasGoogleForms && (
           <TabPane
             tab={
-              <span>
-                <FormOutlined />
-                Google Forms
-              </span>
+              <Space>
+                <FileTextOutlined />
+                <span>Assignment</span>
+                <Tag color="orange">{(material.assignments || []).length}</Tag>
+              </Space>
             }
-            key="3"
+            key="assignment"
           >
-            <Card title="📝 Google Forms ARCS" style={{ marginBottom: 16 }}>
+            <div style={{ padding: "24px" }}>
+              <MaterialAssignmentList
+                assignments={material.assignments || []}
+              />
+            </div>
+          </TabPane>
+
+          {hasGoogleForms && (
+            <>
               {material.google_form_embed_arcs_awal && (
-                <div style={{ marginBottom: 24 }}>
-                  <Title level={4}>ARCS Awal</Title>
-                  <div
-                    style={{
-                      position: "relative",
-                      paddingTop: "75%",
-                      borderRadius: 8,
-                      overflow: "hidden",
-                    }}
-                  >
-                    <iframe
-                      src={material.google_form_embed_arcs_awal}
-                      frameBorder="0"
-                      style={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        width: "100%",
-                        height: "100%",
-                      }}
-                      title="ARCS Awal Form"
-                    />
+                <TabPane
+                  tab={
+                    <Space>
+                      <FormOutlined />
+                      <span>ARCS Awal</span>
+                    </Space>
+                  }
+                  key="3"
+                >
+                  <div style={{ padding: "24px" }}>
+                    <Card
+                      title="📝 Google Form ARCS Awal"
+                      style={{ borderRadius: 12 }}
+                    >
+                      <Title level={4}>ARCS Awal</Title>
+                      <div
+                        style={{
+                          position: "relative",
+                          paddingTop: "75%",
+                          borderRadius: 8,
+                          overflow: "hidden",
+                        }}
+                      >
+                        <iframe
+                          src={material.google_form_embed_arcs_awal}
+                          frameBorder="0"
+                          style={{
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            width: "100%",
+                            height: "100%",
+                          }}
+                          title="ARCS Awal Form"
+                        />
+                      </div>
+                    </Card>
                   </div>
-                </div>
+                </TabPane>
               )}
 
               {material.google_form_embed_arcs_akhir && (
-                <div>
-                  <Title level={4}>ARCS Akhir</Title>
-                  <div
-                    style={{
-                      position: "relative",
-                      paddingTop: "75%",
-                      borderRadius: 8,
-                      overflow: "hidden",
-                    }}
-                  >
-                    <iframe
-                      src={material.google_form_embed_arcs_akhir}
-                      frameBorder="0"
-                      style={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        width: "100%",
-                        height: "100%",
-                      }}
-                      title="ARCS Akhir Form"
-                    />
+                <TabPane
+                  tab={
+                    <Space>
+                      <FormOutlined />
+                      <span>ARCS Akhir</span>
+                    </Space>
+                  }
+                  key="4"
+                >
+                  <div style={{ padding: "24px" }}>
+                    <Card
+                      title="📝 Google Form ARCS Akhir"
+                      style={{ borderRadius: 12 }}
+                    >
+                      <Title level={4}>ARCS Akhir</Title>
+                      <div
+                        style={{
+                          position: "relative",
+                          paddingTop: "75%",
+                          borderRadius: 8,
+                          overflow: "hidden",
+                        }}
+                      >
+                        <iframe
+                          src={material.google_form_embed_arcs_akhir}
+                          frameBorder="0"
+                          style={{
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            width: "100%",
+                            height: "100%",
+                          }}
+                          title="ARCS Akhir Form"
+                        />
+                      </div>
+                    </Card>
                   </div>
-                </div>
+                </TabPane>
               )}
-              {/* {process.env.NODE_ENV === "development" && (
-                <ProgressDebugger
-                  progress={progress}
-                  recordActivity={recordActivity}
-                  materialId={materialId}
-                />
-              )} */}
-            </Card>
-          </TabPane>
-        )}
-      </Tabs>
+            </>
+          )}
+        </Tabs>
+      </Card>
 
-      {/* Progress Tracker */}
+      {/* Progress Tracker - Updated position */}
       <MaterialProgressTracker
         progress={progress}
         updateProgress={updateProgress}
         isActive={true}
+        material={material}
+        isActivityCompleted={isActivityCompleted}
       />
     </div>
   );

@@ -23,9 +23,11 @@ const StudentBreadcrumb = () => {
       if (pathSnippets[1] === "materials" && pathSnippets[2]) {
         const materialSlug = pathSnippets[2];
         try {
-          const materialRes = await api.get(`materials/?slug=${materialSlug}`);
-          const material = materialRes.data.find((m) => m.slug === materialSlug);
-          
+          const materialRes = await api.get(`materials/${materialSlug}/`);
+          const material = materialRes.data.find(
+            (m) => m.slug === materialSlug
+          );
+
           if (material && material.subject) {
             const subjectRes = await api.get(`subjects/${material.subject}/`);
             setDynamicCrumbs([
@@ -45,7 +47,7 @@ const StudentBreadcrumb = () => {
         } catch (error) {
           console.error("Failed to fetch material/subject data:", error);
         }
-        
+
         // Fallback jika gagal fetch
         setDynamicCrumbs([
           ...baseCrumbs,

@@ -38,7 +38,7 @@ router.register(r'subject-classes', SubjectClassViewSet)
 router.register(r'subjects', SubjectViewSet)
 router.register(r'subjects/(?P<subject_id>\d+)/materials',
                 MaterialViewSet, basename='subject-materials')
-router.register(r'materials', MaterialViewSet)
+router.register(r'materials', MaterialViewSet, basename="materials")
 router.register(r'assignments', AssignmentViewSet)
 router.register(r'assignment-submissions', AssignmentSubmissionViewSet)
 router.register(r'assignment-questions', AssignmentQuestionViewSet)
@@ -48,9 +48,6 @@ router.register(r'groups', GroupViewSet)
 router.register(r'group-members', GroupMemberViewSet)
 router.register(r'students', StudentViewSet, basename='student')
 router.register(r'group-quizzes', GroupQuizViewSet, basename='groupquiz')
-path('student/materials/<int:material_id>/access/',
-     MaterialAccessView.as_view(), name='material-access'),
-
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -128,8 +125,8 @@ urlpatterns = [
          SubjectClassDetail.as_view(), name='subject-class-detail'),
     path('subjects/<slug:slug>/',
          SubjectDetailView.as_view(), name='subject-detail'),
-    path('materials/<slug:slug>/',
-         MaterialDetailView.as_view(), name='material-detail'),
+    #     path('materials/<slug:slug>/',
+    #          MaterialDetailView.as_view(), name='material-detail'),
     path("api/assign-quiz-to-groups/", AssignQuizToGroupsView.as_view(),
          name="assign-quiz-to-groups"),
     path('classes/<slug:slug>/', ClassDetailPage.as_view(), name='class-detail'),

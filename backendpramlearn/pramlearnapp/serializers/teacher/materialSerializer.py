@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from pramlearnapp.models import Material, File, MaterialYoutubeVideo
+from pramlearnapp.models import Material, File, MaterialYoutubeVideo, Quiz, Assignment
 from django.utils.text import slugify
 
 
@@ -7,9 +7,16 @@ class FileSerializer(serializers.ModelSerializer):
     """
     Serializer untuk file.
     """
+    file_size = serializers.SerializerMethodField()  # Tambahkan ini
+
     class Meta:
         model = File
-        fields = ['id', 'file', 'uploaded_at']
+        fields = ['id', 'file', 'uploaded_at', 'file_size']
+
+    def get_file_size(self, obj):
+        if obj.file:
+            return obj.file.size
+        return 0
 
 
 class MaterialYoutubeVideoSerializer(serializers.ModelSerializer):
@@ -62,6 +69,23 @@ class MaterialSerializer(serializers.ModelSerializer):
 
 
 class MaterialDetailSerializer(serializers.ModelSerializer):
+    from .quizSerializer import QuizSerializer
+    from .assignmentSerializer import AssignmentSerializer
+    pdf_files = FileSerializer(many=True, read_only=True)
+    youtube_videos = MaterialYoutubeVideoSerializer(many=True, read_only=True)
+    quizzes = QuizSerializer(many=True, read_only=True)
+    assignments = AssignmentSerializer(many=True, read_only=True)
+
     class Meta:
         model = Material
-        fields = '__all__'
+        fields = '__all__'  # atau sebutkan field yang diperlukan + quizzes + assignments
+
+    def get_quizzes(self, obj):
+        from .quizSerializer import QuizSerializer
+        quizzes = Quiz.objects.filter(material=obj)
+        return QuizSerializer(quizzes, many=True).data
+
+    def get_assignments(self, obj):
+        from .assignmentSerializer import AssignmentSerializer
+        assignments = Assignment.objects.filter(material=obj)
+        return AssignmentSerializer(assignments, many=True).data

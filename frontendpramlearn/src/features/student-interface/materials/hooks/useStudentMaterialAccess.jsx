@@ -71,18 +71,14 @@ const useStudentMaterialAccess = (materialSlug) => {
         }
 
         // Fetch material
-        const materialResponse = await api.get(
-          `materials/?slug=${materialSlug}`
-        );
+        const materialResponse = await api.get(`materials/${materialSlug}/`);
 
         if (!materialResponse.data || materialResponse.data.length === 0) {
           setError(new Error("Material not found"));
           return;
         }
 
-        const foundMaterial = materialResponse.data.find(
-          (m) => m.slug === materialSlug
-        );
+        const foundMaterial = materialResponse.data;
         if (!foundMaterial) {
           setError(new Error("Material not found"));
           return;

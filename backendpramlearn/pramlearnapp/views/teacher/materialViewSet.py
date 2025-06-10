@@ -13,6 +13,7 @@ class MaterialViewSet(viewsets.ModelViewSet):
     queryset = Material.objects.all()
     serializer_class = MaterialSerializer
     permission_classes = [permissions.IsAuthenticated]
+    lookup_field = 'slug'
 
     def perform_create(self, serializer):
         subject_id = self.kwargs.get('subject_id')
@@ -31,6 +32,11 @@ class MaterialViewSet(viewsets.ModelViewSet):
         material = self.get_object()
         material.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def get_serializer_class(self):
+        if self.action == "retrieve":
+            return MaterialDetailSerializer
+        return MaterialSerializer
 
 
 class MaterialDetailView(generics.RetrieveAPIView):

@@ -10,7 +10,8 @@ class Assignment(models.Model):
     """
     Model yang merepresentasikan tugas.
     """
-    material = models.ForeignKey(Material, on_delete=models.CASCADE)
+    material = models.ForeignKey(
+        Material, on_delete=models.CASCADE, related_name='assignments')
     title = models.CharField(max_length=255)
     description = models.TextField()
     due_date = models.DateTimeField()
