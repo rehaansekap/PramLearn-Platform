@@ -107,6 +107,10 @@ const useGroupQuizCollaboration = (quizSlug) => {
             }
             break;
 
+          case "error":
+            message.error(data.message);
+            break;
+
           case "question_changed":
             // Show notification when someone changes question
             const currentUserForQuestion = groupMembers.find(
@@ -169,28 +173,49 @@ const useGroupQuizCollaboration = (quizSlug) => {
   );
 
   // Set answer function
-  const setAnswer = useCallback((questionId, selectedChoice) => {
-    // Update local state immediately for responsive UI
-    setAnswers((prev) => ({
-      ...prev,
-      [questionId]: {
-        selected_choice: selectedChoice,
-        student_name: "You",
-        answered_by: "current_user",
-      },
-    }));
+  const setAnswer = useCallback(
+    async (questionId, selectedChoice) => {
+      // Update local state immediately for responsive UI
+      setAnswers((prev) => ({
+        ...prev,
+        [questionId]: {
+          selected_choice: selectedChoice,
+          student_name: "You",
+          answered_by: "current_user",
+        },
+      }));
 
-    // Send to WebSocket for real-time collaboration
-    if (wsRef.current?.readyState === WebSocket.OPEN) {
-      wsRef.current.send(
-        JSON.stringify({
-          type: "answer_selected",
+      try {
+        // Save to database via API
+        await api.post(`student/group-quiz/${quizSlug}/save-answer/`, {
           question_id: questionId,
           selected_choice: selectedChoice,
-        })
-      );
-    }
-  }, []);
+        });
+
+        // Send to WebSocket for real-time collaboration (after successful save)
+        if (wsRef.current?.readyState === WebSocket.OPEN) {
+          wsRef.current.send(
+            JSON.stringify({
+              type: "answer_selected",
+              question_id: questionId,
+              selected_choice: selectedChoice,
+            })
+          );
+        }
+      } catch (error) {
+        console.error("Failed to save answer:", error);
+        message.error("Gagal menyimpan jawaban");
+
+        // Revert local state if save failed
+        setAnswers((prev) => {
+          const newAnswers = { ...prev };
+          delete newAnswers[questionId];
+          return newAnswers;
+        });
+      }
+    },
+    [quizSlug]
+  );
 
   // Question navigation
   const navigateToQuestion = useCallback((questionIndex) => {

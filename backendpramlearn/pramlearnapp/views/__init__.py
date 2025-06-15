@@ -15,7 +15,7 @@ from pramlearnapp.views.student.studentAssignmentViewSet import (
 from pramlearnapp.views.student.studentUpcomingDeadlinesView import StudentUpcomingDeadlinesView
 from pramlearnapp.views.student.studentQuickActionsView import StudentQuickActionsView
 from pramlearnapp.views.student.groupQuizView import (
-    GroupQuizDetailView, SubmitGroupQuizView, GroupQuizResultsView
+    GroupQuizDetailView, SubmitGroupQuizView, GroupQuizResultsView, SaveGroupQuizAnswerView
 )
 
 from pramlearnapp.views.teacher.teacherViewSet import TeacherViewSet
@@ -61,7 +61,7 @@ __all__ = [
     "StudentGradesView", "StudentGradeAnalyticsView", "QuizAttemptReviewView", "AssignmentSubmissionFeedbackView",
     "ScheduleViewSet", "StudentActivityViewSet", "StudentUpcomingDeadlinesView", "StudentQuickActionsView",
     "StudentMaterialProgressView", "StudentMaterialBookmarkView", "StudentMaterialAccessView", "StudentMaterialActivityView",
-    "GroupQuizDetailView", "SubmitGroupQuizView", "GroupQuizResultsView", "StudentGroupQuizListView",
+    "GroupQuizDetailView", "SubmitGroupQuizView", "GroupQuizResultsView", "StudentGroupQuizListView", "SaveGroupQuizAnswerView",
     # Teacher
     "TeacherViewSet", "SubjectViewSet", "SubjectDetailView", "QuizViewSet", "MaterialViewSet", "MaterialDetailView",
     "MaterialAccessView", "AssignQuizToGroupsView", "GroupViewSet", "GroupMemberViewSet", "GroupQuizViewSet", "GroupQuizSubmissionViewSet",

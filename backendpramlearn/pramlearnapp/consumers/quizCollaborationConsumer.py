@@ -3,7 +3,7 @@ import logging
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.contrib.auth.models import AnonymousUser
-from pramlearnapp.models import GroupQuiz, GroupMember, Quiz, Group, CustomUser
+from pramlearnapp.models import GroupQuiz, GroupMember, Quiz, Group, CustomUser, Question, GroupQuizSubmission
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
@@ -131,17 +131,31 @@ class QuizCollaborationConsumer(AsyncWebsocketConsumer):
 
     async def handle_answer_selection(self, data):
         """Handle when user selects an answer"""
-        # Broadcast answer update to group
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                'type': 'answer_updated',
-                'question_id': data.get('question_id'),
-                'selected_choice': data.get('selected_choice'),
-                'user_id': self.scope["user"].id,
-                'username': self.scope["user"].username
-            }
-        )
+        question_id = data.get('question_id')
+        selected_choice = data.get('selected_choice')
+        user_id = self.scope["user"].id
+
+        # Save answer to database
+        success = await self.save_group_answer(question_id, selected_choice, user_id)
+
+        if success:
+            # Broadcast answer update to group
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'answer_updated',
+                    'question_id': question_id,
+                    'selected_choice': selected_choice,
+                    'user_id': user_id,
+                    'username': self.scope["user"].username
+                }
+            )
+        else:
+            # Send error message back to user
+            await self.send(text_data=json.dumps({
+                'type': 'error',
+                'message': 'Gagal menyimpan jawaban'
+            }))
 
     async def handle_question_change(self, data):
         """Handle when user changes question"""
@@ -205,13 +219,102 @@ class QuizCollaborationConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def get_current_answers(self):
-        """Get current answers for the quiz"""
         try:
-            # Implementation depends on your data structure
+            print(
+                f"🔍 DEBUG: Getting current answers for quiz_id={self.quiz_id}, group_id={self.group_id}")
+
+            group_quiz = GroupQuiz.objects.get(
+                quiz_id=self.quiz_id,
+                group_id=self.group_id
+            )
+            print(f"✅ Found GroupQuiz: {group_quiz}")
+
+            submissions = GroupQuizSubmission.objects.filter(
+                group_quiz=group_quiz
+            ).select_related('question', 'student')
+
+            print(f"📊 Found {submissions.count()} submissions")
+
+            answers = {}
+            for submission in submissions:
+                answers[submission.question.id] = {
+                    'selected_choice': submission.selected_choice,
+                    'user_id': submission.student.id,
+                    'username': submission.student.username,
+                    'submitted_at': submission.submitted_at.isoformat() if hasattr(submission, 'submitted_at') else None
+                }
+                print(
+                    f"  📝 Answer: Q{submission.question.id} = {submission.selected_choice} by {submission.student.username}")
+
+            print(f"🎯 Returning answers: {answers}")
+            return answers
+
+        except GroupQuiz.DoesNotExist:
+            print(f"❌ GroupQuiz not found in get_current_answers")
             return {}
         except Exception as e:
-            logger.error(f"❌ Error getting current answers: {e}")
+            print(f"❌ Error getting current answers: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return {}
+
+    @database_sync_to_async
+    def save_group_answer(self, question_id, selected_choice, user_id):
+        try:
+            print(
+                f"🔍 DEBUG: Attempting to save answer - question_id: {question_id}, choice: {selected_choice}, user_id: {user_id}")
+
+            # Get GroupQuiz instance
+            group_quiz = GroupQuiz.objects.get(
+                quiz_id=self.quiz_id,
+                group_id=self.group_id
+            )
+            print(f"✅ Found GroupQuiz: {group_quiz}")
+
+            # Get Question instance
+            question = Question.objects.get(id=question_id)
+            print(f"✅ Found Question: {question}")
+
+            # Get User instance
+            User = get_user_model()
+            user = User.objects.get(id=user_id)
+            print(f"✅ Found User: {user}")
+
+            # Check if answer is correct
+            is_correct = question.correct_choice == selected_choice
+            print(
+                f"🎯 Answer correctness: {is_correct} (correct: {question.correct_choice}, selected: {selected_choice})")
+
+            # Save or update GroupQuizSubmission
+            submission, created = GroupQuizSubmission.objects.update_or_create(
+                group_quiz=group_quiz,
+                question=question,
+                defaults={
+                    'student': user,  # Make sure this is 'student', not 'student_id'
+                    'selected_choice': selected_choice,
+                    'is_correct': is_correct
+                }
+            )
+
+            action = "Created" if created else "Updated"
+            print(f"💾 {action} GroupQuizSubmission: {submission}")
+            print(
+                f"📊 Submission details: group={group_quiz.group.name}, question={question.text[:50]}..., answer={selected_choice}")
+
+            return True
+
+        except GroupQuiz.DoesNotExist:
+            print(
+                f"❌ GroupQuiz not found: quiz_id={self.quiz_id}, group_id={self.group_id}")
+            return False
+        except Question.DoesNotExist:
+            print(f"❌ Question not found: question_id={question_id}")
+            return False
+        except Exception as e:
+            print(f"❌ Error saving group answer: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return False
 
     async def send_current_state(self):
         """Send current quiz state to the user"""

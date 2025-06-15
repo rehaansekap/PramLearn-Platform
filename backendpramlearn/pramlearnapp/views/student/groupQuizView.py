@@ -2,10 +2,12 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
-from pramlearnapp.models import Quiz, Group, GroupMember, GroupQuiz, GroupQuizSubmission, GroupQuizResult
+from pramlearnapp.models import Quiz, Group, GroupMember, GroupQuiz, GroupQuizSubmission, GroupQuizResult, Question
 from pramlearnapp.serializers.student.quizSerializer import GroupQuizSerializer, GroupQuizSubmissionSerializer
 from django.utils import timezone
 from django.db.models import Count, Q
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 
 
 class GroupQuizDetailView(APIView):
@@ -272,6 +274,75 @@ class GroupQuizResultsView(APIView):
             }
 
             return Response(results_data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class SaveGroupQuizAnswerView(APIView):
+    """API untuk menyimpan jawaban quiz kelompok"""
+
+    def post(self, request, quiz_slug):
+        try:
+            # Get quiz by slug
+            quiz = get_object_or_404(Quiz, slug=quiz_slug, is_group_quiz=True)
+
+            # Get user's group
+            user_group = GroupMember.objects.filter(
+                student=request.user,
+                group__material=quiz.material
+            ).first()
+
+            if not user_group:
+                return Response(
+                    {"error": "Anda tidak terdaftar dalam kelompok"},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+
+            # Get GroupQuiz
+            group_quiz = get_object_or_404(
+                GroupQuiz,
+                quiz=quiz,
+                group=user_group.group
+            )
+
+            # Extract data from request
+            question_id = request.data.get('question_id')
+            selected_choice = request.data.get('selected_choice')
+
+            if not question_id or not selected_choice:
+                return Response(
+                    {"error": "question_id dan selected_choice wajib diisi"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Get question
+            question = get_object_or_404(Question, id=question_id)
+
+            # Check if answer is correct
+            is_correct = question.correct_choice == selected_choice
+
+            # Save or update GroupQuizSubmission
+            submission, created = GroupQuizSubmission.objects.update_or_create(
+                group_quiz=group_quiz,
+                question=question,
+                defaults={
+                    'student': request.user,
+                    'selected_choice': selected_choice,
+                    'is_correct': is_correct
+                }
+            )
+
+            return Response({
+                'success': True,
+                'submission_id': submission.id,
+                'is_correct': is_correct,
+                'created': created
+            }, status=status.HTTP_200_OK)
 
         except Exception as e:
             return Response(

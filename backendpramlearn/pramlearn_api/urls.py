@@ -20,7 +20,7 @@ from pramlearnapp.views import (RoleViewSet, UserViewSet, RegisterView, LoginVie
                                 StudentAvailableAssignmentsView, StudentAssignmentQuestionsView, StudentAssignmentDraftView, StudentAssignmentSubmitView, StudentAssignmentSubmissionsView,
                                 StudentGradesView, StudentGradeAnalyticsView, QuizAttemptReviewView, AssignmentSubmissionFeedbackView, ScheduleViewSet, StudentActivityViewSet,
                                 MaterialAccessView, StudentUpcomingDeadlinesView, StudentQuickActionsView, StudentMaterialProgressView, StudentMaterialBookmarkView, StudentMaterialAccessView,
-                                StudentMaterialActivityView, GroupQuizDetailView, SubmitGroupQuizView, GroupQuizResultsView, StudentGroupQuizListView,
+                                StudentMaterialActivityView, GroupQuizDetailView, SubmitGroupQuizView, GroupQuizResultsView, StudentGroupQuizListView, SaveGroupQuizAnswerView
                                 )
 from pramlearnapp.views.teacher.relatedUsersView import CurrentUserView
 
@@ -64,6 +64,9 @@ urlpatterns = [
 
     path('api/student/group-quiz/', StudentGroupQuizListView.as_view(),
          name='student-group-quiz-list'),
+
+    path('api/student/group-quiz/<slug:quiz_slug>/save-answer/',
+         SaveGroupQuizAnswerView.as_view(), name='save-group-quiz-answer'),
 
     path('api/student/group-quiz/<slug:quiz_slug>/',
          GroupQuizDetailView.as_view(), name='group-quiz-detail'),

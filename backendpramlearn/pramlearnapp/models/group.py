@@ -74,11 +74,13 @@ class GroupQuizSubmission(models.Model):
     group_quiz = models.ForeignKey(
         GroupQuiz, on_delete=models.CASCADE, related_name='submissions')
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    # Who submitted this answer
-    student = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    student = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE)  # Pastikan ini 'student'
     selected_choice = models.CharField(
-        max_length=1, choices=[('A', 'A'), ('B', 'B'), ('C', 'C'), ('D', 'D')])
-    is_correct = models.BooleanField()
+        max_length=1,
+        choices=[('A', 'A'), ('B', 'B'), ('C', 'C'), ('D', 'D')]
+    )
+    is_correct = models.BooleanField(default=False)
     submitted_at = models.DateTimeField(auto_now=True)
 
     class Meta:
@@ -87,9 +89,12 @@ class GroupQuizSubmission(models.Model):
 
     def save(self, *args, **kwargs):
         # Auto-calculate if correct
-        if self.question.correct_choice:
+        if self.question and self.question.correct_choice:
             self.is_correct = self.selected_choice == self.question.correct_choice
         super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.group_quiz.group.name} - Q{self.question.id}: {self.selected_choice}"
 
 
 class GroupQuizResult(models.Model):
