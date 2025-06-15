@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { message } from "antd";
-import { useNavigate } from "react-router-dom"; // Tambahkan ini
+import { useNavigate } from "react-router-dom";
 import api from "../../../../api";
 import { WS_URL } from "../../../../api";
 import { useContext } from "react";
@@ -10,7 +10,7 @@ const useGroupQuizCollaboration = (quizSlug) => {
   const { token } = useContext(AuthContext);
   const navigate = useNavigate();
   const [quiz, setQuiz] = useState(null);
-  const [groupId, setGroupId] = useState(null); // 🔧 TAMBAHKAN INI
+  const [groupId, setGroupId] = useState(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState({});
   const [loading, setLoading] = useState(true);
@@ -22,15 +22,38 @@ const useGroupQuizCollaboration = (quizSlug) => {
   const [wsConnected, setWsConnected] = useState(false);
 
   const wsRef = useRef(null);
+  const connectionAttemptRef = useRef(0);
+  const maxConnectionAttempts = 3;
+  const isConnectingRef = useRef(false);
+  const mountedRef = useRef(true); // 🔧 ADD: Track if component is mounted
+
+  // 🔧 IMPROVED: Better cleanup on unmount
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      if (wsRef.current) {
+        console.log("🔌 Cleaning up WebSocket on unmount");
+        wsRef.current.close(1000);
+        wsRef.current = null;
+      }
+    };
+  }, []);
 
   // Fetch quiz data
   const fetchQuizData = useCallback(async () => {
+    if (!mountedRef.current) return;
+
     try {
       setLoading(true);
+      setError(null);
+
       const response = await api.get(`student/group-quiz/${quizSlug}/`);
       const quizData = response.data;
 
-      console.log("🔍 Quiz data received:", quizData); // Debug log
+      if (!mountedRef.current) return;
+
+      console.log("🔍 Quiz data received:", quizData);
 
       setQuiz(quizData);
       setGroupMembers(quizData.group?.members || []);
@@ -38,69 +61,73 @@ const useGroupQuizCollaboration = (quizSlug) => {
       setTimeRemaining(quizData.time_remaining);
       setIsSubmitted(quizData.is_completed || false);
 
-      // 🔧 PERBAIKAN: Ambil group_id dari response API, bukan dari mock data
       if (quizData.group?.id) {
         console.log("✅ Using group_id from API:", quizData.group.id);
-        // Store group_id for WebSocket connection
         setGroupId(quizData.group.id);
       }
     } catch (err) {
-      setError(err);
+      if (mountedRef.current) {
+        setError(err);
+      }
     } finally {
-      setLoading(false);
+      if (mountedRef.current) {
+        setLoading(false);
+      }
     }
   }, [quizSlug]);
 
-  // WebSocket connection
+  // 🔧 IMPROVED: WebSocket connection with better debouncing
   const connectWebSocket = useCallback(
     (quizId, groupId) => {
-      if (!token) {
-        console.log("❌ No token available, cannot connect to WebSocket");
+      if (!token || !mountedRef.current) {
+        console.log("❌ Cannot connect: no token or component unmounted");
         return;
       }
 
+      // Prevent multiple concurrent connections
+      if (isConnectingRef.current) {
+        console.log("⚠️ Connection already in progress, skipping");
+        return;
+      }
+
+      // Check if already connected to same quiz/group
+      if (wsRef.current?.readyState === WebSocket.OPEN && wsConnected) {
+        console.log("✅ Already connected to WebSocket");
+        return;
+      }
+
+      isConnectingRef.current = true;
+
       try {
-        // Tutup koneksi lama jika ada
+        // Close existing connection
         if (wsRef.current) {
+          console.log("🔌 Closing existing WebSocket connection");
           wsRef.current.close();
+          wsRef.current = null;
         }
 
+        // Reset states
+        setWsConnected(false);
+
         const wsUrl = `${WS_URL}/quiz-collaboration/${quizId}/${groupId}/?token=${token}`;
-        console.log("🔗 Connecting to WebSocket:", wsUrl);
+        console.log("🔗 Creating new WebSocket connection:", wsUrl);
 
         wsRef.current = new WebSocket(wsUrl);
 
-        let pingInterval;
-        let connectionTimeout;
-        let reconnectAttempts = 0;
-        const MAX_RECONNECT_ATTEMPTS = 5;
-
-        // Connection timeout
-        connectionTimeout = setTimeout(() => {
-          if (wsRef.current?.readyState === WebSocket.CONNECTING) {
-            console.log("⏰ WebSocket connection timeout");
-            wsRef.current.close();
-            setWsConnected(false);
-          }
-        }, 10000);
-
         wsRef.current.onopen = () => {
-          clearTimeout(connectionTimeout);
+          if (!mountedRef.current) return;
+
           console.log("✅ Quiz collaboration WebSocket connected");
           setWsConnected(true);
-          reconnectAttempts = 0; // Reset reconnect attempts
+          isConnectingRef.current = false;
+          connectionAttemptRef.current = 0;
 
-          // Start heartbeat with longer interval
-          pingInterval = setInterval(() => {
-            if (wsRef.current?.readyState === WebSocket.OPEN) {
-              console.log("💓 Sending heartbeat");
-              wsRef.current.send(JSON.stringify({ type: "ping" }));
-            }
-          }, 45000); // Send ping every 45 seconds
-
-          // Request current state dengan delay yang lebih lama
+          // 🔧 IMPROVED: Wait for connection to stabilize before requesting state
           setTimeout(() => {
-            if (wsRef.current?.readyState === WebSocket.OPEN) {
+            if (
+              wsRef.current?.readyState === WebSocket.OPEN &&
+              mountedRef.current
+            ) {
               console.log("📤 Requesting current state...");
               wsRef.current.send(
                 JSON.stringify({
@@ -108,17 +135,23 @@ const useGroupQuizCollaboration = (quizSlug) => {
                 })
               );
             }
-          }, 1000); // Delay 1 detik setelah connection open
+          }, 500); // 🔧 REDUCED: Wait only 500ms
         };
 
         wsRef.current.onmessage = (event) => {
+          if (!mountedRef.current) return;
+
           try {
             const data = JSON.parse(event.data);
             console.log("📨 WebSocket message received:", data);
 
             switch (data.type) {
               case "pong":
-                console.log("💓 Received pong");
+                console.log("💓 Received pong from server");
+                break;
+
+              case "connection_established":
+                console.log("🔗 Connection established:", data.message);
                 break;
 
               case "current_state":
@@ -176,25 +209,20 @@ const useGroupQuizCollaboration = (quizSlug) => {
                 message.warning(data.message, 2);
                 break;
 
-              // ✨ TAMBAHKAN INI: Handle quiz submission broadcast
               case "quiz_submitted":
                 console.log("🎯 Received quiz submission broadcast:", data);
-
-                // Show notification
                 message.success(data.message, 3);
-
-                // Set submitted state
                 setIsSubmitted(true);
 
-                // Close WebSocket connection
                 if (wsRef.current) {
                   wsRef.current.close(1000);
                 }
 
-                // Redirect all group members to results page
                 setTimeout(() => {
-                  navigate(data.redirect_url);
-                }, 1500); // Small delay to show the message
+                  if (mountedRef.current) {
+                    navigate(data.redirect_url);
+                  }
+                }, 1500);
                 break;
 
               case "error":
@@ -211,62 +239,55 @@ const useGroupQuizCollaboration = (quizSlug) => {
         };
 
         wsRef.current.onclose = (event) => {
-          clearTimeout(connectionTimeout);
-          clearInterval(pingInterval);
+          if (!mountedRef.current) return;
 
           console.log("🔌 Quiz collaboration WebSocket disconnected:", {
             code: event.code,
             reason: event.reason,
             wasClean: event.wasClean,
           });
+
           setWsConnected(false);
+          isConnectingRef.current = false;
 
-          // Handle different close codes
-          if (event.code === 1005) {
-            console.log(
-              "⚠️ Connection closed abnormally (1005) - likely server issue"
-            );
-          }
-
-          // 🔧 PERBAIKAN: Limit reconnection attempts
+          // 🔧 IMPROVED: Only reconnect on unexpected disconnections
           if (
             !isSubmitted &&
-            ![1000, 4001, 4003].includes(event.code) &&
-            reconnectAttempts < MAX_RECONNECT_ATTEMPTS
+            ![1000, 1001, 4001, 4003].includes(event.code) &&
+            connectionAttemptRef.current < maxConnectionAttempts &&
+            mountedRef.current
           ) {
-            reconnectAttempts++;
-            const delay = Math.min(3000 * reconnectAttempts, 30000); // Exponential backoff, max 30s
+            connectionAttemptRef.current++;
+            const delay = Math.min(2000 * connectionAttemptRef.current, 5000);
 
             console.log(
-              `🔄 Attempting to reconnect (${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS}) in ${
-                delay / 1000
-              } seconds...`
+              `🔄 Attempting to reconnect (${
+                connectionAttemptRef.current
+              }/${maxConnectionAttempts}) in ${delay / 1000} seconds...`
             );
 
             setTimeout(() => {
-              if (!isSubmitted) {
+              if (!isSubmitted && mountedRef.current) {
                 connectWebSocket(quizId, groupId);
               }
             }, delay);
-          } else if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
-            console.log(
-              "❌ Max reconnection attempts reached. Switching to polling mode."
-            );
+          } else if (connectionAttemptRef.current >= maxConnectionAttempts) {
+            console.log("❌ Max reconnection attempts reached.");
             message.warning(
-              "Koneksi real-time bermasalah. Menggunakan mode polling."
+              "Koneksi terputus. Silakan refresh halaman jika diperlukan."
             );
-            // You could implement polling fallback here
           }
         };
 
         wsRef.current.onerror = (error) => {
-          clearTimeout(connectionTimeout);
-          clearInterval(pingInterval);
           console.error("❌ Quiz collaboration WebSocket error:", error);
           setWsConnected(false);
+          isConnectingRef.current = false;
         };
       } catch (error) {
         console.error("❌ Error creating WebSocket connection:", error);
+        setWsConnected(false);
+        isConnectingRef.current = false;
       }
     },
     [groupMembers, isSubmitted, token, navigate]
@@ -275,6 +296,8 @@ const useGroupQuizCollaboration = (quizSlug) => {
   // Set answer function
   const setAnswer = useCallback(
     async (questionId, selectedChoice) => {
+      if (!mountedRef.current) return;
+
       setAnswers((prev) => ({
         ...prev,
         [questionId]: {
@@ -290,7 +313,8 @@ const useGroupQuizCollaboration = (quizSlug) => {
           selected_choice: selectedChoice,
         });
 
-        if (wsRef.current?.readyState === WebSocket.OPEN) {
+        // Only send if connection is stable
+        if (wsRef.current?.readyState === WebSocket.OPEN && wsConnected) {
           wsRef.current.send(
             JSON.stringify({
               type: "answer_selected",
@@ -303,40 +327,47 @@ const useGroupQuizCollaboration = (quizSlug) => {
         console.error("Failed to save answer:", error);
         message.error("Gagal menyimpan jawaban");
 
-        setAnswers((prev) => {
-          const newAnswers = { ...prev };
-          delete newAnswers[questionId];
-          return newAnswers;
-        });
+        if (mountedRef.current) {
+          setAnswers((prev) => {
+            const newAnswers = { ...prev };
+            delete newAnswers[questionId];
+            return newAnswers;
+          });
+        }
       }
     },
-    [quizSlug]
+    [quizSlug, wsConnected]
   );
 
   // Question navigation
-  const navigateToQuestion = useCallback((questionIndex) => {
-    setCurrentQuestionIndex(questionIndex);
+  const navigateToQuestion = useCallback(
+    (questionIndex) => {
+      if (!mountedRef.current) return;
 
-    if (wsRef.current?.readyState === WebSocket.OPEN) {
-      wsRef.current.send(
-        JSON.stringify({
-          type: "question_changed",
-          question_index: questionIndex,
-        })
-      );
-    }
-  }, []);
+      setCurrentQuestionIndex(questionIndex);
 
-  // ✨ UPDATE INI: Submit quiz dengan WebSocket broadcast
+      if (wsRef.current?.readyState === WebSocket.OPEN && wsConnected) {
+        wsRef.current.send(
+          JSON.stringify({
+            type: "question_changed",
+            question_index: questionIndex,
+          })
+        );
+      }
+    },
+    [wsConnected]
+  );
+
+  // Submit quiz
   const submitQuiz = useCallback(async () => {
+    if (!mountedRef.current) return;
+
     try {
       console.log("🎯 Submitting quiz and broadcasting to group...");
 
-      // Submit quiz via API
       const response = await api.post(`student/group-quiz/${quizSlug}/submit/`);
 
-      // Broadcast submission to all group members via WebSocket
-      if (wsRef.current?.readyState === WebSocket.OPEN) {
+      if (wsRef.current?.readyState === WebSocket.OPEN && wsConnected) {
         wsRef.current.send(
           JSON.stringify({
             type: "quiz_submitted",
@@ -352,13 +383,15 @@ const useGroupQuizCollaboration = (quizSlug) => {
       console.error("❌ Error submitting quiz:", err);
       throw err;
     }
-  }, [quizSlug]);
+  }, [quizSlug, wsConnected]);
 
   // Timer countdown
   useEffect(() => {
-    if (timeRemaining <= 0) return;
+    if (timeRemaining <= 0 || !mountedRef.current) return;
 
     const timer = setInterval(() => {
+      if (!mountedRef.current) return;
+
       setTimeRemaining((prev) => {
         const newTime = prev - 1;
         return Math.max(0, newTime);
@@ -370,29 +403,42 @@ const useGroupQuizCollaboration = (quizSlug) => {
 
   // Auto submit when time runs out
   useEffect(() => {
-    if (timeRemaining === 0 && !isSubmitted) {
+    if (timeRemaining === 0 && !isSubmitted && mountedRef.current) {
       message.warning("Waktu habis! Quiz akan disubmit otomatis.");
       submitQuiz()
         .then(() => {
-          // Navigation will be handled by WebSocket broadcast
           console.log("✅ Auto-submit completed");
         })
         .catch(console.error);
     }
-  }, [timeRemaining, isSubmitted, submitQuiz, quizSlug]);
+  }, [timeRemaining, isSubmitted, submitQuiz]);
 
-  // Initial data fetch
+  // 🔧 IMPROVED: Better data fetching and WebSocket initialization
   useEffect(() => {
-    if (quizSlug) {
+    if (quizSlug && mountedRef.current) {
+      console.log("🚀 Starting quiz data fetch for:", quizSlug);
       fetchQuizData();
     }
-
-    return () => {
-      if (wsRef.current) {
-        wsRef.current.close(1000);
-      }
-    };
   }, [quizSlug, fetchQuizData]);
+
+  // 🔧 IMPROVED: Separate effect for WebSocket connection after data is loaded
+  useEffect(() => {
+    if (quiz?.id && groupId && token && !loading && mountedRef.current) {
+      console.log("🔗 Initializing WebSocket connection...", {
+        quizId: quiz.id,
+        groupId: groupId,
+      });
+
+      // 🔧 ADD: Small delay to ensure component is fully mounted
+      const timer = setTimeout(() => {
+        if (mountedRef.current) {
+          connectWebSocket(quiz.id, groupId);
+        }
+      }, 100);
+
+      return () => clearTimeout(timer);
+    }
+  }, [quiz?.id, groupId, token, loading, connectWebSocket]);
 
   return {
     quiz,
