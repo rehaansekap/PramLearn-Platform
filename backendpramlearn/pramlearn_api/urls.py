@@ -17,11 +17,10 @@ from pramlearnapp.views import (RoleViewSet, UserViewSet, RegisterView, LoginVie
                                 ClassDetailPage, ClassStudentDetail, StudentMotivationProfileView, UploadARCSCSVView, SubjectDetailView,
                                 AutoGroupStudentsView, AssignQuizToGroupsView, GroupQuizViewSet, SubmitAssignmentView, RelatedUsersForTeacherView,
                                 MaterialAttendanceListView, update_attendance, bulk_create_attendance, QuizRankingView, StudentDashboardView, StudentSubjectsView,
-                                StudentAvailableQuizzesView, StudentQuizDetailView, StudentQuizAttemptView, StudentQuizAnswersView, StudentQuizSubmitView, StudentQuizResultsView,
                                 StudentAvailableAssignmentsView, StudentAssignmentQuestionsView, StudentAssignmentDraftView, StudentAssignmentSubmitView, StudentAssignmentSubmissionsView,
                                 StudentGradesView, StudentGradeAnalyticsView, QuizAttemptReviewView, AssignmentSubmissionFeedbackView, ScheduleViewSet, StudentActivityViewSet,
                                 MaterialAccessView, StudentUpcomingDeadlinesView, StudentQuickActionsView, StudentMaterialProgressView, StudentMaterialBookmarkView, StudentMaterialAccessView,
-                                StudentMaterialActivityView
+                                StudentMaterialActivityView, GroupQuizDetailView, SubmitGroupQuizView, GroupQuizResultsView, StudentGroupQuizListView,
                                 )
 from pramlearnapp.views.teacher.relatedUsersView import CurrentUserView
 
@@ -62,18 +61,19 @@ urlpatterns = [
          name='student-subjects'),
     path('api/available-students/', AvailableStudentListView.as_view(),
          name='available-students'),
-    path('api/student/quizzes/available/', StudentAvailableQuizzesView.as_view(),
-         name='student-available-quizzes'),
-    path('api/student/quiz/<str:quiz_slug>/',
-         StudentQuizDetailView.as_view(), name='student-quiz-detail'),
-    path('api/student/quiz/<str:quiz_slug>/attempt/',
-         StudentQuizAttemptView.as_view(), name='student-quiz-attempt'),
-    path('api/student/quiz/<str:quiz_slug>/results/',
-         StudentQuizResultsView.as_view(), name='student-quiz-results'),
-    path('api/student/quiz-attempt/<int:attempt_id>/answers/',
-         StudentQuizAnswersView.as_view(), name='student-quiz-answers'),
-    path('api/student/quiz-attempt/<int:attempt_id>/submit/',
-         StudentQuizSubmitView.as_view(), name='student-quiz-submit'),
+
+    path('api/student/group-quiz/', StudentGroupQuizListView.as_view(),
+         name='student-group-quiz-list'),
+
+    path('api/student/group-quiz/<slug:quiz_slug>/',
+         GroupQuizDetailView.as_view(), name='group-quiz-detail'),
+
+    path('api/student/group-quiz/<slug:quiz_slug>/submit/',
+         SubmitGroupQuizView.as_view(), name='submit-group-quiz'),
+
+    path('api/student/group-quiz/<slug:quiz_slug>/results/',
+         GroupQuizResultsView.as_view(), name='group-quiz-results'),
+
     path('api/student/assignments/available/',
          StudentAvailableAssignmentsView.as_view(),
          name='student-available-assignments'),

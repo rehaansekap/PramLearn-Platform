@@ -18,6 +18,9 @@ from pramlearnapp.serializers.student.studentActivitySerializer import StudentAc
 from pramlearnapp.serializers.student.materialProgressSerializer import (
     StudentMaterialProgressSerializer, StudentMaterialBookmarkSerializer
 )
+from pramlearnapp.serializers.student.quizSerializer import (
+    QuestionSerializer, GroupQuizSerializer, GroupQuizSubmissionSerializer,
+)
 
 from pramlearnapp.serializers.teacher.teacherSerializer import TeacherSerializer
 from pramlearnapp.serializers.teacher.subjectSerializer import SubjectSerializer, SubjectDetailSerializer, SubjectClassSerializer
@@ -27,7 +30,7 @@ from pramlearnapp.serializers.teacher.materialSerializer import (
 )
 from pramlearnapp.serializers.teacher.groupSerializer import (
     GroupSerializer, GroupMemberSerializer, GroupQuizSerializer,
-    GroupQuizSubmissionSerializer, GroupQuizResultSerializer
+    GroupQuizSubmissionSerializer, GroupQuizResultSerializer  # Ensure this is included
 )
 from pramlearnapp.serializers.teacher.classSerializer import ClassSerializer as TeacherClassSerializer, ClassDetailSerializer as TeacherClassDetailSerializer
 from pramlearnapp.serializers.teacher.assignmentSerializer import (
@@ -46,7 +49,7 @@ __all__ = [
     "StudentMotivationProfileSerializer", "StudentSerializer", "AvailableStudentSerializer",
     "StudentAttendanceSerializer", "StudentAssignmentSerializer", "StudentAssignmentSubmissionSerializer",
     "StudentAssignmentDraftSerializer", "StudentActivitySerializer", "StudentMaterialProgressSerializer",
-    "StudentMaterialBookmarkSerializer",
+    "StudentMaterialBookmarkSerializer", "QuestionSerializer", "GroupQuizSerializer", "GroupQuizSubmissionSerializer",
     # Teacher
     "TeacherSerializer", "SubjectSerializer", "SubjectDetailSerializer", "SubjectClassSerializer",
     "QuizSerializer", "QuestionSerializer", "MaterialSerializer", "MaterialDetailSerializer",

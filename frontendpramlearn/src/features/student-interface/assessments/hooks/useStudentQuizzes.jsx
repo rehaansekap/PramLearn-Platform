@@ -12,10 +12,14 @@ const useStudentQuizzes = () => {
       setError(null);
 
       try {
-        console.log("Fetching available quizzes..."); // Debug log
-        const response = await api.get("student/quizzes/available/");
-        console.log("Quizzes response:", response.data); // Debug log
-        setAvailableQuizzes(response.data);
+        // Gunakan endpoint quizzes yang sudah ada
+        const response = await api.get("/quizzes/");
+        // Filter quiz yang available untuk student jika diperlukan
+        const availableQuizzes = response.data.filter((quiz) => {
+          // Tambahkan logika filter sesuai kebutuhan
+          return quiz.is_published && new Date(quiz.start_date) <= new Date();
+        });
+        setAvailableQuizzes(availableQuizzes);
       } catch (err) {
         console.error("Error fetching available quizzes:", err);
         setError(err);

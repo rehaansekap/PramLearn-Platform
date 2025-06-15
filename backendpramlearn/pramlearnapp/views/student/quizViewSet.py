@@ -2,116 +2,143 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
-from django.utils import timezone  # BENAR
-import datetime
-from ...models import Quiz, GroupQuiz, Group, GroupMember, StudentQuizAttempt, StudentQuizAnswer, Question, StudentActivity
-from ...serializers import QuizSerializer
+from django.utils import timezone
+from pramlearnapp.models import Quiz, Group, GroupMember, GroupQuiz, GroupQuizSubmission, GroupQuizResult
 from pramlearnapp.decorators import student_required
-# Make sure this import path matches your project structure
 
-
-class StudentAvailableQuizzesView(APIView):
-    """
-    Get available quizzes for student based on their group assignments
-    """
+class StudentGroupQuizListView(APIView):
+    """API untuk mendapatkan daftar quiz kelompok yang tersedia untuk student"""
+    
     @student_required
     def get(self, request):
-        user = request.user
-
         try:
-            # Get student's groups
-            student_groups = GroupMember.objects.filter(
-                student=user).values_list('group', flat=True)
-
-            if not student_groups:
-                return Response([], status=status.HTTP_200_OK)
-
-            # Get quizzes assigned to student's groups
+            # Get user's groups
+            user_groups = GroupMember.objects.filter(
+                student=request.user
+            ).values_list('group', flat=True)
+            
+            # Get group quizzes for user's groups
             group_quizzes = GroupQuiz.objects.filter(
-                group__in=student_groups
-            ).select_related('quiz', 'group')
-
-            available_quizzes = []
-
+                group__in=user_groups
+            ).select_related('quiz', 'group').prefetch_related('submissions')
+            
+            quiz_data = []
             for group_quiz in group_quizzes:
                 quiz = group_quiz.quiz
-
-                # Check if student already has attempt
-                existing_attempt = StudentQuizAttempt.objects.filter(
-                    student=user,
-                    quiz=quiz
-                ).first()
-
-                quiz_data = {
+                
+                # Check if quiz has been completed by the group
+                is_completed = group_quiz.is_completed
+                
+                # Get completion info
+                result = None
+                if is_completed:
+                    try:
+                        result = GroupQuizResult.objects.get(group_quiz=group_quiz)
+                    except GroupQuizResult.DoesNotExist:
+                        pass
+                
+                quiz_info = {
                     'id': quiz.id,
-                    'slug': quiz.slug if hasattr(quiz, 'slug') else f"quiz-{quiz.id}",
                     'title': quiz.title,
                     'content': quiz.content,
-                    'questions': Question.objects.filter(quiz=quiz).count(),
-                    'group_name': group_quiz.group.name,
-                    'start_time': group_quiz.start_time,
+                    'slug': quiz.slug,
+                    'is_group_quiz': quiz.is_group_quiz,
                     'end_time': group_quiz.end_time,
-                    'student_attempt': None
+                    'group_name': group_quiz.group.name,
+                    'group_id': group_quiz.group.id,
+                    'is_completed': is_completed,
+                    'score': result.score if result else None,
+                    'completed_at': result.completed_at if result else None,
+                    'questions': quiz.questions.count(),
                 }
-
-                if existing_attempt:
-                    quiz_data['student_attempt'] = {
-                        'id': existing_attempt.id,
-                        'start_time': existing_attempt.start_time,
-                        'end_time': existing_attempt.end_time,
-                        'submitted_at': existing_attempt.submitted_at,
-                        'score': existing_attempt.score
-                    }
-
-                available_quizzes.append(quiz_data)
-
-            return Response(available_quizzes, status=status.HTTP_200_OK)
-
+                
+                quiz_data.append(quiz_info)
+            
+            return Response(quiz_data, status=status.HTTP_200_OK)
+            
         except Exception as e:
             return Response(
-                {'error': str(e)},
+                {"error": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-
-class StudentQuizDetailView(APIView):
-    """
-    Get quiz details for student
-    """
+class GroupQuizDetailView(APIView):
+    """API untuk mendapatkan detail quiz kelompok untuk student"""
+    
     @student_required
     def get(self, request, quiz_slug):
         try:
-            # Find quiz by slug or ID
-            try:
-                quiz = Quiz.objects.get(slug=quiz_slug)
-            except Quiz.DoesNotExist:
-                # Fallback: try to find by ID if slug doesn't work
-                quiz = get_object_or_404(Quiz, id=quiz_slug)
-
-            # Check if student has access to this quiz
-            user = request.user
-            student_groups = GroupMember.objects.filter(
-                student=user).values_list('group', flat=True)
-
-            has_access = GroupQuiz.objects.filter(
-                quiz=quiz,
-                group__in=student_groups
-            ).exists()
-
-            if not has_access:
+            # Get quiz by slug
+            quiz = get_object_or_404(Quiz, slug=quiz_slug, is_group_quiz=True)
+            
+            # Get user's group for this quiz
+            user_group = GroupMember.objects.filter(
+                student=request.user,
+                group__material=quiz.material
+            ).first()
+            
+            if not user_group:
                 return Response(
-                    {'error': 'You do not have access to this quiz'},
+                    {"error": "Anda tidak terdaftar dalam kelompok untuk quiz ini"},
                     status=status.HTTP_403_FORBIDDEN
                 )
-
-            # Get quiz questions
-            questions = Question.objects.filter(quiz=quiz).order_by('id')
-
+            
+            # Get GroupQuiz
+            group_quiz = GroupQuiz.objects.filter(
+                quiz=quiz,
+                group=user_group.group
+            ).first()
+            
+            if not group_quiz:
+                return Response(
+                    {"error": "Quiz ini belum di-assign ke kelompok Anda"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            # Check if already completed
+            if group_quiz.is_completed:
+                return Response(
+                    {"error": "Quiz sudah diselesaikan", "is_completed": True},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Get current submissions
+            submissions = GroupQuizSubmission.objects.filter(
+                group_quiz=group_quiz
+            ).select_related('question', 'student')
+            
+            # Prepare current answers
+            current_answers = {}
+            for submission in submissions:
+                current_answers[submission.question.id] = {
+                    'selected_choice': submission.selected_choice,
+                    'student_name': f"{submission.student.first_name} {submission.student.last_name}".strip() or submission.student.username,
+                    'answered_by': submission.student.id,
+                    'submitted_at': submission.submitted_at.isoformat()
+                }
+            
+            # Get group members
+            group_members = GroupMember.objects.filter(
+                group=user_group.group
+            ).select_related('student')
+            
+            members_data = []
+            for member in group_members:
+                members_data.append({
+                    'id': member.student.id,
+                    'username': member.student.username,
+                    'full_name': f"{member.student.first_name} {member.student.last_name}".strip() or member.student.username,
+                    'is_current_user': member.student.id == request.user.id
+                })
+            
+            # Serialize quiz data
             quiz_data = {
                 'id': quiz.id,
-                'slug': quiz.slug if hasattr(quiz, 'slug') else f"quiz-{quiz.id}",
                 'title': quiz.title,
                 'content': quiz.content,
+                'slug': quiz.slug,
+                'end_time': group_quiz.end_time,
+                'start_time': group_quiz.start_time,
                 'questions': [
                     {
                         'id': q.id,
@@ -120,271 +147,181 @@ class StudentQuizDetailView(APIView):
                         'choice_b': q.choice_b,
                         'choice_c': q.choice_c,
                         'choice_d': q.choice_d,
-                        # Don't send correct answer to student
-                    }
-                    for q in questions
-                ]
+                    } for q in quiz.questions.all()
+                ],
+                'group': {
+                    'id': user_group.group.id,
+                    'name': user_group.group.name,
+                    'code': user_group.group.code,
+                    'members': members_data
+                },
+                'current_answers': current_answers,
+                'is_completed': group_quiz.is_completed,
+                'time_remaining': self.calculate_time_remaining(group_quiz)
             }
-
+            
             return Response(quiz_data, status=status.HTTP_200_OK)
-
-        except Exception as e:
+            
+        except Quiz.DoesNotExist:
             return Response(
-                {'error': str(e)},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
-
-class StudentQuizAttemptView(APIView):
-    """
-    Create or get quiz attempt for student
-    """
-    @student_required
-    def post(self, request, quiz_slug):
-        try:
-            user = request.user
-
-            # Find quiz
-            try:
-                quiz = Quiz.objects.get(slug=quiz_slug)
-            except Quiz.DoesNotExist:
-                quiz = get_object_or_404(Quiz, id=quiz_slug)
-
-            # Check access
-            student_groups = GroupMember.objects.filter(
-                student=user).values_list('group', flat=True)
-            group_quiz = GroupQuiz.objects.filter(
-                quiz=quiz,
-                group__in=student_groups
-            ).first()
-
-            if not group_quiz:
-                return Response(
-                    {'error': 'You do not have access to this quiz'},
-                    status=status.HTTP_403_FORBIDDEN
-                )
-
-            # Get or create attempt
-            attempt, created = StudentQuizAttempt.objects.get_or_create(
-                student=user,
-                quiz=quiz,
-                defaults={
-                    'start_time': datetime.datetime.now(datetime.timezone.utc),
-                    'end_time': group_quiz.end_time,
-                }
-            )
-
-            # Get existing answers if any
-            answers = StudentQuizAnswer.objects.filter(attempt=attempt)
-
-            response_data = {
-                'id': attempt.id,
-                'quiz_id': quiz.id,
-                'start_time': attempt.start_time,
-                'end_time': attempt.end_time,
-                'submitted_at': attempt.submitted_at,
-                'score': attempt.score,
-                'answers': [
-                    {
-                        'question': answer.question.id,
-                        'selected_answer': answer.selected_answer,
-                    }
-                    for answer in answers
-                ]
-            }
-
-            return Response(response_data, status=status.HTTP_200_OK)
-
-        except Exception as e:
-            return Response(
-                {'error': str(e)},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
-
-class StudentQuizAnswersView(APIView):
-    """
-    Save student answers for quiz attempt
-    """
-    @student_required
-    def put(self, request, attempt_id):
-        try:
-            user = request.user
-            attempt = get_object_or_404(
-                StudentQuizAttempt, id=attempt_id, student=user)
-
-            if attempt.submitted_at:
-                return Response(
-                    {'error': 'Quiz already submitted'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-
-            answers_data = request.data.get('answers', [])
-
-            # Save answers
-            for answer_data in answers_data:
-                question_id = answer_data.get('question')
-                selected_answer = answer_data.get('selected_answer')
-
-                if question_id and selected_answer:
-                    question = get_object_or_404(Question, id=question_id)
-
-                    StudentQuizAnswer.objects.update_or_create(
-                        attempt=attempt,
-                        question=question,
-                        defaults={
-                            'selected_answer': selected_answer,
-                            'is_correct': (selected_answer == question.correct_choice)
-                        }
-                    )
-
-            return Response({'message': 'Answers saved successfully'}, status=status.HTTP_200_OK)
-
-        except Exception as e:
-            return Response(
-                {'error': str(e)},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
-
-class StudentQuizSubmitView(APIView):
-    """
-    Submit quiz attempt and calculate score
-    """
-    @student_required
-    def post(self, request, attempt_id):
-        try:
-            user = request.user
-            attempt = get_object_or_404(
-                StudentQuizAttempt, id=attempt_id, student=user)
-
-            if attempt.submitted_at:
-                return Response(
-                    {'error': 'Quiz already submitted'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-
-            # Calculate score
-            total_questions = Question.objects.filter(
-                quiz=attempt.quiz).count()
-            correct_answers = StudentQuizAnswer.objects.filter(
-                attempt=attempt,
-                is_correct=True
-            ).count()
-
-            score = (correct_answers / total_questions *
-                     100) if total_questions > 0 else 0
-
-            # Update attempt
-            attempt.submitted_at = datetime.datetime.now(datetime.timezone.utc)
-            attempt.score = score
-            attempt.save()
-            attempt = StudentQuizAttempt.objects.get(
-                pk=attempt_id, student=request.user)
-            quiz = attempt.quiz
-            StudentActivity.objects.create(
-                student=request.user,
-                title=f"Menyelesaikan Quiz: {quiz.title}",
-                # description=f"Kamu telah menyelesaikan quiz '{quiz.title}' dengan skor {attempt.score:.1f}",
-                activity_type="quiz",  # Ganti dari type= ke activity_type=
-                timestamp=timezone.now(),
-            )
-
-            return Response({
-                'message': 'Quiz submitted successfully',
-                'score': score,
-                'correct_answers': correct_answers,
-                'total_questions': total_questions
-            }, status=status.HTTP_200_OK)
-
-        except StudentQuizAttempt.DoesNotExist:
-            return Response(
-                {'error': 'Quiz attempt not found.'},
+                {"error": "Quiz tidak ditemukan"},
                 status=status.HTTP_404_NOT_FOUND
             )
         except Exception as e:
             return Response(
-                {'error': str(e)},
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    
+    def calculate_time_remaining(self, group_quiz):
+        """Calculate remaining time in seconds"""
+        if not group_quiz.end_time:
+            return None
+        
+        now = timezone.now()
+        if now >= group_quiz.end_time:
+            return 0
+        
+        remaining = group_quiz.end_time - now
+        return int(remaining.total_seconds())
+
+class SubmitGroupQuizView(APIView):
+    """API untuk submit quiz kelompok"""
+    
+    @student_required
+    def post(self, request, quiz_slug):
+        try:
+            # Get quiz by slug
+            quiz = get_object_or_404(Quiz, slug=quiz_slug, is_group_quiz=True)
+            
+            # Get user's group
+            user_group = GroupMember.objects.filter(
+                student=request.user,
+                group__material=quiz.material
+            ).first()
+            
+            if not user_group:
+                return Response(
+                    {"error": "Anda tidak terdaftar dalam kelompok"},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            
+            # Get GroupQuiz
+            group_quiz = get_object_or_404(
+                GroupQuiz,
+                quiz=quiz,
+                group=user_group.group
+            )
+            
+            # Check if already completed
+            if group_quiz.is_completed:
+                return Response(
+                    {"error": "Quiz sudah di-submit sebelumnya"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Calculate and save score
+            result = group_quiz.calculate_and_save_score()
+            
+            # Get detailed results
+            submissions = GroupQuizSubmission.objects.filter(
+                group_quiz=group_quiz
+            ).select_related('question')
+            
+            total_questions = quiz.questions.count()
+            correct_answers = submissions.filter(is_correct=True).count()
+            
+            results_data = {
+                'group_quiz_id': group_quiz.id,
+                'score': result.score,
+                'total_questions': total_questions,
+                'correct_answers': correct_answers,
+                'submitted_at': result.completed_at,
+                'group_name': user_group.group.name,
+                'is_completed': True
+            }
+            
+            return Response(results_data, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-
-class StudentQuizResultsView(APIView):
-    """
-    Get quiz results for student
-    """
+class GroupQuizResultsView(APIView):
+    """API untuk mendapatkan hasil quiz kelompok"""
+    
     @student_required
     def get(self, request, quiz_slug):
         try:
-            user = request.user
-
-            # Find quiz
-            try:
-                quiz = Quiz.objects.get(slug=quiz_slug)
-            except Quiz.DoesNotExist:
-                quiz = get_object_or_404(Quiz, id=quiz_slug)
-
-            # Get student's attempt
-            attempt = get_object_or_404(
-                StudentQuizAttempt, student=user, quiz=quiz)
-
-            if not attempt.submitted_at:
+            # Get quiz by slug
+            quiz = get_object_or_404(Quiz, slug=quiz_slug, is_group_quiz=True)
+            
+            # Get user's group
+            user_group = GroupMember.objects.filter(
+                student=request.user,
+                group__material=quiz.material
+            ).first()
+            
+            if not user_group:
                 return Response(
-                    {'error': 'Quiz not yet submitted'},
-                    status=status.HTTP_400_BAD_REQUEST
+                    {"error": "Anda tidak terdaftar dalam kelompok"},
+                    status=status.HTTP_403_FORBIDDEN
                 )
-
-            # Get answers with details
-            answers = StudentQuizAnswer.objects.filter(
-                attempt=attempt).select_related('question')
-            total_questions = Question.objects.filter(quiz=quiz).count()
-            correct_answers = answers.filter(is_correct=True).count()
-
-            # Calculate time taken
-            time_taken = 0
-            if attempt.start_time and attempt.submitted_at:
-                time_diff = attempt.submitted_at - attempt.start_time
-                time_taken = int(time_diff.total_seconds() / 60)  # in minutes
-
-            # Get ranking (optional)
-            all_attempts = StudentQuizAttempt.objects.filter(
+            
+            # Get GroupQuiz and result
+            group_quiz = get_object_or_404(
+                GroupQuiz,
                 quiz=quiz,
-                submitted_at__isnull=False
-            ).order_by('-score', 'submitted_at')
-
-            rank = None
-            total_participants = all_attempts.count()
-            for idx, other_attempt in enumerate(all_attempts, 1):
-                if other_attempt.id == attempt.id:
-                    rank = idx
-                    break
-
-            response_data = {
-                'score': attempt.score,
-                'correct_answers': correct_answers,
-                'total_questions': total_questions,
-                'time_taken': time_taken,
-                'submitted_at': attempt.submitted_at,
-                'rank': rank,
-                'total_participants': total_participants,
-                'answers': [
-                    {
-                        'question_text': answer.question.text,
-                        'selected_answer': answer.selected_answer,
-                        'selected_answer_text': getattr(answer.question, f'choice_{answer.selected_answer.lower()}', ''),
-                        'correct_answer': answer.question.correct_choice,
-                        'correct_answer_text': getattr(answer.question, f'choice_{answer.question.correct_choice.lower()}', ''),
-                        'is_correct': answer.is_correct,
-                        'explanation': getattr(answer.question, 'explanation', '')
-                    }
-                    for answer in answers
-                ]
+                group=user_group.group
+            )
+            
+            if not group_quiz.is_completed:
+                return Response(
+                    {"error": "Quiz belum diselesaikan"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            try:
+                result = GroupQuizResult.objects.get(group_quiz=group_quiz)
+            except GroupQuizResult.DoesNotExist:
+                return Response(
+                    {"error": "Hasil quiz belum tersedia"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            # Get submissions with details
+            submissions = GroupQuizSubmission.objects.filter(
+                group_quiz=group_quiz
+            ).select_related('question', 'student')
+            
+            answers_detail = []
+            for submission in submissions:
+                question = submission.question
+                answers_detail.append({
+                    'question_id': question.id,
+                    'question_text': question.text,
+                    'selected_answer': submission.selected_choice,
+                    'correct_answer': question.correct_choice,
+                    'is_correct': submission.is_correct,
+                    'answered_by': f"{submission.student.first_name} {submission.student.last_name}".strip() or submission.student.username
+                })
+            
+            results_data = {
+                'quiz_title': quiz.title,
+                'group_name': user_group.group.name,
+                'score': result.score,
+                'total_questions': quiz.questions.count(),
+                'correct_answers': submissions.filter(is_correct=True).count(),
+                'submitted_at': result.completed_at,
+                'answers': answers_detail
             }
-
-            return Response(response_data, status=status.HTTP_200_OK)
-
+            
+            return Response(results_data, status=status.HTTP_200_OK)
+            
         except Exception as e:
             return Response(
-                {'error': str(e)},
+                {"error": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )

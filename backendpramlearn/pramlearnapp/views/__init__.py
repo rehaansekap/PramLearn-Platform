@@ -14,6 +14,9 @@ from pramlearnapp.views.student.studentAssignmentViewSet import (
 )
 from pramlearnapp.views.student.studentUpcomingDeadlinesView import StudentUpcomingDeadlinesView
 from pramlearnapp.views.student.studentQuickActionsView import StudentQuickActionsView
+from pramlearnapp.views.student.groupQuizView import (
+    GroupQuizDetailView, SubmitGroupQuizView, GroupQuizResultsView
+)
 
 from pramlearnapp.views.teacher.teacherViewSet import TeacherViewSet
 from pramlearnapp.views.teacher.subjectViewSet import SubjectViewSet, SubjectDetailView
@@ -37,7 +40,9 @@ from pramlearnapp.views.teacher.assignmentViewSet import (
 from pramlearnapp.views.teacher.relatedUsersView import RelatedUsersForTeacherView, CurrentUserView
 from pramlearnapp.views.student.studentDashboardView import StudentDashboardView
 from pramlearnapp.views.student.studentSubjectsView import StudentSubjectsView
-from pramlearnapp.views.student.quizViewSet import StudentAvailableQuizzesView, StudentQuizDetailView, StudentQuizAttemptView, StudentQuizAnswersView, StudentQuizSubmitView, StudentQuizResultsView
+from pramlearnapp.views.student.quizViewSet import (
+    StudentGroupQuizListView, GroupQuizDetailView, SubmitGroupQuizView, GroupQuizResultsView,
+)
 from pramlearnapp.views.student.studentGradesView import StudentGradesView, StudentGradeAnalyticsView, QuizAttemptReviewView, AssignmentSubmissionFeedbackView
 from pramlearnapp.views.student.scheduleViewSet import ScheduleViewSet
 from pramlearnapp.views.student.studentActivityViewSet import StudentActivityViewSet
@@ -55,7 +60,8 @@ __all__ = [
     "StudentAssignmentSubmitView", "StudentAssignmentSubmissionsView",
     "StudentGradesView", "StudentGradeAnalyticsView", "QuizAttemptReviewView", "AssignmentSubmissionFeedbackView",
     "ScheduleViewSet", "StudentActivityViewSet", "StudentUpcomingDeadlinesView", "StudentQuickActionsView",
-    "StudentMaterialProgressView", "StudentMaterialBookmarkView", "StudentMaterialAccessView", "StudentMaterialActivityView"
+    "StudentMaterialProgressView", "StudentMaterialBookmarkView", "StudentMaterialAccessView", "StudentMaterialActivityView",
+    "GroupQuizDetailView", "SubmitGroupQuizView", "GroupQuizResultsView", "StudentGroupQuizListView",
     # Teacher
     "TeacherViewSet", "SubjectViewSet", "SubjectDetailView", "QuizViewSet", "MaterialViewSet", "MaterialDetailView",
     "MaterialAccessView", "AssignQuizToGroupsView", "GroupViewSet", "GroupMemberViewSet", "GroupQuizViewSet", "GroupQuizSubmissionViewSet",
@@ -63,5 +69,5 @@ __all__ = [
     "ClassDetailPage", "ClassWithStudentsViewSet", "SubjectClassViewSet", "SubjectClassDetail",
     "AssignmentViewSet", "AssignmentSubmissionViewSet", "AssignmentQuestionViewSet", "AssignmentAnswerViewSet",
     "SubmitAssignmentView", "RelatedUsersForTeacherView", "CurrentUserView", "QuizRankingView", "StudentDashboardView",
-    "StudentSubjectsView", "StudentAvailableQuizzesView", "StudentQuizDetailView", "StudentQuizAttemptView", "StudentQuizAnswersView", "StudentQuizSubmitView", "StudentQuizResultsView"
+    "StudentSubjectsView",
 ]

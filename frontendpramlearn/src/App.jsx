@@ -33,6 +33,8 @@ import StudentGradeOverview from "./features/student-interface/grades/StudentGra
 import StudentAnalytics from "./features/student-interface/analytics/StudentAnalytics";
 import StudentGroupDashboard from "./features/student-interface/group/StudentGroupDashboard";
 import StudentNotificationCenter from "./features/student-interface/notifications/StudentNotificationCenter";
+import GroupQuizInterface from "./features/student-interface/assessments/components/GroupQuizInterface";
+import GroupQuizResults from "./features/student-interface/group/components/GroupQuizResults";
 
 // Anti Design theme configuration
 const antdTheme = {
@@ -173,6 +175,22 @@ const AppRoutes = () => {
             <Route path="grades" element={<StudentGradeOverview />} />
             <Route path="progress" element={<StudentAnalytics />} />
             <Route path="group" element={<StudentGroupDashboard />} />
+            {/* Individual Quiz Routes (existing) */}
+            <Route path="quiz/:quizSlug" element={<QuizTakingInterface />} />
+            <Route
+              path="quiz/:quizSlug/results"
+              element={<QuizResultsPage />}
+            />
+
+            {/* Group Quiz Routes (new - 100% menggunakan Group models) */}
+            <Route
+              path="group-quiz/:quizSlug"
+              element={<GroupQuizInterface />}
+            />
+            <Route
+              path="group-quiz/:quizSlug/results"
+              element={<GroupQuizResults />}
+            />
             <Route
               path="notifications"
               element={<StudentNotificationCenter />}

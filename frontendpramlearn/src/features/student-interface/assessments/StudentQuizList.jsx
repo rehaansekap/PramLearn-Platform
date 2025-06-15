@@ -1,30 +1,30 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
-  Card,
   List,
+  Card,
   Button,
-  Tag,
   Typography,
   Space,
-  Avatar,
-  Progress,
+  Tag,
   Badge,
-  Empty,
-  Skeleton,
   Alert,
+  Skeleton,
+  Empty,
+  Progress,
 } from "antd";
 import {
   PlayCircleOutlined,
-  ClockCircleOutlined,
   CheckCircleOutlined,
+  ClockCircleOutlined,
   TrophyOutlined,
-  TeamOutlined,
   QuestionCircleOutlined,
+  TeamOutlined,
 } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import useStudentQuizzes from "./hooks/useStudentQuizzes";
+import useStudentGroupQuizzes from "./hooks/useStudentGroupQuizzes"; // Import new hook
 
 dayjs.extend(relativeTime);
 
@@ -32,14 +32,45 @@ const { Title, Text } = Typography;
 
 const StudentQuizList = () => {
   const navigate = useNavigate();
-  const { availableQuizzes, loading, error } = useStudentQuizzes();
+
+  // Individual quizzes (existing)
+  const {
+    availableQuizzes: individualQuizzes,
+    loading: individualLoading,
+    error: individualError,
+  } = useStudentQuizzes();
+
+  // Group quizzes (new)
+  const {
+    groupQuizzes,
+    loading: groupLoading,
+    error: groupError,
+  } = useStudentGroupQuizzes();
+
   const [actionLoading, setActionLoading] = useState({});
+
+  // Combine both types of quizzes
+  const allQuizzes = [
+    ...(individualQuizzes || []).map((quiz) => ({
+      ...quiz,
+      quiz_type: "individual",
+    })),
+    ...(groupQuizzes || []).map((quiz) => ({ ...quiz, quiz_type: "group" })),
+  ];
+
+  const loading = individualLoading || groupLoading;
+  const error = individualError || groupError;
 
   const handleStartQuiz = async (quiz) => {
     setActionLoading((prev) => ({ ...prev, [quiz.id]: true }));
     try {
-      // Navigate ke quiz interface using slug
-      navigate(`/student/quiz/${quiz.slug}`); // Changed from quiz.id to quiz.slug
+      if (quiz.quiz_type === "group" || quiz.is_group_quiz) {
+        // Navigate to group quiz interface
+        navigate(`/student/group-quiz/${quiz.slug}`);
+      } else {
+        // Navigate to individual quiz interface
+        navigate(`/student/quiz/${quiz.slug}`);
+      }
     } catch (error) {
       console.error("Error starting quiz:", error);
     } finally {
@@ -48,6 +79,25 @@ const StudentQuizList = () => {
   };
 
   const getQuizStatus = (quiz) => {
+    // For group quizzes
+    if (quiz.quiz_type === "group") {
+      if (quiz.is_completed) {
+        return {
+          status: "completed",
+          color: "success",
+          text: "Selesai",
+          icon: <CheckCircleOutlined />,
+        };
+      }
+      return {
+        status: "available",
+        color: "default",
+        text: "Tersedia",
+        icon: <PlayCircleOutlined />,
+      };
+    }
+
+    // For individual quizzes (existing logic)
     if (quiz.student_attempt?.submitted_at) {
       return {
         status: "completed",
@@ -88,7 +138,13 @@ const StudentQuizList = () => {
         text: "Lihat Hasil",
         type: "default",
         icon: <TrophyOutlined />,
-        onClick: () => navigate(`/student/quiz/${quiz.slug}/results`), // Changed from quiz.id to quiz.slug
+        onClick: () => {
+          if (quiz.quiz_type === "group" || quiz.is_group_quiz) {
+            navigate(`/student/group-quiz/${quiz.slug}/results`);
+          } else {
+            navigate(`/student/quiz/${quiz.slug}/results`);
+          }
+        },
       };
     }
 
@@ -129,7 +185,7 @@ const StudentQuizList = () => {
     );
   }
 
-  if (!availableQuizzes || availableQuizzes.length === 0) {
+  if (!allQuizzes || allQuizzes.length === 0) {
     return (
       <div style={{ maxWidth: 800, margin: "0 auto", padding: 16 }}>
         <Empty
@@ -148,7 +204,7 @@ const StudentQuizList = () => {
 
       <List
         grid={{ gutter: 16, xs: 1, sm: 1, md: 1, lg: 1, xl: 1 }}
-        dataSource={availableQuizzes}
+        dataSource={allQuizzes}
         renderItem={(quiz) => {
           const status = getQuizStatus(quiz);
           const buttonAction = getButtonAction(quiz);
@@ -169,47 +225,28 @@ const StudentQuizList = () => {
                       status.status === "available" ? "#1890ff" : "#d9d9d9"
                     }`,
                   }}
-                  bodyStyle={{ padding: 20 }}
                 >
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "flex-start",
-                      marginBottom: 16,
-                    }}
-                  >
-                    <div style={{ flex: 1 }}>
-                      <Title level={4} style={{ margin: 0, marginBottom: 8 }}>
-                        {quiz.title}
-                      </Title>
-                      <Text type="secondary" style={{ display: "block" }}>
-                        {quiz.content}
-                      </Text>
-                    </div>
-                    <Avatar
-                      size="large"
-                      style={{
-                        backgroundColor:
-                          status.color === "success" ? "#52c41a" : "#1890ff",
-                        marginLeft: 16,
-                      }}
-                      icon={status.icon}
-                    />
-                  </div>
+                  <Space direction="vertical" style={{ width: "100%" }}>
+                    {/* Quiz Title */}
+                    <Title level={4} style={{ margin: 0, color: "#11418b" }}>
+                      {quiz.title}
+                    </Title>
 
-                  {/* Quiz Info */}
-                  <Space
-                    direction="vertical"
-                    style={{ width: "100%", marginBottom: 16 }}
-                  >
+                    {/* Quiz Type & Info */}
                     <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
                       <Tag icon={<QuestionCircleOutlined />} color="blue">
-                        {quiz.questions?.length || 0} Soal
+                        {quiz.questions || 0} Soal
                       </Tag>
-                      <Tag icon={<TeamOutlined />} color="green">
-                        Kelompok: {quiz.group_name}
-                      </Tag>
+
+                      {/* Quiz Type Tag */}
+                      {quiz.quiz_type === "group" || quiz.is_group_quiz ? (
+                        <Tag icon={<TeamOutlined />} color="purple">
+                          Quiz Kelompok: {quiz.group_name}
+                        </Tag>
+                      ) : (
+                        <Tag color="green">Quiz Individual</Tag>
+                      )}
+
                       {timeRemaining && (
                         <Tag
                           icon={<ClockCircleOutlined />}
@@ -222,24 +259,36 @@ const StudentQuizList = () => {
                       )}
                     </div>
 
-                    {quiz.student_attempt?.score !== undefined && (
+                    {/* Score Display */}
+                    {((quiz.quiz_type === "group" &&
+                      quiz.score !== undefined) ||
+                      (quiz.quiz_type !== "group" &&
+                        quiz.student_attempt?.score !== undefined)) && (
                       <div>
                         <Text strong>
                           Skor:{" "}
-                          {quiz.student_attempt.score
-                            ? quiz.student_attempt.score.toFixed(1)
-                            : "N/A"}
+                          {quiz.quiz_type === "group"
+                            ? quiz.score?.toFixed(1) || "N/A"
+                            : quiz.student_attempt?.score?.toFixed(1) || "N/A"}
                           /100
                         </Text>
                         <Progress
-                          percent={quiz.student_attempt.score}
+                          percent={
+                            quiz.quiz_type === "group"
+                              ? quiz.score
+                              : quiz.student_attempt?.score
+                          }
                           status={
-                            quiz.student_attempt.score >= 70
+                            (quiz.quiz_type === "group"
+                              ? quiz.score
+                              : quiz.student_attempt?.score) >= 70
                               ? "success"
                               : "exception"
                           }
                           strokeColor={
-                            quiz.student_attempt.score >= 70
+                            (quiz.quiz_type === "group"
+                              ? quiz.score
+                              : quiz.student_attempt?.score) >= 70
                               ? "#52c41a"
                               : "#ff4d4f"
                           }
@@ -264,12 +313,16 @@ const StudentQuizList = () => {
                       fontSize: 16,
                       fontWeight: 600,
                       borderRadius: 8,
+                      marginTop: 16,
                     }}
                   >
                     {buttonAction.text}
                   </Button>
 
-                  {quiz.student_attempt?.submitted_at && (
+                  {/* Completion Info */}
+                  {((quiz.quiz_type === "group" && quiz.completed_at) ||
+                    (quiz.quiz_type !== "group" &&
+                      quiz.student_attempt?.submitted_at)) && (
                     <Text
                       type="secondary"
                       style={{
@@ -280,9 +333,11 @@ const StudentQuizList = () => {
                       }}
                     >
                       Diselesaikan:{" "}
-                      {dayjs(quiz.student_attempt.submitted_at).format(
-                        "DD MMM YYYY, HH:mm"
-                      )}
+                      {dayjs(
+                        quiz.quiz_type === "group"
+                          ? quiz.completed_at
+                          : quiz.student_attempt.submitted_at
+                      ).format("DD MMM YYYY, HH:mm")}
                     </Text>
                   )}
                 </Card>

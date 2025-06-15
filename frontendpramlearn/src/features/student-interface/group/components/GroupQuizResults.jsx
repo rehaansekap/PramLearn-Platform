@@ -1,448 +1,326 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Card,
-  Table,
-  Tag,
+  Typography,
+  Result,
+  Button,
   Progress,
   Space,
-  Typography,
+  Tag,
+  List,
+  Alert,
+  Spin,
+  Statistic,
   Row,
   Col,
-  Statistic,
-  Modal,
-  List,
-  Avatar,
-  Tooltip,
-  Badge,
 } from "antd";
 import {
   TrophyOutlined,
-  ClockCircleOutlined,
   CheckCircleOutlined,
-  EyeOutlined,
-  CrownOutlined,
+  CloseCircleOutlined,
+  ArrowLeftOutlined,
   TeamOutlined,
-  UserOutlined,
+  BookOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
+import api from "../../../../api";
 
-const { Text, Title } = Typography;
+const { Title, Text } = Typography;
 
-const GroupQuizResults = ({ quizResults, rankings, loading }) => {
-  const [selectedQuiz, setSelectedQuiz] = useState(null);
-  const [detailModalVisible, setDetailModalVisible] = useState(false);
+const GroupQuizResults = () => {
+  const { quizSlug } = useParams();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [results, setResults] = useState(null);
+
+  useEffect(() => {
+    const fetchResults = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await api.get(
+          `student/group-quiz/${quizSlug}/results/`
+        );
+        setResults(response.data);
+      } catch (err) {
+        setError(err);
+        console.error("Error fetching group quiz results:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (quizSlug) {
+      fetchResults();
+    }
+  }, [quizSlug]);
+
+  const getScoreColor = (score) => {
+    if (score >= 80) return "#52c41a"; // Green
+    if (score >= 60) return "#faad14"; // Orange
+    return "#ff4d4f"; // Red
+  };
+
+  const getGradeText = (score) => {
+    if (score >= 90) return "A";
+    if (score >= 80) return "B";
+    if (score >= 70) return "C";
+    if (score >= 60) return "D";
+    return "E";
+  };
 
   if (loading) {
     return (
-      <Card loading title="🏆 Hasil Quiz Kelompok">
-        <div style={{ height: 300 }} />
-      </Card>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "60vh",
+        }}
+      >
+        <Spin size="large" tip="Memuat hasil quiz kelompok..." />
+      </div>
     );
   }
 
-  const getRankColor = (rank) => {
-    if (rank === 1) return "#faad14"; // Gold
-    if (rank === 2) return "#52c41a"; // Silver
-    if (rank === 3) return "#ff7a45"; // Bronze
-    return "#1890ff"; // Default
-  };
-
-  const getRankIcon = (rank) => {
-    if (rank === 1) return "🥇";
-    if (rank === 2) return "🥈";
-    if (rank === 3) return "🥉";
-    return "🏅";
-  };
-
-  const handleViewDetail = (quiz) => {
-    setSelectedQuiz(quiz);
-    setDetailModalVisible(true);
-  };
-
-  // Quiz Results Table Columns
-  const quizColumns = [
-    {
-      title: "Quiz",
-      dataIndex: "quiz_title",
-      key: "quiz_title",
-      render: (title, record) => (
-        <div>
-          <Text strong>{title}</Text>
-          <br />
-          <Text type="secondary" style={{ fontSize: 12 }}>
-            {dayjs(record.date).format("DD MMM YYYY")}
-          </Text>
-        </div>
-      ),
-    },
-    {
-      title: "Skor Kelompok",
-      dataIndex: "group_score",
-      key: "group_score",
-      render: (score, record) => (
-        <div style={{ textAlign: "center" }}>
-          <div
-            style={{
-              fontSize: 18,
-              fontWeight: "bold",
-              color: getRankColor(record.rank),
-            }}
-          >
-            {score.toFixed(1)}
-          </div>
-          <Progress
-            percent={score}
-            size="small"
-            strokeColor={getRankColor(record.rank)}
-            showInfo={false}
-          />
-          <Text type="secondary" style={{ fontSize: 11 }}>
-            {record.correct_answers}/{record.total_questions} benar
-          </Text>
-        </div>
-      ),
-      width: 120,
-      align: "center",
-    },
-    {
-      title: "Peringkat",
-      dataIndex: "rank",
-      key: "rank",
-      render: (rank, record) => (
-        <div style={{ textAlign: "center" }}>
-          <div style={{ fontSize: 20, marginBottom: 4 }}>
-            {getRankIcon(rank)}
-          </div>
-          <Tag color={getRankColor(rank)} style={{ margin: 0 }}>
-            #{rank} dari {record.total_groups}
-          </Tag>
-        </div>
-      ),
-      width: 100,
-      align: "center",
-    },
-    {
-      title: "Waktu",
-      dataIndex: "completion_time",
-      key: "completion_time",
-      render: (time) => (
-        <Space>
-          <ClockCircleOutlined style={{ color: "#1890ff" }} />
-          <Text>{time} menit</Text>
-        </Space>
-      ),
-      width: 100,
-    },
-    {
-      title: "Detail",
-      key: "action",
-      render: (_, record) => (
-        <EyeOutlined
-          style={{ fontSize: 16, color: "#1890ff", cursor: "pointer" }}
-          onClick={() => handleViewDetail(record)}
+  if (error) {
+    return (
+      <div style={{ maxWidth: 800, margin: "0 auto", padding: 16 }}>
+        <Alert
+          message="Gagal memuat hasil quiz"
+          description={error.message}
+          type="error"
+          showIcon
+          action={
+            <Button onClick={() => navigate("/student/assessments")}>
+              Kembali
+            </Button>
+          }
         />
-      ),
-      width: 60,
-      align: "center",
-    },
-  ];
+      </div>
+    );
+  }
 
-  // Ranking Table Columns
-  const rankingColumns = [
-    {
-      title: "Peringkat",
-      dataIndex: "rank",
-      key: "rank",
-      render: (rank, record) => (
-        <div style={{ textAlign: "center" }}>
-          <div style={{ fontSize: 20, marginBottom: 4 }}>
-            {getRankIcon(rank)}
-          </div>
-          <Text strong style={{ color: getRankColor(rank) }}>
-            #{rank}
-          </Text>
-        </div>
-      ),
-      width: 80,
-      align: "center",
-    },
-    {
-      title: "Kelompok",
-      dataIndex: "group_name",
-      key: "group_name",
-      render: (name, record) => (
-        <div>
-          <Space>
-            <Text
-              strong
-              style={{ color: record.is_current_group ? "#1890ff" : "#000" }}
-            >
-              {name}
-            </Text>
-            {record.is_current_group && (
-              <Tag color="blue" size="small">
-                Kelompok Anda
-              </Tag>
-            )}
-          </Space>
-          <br />
-          <Text type="secondary" style={{ fontSize: 12 }}>
-            {record.group_code}
-          </Text>
-        </div>
-      ),
-    },
-    {
-      title: "Skor",
-      dataIndex: "score",
-      key: "score",
-      render: (score) => (
-        <div style={{ textAlign: "center" }}>
-          <Text strong style={{ fontSize: 16, color: "#1890ff" }}>
-            {score.toFixed(1)}
-          </Text>
-          <br />
-          <Progress percent={score} size="small" showInfo={false} />
-        </div>
-      ),
-      width: 120,
-      align: "center",
-    },
-    {
-      title: "Anggota",
-      dataIndex: "member_count",
-      key: "member_count",
-      render: (count, record) => (
-        <Space>
-          <TeamOutlined style={{ color: "#52c41a" }} />
-          <Text>{count} orang</Text>
-          <Badge
-            count={record.quiz_completed}
-            size="small"
-            style={{ backgroundColor: "#1890ff" }}
-          />
-        </Space>
-      ),
-      width: 120,
-    },
-  ];
-
-  // Calculate overall statistics
-  const overallStats = {
-    averageScore:
-      quizResults.reduce((sum, q) => sum + q.group_score, 0) /
-      (quizResults.length || 1),
-    bestRank: Math.min(...quizResults.map((q) => q.rank)),
-    totalQuizzes: quizResults.length,
-    improvement:
-      quizResults.length > 1
-        ? quizResults[0].group_score -
-          quizResults[quizResults.length - 1].group_score
-        : 0,
-  };
+  if (!results) {
+    return (
+      <div style={{ maxWidth: 800, margin: "0 auto", padding: 16 }}>
+        <Alert
+          message="Hasil quiz tidak ditemukan"
+          description="Belum ada hasil quiz untuk ditampilkan."
+          type="warning"
+          showIcon
+        />
+      </div>
+    );
+  }
 
   return (
-    <div>
-      {/* Overall Statistics */}
+    <div style={{ maxWidth: 900, margin: "0 auto", padding: 16 }}>
+      {/* Header */}
+      <div style={{ marginBottom: 24 }}>
+        <Button
+          icon={<ArrowLeftOutlined />}
+          onClick={() => navigate("/student/assessments")}
+          style={{ marginBottom: 16 }}
+        >
+          Kembali ke Daftar Quiz
+        </Button>
+
+        <Title level={2} style={{ color: "#11418b", margin: 0 }}>
+          <TeamOutlined style={{ marginRight: 8 }} />
+          Hasil Quiz Kelompok: {results.quiz_title}
+        </Title>
+        <Text type="secondary">
+          Kelompok: {results.group_name} • Diselesaikan pada:{" "}
+          {dayjs(results.submitted_at).format("DD MMMM YYYY, HH:mm")}
+        </Text>
+      </div>
+
+      {/* Overall Result Card */}
       <Card
-        title={
-          <Space>
-            <TrophyOutlined style={{ color: "#faad14" }} />
-            <span>🏆 Statistik Quiz Kelompok</span>
-          </Space>
-        }
-        style={{ marginBottom: 16 }}
+        style={{
+          marginBottom: 24,
+          borderRadius: 12,
+          background: `linear-gradient(135deg, ${getScoreColor(
+            results.score
+          )}15, #fff)`,
+          border: `2px solid ${getScoreColor(results.score)}`,
+        }}
       >
-        <Row gutter={16}>
-          <Col xs={12} sm={6}>
-            <Card size="small" style={{ textAlign: "center" }}>
-              <Statistic
-                title="Rata-rata Skor"
-                value={overallStats.averageScore}
-                precision={1}
-                valueStyle={{ color: "#1890ff" }}
-              />
-            </Card>
-          </Col>
-          <Col xs={12} sm={6}>
-            <Card size="small" style={{ textAlign: "center" }}>
-              <Statistic
-                title="Peringkat Terbaik"
-                value={overallStats.bestRank}
-                prefix={getRankIcon(overallStats.bestRank)}
-                valueStyle={{ color: getRankColor(overallStats.bestRank) }}
-              />
-            </Card>
-          </Col>
-          <Col xs={12} sm={6}>
-            <Card size="small" style={{ textAlign: "center" }}>
-              <Statistic
-                title="Total Quiz"
-                value={overallStats.totalQuizzes}
-                suffix="quiz"
-                valueStyle={{ color: "#52c41a" }}
-              />
-            </Card>
-          </Col>
-          <Col xs={12} sm={6}>
-            <Card size="small" style={{ textAlign: "center" }}>
-              <Statistic
-                title="Peningkatan"
-                value={overallStats.improvement}
-                precision={1}
-                valueStyle={{
-                  color: overallStats.improvement >= 0 ? "#52c41a" : "#ff4d4f",
+        <Result
+          icon={
+            <TrophyOutlined
+              style={{ color: getScoreColor(results.score), fontSize: 72 }}
+            />
+          }
+          title={
+            <Space direction="vertical" size="small">
+              <Title
+                level={2}
+                style={{ margin: 0, color: getScoreColor(results.score) }}
+              >
+                Skor Kelompok: {results.score.toFixed(1)}
+              </Title>
+              <Tag
+                color={getScoreColor(results.score)}
+                style={{
+                  fontSize: 16,
+                  padding: "4px 12px",
+                  fontWeight: "bold",
                 }}
-                prefix={overallStats.improvement >= 0 ? "↗️" : "↘️"}
+              >
+                Grade: {getGradeText(results.score)}
+              </Tag>
+            </Space>
+          }
+          subTitle={
+            <Space direction="vertical" size="small">
+              <Text style={{ fontSize: 16 }}>
+                {results.correct_answers} dari {results.total_questions} soal
+                benar
+              </Text>
+              <Progress
+                percent={results.score}
+                strokeColor={getScoreColor(results.score)}
+                style={{ maxWidth: 300 }}
               />
-            </Card>
-          </Col>
-        </Row>
+            </Space>
+          }
+        />
       </Card>
 
-      <Row gutter={16}>
-        {/* Quiz Results */}
-        <Col xs={24} lg={14}>
-          <Card
-            title="📝 Riwayat Quiz"
-            extra={
-              <Badge
-                count={quizResults.length}
-                style={{ backgroundColor: "#1890ff" }}
-              />
-            }
-          >
-            <Table
-              dataSource={quizResults}
-              columns={quizColumns}
-              rowKey="id"
-              pagination={{
-                pageSize: 5,
-                showSizeChanger: false,
-                style: { textAlign: "center" },
-              }}
-              size="small"
+      {/* Statistics Row */}
+      <Row gutter={16} style={{ marginBottom: 24 }}>
+        <Col xs={24} sm={8}>
+          <Card style={{ textAlign: "center", borderRadius: 8 }}>
+            <Statistic
+              title="Total Soal"
+              value={results.total_questions}
+              suffix="soal"
+              valueStyle={{ color: "#1890ff" }}
             />
           </Card>
         </Col>
-
-        {/* Group Rankings */}
-        <Col xs={24} lg={10}>
-          <Card
-            title="🏅 Ranking Kelompok"
-            extra={<CrownOutlined style={{ color: "#faad14" }} />}
-          >
-            <Table
-              dataSource={rankings}
-              columns={rankingColumns}
-              rowKey="group_code"
-              pagination={false}
-              size="small"
-              rowClassName={(record) =>
-                record.is_current_group ? "current-group-row" : ""
-              }
+        <Col xs={24} sm={8}>
+          <Card style={{ textAlign: "center", borderRadius: 8 }}>
+            <Statistic
+              title="Jawaban Benar"
+              value={results.correct_answers}
+              suffix="soal"
+              valueStyle={{ color: "#52c41a" }}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={8}>
+          <Card style={{ textAlign: "center", borderRadius: 8 }}>
+            <Statistic
+              title="Persentase Benar"
+              value={(
+                (results.correct_answers / results.total_questions) *
+                100
+              ).toFixed(1)}
+              suffix="%"
+              valueStyle={{ color: getScoreColor(results.score) }}
             />
           </Card>
         </Col>
       </Row>
 
-      {/* Detail Modal */}
-      <Modal
+      {/* Detailed Answers Review */}
+      <Card
         title={
           <Space>
-            <TrophyOutlined style={{ color: "#faad14" }} />
-            <span>Detail Quiz: {selectedQuiz?.quiz_title}</span>
+            <BookOutlined />
+            <span>Review Jawaban Kelompok</span>
           </Space>
         }
-        open={detailModalVisible}
-        onCancel={() => setDetailModalVisible(false)}
-        footer={null}
-        width={600}
+        style={{ borderRadius: 12 }}
       >
-        {selectedQuiz && (
-          <div>
-            {/* Quiz Info */}
-            <Row gutter={16} style={{ marginBottom: 24 }}>
-              <Col span={8}>
-                <Card size="small" style={{ textAlign: "center" }}>
-                  <Statistic
-                    title="Skor Kelompok"
-                    value={selectedQuiz.group_score}
-                    precision={1}
-                    valueStyle={{ color: getRankColor(selectedQuiz.rank) }}
-                  />
-                </Card>
-              </Col>
-              <Col span={8}>
-                <Card size="small" style={{ textAlign: "center" }}>
-                  <Text strong style={{ display: "block" }}>
-                    Peringkat
-                  </Text>
-                  <div style={{ fontSize: 20, margin: "8px 0" }}>
-                    {getRankIcon(selectedQuiz.rank)}
-                  </div>
-                  <Text>
-                    #{selectedQuiz.rank} dari {selectedQuiz.total_groups}
-                  </Text>
-                </Card>
-              </Col>
-              <Col span={8}>
-                <Card size="small" style={{ textAlign: "center" }}>
-                  <Statistic
-                    title="Waktu"
-                    value={selectedQuiz.completion_time}
-                    suffix="menit"
-                    valueStyle={{ color: "#1890ff" }}
-                  />
-                </Card>
-              </Col>
-            </Row>
-
-            {/* Individual Scores */}
-            <Title level={5}>📊 Skor Individual</Title>
-            <List
-              dataSource={selectedQuiz.individual_scores}
-              renderItem={(item) => (
-                <List.Item
+        <List
+          itemLayout="vertical"
+          dataSource={results.answers || []}
+          renderItem={(answer, index) => (
+            <List.Item
+              style={{
+                padding: "16px",
+                marginBottom: "12px",
+                borderRadius: "8px",
+                background: answer.is_correct ? "#f6ffed" : "#fff2f0",
+                border: `1px solid ${
+                  answer.is_correct ? "#b7eb8f" : "#ffccc7"
+                }`,
+              }}
+            >
+              <div style={{ marginBottom: 12 }}>
+                <div
                   style={{
-                    padding: "12px 16px",
-                    borderRadius: 8,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
                     marginBottom: 8,
-                    backgroundColor: "#fafafa",
                   }}
                 >
-                  <List.Item.Meta
-                    avatar={<Avatar icon={<UserOutlined />} />}
-                    title={item.student_name}
-                    description={
-                      <Space>
-                        <Text strong style={{ color: "#1890ff" }}>
-                          {item.score}/100
-                        </Text>
-                        <Progress
-                          percent={item.score}
-                          size="small"
-                          strokeColor="#1890ff"
-                          style={{ width: 100 }}
-                        />
-                      </Space>
-                    }
-                  />
-                </List.Item>
-              )}
-            />
-          </div>
-        )}
-      </Modal>
+                  <Tag color={answer.is_correct ? "success" : "error"}>
+                    Soal {index + 1}
+                  </Tag>
+                  {answer.is_correct ? (
+                    <CheckCircleOutlined
+                      style={{ color: "#52c41a", fontSize: 16 }}
+                    />
+                  ) : (
+                    <CloseCircleOutlined
+                      style={{ color: "#ff4d4f", fontSize: 16 }}
+                    />
+                  )}
+                  <Tag color="blue" size="small">
+                    Dijawab oleh: {answer.answered_by}
+                  </Tag>
+                </div>
+                <Title level={5} style={{ margin: 0 }}>
+                  {answer.question_text}
+                </Title>
+              </div>
 
-      <style>{`
-        .current-group-row {
-          background-color: #f6ffed !important;
-        }
-        .current-group-row:hover {
-          background-color: #f6ffed !important;
-        }
-      `}</style>
+              <Space direction="vertical" style={{ width: "100%" }}>
+                <div>
+                  <Text strong>Jawaban Kelompok: </Text>
+                  <Tag color={answer.is_correct ? "success" : "error"}>
+                    {answer.selected_answer}
+                  </Tag>
+                </div>
+
+                {!answer.is_correct && (
+                  <div>
+                    <Text strong>Jawaban Benar: </Text>
+                    <Tag color="success">{answer.correct_answer}</Tag>
+                  </div>
+                )}
+              </Space>
+            </List.Item>
+          )}
+        />
+      </Card>
+
+      {/* Action Buttons */}
+      <div style={{ textAlign: "center", marginTop: 24 }}>
+        <Space size="large">
+          <Button
+            type="primary"
+            icon={<BookOutlined />}
+            onClick={() => navigate("/student/subjects")}
+            size="large"
+          >
+            Kembali ke Mata Pelajaran
+          </Button>
+          <Button onClick={() => navigate("/student/assessments")} size="large">
+            Lihat Quiz Lainnya
+          </Button>
+        </Space>
+      </div>
     </div>
   );
 };
