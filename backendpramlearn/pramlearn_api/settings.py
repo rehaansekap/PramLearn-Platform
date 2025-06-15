@@ -151,6 +151,7 @@ AUTH_USER_MODEL = 'pramlearnapp.CustomUser'
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "http://127.0.0.1:5173",  # Tambahkan URL frontend Anda
     "https://pramlearnstorage.z23.web.core.windows.net",
     "https://www.pramlearn.tech",     # Custom domain frontend
     "https://pramlearn.tech",         # Root domain
@@ -164,6 +165,7 @@ if not DEBUG:
         "https://pramlearnstorage.z23.web.core.windows.net")
 
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_ORIGIN = True
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=4),

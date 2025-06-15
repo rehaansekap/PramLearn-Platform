@@ -25,6 +25,7 @@ var/
 venv~
 venv~/
 .venv/
+venv/
 
 # Django stuff:
 *.log
@@ -44,7 +45,8 @@ coverage.xml
 *.cover
 .hypothesis/
 .pytest_cache/
-.
+*.pyc
+__pycache__/
 
 # VSCode & IDE
 .vscode/
