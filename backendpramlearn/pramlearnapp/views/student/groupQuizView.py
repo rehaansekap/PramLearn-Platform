@@ -210,14 +210,16 @@ class SubmitGroupQuizView(APIView):
 
 
 class GroupQuizResultsView(APIView):
-    """
-    API untuk mendapatkan hasil quiz kelompok
-    """
+    """API untuk mendapatkan hasil quiz kelompok"""
 
     def get(self, request, quiz_slug):
         try:
+            print(
+                f"🔍 DEBUG: Fetching group quiz results for slug: {quiz_slug}")
+
             # Get quiz by slug
             quiz = get_object_or_404(Quiz, slug=quiz_slug, is_group_quiz=True)
+            print(f"✅ Found quiz: {quiz}")
 
             # Get user's group
             user_group = GroupMember.objects.filter(
@@ -226,6 +228,7 @@ class GroupQuizResultsView(APIView):
             ).first()
 
             if not user_group:
+                print(f"❌ User not in group for quiz: {quiz_slug}")
                 return Response(
                     {"error": "Anda tidak terdaftar dalam kelompok"},
                     status=status.HTTP_403_FORBIDDEN
@@ -238,9 +241,19 @@ class GroupQuizResultsView(APIView):
                 group=user_group.group
             )
 
+            if not group_quiz.is_completed:
+                print(f"❌ Group quiz not completed: {group_quiz}")
+                return Response(
+                    {"error": "Quiz belum diselesaikan"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
             try:
                 result = GroupQuizResult.objects.get(group_quiz=group_quiz)
+                print(f"✅ Found result: {result}")
             except GroupQuizResult.DoesNotExist:
+                print(
+                    f"❌ GroupQuizResult not found for group_quiz: {group_quiz}")
                 return Response(
                     {"error": "Hasil quiz belum tersedia"},
                     status=status.HTTP_404_NOT_FOUND
@@ -250,6 +263,8 @@ class GroupQuizResultsView(APIView):
             submissions = GroupQuizSubmission.objects.filter(
                 group_quiz=group_quiz
             ).select_related('question', 'student')
+
+            print(f"📊 Found {submissions.count()} submissions")
 
             answers_detail = []
             for submission in submissions:
@@ -269,13 +284,17 @@ class GroupQuizResultsView(APIView):
                 'score': result.score,
                 'total_questions': quiz.questions.count(),
                 'correct_answers': submissions.filter(is_correct=True).count(),
-                'submitted_at': result.created_at,
+                'submitted_at': result.completed_at,
                 'answers': answers_detail
             }
 
+            print(f"✅ Returning results: {results_data}")
             return Response(results_data, status=status.HTTP_200_OK)
 
         except Exception as e:
+            print(f"❌ Error in GroupQuizResultsView: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return Response(
                 {"error": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR

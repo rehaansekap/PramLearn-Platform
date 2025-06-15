@@ -43,10 +43,11 @@ const GroupQuizInterface = () => {
   const [submitModalVisible, setSubmitModalVisible] = useState(false);
 
   // Add the useStudentGroup hook
-  const { groupData } = useStudentGroup();
+  // const { groupData } = useStudentGroup();
 
   const {
     quiz,
+    groupId,
     currentQuestionIndex,
     answers,
     loading,
@@ -63,15 +64,15 @@ const GroupQuizInterface = () => {
   } = useGroupQuizCollaboration(quizSlug);
 
   useEffect(() => {
-    // Pastikan user sudah login dan connectWebSocket tersedia sebelum connect WebSocket
-    if (quiz && groupData?.groupInfo && user && token && connectWebSocket) {
-      console.log("Connecting to WebSocket...", {
+    // 🔧 PERBAIKAN: Gunakan groupId dari hook, bukan dari useStudentGroup
+    if (quiz && groupId && user && token && connectWebSocket) {
+      console.log("🔗 Connecting to WebSocket...", {
         quizId: quiz.id,
-        groupId: groupData.groupInfo.id,
+        groupId: groupId, // Gunakan groupId dari hook
       });
-      connectWebSocket(quiz.id, groupData.groupInfo.id);
+      connectWebSocket(quiz.id, groupId);
     }
-  }, [quiz, groupData?.groupInfo, connectWebSocket, user, token]);
+  }, [quiz, groupId, user, token, connectWebSocket]); // 🔧 UPDATE dependencies
 
   // Jika user belum login, tampilkan pesan
   if (!user || !token) {
@@ -101,12 +102,15 @@ const GroupQuizInterface = () => {
     setSubmitModalVisible(true);
   };
 
+  // Update method handleSubmitConfirm dan handleAutoSubmit
+  // Hapus navigate dari handleSubmitConfirm dan handleAutoSubmit
   const handleSubmitConfirm = async () => {
     setSubmitModalVisible(false);
     try {
       await submitQuiz();
       message.success("Quiz berhasil disubmit!");
-      navigate(`/student/quiz/${quizSlug}/results`);
+      // ❌ HAPUS INI: navigate akan dihandle oleh WebSocket broadcast
+      // navigate(`/student/group-quiz/${quizSlug}/results`);
     } catch (error) {
       message.error("Gagal submit quiz");
     }
@@ -116,7 +120,8 @@ const GroupQuizInterface = () => {
     try {
       await submitQuiz();
       message.success("Quiz berhasil disubmit!");
-      navigate(`/student/quiz/${quizSlug}/results`);
+      // ❌ HAPUS INI: navigate akan dihandle oleh WebSocket broadcast
+      // navigate(`/student/group-quiz/${quizSlug}/results`);
     } catch (error) {
       message.error("Gagal submit quiz");
     }
@@ -165,6 +170,7 @@ const GroupQuizInterface = () => {
     );
   }
 
+  // Juga update di bagian isSubmitted check
   if (isSubmitted) {
     return (
       <Alert
@@ -174,7 +180,9 @@ const GroupQuizInterface = () => {
         showIcon
         style={{ margin: 16 }}
         action={
-          <Button onClick={() => navigate(`/student/quiz/${quizSlug}/results`)}>
+          <Button
+            onClick={() => navigate(`/student/group-quiz/${quizSlug}/results`)}
+          >
             Lihat Hasil
           </Button>
         }

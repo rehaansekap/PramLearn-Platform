@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from datetime import timedelta
 from .classes import Class
 from .user import CustomUser
 from .quiz import Quiz
@@ -67,6 +68,50 @@ class GroupQuiz(models.Model):
         self.save()
 
         return result
+
+    def test_group_quiz_assignment():
+        # Get data
+        quiz = Quiz.objects.filter(slug='quiz-1').first()
+        user = CustomUser.objects.filter(username='student1').first()
+
+        print(f"Quiz: {quiz}")
+        print(f"User: {user}")
+
+        if not quiz or not user:
+            print("❌ Quiz or user not found")
+            return
+
+        # Find user's group
+        user_group = GroupMember.objects.filter(student=user).first()
+        if user_group:
+            print(
+                f"✅ User is in group: {user_group.group.id} ({user_group.group.name})")
+
+            # Check if GroupQuiz exists for this group
+            group_quiz = GroupQuiz.objects.filter(
+                quiz=quiz,
+                group=user_group.group
+            ).first()
+
+            if group_quiz:
+                print(f"✅ GroupQuiz exists: {group_quiz}")
+            else:
+                print(
+                    f"❌ No GroupQuiz found for quiz {quiz.id} and group {user_group.group.id}")
+
+                # Create GroupQuiz if needed
+                group_quiz = GroupQuiz.objects.create(
+                    quiz=quiz,
+                    group=user_group.group,
+                    start_time=timezone.now(),
+                    end_time=timezone.now() + timedelta(hours=1)
+                )
+                print(f"✅ Created GroupQuiz: {group_quiz}")
+        else:
+            print("❌ User is not in any group")
+
+    if __name__ == "__main__":
+        test_group_quiz_assignment()
 
 
 class GroupQuizSubmission(models.Model):

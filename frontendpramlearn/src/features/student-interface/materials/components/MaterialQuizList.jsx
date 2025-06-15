@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react"; // Add useState and useEffect
 import { Card, Typography, Button, Row, Col, Tag, Space, Empty } from "antd";
 import {
   BookOutlined,
@@ -11,40 +11,44 @@ import {
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import duration from "dayjs/plugin/duration"; // Add this import
 import "dayjs/locale/id";
 
 // Configure dayjs
 dayjs.extend(relativeTime);
+dayjs.extend(duration); // Add this line
 dayjs.locale("id");
 
 const { Title, Text } = Typography;
 
 const MaterialQuizList = ({ quizzes }) => {
+  const [currentTime, setCurrentTime] = useState(dayjs());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(dayjs());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  // Update fungsi getTimeRemaining
   const getTimeRemaining = (endTime) => {
     if (!endTime) return null;
-    const now = dayjs();
+
     const end = dayjs(endTime);
+    if (currentTime.isAfter(end)) return "EXPIRED";
 
-    if (now.isAfter(end)) return "Expired";
+    const diff = end.diff(currentTime);
+    const duration = dayjs.duration(diff);
 
-    const diffMs = end.diff(now);
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    const diffHours = Math.floor(
-      (diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-    );
-    const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+    const hours = Math.floor(duration.asHours());
+    const minutes = duration.minutes();
+    const seconds = duration.seconds();
 
-    if (diffDays > 7) {
-      return `${diffDays} hari lagi`;
-    } else if (diffDays > 0) {
-      return `${diffDays} hari ${diffHours} jam lagi`;
-    } else if (diffHours > 0) {
-      return `${diffHours} jam ${diffMinutes} menit lagi`;
-    } else if (diffMinutes > 0) {
-      return `${diffMinutes} menit lagi`;
-    } else {
-      return "Berakhir segera";
-    }
+    return `${hours.toString().padStart(2, "0")}:${minutes
+      .toString()
+      .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
   };
 
   const getTimeRemainingColor = (endTime) => {

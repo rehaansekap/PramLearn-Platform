@@ -64,18 +64,14 @@ urlpatterns = [
 
     path('api/student/group-quiz/', StudentGroupQuizListView.as_view(),
          name='student-group-quiz-list'),
-
-    path('api/student/group-quiz/<slug:quiz_slug>/save-answer/',
-         SaveGroupQuizAnswerView.as_view(), name='save-group-quiz-answer'),
-
     path('api/student/group-quiz/<slug:quiz_slug>/',
          GroupQuizDetailView.as_view(), name='group-quiz-detail'),
-
     path('api/student/group-quiz/<slug:quiz_slug>/submit/',
          SubmitGroupQuizView.as_view(), name='submit-group-quiz'),
-
     path('api/student/group-quiz/<slug:quiz_slug>/results/',
          GroupQuizResultsView.as_view(), name='group-quiz-results'),
+    path('api/student/group-quiz/<slug:quiz_slug>/save-answer/',
+         SaveGroupQuizAnswerView.as_view(), name='save-group-quiz-answer'),
 
     path('api/student/assignments/available/',
          StudentAvailableAssignmentsView.as_view(),
