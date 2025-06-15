@@ -225,7 +225,11 @@ const StudentQuizList = () => {
                     {quiz.student_attempt?.score !== undefined && (
                       <div>
                         <Text strong>
-                          Skor: {quiz.student_attempt.score.toFixed(1)}/100
+                          Skor:{" "}
+                          {quiz.student_attempt.score
+                            ? quiz.student_attempt.score.toFixed(1)
+                            : "N/A"}
+                          /100
                         </Text>
                         <Progress
                           percent={quiz.student_attempt.score}
