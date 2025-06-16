@@ -115,7 +115,8 @@ const MaterialProgressTracker = ({
                 width: 56,
                 height: 56,
                 fontSize: 20,
-                background: "linear-gradient(135deg, #11418b 0%, #1890ff 100%)",
+                background:
+                  "linear-gradient(135deg, #001529 0%, #3a3f5c 60%, #43cea2 100%)", // Sama dengan StudentLayout untuk quiz
                 border: "none",
                 boxShadow: "0 4px 12px rgba(17, 65, 139, 0.3)",
                 display: "flex",

@@ -44,7 +44,7 @@ const SubjectCard = ({ subject, onClick, onQuickAccessMaterial }) => {
       {/* Header dengan gradient */}
       <div
         style={{
-          background: "linear-gradient(135deg, #11418b 0%, #1890ff 100%)",
+          background: "linear-gradient(135deg, #001529 0%, #3a3f5c 60%, #43cea2 100%)", // Sama dengan StudentLayout
           padding: "20px 24px 16px",
           color: "white",
           position: "relative",

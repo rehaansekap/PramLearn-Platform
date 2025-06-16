@@ -236,7 +236,7 @@ const StudentVideoPlayer = ({
                 <div
                   style={{
                     background:
-                      "linear-gradient(135deg, #ff0000 0%, #ff4444 100%)",
+                      "linear-gradient(135deg, #001529 0%, #3a3f5c 60%, #43cea2 100%)", // Sama dengan StudentLayout untuk quiz
                     padding: "16px",
                     margin: "-20px -20px 16px -20px",
                     color: "white",

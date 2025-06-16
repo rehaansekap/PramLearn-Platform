@@ -208,7 +208,8 @@ const StudentMaterialViewer = () => {
       {/* Header Section - Konsisten dengan subjects */}
       <div
         style={{
-          background: "linear-gradient(135deg, #11418b 0%, #1890ff 100%)",
+          background:
+            "linear-gradient(135deg, #001529 0%, #3a3f5c 60%, #43cea2 100%)", // Sama dengan StudentLayout
           borderRadius: 16,
           padding: "32px 24px",
           marginBottom: 32,
@@ -318,7 +319,24 @@ const StudentMaterialViewer = () => {
                 )}
                 trailColor="rgba(255, 255, 255, 0.2)"
                 showInfo={true}
-                style={{ maxWidth: 400 }}
+                style={{
+                  maxWidth: 400,
+                  // Styling untuk teks persentase
+                  color: "white",
+                }}
+                // Format teks persentase dengan style khusus
+                format={(percent) => (
+                  <span
+                    style={{
+                      color: "white",
+                      fontWeight: 500,
+                      fontSize: 14,
+                      textShadow: "0 1px 2px rgba(0,0,0,0.3)", // Tambah shadow untuk kontras
+                    }}
+                  >
+                    {percent}%
+                  </span>
+                )}
               />
             </div>
           </Col>

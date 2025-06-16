@@ -12,11 +12,12 @@ const useStudentGroupQuizzes = () => {
       setError(null);
 
       try {
-        // Gunakan endpoint yang ada di urls.py line 29
+        console.log("🔍 Fetching group quizzes...");
         const response = await api.get("/student/group-quiz/");
+        console.log("📊 Group quizzes response:", response.data);
         setGroupQuizzes(response.data);
       } catch (err) {
-        console.error("Error fetching group quizzes:", err);
+        console.error("❌ Error fetching group quizzes:", err);
         setError(err);
       } finally {
         setLoading(false);

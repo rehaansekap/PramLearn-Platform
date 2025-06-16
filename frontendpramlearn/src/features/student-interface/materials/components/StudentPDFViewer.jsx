@@ -128,7 +128,7 @@ const StudentPDFViewer = ({
               <div
                 style={{
                   background:
-                    "linear-gradient(135deg, #dc3545 0%, #fd7e14 100%)",
+                    "linear-gradient(135deg, #001529 0%, #3a3f5c 60%, #43cea2 100%)", // Sama dengan StudentLayout untuk quiz
                   padding: "16px",
                   margin: "-20px -20px 16px -20px",
                   color: "white",
@@ -233,7 +233,7 @@ const StudentPDFViewer = ({
                     height: 40,
                     fontWeight: 600,
                     background:
-                      "linear-gradient(135deg, #dc3545 0%, #fd7e14 100%)",
+                      "linear-gradient(135deg, #001529 0%, #3a3f5c 60%, #43cea2 100%)", // Sama dengan StudentLayout untuk quiz
                     border: "none",
                     fontSize: 14,
                   }}

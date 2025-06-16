@@ -8,6 +8,7 @@ from django.utils import timezone
 from django.db.models import Count, Q
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+import traceback
 
 
 class GroupQuizDetailView(APIView):
@@ -137,9 +138,7 @@ class GroupQuizDetailView(APIView):
 
 
 class SubmitGroupQuizView(APIView):
-    """
-    API untuk submit quiz kelompok
-    """
+    """API untuk submit quiz kelompok"""
 
     def post(self, request, quiz_slug):
         try:
@@ -174,6 +173,10 @@ class SubmitGroupQuizView(APIView):
 
             # Calculate and save score
             result = group_quiz.calculate_and_save_score()
+
+            # ENSURE is_completed is set to True
+            group_quiz.is_completed = True
+            group_quiz.save()
 
             # Get detailed results
             submissions = GroupQuizSubmission.objects.filter(
@@ -241,13 +244,7 @@ class GroupQuizResultsView(APIView):
                 group=user_group.group
             )
 
-            if not group_quiz.is_completed:
-                print(f"❌ Group quiz not completed: {group_quiz}")
-                return Response(
-                    {"error": "Quiz belum diselesaikan"},
-                    status=status.HTTP_404_NOT_FOUND
-                )
-
+            # Check for result existence
             try:
                 result = GroupQuizResult.objects.get(group_quiz=group_quiz)
                 print(f"✅ Found result: {result}")
@@ -259,6 +256,12 @@ class GroupQuizResultsView(APIView):
                     status=status.HTTP_404_NOT_FOUND
                 )
 
+            # If result exists but is_completed is False, update it
+            if not group_quiz.is_completed:
+                group_quiz.is_completed = True
+                group_quiz.save()
+                print(f"✅ Updated group_quiz.is_completed to True")
+
             # Get submissions with details
             submissions = GroupQuizSubmission.objects.filter(
                 group_quiz=group_quiz
@@ -266,29 +269,95 @@ class GroupQuizResultsView(APIView):
 
             print(f"📊 Found {submissions.count()} submissions")
 
+            # Get group members - ENSURE THIS IS ALWAYS EXECUTED
+            group_members = GroupMember.objects.filter(
+                group=user_group.group
+            ).select_related('student').order_by('student__username')
+
+            print(f"📊 Found {group_members.count()} group members")
+
+            members_data = []
+            for member in group_members:
+                # Count answers by this member
+                member_answers_count = submissions.filter(
+                    student=member.student
+                ).count()
+
+                print(
+                    f"📊 Member {member.student.username} answered {member_answers_count} questions")
+
+                member_data = {
+                    'id': member.student.id,
+                    'username': member.student.username,
+                    'first_name': member.student.first_name,
+                    'last_name': member.student.last_name,
+                    'full_name': f"{member.student.first_name} {member.student.last_name}".strip() or member.student.username,
+                    'is_current_user': member.student.id == request.user.id,
+                    'answered_count': member_answers_count
+                }
+                members_data.append(member_data)
+                print(f"📊 Added member data: {member_data}")
+
+            # Create answers detail - COMPLETE THIS SECTION
             answers_detail = []
             for submission in submissions:
                 question = submission.question
-                answers_detail.append({
+                answer_data = {
                     'question_id': question.id,
                     'question_text': question.text,
                     'selected_answer': submission.selected_choice,
                     'correct_answer': question.correct_choice,
                     'is_correct': submission.is_correct,
-                    'answered_by': f"{submission.student.first_name} {submission.student.last_name}".strip() or submission.student.username
-                })
+                    'answered_by': f"{submission.student.first_name} {submission.student.last_name}".strip() or submission.student.username,
+                    'answered_by_id': submission.student.id,
+                    'answered_by_username': submission.student.username,
+                    'selected_answer_text': getattr(question, f'choice_{submission.selected_choice.lower()}', ''),
+                    'correct_answer_text': getattr(question, f'choice_{question.correct_choice.lower()}', ''),
+                    'explanation': getattr(question, 'explanation', None)
+                }
+                answers_detail.append(answer_data)
 
+            # Construct the final response
             results_data = {
                 'quiz_title': quiz.title,
                 'group_name': user_group.group.name,
+                'group_code': user_group.group.code,
                 'score': result.score,
                 'total_questions': quiz.questions.count(),
                 'correct_answers': submissions.filter(is_correct=True).count(),
                 'submitted_at': result.completed_at,
-                'answers': answers_detail
+                'time_taken': getattr(result, 'time_taken', 0),
+                'rank': getattr(result, 'rank', None),
+                'total_participants': getattr(result, 'total_participants', None),
+                'answers': answers_detail,
+                'group_members': members_data  # CRITICAL: This must be included
             }
 
-            print(f"✅ Returning results: {results_data}")
+            # Debug logging - DETAILED CHECK
+            print(f"📤 Final response data keys: {list(results_data.keys())}")
+            print(
+                f"📤 Response includes group_members: {'group_members' in results_data}")
+            print(
+                f"📤 Group members type: {type(results_data.get('group_members'))}")
+            print(f"📤 Group members count: {len(members_data)}")
+            print(f"📤 Group members data: {results_data['group_members']}")
+
+            # Test serialization
+            import json
+            try:
+                json_str = json.dumps(results_data, default=str)
+                print(
+                    f"📤 JSON serialization successful, length: {len(json_str)}")
+
+                # Parse back to check
+                parsed_data = json.loads(json_str)
+                print(
+                    f"📤 Parsed back successfully, group_members in parsed: {'group_members' in parsed_data}")
+                print(
+                    f"📤 Parsed group_members count: {len(parsed_data.get('group_members', []))}")
+            except Exception as json_error:
+                print(f"❌ JSON serialization error: {json_error}")
+
             return Response(results_data, status=status.HTTP_200_OK)
 
         except Exception as e:

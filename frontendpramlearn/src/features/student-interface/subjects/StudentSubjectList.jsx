@@ -104,9 +104,11 @@ const StudentSubjectList = () => {
       />
 
       {/* Header Section - Konsisten dengan student assignments */}
+      {/* Header Section - Konsisten dengan student assignments */}
       <div
         style={{
-          background: "linear-gradient(135deg, #11418b 0%, #1890ff 100%)",
+          background:
+            "linear-gradient(135deg, #001529 0%, #3a3f5c 60%, #43cea2 100%)", // Sama dengan StudentLayout
           borderRadius: 16,
           padding: "32px 24px",
           marginBottom: 32,
