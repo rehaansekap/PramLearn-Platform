@@ -89,10 +89,6 @@ class GroupQuizDetailView(APIView):
                     status=status.HTTP_403_FORBIDDEN
                 )
 
-            # 🔍 DEBUG: Log untuk memastikan group ID
-            print(
-                f"🔍 DEBUG: User {request.user.username} is in group {user_group.group.id}")
-
             # Get GroupQuiz
             group_quiz = GroupQuiz.objects.filter(
                 quiz=quiz,
@@ -101,16 +97,49 @@ class GroupQuizDetailView(APIView):
 
             if not group_quiz:
                 return Response(
-                    {"error": "Quiz ini belum di-assign ke kelompok Anda"},
+                    {"error": "Quiz belum di-assign ke kelompok Anda"},
                     status=status.HTTP_404_NOT_FOUND
                 )
 
-            # Check if already completed
-            if group_quiz.is_completed:
-                return Response(
-                    {"error": "Quiz sudah diselesaikan", "is_completed": True},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+            # ✅ PERBAIKAN: Check completion status lebih thorough
+            is_quiz_completed = self.is_quiz_completed(group_quiz)
+
+            # Update GroupQuiz status if needed
+            if is_quiz_completed and not group_quiz.is_completed:
+                group_quiz.is_completed = True
+                group_quiz.save()
+
+            # ✅ PERBAIKAN: Get existing result if completed
+            quiz_result = None
+            quiz_score = None
+            if is_quiz_completed:
+                try:
+                    quiz_result = GroupQuizResult.objects.get(
+                        group_quiz=group_quiz)
+                    quiz_score = quiz_result.score
+                except GroupQuizResult.DoesNotExist:
+                    # Calculate score if result doesn't exist
+                    quiz_result = group_quiz.calculate_and_save_score()
+                    quiz_score = quiz_result.score
+
+            # If completed, return completed status
+            if is_quiz_completed:
+                return Response({
+                    'id': quiz.id,
+                    'title': quiz.title,
+                    'content': quiz.content,
+                    'slug': quiz.slug,
+                    'is_completed': True,
+                    'score': quiz_score,
+                    'completed_at': quiz_result.completed_at if quiz_result else None,
+                    'group': {
+                        'id': user_group.group.id,
+                        'name': user_group.group.name,
+                        'code': user_group.group.code,
+                    },
+                    'questions_count': quiz.questions.count(),
+                    'total_questions': quiz.questions.count(),
+                }, status=status.HTTP_200_OK)
 
             # Get current submissions
             submissions = GroupQuizSubmission.objects.filter(
@@ -122,9 +151,8 @@ class GroupQuizDetailView(APIView):
             for submission in submissions:
                 current_answers[submission.question.id] = {
                     'selected_choice': submission.selected_choice,
-                    'student_name': f"{submission.student.first_name} {submission.student.last_name}".strip() or submission.student.username,
-                    'answered_by': submission.student.id,
-                    'submitted_at': submission.submitted_at.isoformat()
+                    'student_name': submission.student.username,
+                    'answered_by': submission.student.id
                 }
 
             # Get group members
@@ -137,7 +165,8 @@ class GroupQuizDetailView(APIView):
                 members_data.append({
                     'id': member.student.id,
                     'username': member.student.username,
-                    'full_name': f"{member.student.first_name} {member.student.last_name}".strip() or member.student.username,
+                    'first_name': member.student.first_name,
+                    'last_name': member.student.last_name,
                     'is_current_user': member.student.id == request.user.id
                 })
 
@@ -160,19 +189,17 @@ class GroupQuizDetailView(APIView):
                     } for q in quiz.questions.all()
                 ],
                 'group': {
-                    'id': user_group.group.id,  # 🔧 PASTIKAN INI BENAR
+                    'id': user_group.group.id,
                     'name': user_group.group.name,
                     'code': user_group.group.code,
                     'members': members_data
                 },
                 'current_answers': current_answers,
-                'is_completed': group_quiz.is_completed,
+                'is_completed': is_quiz_completed,
+                'score': quiz_score,
+                'questions_count': quiz.questions.count(),
                 'time_remaining': self.calculate_time_remaining(group_quiz)
             }
-
-            # 🔍 DEBUG: Log response data
-            print(
-                f"🔍 DEBUG: Returning group_id={user_group.group.id} for user {request.user.username}")
 
             return Response(quiz_data, status=status.HTTP_200_OK)
 
@@ -182,6 +209,15 @@ class GroupQuizDetailView(APIView):
                 {"error": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+    def is_quiz_completed(self, group_quiz):
+        """Check if quiz is completed by checking if all questions are answered"""
+        total_questions = group_quiz.quiz.questions.count()
+        answered_questions = GroupQuizSubmission.objects.filter(
+            group_quiz=group_quiz
+        ).count()
+
+        return answered_questions >= total_questions
 
     def calculate_time_remaining(self, group_quiz):
         """Calculate remaining time in seconds"""

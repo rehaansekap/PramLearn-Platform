@@ -81,22 +81,30 @@ const MaterialQuizList = ({ quizzes }) => {
                   `/student/group-quiz/${quiz.slug}/`
                 );
 
-                // Merge data dari API group quiz
+                // ✅ PERBAIKAN: Merge semua data dengan prioritas pada API response
                 enhancedQuiz = {
                   ...enhancedQuiz,
                   ...response.data,
+                  // Ensure these critical fields are properly set
+                  is_completed: response.data.is_completed || false,
+                  score: response.data.score || null,
+                  completed_at: response.data.completed_at || null,
                   group: response.data.group,
-                  is_completed: response.data.is_completed,
                   time_remaining: response.data.time_remaining,
-                  current_answers: response.data.current_answers,
-                  // Override questions_count jika ada dari API
+                  current_answers: response.data.current_answers || {},
                   questions_count:
                     response.data.questions?.length ||
+                    response.data.questions_count ||
                     quiz.questions?.length ||
                     0,
                 };
 
-                console.log(`✅ Enhanced group quiz data:`, enhancedQuiz);
+                console.log(`✅ Enhanced group quiz data:`, {
+                  slug: quiz.slug,
+                  is_completed: enhancedQuiz.is_completed,
+                  score: enhancedQuiz.score,
+                  questions_count: enhancedQuiz.questions_count,
+                });
               } catch (error) {
                 if (
                   error.response?.status === 404 ||
@@ -286,7 +294,13 @@ const MaterialQuizList = ({ quizzes }) => {
 
           // Quiz status logic
           const getQuizStatus = () => {
-            if (quiz.is_completed || quiz.student_attempt?.submitted_at) {
+            // ✅ PERBAIKAN: Check completed status first dengan berbagai kondisi
+            if (
+              quiz.is_completed ||
+              quiz.student_attempt?.submitted_at ||
+              (quiz.score !== null && quiz.score !== undefined) ||
+              quiz.completed_at
+            ) {
               return {
                 status: "completed",
                 color: "success",
@@ -294,6 +308,8 @@ const MaterialQuizList = ({ quizzes }) => {
                 icon: <CheckCircleOutlined />,
               };
             }
+
+            // Check in progress
             if (
               quiz.student_attempt?.start_time ||
               (quiz.current_answers &&
@@ -306,6 +322,8 @@ const MaterialQuizList = ({ quizzes }) => {
                 icon: <ClockCircleOutlined />,
               };
             }
+
+            // Default available
             return {
               status: "available",
               color: "default",
@@ -558,72 +576,79 @@ const MaterialQuizList = ({ quizzes }) => {
                   )}
 
                   {/* Score Display untuk Completed Quiz */}
-                  {status.status === "completed" && quiz.score !== null && (
-                    <div
-                      style={{
-                        background:
-                          "linear-gradient(135deg, #f6ffed 0%, #e6fffb 100%)",
-                        border: "2px solid #b7eb8f",
-                        borderRadius: 12,
-                        padding: "16px",
-                        marginBottom: 16,
-                        textAlign: "center",
-                      }}
-                    >
+                  {status.status === "completed" &&
+                    quiz.score !== null &&
+                    quiz.score !== undefined && (
                       <div
                         style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          gap: 12,
-                          marginBottom: 8,
+                          background:
+                            "linear-gradient(135deg, #f6ffed 0%, #e6fffb 100%)",
+                          border: "2px solid #b7eb8f",
+                          borderRadius: 12,
+                          padding: "16px",
+                          marginBottom: 16,
+                          textAlign: "center",
                         }}
                       >
                         <div
                           style={{
-                            background: "#52c41a",
-                            borderRadius: "50%",
-                            width: 32,
-                            height: 32,
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
+                            gap: 12,
+                            marginBottom: 8,
                           }}
                         >
-                          <TrophyOutlined
-                            style={{ color: "white", fontSize: 16 }}
-                          />
-                        </div>
-                        <div>
-                          <Text
-                            strong
-                            style={{ fontSize: 15, color: "#52c41a" }}
-                          >
-                            Quiz Selesai
-                          </Text>
                           <div
                             style={{
-                              fontSize: 20,
-                              fontWeight: 700,
-                              color: "#52c41a",
+                              background: "#52c41a",
+                              borderRadius: "50%",
+                              width: 32,
+                              height: 32,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
                             }}
                           >
-                            {quiz.score.toFixed(1)}/100
+                            <TrophyOutlined
+                              style={{ color: "white", fontSize: 16 }}
+                            />
+                          </div>
+                          <div>
+                            <Text
+                              strong
+                              style={{ fontSize: 15, color: "#52c41a" }}
+                            >
+                              Quiz Selesai
+                            </Text>
+                            <div
+                              style={{
+                                fontSize: 20,
+                                fontWeight: 700,
+                                color: "#52c41a",
+                              }}
+                            >
+                              {typeof quiz.score === "number"
+                                ? quiz.score.toFixed(1)
+                                : "0.0"}
+                              /100
+                            </div>
                           </div>
                         </div>
+                        <Progress
+                          percent={
+                            typeof quiz.score === "number" ? quiz.score : 0
+                          }
+                          strokeColor={{
+                            "0%": "#52c41a",
+                            "100%": "#389e0d",
+                          }}
+                          showInfo={false}
+                          strokeWidth={8}
+                          style={{ marginBottom: 0 }}
+                        />
                       </div>
-                      <Progress
-                        percent={quiz.score}
-                        strokeColor={{
-                          "0%": "#52c41a",
-                          "100%": "#389e0d",
-                        }}
-                        showInfo={false}
-                        strokeWidth={8}
-                        style={{ marginBottom: 0 }}
-                      />
-                    </div>
-                  )}
+                    )}
 
                   {/* Time Remaining Box */}
                   {quiz.end_time && (
