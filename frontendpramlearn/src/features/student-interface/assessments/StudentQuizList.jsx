@@ -484,6 +484,7 @@ const StudentQuizList = () => {
               const timeRemaining = getTimeRemaining(quiz.end_time);
               const timeColor = getTimeColor(quiz.end_time);
               const buttonAction = getButtonAction(quiz);
+              const isMobile = window.innerWidth <= 768; // Tambahkan deteksi mobile
 
               return (
                 <List.Item>
@@ -510,13 +511,16 @@ const StudentQuizList = () => {
                         "0 4px 16px rgba(0,0,0,0.08)";
                     }}
                   >
-                    {/* Status Badge - Top Right Corner */}
+                    {/* Status Badge - Top Center untuk mobile, Top Right untuk desktop */}
                     <div
                       style={{
+                        marginTop: isMobile ? 5 : 0,
                         position: "absolute",
-                        top: 16,
-                        right: 16,
-                        zIndex: 2,
+                        top: isMobile ? 8 : 12,
+                        left: isMobile ? "52%" : "auto", // Center horizontal pada mobile
+                        right: isMobile ? "auto" : 12, // Right positioning untuk desktop
+                        transform: isMobile ? "translateX(-50%)" : "none", // Center transform pada mobile
+                        zIndex: 3,
                       }}
                     >
                       <Tag
@@ -524,24 +528,22 @@ const StudentQuizList = () => {
                         color={status.color}
                         style={{
                           fontWeight: 600,
-                          fontSize: 11,
-                          padding: "2px 8px",
+                          fontSize: isMobile ? 10 : 11,
+                          padding: isMobile ? "3px 4px" : "5px 8px",
                           borderRadius: 6,
-                          border: "none",
                           boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
                         }}
                       >
                         {status.text}
                       </Tag>
                     </div>
-
                     {/* Header Section */}
                     <div
                       style={{
                         background:
                           quiz.quiz_type === "group" || quiz.is_group_quiz
-                            ? "linear-gradient(135deg, #001529 0%, #3a3f5c 60%, #43cea2 100%)" // Tetap purple untuk group quiz
-                            : "linear-gradient(135deg, #001529 0%, #3a3f5c 60%, #43cea2 100%)", // Sama dengan StudentLayout untuk individual quiz
+                            ? "linear-gradient(135deg, #001529 0%, #3a3f5c 60%, #43cea2 100%)"
+                            : "linear-gradient(135deg, #001529 0%, #3a3f5c 60%, #43cea2 100%)",
                         padding: "24px 20px 20px 20px",
                         color: "white",
                         position: "relative",
@@ -571,10 +573,10 @@ const StudentQuizList = () => {
                           background: "rgba(255, 255, 255, 0.05)",
                         }}
                       />
-
                       {/* Quiz Type Badge */}
                       <div
                         style={{
+                          marginTop: isMobile ? 30 : 0,
                           marginBottom: 12,
                           position: "relative",
                           zIndex: 1,
@@ -614,7 +616,6 @@ const StudentQuizList = () => {
                           </Space>
                         )}
                       </div>
-
                       {/* Quiz Title */}
                       <Title
                         level={5}
@@ -632,6 +633,67 @@ const StudentQuizList = () => {
                           ? `${quiz.title.substring(0, 45)}...`
                           : quiz.title}
                       </Title>
+
+                      {/* Subject & Material Info - PERBAIKAN dengan fallback */}
+                      <div style={{ position: "relative", zIndex: 1 }}>
+                        {(() => {
+                          const subjectName =
+                            quiz.subject_name ||
+                            quiz.subject?.name ||
+                            quiz.material?.subject?.name ||
+                            quiz.material_subject_name ||
+                            quiz.class_subject_name ||
+                            quiz.course_name ||
+                            quiz.course?.name ||
+                            // Fallback berdasarkan group quiz pattern
+                            (quiz.is_group_quiz && "Mata Pelajaran") ||
+                            "Mata Pelajaran"; // Default fallback
+
+                          return (
+                            <div style={{ marginTop: 8 }}>
+                              <Text
+                                style={{
+                                  color: "rgba(255, 255, 255, 0.8)",
+                                  fontSize: 12,
+                                }}
+                              >
+                                Mata Pelajaran: {subjectName}
+                              </Text>
+                            </div>
+                          );
+                        })()}
+
+                        {/* Material Name dengan fallback */}
+                        {(() => {
+                          const materialName =
+                            quiz.material_name ||
+                            quiz.material_title ||
+                            quiz.material?.title ||
+                            quiz.material?.name ||
+                            quiz.chapter_name ||
+                            quiz.lesson_name ||
+                            // Untuk group quiz, bisa gunakan pattern dari title
+                            (quiz.is_group_quiz && quiz.title.includes("Quiz")
+                              ? quiz.title.replace("Quiz", "Materi")
+                              : null);
+
+                          if (materialName) {
+                            return (
+                              <div style={{ marginTop: 4 }}>
+                                <Text
+                                  style={{
+                                    color: "rgba(255, 255, 255, 0.7)",
+                                    fontSize: 11,
+                                  }}
+                                >
+                                  Materi: {materialName}
+                                </Text>
+                              </div>
+                            );
+                          }
+                          return null;
+                        })()}
+                      </div>
                     </div>
 
                     {/* Content Section */}
@@ -676,7 +738,6 @@ const StudentQuizList = () => {
                         >
                           <div
                             style={{
-                              // icon and text alignment center
                               display: "flex",
                               alignItems: "center",
                               justifyContent: "center",
@@ -823,7 +884,7 @@ const StudentQuizList = () => {
                         </div>
                       )}
 
-                      {/* Quiz Meta Information */}
+                      {/* Quiz Meta Information - TAMBAHKAN tag mata pelajaran */}
                       <div style={{ marginBottom: 16 }}>
                         <Space wrap size={8}>
                           {quiz.questions_count && (
@@ -878,6 +939,33 @@ const StudentQuizList = () => {
                               </Text>
                             </div>
                           )}
+                          {/* TAMBAHKAN TAG MATA PELAJARAN */}
+                          {quiz.subject_name && (
+                            <div
+                              style={{
+                                background: "#f6ffed",
+                                border: "1px solid #b7eb8f",
+                                borderRadius: 8,
+                                padding: "6px 12px",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 6,
+                              }}
+                            >
+                              <BookOutlined
+                                style={{ color: "#52c41a", fontSize: 12 }}
+                              />
+                              <Text
+                                style={{
+                                  fontSize: 12,
+                                  color: "#52c41a",
+                                  fontWeight: 500,
+                                }}
+                              >
+                                {quiz.subject_name}
+                              </Text>
+                            </div>
+                          )}
                         </Space>
                       </div>
 
@@ -897,9 +985,9 @@ const StudentQuizList = () => {
                           background:
                             timeRemaining === "EXPIRED"
                               ? "#f5f5f5"
-                              : buttonAction.style?.background || // Gunakan style custom jika ada
+                              : buttonAction.style?.background ||
                                 (buttonAction.type === "primary"
-                                  ? "linear-gradient(135deg, #001529 0%, #3a3f5c 60%, #43cea2 100%)" // Sama dengan StudentLayout
+                                  ? "linear-gradient(135deg, #001529 0%, #3a3f5c 60%, #43cea2 100%)"
                                   : undefined),
                           border:
                             timeRemaining === "EXPIRED"
@@ -916,7 +1004,6 @@ const StudentQuizList = () => {
                                 "0 4px 12px rgba(0, 21, 41, 0.2)",
                           textShadow:
                             buttonAction.style?.textShadow || undefined,
-                          // Hover effects untuk gradient emas
                           transition: "all 0.3s ease",
                         }}
                         onMouseEnter={(e) => {

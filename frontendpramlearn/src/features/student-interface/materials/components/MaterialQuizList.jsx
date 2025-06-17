@@ -18,7 +18,6 @@ import {
   FileTextOutlined,
   QuestionCircleOutlined,
   TeamOutlined,
-  CalendarOutlined,
   CheckCircleOutlined,
   TrophyOutlined,
 } from "@ant-design/icons";
@@ -35,7 +34,7 @@ dayjs.locale("id");
 
 const { Title, Text } = Typography;
 
-const MaterialQuizList = ({ quizzes }) => {
+const MaterialQuizList = ({ quizzes, material }) => {
   const [currentTime, setCurrentTime] = useState(dayjs());
   const [enrichedQuizzes, setEnrichedQuizzes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -67,6 +66,14 @@ const MaterialQuizList = ({ quizzes }) => {
               questions_count: quiz.questions?.length || 0,
               duration: quiz.duration || null,
               end_time: quiz.end_time,
+
+              // PERBAIKAN: Gunakan data dari material parent
+              subject_name: material?.subject_name || quiz.subject_name,
+              subject_id: material?.subject || quiz.subject_id,
+              material_name: material?.title || quiz.material_name,
+              material_id: material?.id || quiz.material_id,
+              material_slug: material?.slug || quiz.material_slug,
+
               // Default status untuk individual quiz
               is_completed: false,
               score: null,
@@ -81,10 +88,14 @@ const MaterialQuizList = ({ quizzes }) => {
                   `/student/group-quiz/${quiz.slug}/`
                 );
 
-                // ✅ PERBAIKAN: Merge semua data dengan prioritas pada API response
                 enhancedQuiz = {
                   ...enhancedQuiz,
                   ...response.data,
+                  // Pastikan subject dan material info tetap ada
+                  subject_name:
+                    enhancedQuiz.subject_name || response.data.subject_name,
+                  material_name:
+                    enhancedQuiz.material_name || response.data.material_name,
                   // Ensure these critical fields are properly set
                   is_completed: response.data.is_completed || false,
                   score: response.data.score || null,
@@ -101,41 +112,13 @@ const MaterialQuizList = ({ quizzes }) => {
 
                 console.log(`✅ Enhanced group quiz data:`, {
                   slug: quiz.slug,
+                  subject_name: enhancedQuiz.subject_name,
+                  material_name: enhancedQuiz.material_name,
                   is_completed: enhancedQuiz.is_completed,
                   score: enhancedQuiz.score,
-                  questions_count: enhancedQuiz.questions_count,
                 });
               } catch (error) {
-                if (
-                  error.response?.status === 404 ||
-                  error.response?.status === 403
-                ) {
-                  console.log(
-                    `⚠️ Group quiz ${quiz.slug} not assigned to user or not found`
-                  );
-                  // Keep original quiz data but mark as not available
-                  enhancedQuiz.not_available = true;
-                  enhancedQuiz.not_available_reason =
-                    error.response?.status === 403
-                      ? "Tidak terdaftar dalam kelompok"
-                      : "Quiz tidak ditemukan";
-                } else {
-                  console.error(
-                    `❌ Error fetching group quiz ${quiz.slug}:`,
-                    error
-                  );
-                }
-              }
-            } else {
-              // Untuk individual quiz, coba fetch status dari API
-              try {
-                // Asumsi ada endpoint untuk individual quiz status
-                // Jika tidak ada, gunakan data default
-                console.log(`📝 Individual quiz: ${quiz.slug}`);
-              } catch (error) {
-                console.log(
-                  `⚠️ Could not fetch individual quiz status for ${quiz.slug}`
-                );
+                // ...existing error handling...
               }
             }
 
@@ -153,7 +136,7 @@ const MaterialQuizList = ({ quizzes }) => {
     };
 
     enhanceQuizData();
-  }, [quizzes]);
+  }, [quizzes, material]); // Tambahkan material sebagai dependency
 
   const getTimeRemaining = (endTime) => {
     if (!endTime) return null;
@@ -245,7 +228,7 @@ const MaterialQuizList = ({ quizzes }) => {
         </Text>
       </div>
 
-      {/* Quiz Cards */}
+      {/* Quiz Cards - Updated to match StudentQuizList design */}
       <Row gutter={[16, 16]}>
         {enrichedQuizzes.map((quiz) => {
           // Skip quiz yang tidak tersedia untuk user
@@ -291,16 +274,29 @@ const MaterialQuizList = ({ quizzes }) => {
           const timeRemaining = getTimeRemaining(quiz.end_time);
           const timeColor = getTimeRemainingColor(quiz.end_time);
           const isExpired = timeRemaining === "EXPIRED";
+          const isMobile = window.innerWidth <= 768;
 
-          // Quiz status logic
+          // Quiz status logic - SAMA DENGAN StudentQuizList
           const getQuizStatus = () => {
-            // ✅ PERBAIKAN: Check completed status first dengan berbagai kondisi
-            if (
-              quiz.is_completed ||
-              quiz.student_attempt?.submitted_at ||
-              (quiz.score !== null && quiz.score !== undefined) ||
-              quiz.completed_at
-            ) {
+            if (quiz.quiz_type === "group" || quiz.is_group_quiz) {
+              if (quiz.is_completed) {
+                return {
+                  status: "completed",
+                  color: "success",
+                  text: "Selesai",
+                  icon: <CheckCircleOutlined />,
+                };
+              }
+              return {
+                status: "available",
+                color: "default",
+                text: "Tersedia",
+                icon: <PlayCircleOutlined />,
+              };
+            }
+
+            // Individual quiz logic
+            if (quiz.student_attempt?.submitted_at) {
               return {
                 status: "completed",
                 color: "success",
@@ -308,13 +304,7 @@ const MaterialQuizList = ({ quizzes }) => {
                 icon: <CheckCircleOutlined />,
               };
             }
-
-            // Check in progress
-            if (
-              quiz.student_attempt?.start_time ||
-              (quiz.current_answers &&
-                Object.keys(quiz.current_answers).length > 0)
-            ) {
+            if (quiz.student_attempt?.start_time) {
               return {
                 status: "in_progress",
                 color: "processing",
@@ -322,8 +312,6 @@ const MaterialQuizList = ({ quizzes }) => {
                 icon: <ClockCircleOutlined />,
               };
             }
-
-            // Default available
             return {
               status: "available",
               color: "default",
@@ -334,7 +322,7 @@ const MaterialQuizList = ({ quizzes }) => {
 
           const status = getQuizStatus();
 
-          // Button action
+          // Button action - SAMA DENGAN StudentQuizList
           const getButtonAction = () => {
             if (status.status === "completed") {
               return {
@@ -366,6 +354,10 @@ const MaterialQuizList = ({ quizzes }) => {
                   (window.location.href = quiz.is_group_quiz
                     ? `/student/group-quiz/${quiz.slug}`
                     : `/student/quiz/${quiz.slug}`),
+                style: {
+                  background:
+                    "linear-gradient(135deg, #001529 0%, #3a3f5c 60%, #43cea2 100%)",
+                },
               };
             }
 
@@ -407,13 +399,15 @@ const MaterialQuizList = ({ quizzes }) => {
                     "0 4px 16px rgba(0,0,0,0.08)";
                 }}
               >
-                {/* Status Badge - Top Right Corner */}
+                {/* Status Badge - POSISI SAMA DENGAN StudentQuizList */}
                 <div
                   style={{
                     position: "absolute",
-                    top: 16,
-                    right: 16,
-                    zIndex: 2,
+                    top: isMobile ? 8 : 12,
+                    left: isMobile ? "50%" : "auto",
+                    right: isMobile ? "auto" : 12,
+                    transform: isMobile ? "translateX(-50%)" : "none",
+                    zIndex: 3,
                   }}
                 >
                   <Tag
@@ -421,10 +415,9 @@ const MaterialQuizList = ({ quizzes }) => {
                     color={status.color}
                     style={{
                       fontWeight: 600,
-                      fontSize: 11,
-                      padding: "2px 8px",
+                      fontSize: isMobile ? 10 : 11,
+                      padding: isMobile ? "3px 4px" : "5px 8px",
                       borderRadius: 6,
-                      border: "none",
                       boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
                     }}
                   >
@@ -432,7 +425,7 @@ const MaterialQuizList = ({ quizzes }) => {
                   </Tag>
                 </div>
 
-                {/* Header Section */}
+                {/* Header Section - SAMA DENGAN StudentQuizList */}
                 <div
                   style={{
                     background:
@@ -470,46 +463,45 @@ const MaterialQuizList = ({ quizzes }) => {
                   {/* Quiz Type Badge */}
                   <div
                     style={{
+                      marginTop: isMobile ? 30 : 0,
                       marginBottom: 12,
                       position: "relative",
                       zIndex: 1,
                     }}
                   >
-                    <Space size={8}>
-                      {quiz.is_group_quiz ? (
-                        <>
-                          <TeamOutlined style={{ fontSize: 16 }} />
-                          <Tag
-                            color="rgba(255, 255, 255, 0.2)"
-                            style={{
-                              color: "white",
-                              border: "1px solid rgba(255, 255, 255, 0.3)",
-                              background: "rgba(255, 255, 255, 0.15)",
-                              fontSize: 11,
-                              fontWeight: 500,
-                            }}
-                          >
-                            Group Quiz
-                          </Tag>
-                        </>
-                      ) : (
-                        <>
-                          <FileTextOutlined style={{ fontSize: 16 }} />
-                          <Tag
-                            color="rgba(255, 255, 255, 0.2)"
-                            style={{
-                              color: "white",
-                              border: "1px solid rgba(255, 255, 255, 0.3)",
-                              background: "rgba(255, 255, 255, 0.15)",
-                              fontSize: 11,
-                              fontWeight: 500,
-                            }}
-                          >
-                            Individual Quiz
-                          </Tag>
-                        </>
-                      )}
-                    </Space>
+                    {quiz.quiz_type === "group" || quiz.is_group_quiz ? (
+                      <Space size={8}>
+                        <TeamOutlined style={{ fontSize: 16 }} />
+                        <Tag
+                          color="rgba(255, 255, 255, 0.2)"
+                          style={{
+                            color: "white",
+                            border: "1px solid rgba(255, 255, 255, 0.3)",
+                            background: "rgba(255, 255, 255, 0.15)",
+                            fontSize: 11,
+                            fontWeight: 500,
+                          }}
+                        >
+                          Kelompok: {quiz.group?.name || "Group Quiz"}
+                        </Tag>
+                      </Space>
+                    ) : (
+                      <Space size={8}>
+                        <FileTextOutlined style={{ fontSize: 16 }} />
+                        <Tag
+                          color="rgba(255, 255, 255, 0.2)"
+                          style={{
+                            color: "white",
+                            border: "1px solid rgba(255, 255, 255, 0.3)",
+                            background: "rgba(255, 255, 255, 0.15)",
+                            fontSize: 11,
+                            fontWeight: 500,
+                          }}
+                        >
+                          Individual Quiz
+                        </Tag>
+                      </Space>
+                    )}
                   </div>
 
                   {/* Quiz Title */}
@@ -530,24 +522,63 @@ const MaterialQuizList = ({ quizzes }) => {
                       : quiz.title}
                   </Title>
 
-                  {/* Group Info untuk Group Quiz */}
-                  {quiz.is_group_quiz && quiz.group && (
-                    <div
-                      style={{ marginTop: 8, position: "relative", zIndex: 1 }}
-                    >
-                      <Text
-                        style={{
-                          color: "rgba(255, 255, 255, 0.8)",
-                          fontSize: 12,
-                        }}
-                      >
-                        Kelompok: {quiz.group.name}
-                      </Text>
-                    </div>
-                  )}
+                  {/* Subject & Material Info - TAMBAHKAN SEPERTI StudentQuizList */}
+                  <div style={{ position: "relative", zIndex: 1 }}>
+                    {(() => {
+                      const subjectName =
+                        quiz.subject_name ||
+                        quiz.subject?.name ||
+                        quiz.material?.subject?.name ||
+                        quiz.material_subject_name ||
+                        quiz.class_subject_name ||
+                        quiz.course_name ||
+                        quiz.course?.name ||
+                        "Mata Pelajaran";
+
+                      return (
+                        <div style={{ marginTop: 8 }}>
+                          <Text
+                            style={{
+                              color: "rgba(255, 255, 255, 0.8)",
+                              fontSize: 12,
+                            }}
+                          >
+                            Mata Pelajaran: {subjectName}
+                          </Text>
+                        </div>
+                      );
+                    })()}
+
+                    {/* Material Name */}
+                    {(() => {
+                      const materialName =
+                        quiz.material_name ||
+                        quiz.material_title ||
+                        quiz.material?.title ||
+                        quiz.material?.name ||
+                        quiz.chapter_name ||
+                        quiz.lesson_name;
+
+                      if (materialName) {
+                        return (
+                          <div style={{ marginTop: 4 }}>
+                            <Text
+                              style={{
+                                color: "rgba(255, 255, 255, 0.7)",
+                                fontSize: 11,
+                              }}
+                            >
+                              Materi: {materialName}
+                            </Text>
+                          </div>
+                        );
+                      }
+                      return null;
+                    })()}
+                  </div>
                 </div>
 
-                {/* Content Section */}
+                {/* Content Section - SAMA DENGAN StudentQuizList */}
                 <div style={{ padding: "20px" }}>
                   {/* Quiz Description */}
                   {quiz.content && (
@@ -575,90 +606,88 @@ const MaterialQuizList = ({ quizzes }) => {
                     </div>
                   )}
 
-                  {/* Score Display untuk Completed Quiz */}
-                  {status.status === "completed" &&
-                    quiz.score !== null &&
-                    quiz.score !== undefined && (
+                  {/* Score Display for Completed Quiz - SAMA DENGAN StudentQuizList */}
+                  {status.status === "completed" && (
+                    <div
+                      style={{
+                        background:
+                          "linear-gradient(135deg, #f6ffed 0%, #e6fffb 100%)",
+                        border: "1px solid #b7eb8f",
+                        borderRadius: 12,
+                        padding: "16px",
+                        marginBottom: 16,
+                      }}
+                    >
                       <div
                         style={{
-                          background:
-                            "linear-gradient(135deg, #f6ffed 0%, #e6fffb 100%)",
-                          border: "2px solid #b7eb8f",
-                          borderRadius: 12,
-                          padding: "16px",
-                          marginBottom: 16,
-                          textAlign: "center",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: 12,
+                          marginBottom: 8,
                         }}
                       >
                         <div
                           style={{
+                            background: "#52c41a",
+                            borderRadius: "50%",
+                            width: 32,
+                            height: 32,
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            gap: 12,
-                            marginBottom: 8,
                           }}
                         >
+                          <TrophyOutlined
+                            style={{ color: "white", fontSize: 16 }}
+                          />
+                        </div>
+                        <div>
+                          <Text
+                            strong
+                            style={{ fontSize: 15, color: "#52c41a" }}
+                          >
+                            Quiz Selesai
+                          </Text>
                           <div
                             style={{
-                              background: "#52c41a",
-                              borderRadius: "50%",
-                              width: 32,
-                              height: 32,
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
+                              fontSize: 20,
+                              fontWeight: 700,
+                              color: "#52c41a",
                             }}
                           >
-                            <TrophyOutlined
-                              style={{ color: "white", fontSize: 16 }}
-                            />
-                          </div>
-                          <div>
-                            <Text
-                              strong
-                              style={{ fontSize: 15, color: "#52c41a" }}
-                            >
-                              Quiz Selesai
-                            </Text>
-                            <div
-                              style={{
-                                fontSize: 20,
-                                fontWeight: 700,
-                                color: "#52c41a",
-                              }}
-                            >
-                              {typeof quiz.score === "number"
-                                ? quiz.score.toFixed(1)
-                                : "0.0"}
-                              /100
-                            </div>
+                            {(
+                              quiz.student_attempt?.score ||
+                              quiz.score ||
+                              0
+                            ).toFixed(1)}
+                            /100
                           </div>
                         </div>
-                        <Progress
-                          percent={
-                            typeof quiz.score === "number" ? quiz.score : 0
-                          }
-                          strokeColor={{
-                            "0%": "#52c41a",
-                            "100%": "#389e0d",
-                          }}
-                          showInfo={false}
-                          strokeWidth={8}
-                          style={{ marginBottom: 0 }}
-                        />
                       </div>
-                    )}
+                      <Progress
+                        percent={quiz.student_attempt?.score || quiz.score || 0}
+                        strokeColor={{
+                          "0%": "#52c41a",
+                          "100%": "#389e0d",
+                        }}
+                        showInfo={false}
+                        strokeWidth={8}
+                        style={{ marginBottom: 0 }}
+                      />
+                    </div>
+                  )}
 
-                  {/* Time Remaining Box */}
+                  {/* Time Remaining - SAMA DENGAN StudentQuizList */}
                   {quiz.end_time && (
                     <div
                       style={{
-                        background: isExpired
-                          ? "linear-gradient(135deg, #fff2f0 0%, #ffebe6 100%)"
-                          : "linear-gradient(135deg, #f6ffed 0%, #e6fffb 100%)",
-                        border: `2px solid ${
-                          isExpired ? "#ffccc7" : "#b7eb8f"
+                        background:
+                          timeRemaining === "EXPIRED"
+                            ? "linear-gradient(135deg, #fff2f0 0%, #ffebe6 100%)"
+                            : "linear-gradient(135deg, #f6ffed 0%, #e6fffb 100%)",
+                        border: `1px solid ${
+                          timeRemaining === "EXPIRED" ? "#ffccc7" : "#b7eb8f"
                         }`,
                         borderRadius: 12,
                         padding: "16px",
@@ -677,7 +706,10 @@ const MaterialQuizList = ({ quizzes }) => {
                       >
                         <div
                           style={{
-                            background: isExpired ? "#ff4d4f" : "#52c41a",
+                            background:
+                              timeRemaining === "EXPIRED"
+                                ? "#ff4d4f"
+                                : "#52c41a",
                             borderRadius: "50%",
                             width: 24,
                             height: 24,
@@ -697,7 +729,9 @@ const MaterialQuizList = ({ quizzes }) => {
                             color: "#666",
                           }}
                         >
-                          {isExpired ? "Waktu Habis" : "Sisa Waktu"}
+                          {timeRemaining === "EXPIRED"
+                            ? "Waktu Habis"
+                            : "Sisa Waktu"}
                         </Text>
                       </div>
 
@@ -705,11 +739,14 @@ const MaterialQuizList = ({ quizzes }) => {
                         style={{
                           fontSize: 18,
                           fontWeight: 700,
-                          color: isExpired ? "#ff4d4f" : timeColor,
+                          color:
+                            timeRemaining === "EXPIRED" ? "#ff4d4f" : timeColor,
                           marginBottom: 4,
                         }}
                       >
-                        {isExpired ? "EXPIRED" : timeRemaining || "Unlimited"}
+                        {timeRemaining === "EXPIRED"
+                          ? "EXPIRED"
+                          : timeRemaining || "Unlimited"}
                       </div>
 
                       {quiz.end_time && (
@@ -721,10 +758,10 @@ const MaterialQuizList = ({ quizzes }) => {
                     </div>
                   )}
 
-                  {/* Quiz Meta Information */}
+                  {/* Quiz Meta Information - SAMA DENGAN StudentQuizList */}
                   <div style={{ marginBottom: 16 }}>
                     <Space wrap size={8}>
-                      {quiz.questions_count > 0 && (
+                      {quiz.questions_count && (
                         <div
                           style={{
                             background: "#f0f8ff",
@@ -776,15 +813,42 @@ const MaterialQuizList = ({ quizzes }) => {
                           </Text>
                         </div>
                       )}
+                      {/* TAMBAHKAN TAG MATA PELAJARAN - SAMA DENGAN StudentQuizList */}
+                      {quiz.subject_name && (
+                        <div
+                          style={{
+                            background: "#f6ffed",
+                            border: "1px solid #b7eb8f",
+                            borderRadius: 8,
+                            padding: "6px 12px",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 6,
+                          }}
+                        >
+                          <BookOutlined
+                            style={{ color: "#52c41a", fontSize: 12 }}
+                          />
+                          <Text
+                            style={{
+                              fontSize: 12,
+                              color: "#52c41a",
+                              fontWeight: 500,
+                            }}
+                          >
+                            {quiz.subject_name}
+                          </Text>
+                        </div>
+                      )}
                     </Space>
                   </div>
 
-                  {/* Action Button */}
+                  {/* Action Button - SAMA DENGAN StudentQuizList */}
                   <Button
                     type={buttonAction.type}
                     icon={buttonAction.icon}
                     onClick={buttonAction.onClick}
-                    disabled={isExpired}
+                    disabled={timeRemaining === "EXPIRED"}
                     size="large"
                     style={{
                       width: "100%",
@@ -792,41 +856,53 @@ const MaterialQuizList = ({ quizzes }) => {
                       borderRadius: 10,
                       fontWeight: 600,
                       fontSize: 13,
-                      background: isExpired
-                        ? "#f5f5f5"
-                        : buttonAction.style?.background ||
-                          (buttonAction.type === "primary"
-                            ? "linear-gradient(135deg, #001529 0%, #3a3f5c 60%, #43cea2 100%)"
-                            : undefined),
-                      border: isExpired
-                        ? "1px solid #d9d9d9"
-                        : buttonAction.style?.borderColor || "none",
-                      color: isExpired
-                        ? "#999"
-                        : buttonAction.style?.color || undefined,
-                      boxShadow: isExpired
-                        ? "none"
-                        : buttonAction.style?.boxShadow ||
-                          "0 4px 12px rgba(0, 21, 41, 0.2)",
+                      background:
+                        timeRemaining === "EXPIRED"
+                          ? "#f5f5f5"
+                          : buttonAction.style?.background ||
+                            (buttonAction.type === "primary"
+                              ? "linear-gradient(135deg, #001529 0%, #3a3f5c 60%, #43cea2 100%)"
+                              : undefined),
+                      border:
+                        timeRemaining === "EXPIRED"
+                          ? "1px solid #d9d9d9"
+                          : buttonAction.style?.borderColor || "none",
+                      color:
+                        timeRemaining === "EXPIRED"
+                          ? "#999"
+                          : buttonAction.style?.color || undefined,
+                      boxShadow:
+                        timeRemaining === "EXPIRED"
+                          ? "none"
+                          : buttonAction.style?.boxShadow ||
+                            "0 4px 12px rgba(0, 21, 41, 0.2)",
                       textShadow: buttonAction.style?.textShadow || undefined,
                       transition: "all 0.3s ease",
                     }}
                     onMouseEnter={(e) => {
-                      if (buttonAction.style?.background && !isExpired) {
+                      if (
+                        buttonAction.style?.background &&
+                        timeRemaining !== "EXPIRED"
+                      ) {
                         e.currentTarget.style.transform = "translateY(-2px)";
                         e.currentTarget.style.boxShadow =
                           "0 6px 16px rgba(255, 173, 20, 0.5)";
                       }
                     }}
                     onMouseLeave={(e) => {
-                      if (buttonAction.style?.background && !isExpired) {
+                      if (
+                        buttonAction.style?.background &&
+                        timeRemaining !== "EXPIRED"
+                      ) {
                         e.currentTarget.style.transform = "translateY(0)";
                         e.currentTarget.style.boxShadow =
                           "0 4px 12px rgba(255, 173, 20, 0.4)";
                       }
                     }}
                   >
-                    {isExpired ? "Waktu Habis" : buttonAction.text}
+                    {timeRemaining === "EXPIRED"
+                      ? "Waktu Habis"
+                      : buttonAction.text}
                   </Button>
                 </div>
               </Card>

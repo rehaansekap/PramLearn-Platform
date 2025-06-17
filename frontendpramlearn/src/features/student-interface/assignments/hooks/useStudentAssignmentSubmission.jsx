@@ -49,20 +49,24 @@ const useStudentAssignmentSubmission = () => {
       try {
         api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
         const response = await api.get(
-          `student/assignment/${assignmentId}/questions/`
+          `/student/assignment/${assignmentId}/questions/`
         );
+
         console.log("Questions response:", response.data);
 
-        // Handle different response structures
+        // PERBAIKAN: Extract questions dari response yang benar
         if (response.data && response.data.questions) {
           setAssignmentQuestions(
             Array.isArray(response.data.questions)
               ? response.data.questions
               : []
           );
+          console.log("✅ Questions set:", response.data.questions.length);
         } else if (Array.isArray(response.data)) {
           setAssignmentQuestions(response.data);
+          console.log("✅ Questions set (direct array):", response.data.length);
         } else {
+          console.log("⚠️ No questions found in response");
           setAssignmentQuestions([]);
         }
       } catch (err) {
@@ -161,28 +165,34 @@ const useStudentAssignmentSubmission = () => {
 
   // Submit assignment
   const submitAssignment = useCallback(
-    async (assignmentId, submissionData) => {
-      if (!assignmentId || !token || submitting) return false;
+    async (assignmentId, data) => {
+      if (submitting) return false;
 
       setSubmitting(true);
       try {
-        api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+        const { answers: answersData, uploaded_files: filesToSubmit } = data;
 
         const formData = new FormData();
-        formData.append("assignment", assignmentId);
 
-        // Add answers
-        const answersToSubmit = submissionData.answers || answers;
-        Object.keys(answersToSubmit).forEach((questionId) => {
-          formData.append(
-            `answers[${questionId}]`,
-            answersToSubmit[questionId]
-          );
+        // Add answers data
+        Object.entries(answersData).forEach(([questionId, answer]) => {
+          formData.append(`answers[${questionId}][question]`, questionId);
+          if (answer.selected_choice) {
+            formData.append(
+              `answers[${questionId}][selected_choice]`,
+              answer.selected_choice
+            );
+          }
+          if (answer.essay_answer) {
+            formData.append(
+              `answers[${questionId}][essay_answer]`,
+              answer.essay_answer
+            );
+          }
         });
 
-        // Add files
-        const filesToSubmit = submissionData.files || uploadedFiles;
-        if (Array.isArray(filesToSubmit)) {
+        // Add files if any
+        if (Array.isArray(filesToSubmit) && filesToSubmit.length > 0) {
           filesToSubmit.forEach((file, index) => {
             if (file.originFileObj) {
               formData.append(`files`, file.originFileObj);
@@ -208,11 +218,11 @@ const useStudentAssignmentSubmission = () => {
         // Refresh submission history
         await fetchSubmissionHistory(assignmentId);
 
-        message.success("Assignment submitted successfully!");
+        // UBAH: Gunakan return value untuk menunjukkan success, biar parent component yang handle message
         return response.data;
       } catch (err) {
         console.error("Error submitting assignment:", err);
-        message.error("Failed to submit assignment");
+        // UBAH: Return false instead of showing message here
         return false;
       } finally {
         setSubmitting(false);
@@ -226,15 +236,25 @@ const useStudentAssignmentSubmission = () => {
     (assignment) => {
       const now = dayjs();
       const dueDate = dayjs(assignment.due_date);
-      const hasSubmission =
+
+      // PERBAIKAN: Cek submission dari assignment object juga
+      const hasSubmissionFromList =
+        assignment.submission_id || assignment.submitted_at;
+      const hasSubmissionFromState =
         Array.isArray(submissions) &&
         submissions.some((s) => s.assignment === assignment.id);
 
-      if (hasSubmission) {
-        const submission = submissions.find(
+      if (hasSubmissionFromList || hasSubmissionFromState) {
+        // Cek grade dari assignment object atau submissions
+        const submissionFromState = submissions.find(
           (s) => s.assignment === assignment.id
         );
-        if (submission && submission.grade !== null) {
+
+        const hasGrade =
+          assignment.grade !== null ||
+          (submissionFromState && submissionFromState.grade !== null);
+
+        if (hasGrade) {
           return { status: "graded", color: "success", text: "Graded" };
         }
         return { status: "submitted", color: "processing", text: "Submitted" };
@@ -243,7 +263,6 @@ const useStudentAssignmentSubmission = () => {
       if (now.isAfter(dueDate)) {
         return { status: "overdue", color: "error", text: "Overdue" };
       }
-
       return { status: "available", color: "default", text: "Available" };
     },
     [submissions]
@@ -348,14 +367,22 @@ const useStudentAssignmentSubmission = () => {
     isDraftDirty,
     error,
 
-    // Actions
+    // Actions with both naming conventions
     selectAssignment,
     updateAnswer,
+    onAnswerChange: updateAnswer, // Export as onAnswerChange
     addUploadedFile,
+    onFileChange: addUploadedFile, // Export as onFileChange
     removeUploadedFile,
+    onFileRemove: removeUploadedFile, // Export as onFileRemove
     saveDraft,
+    onSaveDraft: saveDraft, // Export as onSaveDraft
     submitAssignment,
+    onSubmit: submitAssignment, // Export as onSubmit
     fetchAvailableAssignments,
+    refreshAssignments: fetchAvailableAssignments, // Add alias
+    fetchAssignmentQuestions,
+    setSelectedAssignment,
 
     // Utilities
     getAssignmentStatus,

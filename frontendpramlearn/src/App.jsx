@@ -29,12 +29,14 @@ import StudentQuizList from "./features/student-interface/assessments/StudentQui
 import QuizTakingInterface from "./features/student-interface/assessments/components/QuizTakingInterface";
 import QuizResultsPage from "./features/student-interface/assessments/components/QuizResultsPage";
 import StudentAssignments from "./features/student-interface/assignments/StudentAssignments";
+import AssignmentSubmissionForm from "./features/student-interface/assignments/components/AssignmentSubmissionForm";
 import StudentGradeOverview from "./features/student-interface/grades/StudentGradeOverview";
 import StudentAnalytics from "./features/student-interface/analytics/StudentAnalytics";
 import StudentGroupDashboard from "./features/student-interface/group/StudentGroupDashboard";
 import StudentNotificationCenter from "./features/student-interface/notifications/StudentNotificationCenter";
 import GroupQuizInterface from "./features/student-interface/assessments/components/GroupQuizInterface";
 import GroupQuizResults from "./features/student-interface/group/components/GroupQuizResults";
+import SubmissionHistory from "./features/student-interface/assignments/components/SubmissionHistory";
 
 // Anti Design theme configuration
 const antdTheme = {
@@ -166,12 +168,23 @@ const AppRoutes = () => {
               element={<StudentMaterialViewer />}
             />
             <Route path="assessments" element={<StudentQuizList />} />
+
             <Route path="quiz/:quizSlug" element={<QuizTakingInterface />} />
             <Route
               path="quiz/:quizSlug/results"
               element={<QuizResultsPage />}
             />
+
             <Route path="assignments" element={<StudentAssignments />} />
+            <Route
+              path="assignments/:assignmentSlug"
+              element={<StudentAssignments />}
+            />
+            <Route
+              path="assignments/:assignmentSlug/results"
+              element={<StudentAssignments />}
+            />
+
             <Route path="grades" element={<StudentGradeOverview />} />
             <Route path="progress" element={<StudentAnalytics />} />
             <Route path="group" element={<StudentGroupDashboard />} />

@@ -59,7 +59,7 @@ const useGroupQuizCollaboration = (quizSlug) => {
       setGroupMembers(quizData.group?.members || []);
       setAnswers(quizData.current_answers || {});
       setTimeRemaining(quizData.time_remaining);
-      setIsSubmitted(quizData.is_completed || false);
+      setIsSubmitted(quizData.is_submitted || null);
 
       if (quizData.group?.id) {
         console.log("✅ Using group_id from API:", quizData.group.id);

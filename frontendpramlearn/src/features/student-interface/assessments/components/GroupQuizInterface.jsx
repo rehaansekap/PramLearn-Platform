@@ -41,12 +41,14 @@ import {
 import { AuthContext } from "../../../../context/AuthContext";
 import useGroupQuizCollaboration from "../hooks/useGroupQuizCollaboration";
 import QuizTimer from "./QuizTimer";
+import { useOnlineStatus } from "../../../../context/OnlineStatusContext";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
 const { useBreakpoint } = Grid;
 
 const GroupQuizInterface = () => {
+  const { isUserOnline, userStatuses } = useOnlineStatus();
   const { quizSlug } = useParams();
   const { user, token } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -452,16 +454,22 @@ const GroupQuizInterface = () => {
                     }}
                   >
                     <Badge
-                      status={
-                        onlineMembers.has(member.id) ? "success" : "default"
-                      }
+                      status={isUserOnline(member) ? "success" : "default"}
+                      //add green border if online
+                      style={{
+                        border: isUserOnline(member.is_current_user)
+                          ? "2px solid #52c41a"
+                          : "none",
+                      }}
                       dot
                     >
                       <Avatar size="small" icon={<UserOutlined />} />
                     </Badge>
                     <div style={{ flex: 1 }}>
                       <Text strong={member.is_current_user}>
-                        {member.full_name}
+                        {member.full_name ||
+                          `${member.first_name} ${member.last_name}` ||
+                          member.username}
                       </Text>
                       {member.is_current_user && (
                         <Tag
@@ -474,7 +482,7 @@ const GroupQuizInterface = () => {
                       )}
                       <br />
                       <Text type="secondary" style={{ fontSize: 11 }}>
-                        {onlineMembers.has(member.id) ? "Online" : "Offline"}
+                        {isUserOnline(member) ? "Online" : "Offline"}
                       </Text>
                     </div>
                   </div>
@@ -1137,7 +1145,18 @@ const GroupQuizInterface = () => {
         width={500}
       >
         <Space direction="vertical" style={{ width: "100%" }}>
-          <Text>Apakah Anda yakin ingin submit quiz untuk kelompok?</Text>
+          <Text
+            style={{
+              // make it center with justify center
+              textAlign: "center",
+              alignItems: "center",
+              display: "flex",
+              justifyContent: "center",
+              color: "#1f2937",
+            }}
+          >
+            Apakah Anda yakin ingin submit quiz untuk kelompok?
+          </Text>
           <div
             style={{
               background: "#f6f6f6",

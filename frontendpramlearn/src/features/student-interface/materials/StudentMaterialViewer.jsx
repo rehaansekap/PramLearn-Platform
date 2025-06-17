@@ -436,7 +436,10 @@ const StudentMaterialViewer = () => {
             key="quiz"
           >
             <div style={{ padding: "24px" }}>
-              <MaterialQuizList quizzes={material.quizzes || []} />
+              <MaterialQuizList
+                quizzes={material.quizzes || []}
+                material={material} // TAMBAHKAN INI - Pass material data
+              />
             </div>
           </TabPane>
 
@@ -453,6 +456,7 @@ const StudentMaterialViewer = () => {
             <div style={{ padding: "24px" }}>
               <MaterialAssignmentList
                 assignments={material.assignments || []}
+                material={material} // TAMBAHKAN INI - Pass material data
               />
             </div>
           </TabPane>

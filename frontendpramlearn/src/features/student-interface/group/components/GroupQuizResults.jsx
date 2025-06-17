@@ -41,15 +41,18 @@ const { Title, Text } = Typography;
 const { useBreakpoint } = Grid;
 
 const QuizResultsPage = () => {
+  const [currentPage, setCurrentPage] = useState(1);
   const { quizSlug } = useParams();
   const navigate = useNavigate();
-  const screens = useBreakpoint();
-  const isMobile = !screens.md;
 
   const [results, setResults] = useState(null);
   const [quizDetails, setQuizDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const screens = useBreakpoint();
+  const isMobile = !screens.md;
+  const pageSize = isMobile ? 3 : 5;
 
   useEffect(() => {
     const fetchResults = async () => {
@@ -454,24 +457,6 @@ const QuizResultsPage = () => {
                 marginBottom: 16,
               }}
             >
-              {/* Debug info - remove after fixing */}
-              {process.env.NODE_ENV === "development" && (
-                <div
-                  style={{
-                    marginBottom: 16,
-                    padding: 8,
-                    background: "#f0f0f0",
-                    fontSize: 12,
-                  }}
-                >
-                  <div>
-                    Group Members Count: {results?.group_members?.length || 0}
-                  </div>
-                  <div>Answers Count: {results?.answers?.length || 0}</div>
-                  <div>Total Questions: {results?.total_questions || 0}</div>
-                </div>
-              )}
-
               <Table
                 dataSource={
                   results?.group_members?.map((member, index) => ({
@@ -838,11 +823,40 @@ const QuizResultsPage = () => {
               itemLayout="vertical"
               dataSource={results.answers || []}
               pagination={{
-                pageSize: isMobile ? 5 : 5,
+                pageSize: pageSize,
                 showSizeChanger: false,
-                style: { textAlign: "center", marginTop: 24 },
-                showTotal: (total, range) =>
-                  `${range[0]}-${range[1]} dari ${total} soal`,
+                style: {
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginTop: 24,
+                  gap: isMobile ? 0 : 0,
+                  flexWrap: "wrap",
+                },
+                showTotal: (total, range) => (
+                  <div
+                    style={{
+                      textAlign: "center",
+                      marginBottom: isMobile ? 8 : 0,
+                      marginRight: isMobile ? 0 : 16, // Margin kanan untuk desktop
+                      minWidth: isMobile ? "100%" : "auto",
+                      fontSize: isMobile ? 13 : 14,
+                      fontWeight: 500,
+                      color: "#333",
+                      display: "block",
+                      order: isMobile ? -1 : 0, // Tampil di atas pada mobile
+                    }}
+                  >
+                    {`${range[0]}-${range[1]} dari ${total} soal`}
+                  </div>
+                ),
+                current: currentPage,
+                onChange: (page) => setCurrentPage(page),
+                position: "bottom",
+                itemRender: (page, type, originalElement) => {
+                  return originalElement;
+                },
               }}
               renderItem={(answer, index) => (
                 <List.Item

@@ -1,67 +1,201 @@
-import React, { useState } from "react";
-import { Spin, Alert } from "antd";
+import React, { useEffect, useState, useCallback } from "react";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
+import { Spin, Alert, Button } from "antd";
 import StudentAssignmentList from "./components/StudentAssignmentList";
 import AssignmentSubmissionForm from "./components/AssignmentSubmissionForm";
 import SubmissionHistory from "./components/SubmissionHistory";
 import useStudentAssignmentSubmission from "./hooks/useStudentAssignmentSubmission";
 
 const StudentAssignments = () => {
-  const [currentView, setCurrentView] = useState("list"); // list, submit, history
+  const { assignmentSlug } = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
 
+  // Custom hook untuk fetch data assignment & submission
   const {
-    // Data
     assignments,
     selectedAssignment,
     assignmentQuestions,
     submissions,
+    currentSubmission,
+    loading,
+    error,
+    getAssignmentStatus,
+    setSelectedAssignment,
+    getTimeRemaining,
     answers,
     uploadedFiles,
-
-    // States
-    loading,
     submitting,
     draftSaving,
     isDraftDirty,
-    error,
-
-    // Actions
-    selectAssignment,
+    // onAnswerChange, // Remove this line - it doesn't exist in the hook
+    // onFileChange,   // Remove this line - it doesn't exist in the hook
+    // onFileRemove,   // Remove this line - it doesn't exist in the hook
+    // onSaveDraft,    // Remove this line - it doesn't exist in the hook
+    // onSubmit,       // Remove this line - it doesn't exist in the hook
+    refreshAssignments,
+    fetchAssignmentQuestions,
     updateAnswer,
     addUploadedFile,
     removeUploadedFile,
     saveDraft,
     submitAssignment,
-
-    // Utilities
-    getAssignmentStatus,
-    getTimeRemaining,
   } = useStudentAssignmentSubmission();
 
-  const handleSelectAssignment = async (assignment) => {
-    console.log("Handling assignment selection:", assignment);
-    try {
-      await selectAssignment(assignment);
-      const status = getAssignmentStatus(assignment);
+  const [currentView, setCurrentView] = useState("list");
+  const [notFound, setNotFound] = useState(false);
 
-      if (status.status === "submitted" || status.status === "graded") {
+  // Otomatis pilih assignment jika akses langsung via slug
+  useEffect(() => {
+    if (assignmentSlug && assignments.length > 0 && !selectedAssignment) {
+      const found = assignments.find(
+        (a) =>
+          a.slug === assignmentSlug ||
+          (a.title &&
+            a.title
+              .toLowerCase()
+              .replace(/\s+/g, "-")
+              .replace(/[^a-z0-9-]/g, "") === assignmentSlug)
+      );
+      if (found) {
+        setSelectedAssignment(found);
+      } else {
+        setNotFound(true);
+      }
+    }
+  }, [assignmentSlug, assignments, selectedAssignment, setSelectedAssignment]);
+
+  useEffect(() => {
+    if (selectedAssignment?.id && currentView === "submit") {
+      console.log(
+        "🔄 Fetching questions for assignment:",
+        selectedAssignment.id
+      );
+      // Pastikan hook memiliki fungsi fetchAssignmentQuestions yang exposed
+      fetchAssignmentQuestions(selectedAssignment.id);
+    }
+  }, [selectedAssignment?.id, currentView]);
+
+  // Atur currentView berdasarkan status assignment & URL
+  useEffect(() => {
+    if (notFound) {
+      setCurrentView("notfound");
+      return;
+    }
+    if (assignmentSlug && selectedAssignment) {
+      const status = getAssignmentStatus(selectedAssignment);
+      if (
+        location.pathname.endsWith("/results") ||
+        status.status === "submitted" ||
+        status.status === "graded"
+      ) {
         setCurrentView("history");
       } else {
         setCurrentView("submit");
       }
-    } catch (error) {
-      console.error("Error selecting assignment:", error);
+    } else if (!assignmentSlug) {
+      setCurrentView("list");
     }
-  };
+  }, [
+    assignmentSlug,
+    selectedAssignment,
+    location.pathname,
+    getAssignmentStatus,
+    notFound,
+  ]);
 
-  const handleBackToList = () => {
+  // Handler untuk kembali ke daftar assignment
+  const handleBackToList = useCallback(() => {
+    // Clear states
+    setSelectedAssignment(null);
     setCurrentView("list");
-  };
 
-  const handleSubmitSuccess = () => {
-    setCurrentView("history");
-  };
+    // Navigate ke route list tanpa slug
+    navigate("/student/assignments", { replace: true });
+  }, [navigate, setSelectedAssignment]);
 
-  // Render based on current view
+  // Handler ketika memilih assignment dari list
+  const handleSelectAssignment = useCallback(
+    (assignment) => {
+      setSelectedAssignment(assignment);
+      const status = getAssignmentStatus(assignment);
+      if (status.status === "submitted" || status.status === "graded") {
+        setCurrentView("history");
+        navigate(
+          `/student/assignments/${
+            assignment.slug ||
+            assignment.title
+              .toLowerCase()
+              .replace(/\s+/g, "-")
+              .replace(/[^a-z0-9-]/g, "")
+          }/results`
+        );
+      } else {
+        setCurrentView("submit");
+        navigate(
+          `/student/assignments/${
+            assignment.slug ||
+            assignment.title
+              .toLowerCase()
+              .replace(/\s+/g, "-")
+              .replace(/[^a-z0-9-]/g, "")
+          }`
+        );
+      }
+    },
+    [getAssignmentStatus, navigate, setSelectedAssignment]
+  );
+
+  // Render error jika assignment tidak ditemukan
+  if (currentView === "notfound") {
+    return (
+      <div style={{ textAlign: "center", padding: "40px 0" }}>
+        <Alert
+          message="Assignment tidak ditemukan"
+          description="Assignment yang Anda cari tidak tersedia atau sudah dihapus."
+          type="warning"
+          showIcon
+          style={{ borderRadius: 12, maxWidth: 500, margin: "0 auto" }}
+          action={
+            <Button type="primary" onClick={handleBackToList}>
+              Kembali ke Daftar Assignment
+            </Button>
+          }
+        />
+      </div>
+    );
+  }
+
+  // Render loading
+  if (loading) {
+    return (
+      <div style={{ textAlign: "center", padding: "60px 0" }}>
+        <Spin size="large" tip="Memuat data assignment..." />
+      </div>
+    );
+  }
+
+  // Render error umum
+  if (error) {
+    return (
+      <div style={{ textAlign: "center", padding: "60px 0" }}>
+        <Alert
+          message="Terjadi kesalahan"
+          description={error}
+          type="error"
+          showIcon
+          style={{ borderRadius: 12, maxWidth: 500, margin: "0 auto" }}
+          action={
+            <Button type="primary" onClick={refreshAssignments}>
+              Coba Lagi
+            </Button>
+          }
+        />
+      </div>
+    );
+  }
+
+  // Render daftar assignment
   if (currentView === "list") {
     return (
       <StudentAssignmentList
@@ -75,6 +209,7 @@ const StudentAssignments = () => {
     );
   }
 
+  // Render form pengerjaan assignment
   if (currentView === "submit" && selectedAssignment) {
     return (
       <AssignmentSubmissionForm
@@ -85,34 +220,31 @@ const StudentAssignments = () => {
         submitting={submitting}
         draftSaving={draftSaving}
         isDraftDirty={isDraftDirty}
-        onAnswerChange={updateAnswer}
+        onAnswerChange={updateAnswer} // Make sure this is updateAnswer, not undefined
         onFileChange={addUploadedFile}
         onFileRemove={removeUploadedFile}
         onSaveDraft={saveDraft}
-        onSubmit={async (assignmentId, data) => {
-          const success = await submitAssignment(assignmentId, data);
-          if (success) {
-            handleSubmitSuccess();
-          }
-          return success;
-        }}
+        onSubmit={submitAssignment}
         onBack={handleBackToList}
         getTimeRemaining={getTimeRemaining}
+        updateAnswer={updateAnswer} // Remove this duplicate prop
+        currentSubmission={currentSubmission}
       />
     );
   }
 
+  // Render riwayat submission
   if (currentView === "history" && selectedAssignment) {
     return (
       <SubmissionHistory
-        submissions={submissions}
-        assignment={selectedAssignment}
         onBack={handleBackToList}
+        assignment={selectedAssignment}
+        submissions={submissions}
       />
     );
   }
 
-  // Fallback loading state
+  // Fallback loading
   return (
     <div style={{ textAlign: "center", padding: "40px 0" }}>
       <Spin size="large" tip="Loading..." />
