@@ -45,16 +45,22 @@ class StudentGroupQuizListView(APIView):
                     'title': quiz.title,
                     'content': quiz.content,
                     'slug': quiz.slug,
-                    'is_group_quiz': True,  # Pastikan ini ada
+                    'is_group_quiz': True,
                     'end_time': group_quiz.end_time,
                     'group_name': group_quiz.group.name,
                     'group_id': group_quiz.group.id,
                     'is_completed': is_completed,
                     'score': result.score if result else None,
                     'completed_at': result.completed_at if result else None,
-                    'questions_count': quiz.questions.count(),  # Tambah ini
-                    # Tambah ini
+                    'questions_count': quiz.questions.count(),
                     'duration': quiz.duration if hasattr(quiz, 'duration') else None,
+
+                    # TAMBAHKAN INI - Informasi Subject dan Material
+                    'subject_name': quiz.material.subject.name if quiz.material and quiz.material.subject else None,
+                    'subject_id': quiz.material.subject.id if quiz.material and quiz.material.subject else None,
+                    'material_name': quiz.material.title if quiz.material else None,
+                    'material_id': quiz.material.id if quiz.material else None,
+                    'material_slug': quiz.material.slug if quiz.material else None,
                 }
 
                 quiz_data.append(quiz_info)
@@ -119,8 +125,23 @@ class GroupQuizDetailView(APIView):
                     quiz_score = quiz_result.score
                 except GroupQuizResult.DoesNotExist:
                     # Calculate score if result doesn't exist
-                    quiz_result = group_quiz.calculate_and_save_score()
-                    quiz_score = quiz_result.score
+                    return Response({
+                        'id': quiz.id,
+                        'title': quiz.title,
+                        'content': quiz.content,
+                        'slug': quiz.slug,
+                        'is_completed': False,
+                        'is_submitted': False,
+                        'score': quiz_score,
+                        'completed_at': quiz_result.completed_at if quiz_result else None,
+                        'group': {
+                            'id': user_group.group.id,
+                            'name': user_group.group.name,
+                            'code': user_group.group.code,
+                        },
+                        'questions_count': quiz.questions.count(),
+                        'total_questions': quiz.questions.count(),
+                    }, status=status.HTTP_200_OK)
 
             # If completed, return completed status
             if is_quiz_completed:
@@ -216,8 +237,7 @@ class GroupQuizDetailView(APIView):
         answered_questions = GroupQuizSubmission.objects.filter(
             group_quiz=group_quiz
         ).count()
-
-        return answered_questions >= total_questions
+        return group_quiz.submitted_at is not None
 
     def calculate_time_remaining(self, group_quiz):
         """Calculate remaining time in seconds"""

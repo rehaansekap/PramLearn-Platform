@@ -1,9 +1,10 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework import status
+from rest_framework import status, permissions
 from django.utils import timezone
 from django.db.models import Q, Prefetch
+from django.utils.text import slugify
 from pramlearnapp.permissions import IsStudentUser
 from pramlearnapp.models import (
     Assignment, AssignmentQuestion, AssignmentSubmission,
@@ -69,14 +70,41 @@ class StudentAvailableAssignmentsView(APIView):
                 'questions'
             ).order_by('-created_at')
 
-            # Serialize with student context
-            serializer = StudentAssignmentSerializer(
-                assignments,
-                many=True,
-                context={'request': request, 'student': user}
-            )
+            # UBAH: Manual serialization dengan informasi submission
+            assignment_data = []
+            for assignment in assignments:
+                # Cek submission untuk assignment ini
+                submission = AssignmentSubmission.objects.filter(
+                    student=user,
+                    assignment=assignment,
+                    is_draft=False  # Hanya submission final
+                ).first()
 
-            return Response(serializer.data)
+                # Get questions count
+                questions_count = assignment.questions.count()
+
+                # Get subject name
+                subject_name = assignment.material.subject.name if assignment.material.subject else 'Unknown'
+
+                assignment_dict = {
+                    'id': assignment.id,
+                    'title': assignment.title,
+                    'description': assignment.description,
+                    'due_date': assignment.due_date.isoformat(),
+                    'created_at': assignment.created_at.isoformat() if hasattr(assignment, 'created_at') else None,
+                    'questions_count': questions_count,
+                    'subject_name': subject_name,
+                    'material_title': assignment.material.title,
+                    'slug': assignment.slug,
+                    # TAMBAHKAN informasi submission
+                    'submission_id': submission.id if submission else None,
+                    'submitted_at': submission.submission_date.isoformat() if submission else None,
+                    'grade': submission.grade if submission else None,
+                    'is_submitted': submission is not None,
+                }
+                assignment_data.append(assignment_dict)
+
+            return Response(assignment_data, status=status.HTTP_200_OK)
 
         except Exception as e:
             return Response(
@@ -216,7 +244,7 @@ class StudentAssignmentDraftView(APIView):
 
 
 class StudentAssignmentSubmitView(APIView):
-    permission_classes = [IsAuthenticated, IsStudentUser]
+    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, assignment_id):
         """Submit assignment"""
@@ -240,107 +268,65 @@ class StudentAssignmentSubmitView(APIView):
                     status=status.HTTP_403_FORBIDDEN
                 )
 
-            # Check if already submitted
+            # PERBAIKAN: Check if already submitted (final submission)
             existing_submission = AssignmentSubmission.objects.filter(
                 student=user,
                 assignment=assignment
             ).first()
 
+            print(f"🔍 Checking existing submission: {existing_submission}")
             if existing_submission:
+                print(f"📋 Submission is_draft: {existing_submission.is_draft}")
+
+            # UBAH KONDISI INI: Hanya tolak jika submission sudah final (is_draft=False)
+            if existing_submission and not existing_submission.is_draft:
+                print("❌ Assignment already submitted (not draft)")
                 return Response(
                     {"detail": "Assignment already submitted"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
-            # Check due date (optional - allow late submission)
-            is_late = timezone.now() > assignment.due_date
-
-            # Create submission
-            submission = AssignmentSubmission.objects.create(
-                student=user,
-                assignment=assignment,
-                submission_date=timezone.now()
-            )
-
-            # Handle answers from request data
-            answers_data = {}
-            for key, value in request.data.items():
-                if key.startswith('answers[') and key.endswith(']'):
-                    # Extract question ID from answers[123] format
-                    question_id = key[8:-1]  # Remove 'answers[' and ']'
-                    try:
-                        question_id = int(question_id)
-                        answers_data[question_id] = value
-                    except ValueError:
-                        continue
-
-            # Create answer records
-            for question_id, answer_value in answers_data.items():
-                try:
-                    question = AssignmentQuestion.objects.get(
-                        id=question_id, assignment=assignment)
-
-                    # Create answer - handle both multiple choice and essay
-                    if question.choice_a:  # Multiple choice
-                        AssignmentAnswer.objects.create(
-                            submission=submission,
-                            question=question,
-                            selected_choice=answer_value,
-                            answer_text=None
-                        )
-                    else:  # Essay question
-                        AssignmentAnswer.objects.create(
-                            submission=submission,
-                            question=question,
-                            selected_choice=None,
-                            answer_text=answer_value
-                        )
-                except AssignmentQuestion.DoesNotExist:
-                    continue
-
-            # Handle file uploads
-            uploaded_files = []
-            if 'files' in request.FILES:
-                files = request.FILES.getlist('files')
-                for file in files:
-                    # Save file and store reference
-                    file_path = default_storage.save(
-                        f'assignment_submissions/{submission.id}/{file.name}',
-                        file
-                    )
-                    uploaded_files.append({
-                        'name': file.name,
-                        'path': file_path,
-                        'size': file.size,
-                        'url': default_storage.url(file_path)
-                    })
-
-            # Update submission with files
-            if uploaded_files:
-                submission.files = uploaded_files
+            # Create or update submission
+            if not existing_submission:
+                # Create new submission
+                submission = AssignmentSubmission.objects.create(
+                    student=user,
+                    assignment=assignment,
+                    submission_date=timezone.now(),
+                    is_draft=False  # Mark as final submission
+                )
+                print(f"✅ New final submission created: {submission.id}")
+            else:
+                # Update existing draft to final
+                submission = existing_submission
+                submission.submission_date = timezone.now()
+                submission.is_draft = False  # Mark as final
                 submission.save()
+                print(f"🔄 Draft submission finalized: {submission.id}")
 
-            # Calculate grade for multiple choice questions
-            submission.calculate_and_save_grade()
-
-            # Clean up draft
-            StudentAssignmentDraft.objects.filter(
-                student=user,
-                assignment=assignment
-            ).delete()
+            # Calculate grade
+            submission.calculate_and_save_score()
+            print(f"📊 Grade calculated: {submission.grade}")
 
             return Response({
-                'id': submission.id,
-                'submission_date': submission.submission_date,
-                'grade': submission.grade,
-                'is_late': is_late,
-                'message': 'Assignment submitted successfully'
+                "message": "Assignment submitted successfully",
+                "submission_id": submission.id,
+                "grade": submission.grade
             }, status=status.HTTP_201_CREATED)
 
         except Assignment.DoesNotExist:
             return Response(
                 {"detail": "Assignment not found"},
                 status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            print(f"❌ Error submitting assignment: {str(e)}")
+            import traceback
+            print(f"❌ Traceback: {traceback.format_exc()}")
+
+            return Response(
+                {"detail": "Internal server error"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
 
@@ -376,4 +362,76 @@ class StudentAssignmentSubmissionsView(APIView):
             return Response(
                 {"detail": "Assignment not found"},
                 status=status.HTTP_404_NOT_FOUND
+            )
+
+
+class StudentAssignmentBySlugView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, assignment_slug):
+        try:
+            # Cari assignment berdasarkan slug
+            assignment = Assignment.objects.select_related(
+                'material__subject'
+            ).prefetch_related('questions').get(slug=assignment_slug)
+
+            # Verify student has access to this assignment
+            user = request.user
+            class_students = ClassStudent.objects.filter(student=user)
+            class_ids = class_students.values_list("class_id", flat=True)
+            subject_classes = SubjectClass.objects.filter(
+                class_id__in=class_ids,
+                subject=assignment.material.subject
+            )
+
+            if not subject_classes.exists():
+                return Response(
+                    {"error": "You don't have access to this assignment"},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+
+            # Get assignment data
+            assignment_data = {
+                'id': assignment.id,
+                'title': assignment.title,
+                'description': assignment.description,
+                'due_date': assignment.due_date.isoformat(),
+                'slug': assignment.slug,
+                'material_title': assignment.material.title,
+                'subject_name': assignment.material.subject.name,
+                'questions_count': assignment.questions.count(),
+            }
+
+            # Get submissions for this assignment and user
+            submissions = AssignmentSubmission.objects.filter(
+                assignment=assignment,
+                student=user,
+                is_draft=False  # Only final submissions
+            ).order_by('-submission_date')
+
+            submissions_data = []
+            for submission in submissions:
+                submissions_data.append({
+                    'id': submission.id,
+                    'submission_date': submission.submission_date.isoformat(),
+                    'grade': submission.grade,
+                    'teacher_feedback': submission.teacher_feedback,
+                    'is_draft': submission.is_draft,
+                })
+
+            return Response({
+                'assignment': assignment_data,
+                'submissions': submissions_data
+            }, status=status.HTTP_200_OK)
+
+        except Assignment.DoesNotExist:
+            return Response(
+                {"error": "Assignment not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            print(f"Error in StudentAssignmentBySlugView: {str(e)}")
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )

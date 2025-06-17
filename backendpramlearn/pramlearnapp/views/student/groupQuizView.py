@@ -45,6 +45,40 @@ class GroupQuizDetailView(APIView):
                     status=status.HTTP_404_NOT_FOUND
                 )
 
+            # ✅ PERBAIKAN: Check submission status FIRST
+            is_quiz_submitted = self.is_quiz_submitted(group_quiz)
+
+            # If submitted, return completed status with results
+            if is_quiz_submitted:
+                try:
+                    quiz_result = GroupQuizResult.objects.get(
+                        group_quiz=group_quiz)
+                    quiz_score = quiz_result.score
+                except GroupQuizResult.DoesNotExist:
+                    quiz_score = 0
+
+                return Response({
+                    'id': quiz.id,
+                    'title': quiz.title,
+                    'content': quiz.content,
+                    'slug': quiz.slug,
+                    'is_completed': True,
+                    'score': quiz_score,
+                    'completed_at': quiz_result.completed_at if quiz_result else None,
+                    'group': {
+                        'id': user_group.group.id,
+                        'name': user_group.group.name,
+                        'code': user_group.group.code,
+                    },
+                    'questions_count': quiz.questions.count(),
+                    'total_questions': quiz.questions.count(),
+                }, status=status.HTTP_200_OK)
+
+            # ✅ HAPUS LOGIKA AUTO-COMPLETION INI:
+            # Jangan otomatis menganggap quiz selesai hanya karena semua soal terjawab
+            # Quiz hanya dianggap selesai jika user benar-benar submit
+
+            # Continue dengan logic normal untuk quiz yang masih aktif
             # Get current submissions
             submissions = GroupQuizSubmission.objects.filter(
                 group_quiz=group_quiz
@@ -98,7 +132,8 @@ class GroupQuizDetailView(APIView):
                     'members': members_data
                 },
                 'current_answers': current_answers,
-                'is_submitted': self.is_quiz_submitted(group_quiz),
+                'is_submitted': False,  # ✅ Quiz belum di-submit
+                'is_completed': False,  # ✅ Quiz belum selesai
                 'time_remaining': self.calculate_time_remaining(group_quiz)
             }
 
@@ -116,13 +151,10 @@ class GroupQuizDetailView(APIView):
             )
 
     def is_quiz_submitted(self, group_quiz):
-        """Check if quiz is completed by checking if all questions are answered"""
-        total_questions = group_quiz.quiz.questions.count()
-        answered_questions = GroupQuizSubmission.objects.filter(
-            group_quiz=group_quiz
-        ).count()
+        """Check if quiz is already submitted"""
+        return group_quiz.submitted_at is not None
 
-        return answered_questions >= total_questions
+    # ✅ HAPUS method is_all_questions_answered karena tidak diperlukan lagi
 
     def calculate_time_remaining(self, group_quiz):
         """Calculate remaining time in seconds"""
@@ -174,8 +206,9 @@ class SubmitGroupQuizView(APIView):
             # Calculate and save score
             result = group_quiz.calculate_and_save_score()
 
-            # ENSURE is_completed is set to True
+            # PASTIKAN kedua field di-set dengan benar
             group_quiz.is_completed = True
+            group_quiz.submitted_at = timezone.now()
             group_quiz.save()
 
             # Get detailed results
@@ -204,12 +237,8 @@ class SubmitGroupQuizView(APIView):
             )
 
     def is_quiz_submitted(self, group_quiz):
-        """Check if quiz is already submitted"""
-        try:
-            GroupQuizResult.objects.get(group_quiz=group_quiz)
-            return True
-        except GroupQuizResult.DoesNotExist:
-            return False
+        """Check if quiz is already submitted by checking submitted_at field"""
+        return group_quiz.submitted_at is not None
 
 
 class GroupQuizResultsView(APIView):

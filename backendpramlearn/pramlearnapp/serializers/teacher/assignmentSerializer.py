@@ -28,10 +28,14 @@ class AssignmentAnswerSerializer(serializers.ModelSerializer):
 
 class AssignmentSerializer(serializers.ModelSerializer):
     questions = AssignmentQuestionSerializer(many=True, read_only=True)
+    slug = serializers.SerializerMethodField()
+
+    def get_slug(self, obj):
+        return obj.title.lower().replace(' ', '-').replace('[^a-z0-9-]', '')
 
     class Meta:
         model = Assignment
-        fields = ['id', 'material', 'title',
+        fields = ['id', 'material', 'title', 'slug',
                   'description', 'due_date', 'questions']
 
 

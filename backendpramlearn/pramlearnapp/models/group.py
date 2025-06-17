@@ -35,9 +35,17 @@ class GroupQuiz(models.Model):
     end_time = models.DateTimeField(null=True, blank=True)
     is_completed = models.BooleanField(
         default=False)  # Track completion status
+    submitted_at = models.DateTimeField(
+        null=True, blank=True)  # ADD THIS FIELD
+
+    class Meta:
+        unique_together = ('quiz', 'group')
+
+    def __str__(self):
+        return f"{self.group.name} - {self.quiz.title}"
 
     def calculate_and_save_score(self):
-        # timezone is now imported at the top
+        """Calculate and save score - hanya dipanggil saat submit"""
         from django.utils import timezone
 
         questions = self.quiz.questions.all()
@@ -60,11 +68,12 @@ class GroupQuiz(models.Model):
 
         if not created:
             result.score = score
-            result.updated_at = timezone.now()
+            result.completed_at = timezone.now()  # ✅ Update completion time
             result.save()
 
-        # Mark as completed
+        # ✅ PENTING: Set kedua field ini bersamaan saat submit
         self.is_completed = True
+        self.submitted_at = timezone.now()
         self.save()
 
         return result
@@ -150,6 +159,13 @@ class GroupQuizResult(models.Model):
     completed_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        import traceback
+        print(f"🔍 GroupQuizResult.save() called for {self}")
+        print(f"🔍 Call stack:")
+        traceback.print_stack()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.group_quiz.group.name} - {self.group_quiz.quiz.title}: {self.score}"

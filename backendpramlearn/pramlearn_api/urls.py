@@ -20,7 +20,8 @@ from pramlearnapp.views import (RoleViewSet, UserViewSet, RegisterView, LoginVie
                                 StudentAvailableAssignmentsView, StudentAssignmentQuestionsView, StudentAssignmentDraftView, StudentAssignmentSubmitView, StudentAssignmentSubmissionsView,
                                 StudentGradesView, StudentGradeAnalyticsView, QuizAttemptReviewView, AssignmentSubmissionFeedbackView, ScheduleViewSet, StudentActivityViewSet,
                                 MaterialAccessView, StudentUpcomingDeadlinesView, StudentQuickActionsView, StudentMaterialProgressView, StudentMaterialBookmarkView, StudentMaterialAccessView,
-                                StudentMaterialActivityView, GroupQuizDetailView, SubmitGroupQuizView, GroupQuizResultsView, StudentGroupQuizListView, SaveGroupQuizAnswerView
+                                StudentMaterialActivityView, GroupQuizDetailView, SubmitGroupQuizView, GroupQuizResultsView, StudentGroupQuizListView, SaveGroupQuizAnswerView,
+                                AssignmentSubmissionDetailView, StudentAssignmentBySlugView
                                 )
 from pramlearnapp.views.teacher.relatedUsersView import CurrentUserView
 
@@ -41,7 +42,6 @@ router.register(r'materials', MaterialViewSet, basename="materials")
 router.register(r'assignments', AssignmentViewSet)
 router.register(r'assignment-submissions', AssignmentSubmissionViewSet)
 router.register(r'assignment-questions', AssignmentQuestionViewSet)
-router.register(r'assignment-answers', AssignmentAnswerViewSet)
 router.register(r'quizzes', QuizViewSet)
 router.register(r'groups', GroupViewSet)
 router.register(r'group-members', GroupMemberViewSet)
@@ -73,6 +73,8 @@ urlpatterns = [
     path('api/student/group-quiz/<slug:quiz_slug>/save-answer/',
          SaveGroupQuizAnswerView.as_view(), name='save-group-quiz-answer'),
 
+    path('api/assignment-answers/', AssignmentAnswerViewSet.as_view(),
+         name='assignment-answers'),
     path('api/student/assignments/available/',
          StudentAvailableAssignmentsView.as_view(),
          name='student-available-assignments'),
@@ -88,13 +90,22 @@ urlpatterns = [
     path('api/student/assignment/<int:assignment_id>/submissions/',
          StudentAssignmentSubmissionsView.as_view(),
          name='student-assignment-submissions'),
+    path('api/student/assignments/<str:assignment_slug>/results/',
+         StudentAssignmentBySlugView.as_view(), name='student-assignment-by-slug'),
+    path('api/student/assignment-submission/<int:submission_id>/feedback/',
+         AssignmentSubmissionFeedbackView.as_view(), name='assignment-submission-feedback'),
+    path('api/student/assignment-submission/<int:submission_id>/details/',
+         AssignmentSubmissionDetailView.as_view(),
+         name='assignment-submission-details'),
+
+
     path('api/student/grades/', StudentGradesView.as_view(), name='student-grades'),
     path('api/student/analytics/grade-trends/',
          StudentGradeAnalyticsView.as_view(), name='student-grade-analytics'),
     path('api/student/quiz-attempt/<int:attempt_id>/review/',
          QuizAttemptReviewView.as_view(), name='quiz-attempt-review'),
-    path('api/student/assignment-submission/<int:submission_id>/feedback/',
-         AssignmentSubmissionFeedbackView.as_view(), name='assignment-submission-feedback'),
+
+
     path('api/student/materials/<int:material_id>/access/',
          MaterialAccessView.as_view(), name='material-access'),
     path('api/student/upcoming-deadlines/',

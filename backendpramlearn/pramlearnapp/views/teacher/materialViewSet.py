@@ -55,6 +55,20 @@ class MaterialDetailView(generics.RetrieveAPIView):
             raise Http404("Material not found")
         return super().get(request, *args, **kwargs)
 
+    def get_object(self):
+        return Material.objects.select_related('subject').prefetch_related(
+            'pdf_files',
+            'youtube_videos',
+            'quizzes',
+            'assignments',
+            'assignments__assignmentsubmission_set'  # Prefetch submissions
+        ).get(slug=self.kwargs['slug'])
+
+    # def get_object(self):
+    #     return Material.objects.select_related('subject').prefetch_related(
+    #         'pdf_files', 'youtube_videos', 'quizzes', 'assignments'
+    #     ).get(slug=self.kwargs['slug'])
+
 
 class MaterialAccessView(APIView):
     permission_classes = [IsAuthenticated]

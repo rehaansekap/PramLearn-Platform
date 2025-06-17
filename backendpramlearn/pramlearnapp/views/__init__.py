@@ -10,7 +10,7 @@ from pramlearnapp.views.student.attendanceView import MaterialAttendanceListView
 from pramlearnapp.views.student.studentAssignmentViewSet import (
     StudentAvailableAssignmentsView, StudentAssignmentQuestionsView,
     StudentAssignmentDraftView, StudentAssignmentSubmitView,
-    StudentAssignmentSubmissionsView
+    StudentAssignmentSubmissionsView, StudentAssignmentBySlugView
 )
 from pramlearnapp.views.student.studentUpcomingDeadlinesView import StudentUpcomingDeadlinesView
 from pramlearnapp.views.student.studentQuickActionsView import StudentQuickActionsView
@@ -35,7 +35,7 @@ from pramlearnapp.views.teacher.classViewSet import (
 )
 from pramlearnapp.views.teacher.assignmentViewSet import (
     AssignmentViewSet, AssignmentSubmissionViewSet,
-    AssignmentQuestionViewSet, AssignmentAnswerViewSet, SubmitAssignmentView
+    AssignmentQuestionViewSet, AssignmentAnswerViewSet, SubmitAssignmentView, AssignmentSubmissionDetailView,
 )
 from pramlearnapp.views.teacher.relatedUsersView import RelatedUsersForTeacherView, CurrentUserView
 from pramlearnapp.views.student.studentDashboardView import StudentDashboardView
@@ -57,7 +57,7 @@ __all__ = [
     "StudentMotivationProfileView", "UploadARCSCSVView", "StudentViewSet",
     "MaterialAttendanceListView", "update_attendance", "bulk_create_attendance",
     "StudentAvailableAssignmentsView", "StudentAssignmentQuestionsView", "StudentAssignmentDraftView",
-    "StudentAssignmentSubmitView", "StudentAssignmentSubmissionsView",
+    "StudentAssignmentSubmitView", "StudentAssignmentSubmissionsView", "StudentAssignmentBySlugView",
     "StudentGradesView", "StudentGradeAnalyticsView", "QuizAttemptReviewView", "AssignmentSubmissionFeedbackView",
     "ScheduleViewSet", "StudentActivityViewSet", "StudentUpcomingDeadlinesView", "StudentQuickActionsView",
     "StudentMaterialProgressView", "StudentMaterialBookmarkView", "StudentMaterialAccessView", "StudentMaterialActivityView",
@@ -67,7 +67,7 @@ __all__ = [
     "MaterialAccessView", "AssignQuizToGroupsView", "GroupViewSet", "GroupMemberViewSet", "GroupQuizViewSet", "GroupQuizSubmissionViewSet",
     "GroupQuizResultViewSet", "AutoGroupStudentsView", "FileUploadView", "FileDeleteView", "ClassViewSet",
     "ClassDetailPage", "ClassWithStudentsViewSet", "SubjectClassViewSet", "SubjectClassDetail",
-    "AssignmentViewSet", "AssignmentSubmissionViewSet", "AssignmentQuestionViewSet", "AssignmentAnswerViewSet",
+    "AssignmentViewSet", "AssignmentSubmissionViewSet", "AssignmentQuestionViewSet", "AssignmentAnswerViewSet", "AssignmentSubmissionDetailView",
     "SubmitAssignmentView", "RelatedUsersForTeacherView", "CurrentUserView", "QuizRankingView", "StudentDashboardView",
     "StudentSubjectsView",
 ]
