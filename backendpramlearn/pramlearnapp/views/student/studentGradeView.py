@@ -2,7 +2,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from django.db.models import Avg, Count, Q
+from rest_framework.decorators import api_view, permission_classes
+from django.db.models import Avg, Count, Q, Min, Max
 from django.utils import timezone
 from datetime import datetime, timedelta
 from ...models import Grade, GradeStatistics, Achievement
@@ -201,3 +202,45 @@ class StudentAchievementView(APIView):
                 {'error': 'Internal server error'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def student_analytics(request):
+    user = request.user
+
+    # Ambil semua grades untuk student
+    grades = Grade.objects.filter(
+        student=user).select_related('subject', 'assignment')
+
+    if not grades.exists():
+        return Response({
+            'overview': {
+                'total_assessments': 0,
+                'average_score': 0,
+                'highest_score': 0,
+                'lowest_score': 0
+            },
+            'monthly_trends': [],
+            'subject_performance': []
+        })
+
+    # Calculate overview statistics
+    overview = {
+        'total_assessments': grades.count(),
+        'average_score': grades.aggregate(avg=Avg('grade'))['avg'] or 0,
+        'highest_score': grades.aggregate(max=Max('grade'))['max'] or 0,
+        'lowest_score': grades.aggregate(min=Min('grade'))['min'] or 0
+    }
+
+    # Subject performance
+    subject_performance = grades.values('subject__name').annotate(
+        avg_score=Avg('grade'),
+        total_assessments=Count('id')
+    ).order_by('-avg_score')
+
+    return Response({
+        'overview': overview,
+        'monthly_trends': [],  # Implementasi sesuai kebutuhan
+        'subject_performance': list(subject_performance)
+    })

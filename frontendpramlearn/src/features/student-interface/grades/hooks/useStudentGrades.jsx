@@ -4,15 +4,34 @@ import api from "../../../../api";
 import { AuthContext } from "../../../../context/AuthContext"; // ✅ PERBAIKI INI
 
 const useStudentGrades = () => {
-  const { user, token } = useContext(AuthContext); // ✅ GUNAKAN useContext LANGSUNG
-  // Tambahkan console log untuk debugging
-  console.log("🟢 useStudentGrades mounted", { user, token });
+  const { user, token } = useContext(AuthContext);
 
   const [grades, setGrades] = useState([]);
+  const [subjects, setSubjects] = useState([]);
   const [statistics, setStatistics] = useState({});
   const [achievements, setAchievements] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const fetchSubjects = useCallback(async () => {
+    if (!token || !user) return;
+
+    try {
+      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      console.log("🔄 Fetching subjects...");
+
+      const response = await api.get("/student/subjects/");
+      console.log("✅ Subjects response:", response.data);
+
+      if (response.data && response.data.subjects) {
+        setSubjects(response.data.subjects);
+      } else if (Array.isArray(response.data)) {
+        setSubjects(response.data);
+      }
+    } catch (err) {
+      console.error("❌ Error fetching subjects:", err);
+    }
+  }, [token, user]);
 
   // Fetch grades dengan filtering
   const fetchGrades = useCallback(
@@ -161,11 +180,11 @@ const useStudentGrades = () => {
 
   // Utility functions
   const getGradeColor = useCallback((score) => {
-    if (score >= 90) return "#52c41a"; // Green - A
-    if (score >= 80) return "#1890ff"; // Blue - B
-    if (score >= 70) return "#faad14"; // Orange - C
-    if (score >= 60) return "#fa8c16"; // Orange - D
-    return "#ff4d4f"; // Red - E
+    if (score >= 90) return "#52c41a"; 
+    if (score >= 80) return "#1890ff"; 
+    if (score >= 70) return "#faad14"; 
+    if (score >= 60) return "#fa8c16"; 
+    return "#ff4d4f"; 
   }, []);
 
   const getGradeLetter = useCallback((score) => {
@@ -198,8 +217,17 @@ const useStudentGrades = () => {
     return { trend, percentage: Math.round(percentage * 10) / 10 };
   }, []);
 
+  useEffect(() => {
+    if (user && token) {
+      fetchGrades();
+      fetchSubjects();
+      fetchAchievements();
+    }
+  }, [user, token, fetchGrades, fetchSubjects, fetchAchievements]);
+
   return {
     grades,
+    subjects,
     statistics,
     achievements,
     loading,
@@ -211,7 +239,6 @@ const useStudentGrades = () => {
     getGradeColor,
     getGradeLetter,
     calculateTrendPercentage,
-    // Helper values
     hasGrades: grades.length > 0,
     totalGrades: grades.length,
   };

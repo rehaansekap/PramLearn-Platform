@@ -99,6 +99,7 @@ urlpatterns = [
          name='assignment-submission-details'),
 
 
+    path('api/student/analytics/', StudentGradeAnalyticsView.as_view(), name='student-analytics'),
     path('api/student/grades/', StudentGradeView.as_view(), name='student-grades'),
     path('api/student/analytics/grade-trends/',
          StudentGradeAnalyticsView.as_view(), name='student-grade-analytics'),
@@ -128,8 +129,8 @@ urlpatterns = [
     path('api/student/materials/<int:material_id>/activities/',
          StudentMaterialActivityView.as_view()),
 
-#     path('api/student/quiz-attempt/<int:attempt_id>/review/',
-#          QuizAttemptReviewView.as_view(), name='quiz-attempt-review'),
+    #     path('api/student/quiz-attempt/<int:attempt_id>/review/',
+    #          QuizAttemptReviewView.as_view(), name='quiz-attempt-review'),
     path('api/available-and-related-students/<int:class_id>/',
          AvailableAndRelatedStudentListView.as_view(), name='available-and-related-students'),
     path('api/subjects/<int:subject_id>/materials/',

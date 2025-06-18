@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Card, Row, Col, Spin, Empty, Tabs, Statistic, Progress } from "antd";
 import {
   LineChartOutlined,
@@ -9,7 +9,83 @@ import {
 
 const { TabPane } = Tabs;
 
-const GradeChart = ({ grades, subjects = [], loading, compact = false }) => {
+const GradeChart = ({ grades, subjects = [], analytics, loading, compact = false }) => {
+  // Tambahkan state untuk subjects yang sudah diproses
+  const [processedSubjects, setProcessedSubjects] = useState([]);
+
+  // Generate subjects dari grades jika subjects kosong
+  const getSubjectsToUse = () => {
+    if (subjects && subjects.length > 0) {
+      console.log("✅ Using provided subjects:", subjects);
+      return subjects;
+    }
+
+    // Generate dari grades
+    const uniqueSubjects = [
+      ...new Set(grades?.map((g) => g.subject_name) || []),
+    ];
+    const generatedSubjects = uniqueSubjects.map((name) => ({
+      id: name,
+      name: name,
+    }));
+
+    console.log("🔄 Generated subjects from grades:", generatedSubjects);
+    return generatedSubjects;
+  };
+
+  const subjectsToUse = getSubjectsToUse();
+
+  useEffect(() => {
+    console.log("🔍 GradeChart Debug:", {
+      grades: grades?.length || 0,
+      subjects: subjects?.length || 0,
+      analytics: analytics,
+      loading: loading,
+      gradesStructure: grades?.[0],
+      subjectsStructure: subjects?.[0],
+    });
+  }, [grades, subjects, analytics, loading]);
+
+  if (loading) {
+    return (
+      <div style={{ textAlign: "center", padding: "40px 0" }}>
+        <Spin size="large" tip="Loading analytics..." />
+      </div>
+    );
+  }
+
+  // Add fallback for empty analytics
+  if (!analytics && (!grades || grades.length === 0)) {
+    return (
+      <Empty
+        description="No analytics data available yet"
+        image={Empty.PRESENTED_IMAGE_SIMPLE}
+      />
+    );
+  }
+
+  useEffect(() => {
+    console.log("🔍 GradeChart Debug Detail:", {
+      grades: {
+        count: grades?.length || 0,
+        sample: grades?.[0],
+        subjects_in_grades: [
+          ...new Set(grades?.map((g) => g.subject_name) || []),
+        ],
+      },
+      subjects: {
+        count: subjects?.length || 0,
+        sample: subjects?.[0],
+        list: subjects?.map((s) => s.name || s) || [],
+      },
+      subjectsToUse: {
+        count: subjectsToUse?.length || 0,
+        list: subjectsToUse?.map((s) => s.name || s) || [],
+      },
+      loading,
+    });
+  }, [grades, subjects, subjectsToUse, loading]);
+
   if (loading) {
     return (
       <div style={{ textAlign: "center", padding: "40px 0" }}>
@@ -50,6 +126,16 @@ const GradeChart = ({ grades, subjects = [], loading, compact = false }) => {
     if (score >= 60) return "#faad14";
     return "#ff4d4f";
   };
+
+  // Tambahkan debugging
+  useEffect(() => {
+    console.log("🔍 GradeChart Debug:", {
+      grades: grades?.length || 0,
+      subjects: subjects?.length || 0,
+      gradesStructure: grades?.[0],
+      subjectsStructure: subjects?.[0],
+    });
+  }, [grades, subjects]);
 
   if (compact) {
     // Compact version for dashboard
@@ -230,57 +316,92 @@ const GradeChart = ({ grades, subjects = [], loading, compact = false }) => {
         }
         key="subjects"
       >
-        <Row gutter={16}>
-          {subjects.map((subject) => {
-            const subjectGrades = grades.filter(
-              (g) => g.subject_name === subject.name
-            );
-            const avgScore =
-              subjectGrades.length > 0
-                ? subjectGrades.reduce((sum, g) => sum + (g.grade || 0), 0) /
-                  subjectGrades.length
-                : 0;
+        {loading ? (
+          <div style={{ textAlign: "center", padding: "40px 0" }}>
+            <Spin size="large" tip="Loading subject performance..." />
+          </div>
+        ) : subjectsToUse.length === 0 ? (
+          <div style={{ textAlign: "center", padding: "40px 0" }}>
+            <Empty
+              description="No subjects data available"
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+            />
+            <p style={{ color: "#666", marginTop: 16 }}>
+              Subjects count: {subjects.length}
+              <br />
+              Grades count: {grades?.length || 0}
+              <br />
+              Available subjects from grades:{" "}
+              {[...new Set(grades?.map((g) => g.subject_name) || [])].join(
+                ", "
+              )}
+            </p>
+          </div>
+        ) : (
+          <Row gutter={16}>
+            {subjectsToUse.map((subject) => {
+              const subjectGrades = grades.filter(
+                (g) => g.subject_name === (subject.name || subject)
+              );
 
-            return (
-              <Col
-                xs={24}
-                sm={12}
-                md={8}
-                key={subject.id}
-                style={{ marginBottom: 16 }}
-              >
-                <Card size="small">
-                  <div style={{ marginBottom: 12 }}>
-                    <div style={{ fontWeight: 500, marginBottom: 4 }}>
-                      {subject.name}
-                    </div>
-                    <div style={{ fontSize: 12, color: "#666" }}>
-                      {subjectGrades.length} assessments
-                    </div>
-                  </div>
+              if (subjectGrades.length === 0) {
+                console.log(
+                  `⚠️ No grades found for subject: ${subject.name || subject}`
+                );
+                return null;
+              }
 
-                  <div style={{ textAlign: "center", marginBottom: 12 }}>
-                    <div
-                      style={{
-                        fontSize: 24,
-                        fontWeight: "bold",
-                        color: getGradeColor(avgScore),
-                      }}
-                    >
-                      {avgScore.toFixed(1)}
-                    </div>
-                  </div>
+              const avgScore =
+                subjectGrades.reduce((sum, g) => sum + (g.grade || 0), 0) /
+                subjectGrades.length;
 
-                  <Progress
-                    percent={avgScore}
-                    strokeColor={getGradeColor(avgScore)}
-                    showInfo={false}
-                  />
-                </Card>
-              </Col>
-            );
-          })}
-        </Row>
+              console.log(
+                `📊 Subject: ${
+                  subject.name || subject
+                }, Avg: ${avgScore}, Count: ${subjectGrades.length}`
+              );
+
+              return (
+                <Col
+                  xs={24}
+                  sm={12}
+                  md={8}
+                  key={subject.id || subject}
+                  style={{ marginBottom: 16 }}
+                >
+                  <Card size="small">
+                    <div style={{ marginBottom: 12 }}>
+                      <div style={{ fontWeight: 500, marginBottom: 4 }}>
+                        {subject.name || subject}
+                      </div>
+                      <div style={{ fontSize: 12, color: "#666" }}>
+                        {subjectGrades.length} assessments
+                      </div>
+                    </div>
+
+                    <div style={{ textAlign: "center", marginBottom: 12 }}>
+                      <div
+                        style={{
+                          fontSize: 24,
+                          fontWeight: "bold",
+                          color: getGradeColor(avgScore),
+                        }}
+                      >
+                        {avgScore.toFixed(1)}
+                      </div>
+                    </div>
+
+                    <Progress
+                      percent={avgScore}
+                      strokeColor={getGradeColor(avgScore)}
+                      showInfo={false}
+                    />
+                  </Card>
+                </Col>
+              );
+            })}
+          </Row>
+        )}
       </TabPane>
 
       <TabPane
@@ -293,7 +414,14 @@ const GradeChart = ({ grades, subjects = [], loading, compact = false }) => {
         key="distribution"
       >
         <Card title="Grade Distribution Analysis">
-          <Row gutter={16}>
+          <Row
+            gutter={16}
+            style={{
+              // make it center
+              justifyContent: "center",
+              textAlign: "center",
+            }}
+          >
             {["A", "B", "C", "D", "E"].map((letter) => {
               const count = grades.filter((g) => {
                 const score = g.grade || 0;
