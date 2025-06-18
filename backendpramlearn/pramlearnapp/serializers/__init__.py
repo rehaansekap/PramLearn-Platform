@@ -21,6 +21,10 @@ from pramlearnapp.serializers.student.materialProgressSerializer import (
 from pramlearnapp.serializers.student.quizSerializer import (
     QuestionSerializer, GroupQuizSerializer, GroupQuizSubmissionSerializer,
 )
+from pramlearnapp.serializers.student.gradeSerializer import (
+    GradeSerializer, GradeStatisticsSerializer, AchievementSerializer,
+    StudentGradeAnalyticsSerializer
+)
 
 from pramlearnapp.serializers.teacher.teacherSerializer import TeacherSerializer
 from pramlearnapp.serializers.teacher.subjectSerializer import SubjectSerializer, SubjectDetailSerializer, SubjectClassSerializer
@@ -50,6 +54,7 @@ __all__ = [
     "StudentAttendanceSerializer", "StudentAssignmentSerializer", "StudentAssignmentSubmissionSerializer",
     "StudentAssignmentDraftSerializer", "StudentActivitySerializer", "StudentMaterialProgressSerializer",
     "StudentMaterialBookmarkSerializer", "QuestionSerializer", "GroupQuizSerializer", "GroupQuizSubmissionSerializer",
+    "GradeSerializer", "GradeStatisticsSerializer", "AchievementSerializer", "StudentGradeAnalyticsSerializer",
     # Teacher
     "TeacherSerializer", "SubjectSerializer", "SubjectDetailSerializer", "SubjectClassSerializer",
     "QuizSerializer", "QuestionSerializer", "MaterialSerializer", "MaterialDetailSerializer",

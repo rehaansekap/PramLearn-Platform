@@ -17,6 +17,16 @@ from pramlearnapp.views.student.studentQuickActionsView import StudentQuickActio
 from pramlearnapp.views.student.groupQuizView import (
     GroupQuizDetailView, SubmitGroupQuizView, GroupQuizResultsView, SaveGroupQuizAnswerView
 )
+from pramlearnapp.views.student.scheduleViewSet import ScheduleViewSet
+from pramlearnapp.views.student.studentActivityViewSet import StudentActivityViewSet
+from pramlearnapp.views.student.materialProgressView import StudentMaterialProgressView, StudentMaterialBookmarkView, StudentMaterialAccessView, StudentMaterialActivityView
+# from pramlearnapp.views.student.studentGradesView import (
+#     StudentGradesView, StudentGradeAnalyticsView,
+#     QuizAttemptReviewView, AssignmentSubmissionFeedbackView
+# )
+from pramlearnapp.views.student.studentGradeView import (
+    StudentGradeView, StudentGradeAnalyticsView, StudentAchievementView
+)
 
 from pramlearnapp.views.teacher.teacherViewSet import TeacherViewSet
 from pramlearnapp.views.teacher.subjectViewSet import SubjectViewSet, SubjectDetailView
@@ -43,10 +53,6 @@ from pramlearnapp.views.student.studentSubjectsView import StudentSubjectsView
 from pramlearnapp.views.student.quizViewSet import (
     StudentGroupQuizListView, GroupQuizDetailView, SubmitGroupQuizView, GroupQuizResultsView,
 )
-from pramlearnapp.views.student.studentGradesView import StudentGradesView, StudentGradeAnalyticsView, QuizAttemptReviewView, AssignmentSubmissionFeedbackView
-from pramlearnapp.views.student.scheduleViewSet import ScheduleViewSet
-from pramlearnapp.views.student.studentActivityViewSet import StudentActivityViewSet
-from pramlearnapp.views.student.materialProgressView import StudentMaterialProgressView, StudentMaterialBookmarkView, StudentMaterialAccessView, StudentMaterialActivityView
 #     Custom permissions that allow access to a view based on the model's permissions
 
 __all__ = [
@@ -62,6 +68,7 @@ __all__ = [
     "ScheduleViewSet", "StudentActivityViewSet", "StudentUpcomingDeadlinesView", "StudentQuickActionsView",
     "StudentMaterialProgressView", "StudentMaterialBookmarkView", "StudentMaterialAccessView", "StudentMaterialActivityView",
     "GroupQuizDetailView", "SubmitGroupQuizView", "GroupQuizResultsView", "StudentGroupQuizListView", "SaveGroupQuizAnswerView",
+    "StudentGradeView", "StudentGradeAnalyticsView", "StudentAchievementView",
     # Teacher
     "TeacherViewSet", "SubjectViewSet", "SubjectDetailView", "QuizViewSet", "MaterialViewSet", "MaterialDetailView",
     "MaterialAccessView", "AssignQuizToGroupsView", "GroupViewSet", "GroupMemberViewSet", "GroupQuizViewSet", "GroupQuizSubmissionViewSet",

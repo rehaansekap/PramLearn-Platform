@@ -9,8 +9,12 @@ from .attedance import StudentAttendance
 from .studentActivity import StudentActivity
 from .schedule import Schedule
 from .announcement import Announcement
+from .grade import Grade, GradeStatistics, Achievement
 
 __all__ = [
+    "Grade",
+    "GradeStatistics",
+    "Achievement",
     "Role",
     "CustomUser",
     "StudentMotivationProfile",

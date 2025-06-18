@@ -9,7 +9,7 @@ import {
 
 const { TabPane } = Tabs;
 
-const GradeChart = ({ grades, subjects, loading, compact = false }) => {
+const GradeChart = ({ grades, subjects = [], loading, compact = false }) => {
   if (loading) {
     return (
       <div style={{ textAlign: "center", padding: "40px 0" }}>

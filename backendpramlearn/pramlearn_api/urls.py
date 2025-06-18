@@ -18,10 +18,10 @@ from pramlearnapp.views import (RoleViewSet, UserViewSet, RegisterView, LoginVie
                                 AutoGroupStudentsView, AssignQuizToGroupsView, GroupQuizViewSet, SubmitAssignmentView, RelatedUsersForTeacherView,
                                 MaterialAttendanceListView, update_attendance, bulk_create_attendance, QuizRankingView, StudentDashboardView, StudentSubjectsView,
                                 StudentAvailableAssignmentsView, StudentAssignmentQuestionsView, StudentAssignmentDraftView, StudentAssignmentSubmitView, StudentAssignmentSubmissionsView,
-                                StudentGradesView, StudentGradeAnalyticsView, QuizAttemptReviewView, AssignmentSubmissionFeedbackView, ScheduleViewSet, StudentActivityViewSet,
+                                StudentGradeAnalyticsView, ScheduleViewSet, StudentActivityViewSet,
                                 MaterialAccessView, StudentUpcomingDeadlinesView, StudentQuickActionsView, StudentMaterialProgressView, StudentMaterialBookmarkView, StudentMaterialAccessView,
                                 StudentMaterialActivityView, GroupQuizDetailView, SubmitGroupQuizView, GroupQuizResultsView, StudentGroupQuizListView, SaveGroupQuizAnswerView,
-                                AssignmentSubmissionDetailView, StudentAssignmentBySlugView
+                                AssignmentSubmissionDetailView, StudentAssignmentBySlugView, StudentAchievementView, StudentGradeView,
                                 )
 from pramlearnapp.views.teacher.relatedUsersView import CurrentUserView
 
@@ -92,18 +92,22 @@ urlpatterns = [
          name='student-assignment-submissions'),
     path('api/student/assignments/<str:assignment_slug>/results/',
          StudentAssignmentBySlugView.as_view(), name='student-assignment-by-slug'),
-    path('api/student/assignment-submission/<int:submission_id>/feedback/',
-         AssignmentSubmissionFeedbackView.as_view(), name='assignment-submission-feedback'),
+    #     path('api/student/assignment-submission/<int:submission_id>/feedback/',
+    #          AssignmentSubmissionFeedbackView.as_view(), name='assignment-submission-feedback'),
     path('api/student/assignment-submission/<int:submission_id>/details/',
          AssignmentSubmissionDetailView.as_view(),
          name='assignment-submission-details'),
 
 
-    path('api/student/grades/', StudentGradesView.as_view(), name='student-grades'),
+    path('api/student/grades/', StudentGradeView.as_view(), name='student-grades'),
     path('api/student/analytics/grade-trends/',
          StudentGradeAnalyticsView.as_view(), name='student-grade-analytics'),
-    path('api/student/quiz-attempt/<int:attempt_id>/review/',
-         QuizAttemptReviewView.as_view(), name='quiz-attempt-review'),
+    path('api/student/achievements/', StudentAchievementView.as_view(),
+         name='student-achievements'),
+    #     path('api/student/grades/', StudentGradesView.as_view(), name='student-grades'),
+    #     path('api/student/analytics/grade-trends/',
+    #          StudentGradeAnalyticsView.as_view(), name='student-grade-analytics'),
+
 
 
     path('api/student/materials/<int:material_id>/access/',
@@ -124,7 +128,8 @@ urlpatterns = [
     path('api/student/materials/<int:material_id>/activities/',
          StudentMaterialActivityView.as_view()),
 
-
+#     path('api/student/quiz-attempt/<int:attempt_id>/review/',
+#          QuizAttemptReviewView.as_view(), name='quiz-attempt-review'),
     path('api/available-and-related-students/<int:class_id>/',
          AvailableAndRelatedStudentListView.as_view(), name='available-and-related-students'),
     path('api/subjects/<int:subject_id>/materials/',

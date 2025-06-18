@@ -18,6 +18,14 @@ from pramlearnapp.serializers.student.studentAssignmentSerializer import (
 import json
 from django.core.files.storage import default_storage
 from pramlearnapp.utils.log_student_activity import log_student_activity
+# Tambahkan import untuk grade service
+from pramlearnapp.services.gradeService import create_grade_from_submission
+import logging
+from django.db import transaction  # ✅ TAMBAHKAN IMPORT INI
+
+
+# Setup logger
+logger = logging.getLogger(__name__)
 
 
 class StudentAvailableAssignmentsView(APIView):
@@ -107,6 +115,7 @@ class StudentAvailableAssignmentsView(APIView):
             return Response(assignment_data, status=status.HTTP_200_OK)
 
         except Exception as e:
+            logger.error(f"Error fetching assignments: {str(e)}")
             return Response(
                 {"detail": f"Error fetching assignments: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -174,6 +183,12 @@ class StudentAssignmentQuestionsView(APIView):
                 {"detail": "Assignment not found"},
                 status=status.HTTP_404_NOT_FOUND
             )
+        except Exception as e:
+            logger.error(f"Error fetching assignment questions: {str(e)}")
+            return Response(
+                {"detail": "Internal server error"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class StudentAssignmentDraftView(APIView):
@@ -195,6 +210,12 @@ class StudentAssignmentDraftView(APIView):
                 'last_saved': None,
                 'created_at': None
             })
+        except Exception as e:
+            logger.error(f"Error loading draft: {str(e)}")
+            return Response(
+                {"detail": "Internal server error"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
     def put(self, request, assignment_id):
         """Save draft for assignment"""
@@ -241,6 +262,12 @@ class StudentAssignmentDraftView(APIView):
                 {"detail": "Assignment not found"},
                 status=status.HTTP_404_NOT_FOUND
             )
+        except Exception as e:
+            logger.error(f"Error saving draft: {str(e)}")
+            return Response(
+                {"detail": "Internal server error"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class StudentAssignmentSubmitView(APIView):
@@ -255,6 +282,9 @@ class StudentAssignmentSubmitView(APIView):
 
             # Verify access and due date
             user = request.user
+            logger.info(
+                f"🎯 Assignment submission attempt: User={user.username}, Assignment={assignment_id}")
+
             class_students = ClassStudent.objects.filter(student=user)
             class_ids = class_students.values_list("class_id", flat=True)
             subject_classes = SubjectClass.objects.filter(
@@ -268,61 +298,129 @@ class StudentAssignmentSubmitView(APIView):
                     status=status.HTTP_403_FORBIDDEN
                 )
 
-            # PERBAIKAN: Check if already submitted (final submission)
+            # Check if already submitted (final submission)
             existing_submission = AssignmentSubmission.objects.filter(
                 student=user,
                 assignment=assignment
             ).first()
 
-            print(f"🔍 Checking existing submission: {existing_submission}")
-            if existing_submission:
-                print(f"📋 Submission is_draft: {existing_submission.is_draft}")
+            logger.info(
+                f"Checking existing submission for user {user.id}, assignment {assignment_id}: {existing_submission}")
 
-            # UBAH KONDISI INI: Hanya tolak jika submission sudah final (is_draft=False)
+            if existing_submission:
+                logger.info(
+                    f"Submission is_draft: {existing_submission.is_draft}")
+
+            # Only reject if submission is already final (is_draft=False)
             if existing_submission and not existing_submission.is_draft:
-                print("❌ Assignment already submitted (not draft)")
+                logger.warning(
+                    f"Assignment {assignment_id} already submitted by user {user.id}")
                 return Response(
                     {"detail": "Assignment already submitted"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
-            # Create or update submission
-            if not existing_submission:
-                # Create new submission
-                submission = AssignmentSubmission.objects.create(
-                    student=user,
-                    assignment=assignment,
-                    submission_date=timezone.now(),
-                    is_draft=False  # Mark as final submission
-                )
-                print(f"✅ New final submission created: {submission.id}")
-            else:
-                # Update existing draft to final
-                submission = existing_submission
-                submission.submission_date = timezone.now()
-                submission.is_draft = False  # Mark as final
-                submission.save()
-                print(f"🔄 Draft submission finalized: {submission.id}")
+            # ✅ PERBAIKAN: Gunakan transaction.atomic untuk memastikan konsistensi
+            with transaction.atomic():
+                logger.info("🔄 Starting assignment submission transaction...")
 
-            # Calculate grade
-            submission.calculate_and_save_score()
-            print(f"📊 Grade calculated: {submission.grade}")
+                # Create or update submission
+                if not existing_submission:
+                    # Create new submission
+                    submission = AssignmentSubmission.objects.create(
+                        student=user,
+                        assignment=assignment,
+                        submission_date=timezone.now(),
+                        is_draft=False,  # Mark as final submission
+                        start_time=timezone.now()  # Set start time
+                    )
+                    logger.info(
+                        f"✅ New final submission created: {submission.id}")
+                else:
+                    # Update existing draft to final
+                    submission = existing_submission
+                    submission.submission_date = timezone.now()
+                    submission.is_draft = False  # Mark as final
+                    submission.save()
+                    logger.info(
+                        f"✅ Draft submission finalized: {submission.id}")
 
-            return Response({
+                # Calculate assignment score first
+                submission.calculate_and_save_score()
+                logger.info(
+                    f"✅ Assignment score calculated: {submission.grade}")
+
+                # ✅ PERBAIKAN: CREATE GRADE RECORD using the service dengan error handling yang lebih baik
+                try:
+                    logger.info(
+                        f"🔄 Creating grade record for submission {submission.id}...")
+                    grade = create_grade_from_submission(submission)
+
+                    if grade:
+                        logger.info(f"✅ Grade record created successfully:")
+                        logger.info(f"   - Grade ID: {grade.id}")
+                        logger.info(f"   - Grade Value: {grade.grade}")
+                        logger.info(f"   - Student: {grade.student.username}")
+                        logger.info(
+                            f"   - Assignment: {grade.assignment.title if grade.assignment else 'N/A'}")
+                        logger.info(f"   - Type: {grade.type}")
+                    else:
+                        logger.error(
+                            f"❌ Failed to create grade record for submission {submission.id}")
+                        # Don't fail the whole transaction, just log the warning
+
+                except Exception as grade_error:
+                    logger.error(
+                        f"❌ Exception creating grade record: {str(grade_error)}")
+                    import traceback
+                    logger.error(
+                        f"❌ Grade creation traceback: {traceback.format_exc()}")
+                    # Set grade to None but don't fail the transaction
+                    grade = None
+
+                # Log student activity
+                try:
+                    StudentActivity.objects.create(
+                        student=user,
+                        title=f"Menyelesaikan Assignment: {assignment.title}",
+                        description=f"Assignment diselesaikan dengan nilai {submission.grade:.1f}",
+                        activity_type="assignment",
+                        timestamp=timezone.now(),
+                    )
+                    logger.info(f"✅ Student activity logged")
+                except Exception as activity_error:
+                    logger.error(
+                        f"❌ Failed to log student activity: {str(activity_error)}")
+
+            # ✅ PERBAIKAN: Return response dengan detail yang lebih lengkap
+            response_data = {
                 "message": "Assignment submitted successfully",
                 "submission_id": submission.id,
-                "grade": submission.grade
-            }, status=status.HTTP_201_CREATED)
+                "grade": submission.grade,
+                "grade_record_id": grade.id if grade else None,
+                "grade_created": grade is not None
+            }
+
+            logger.info(f"🎉 Assignment submission completed successfully!")
+            logger.info(f"📊 Summary:")
+            logger.info(f"   - Submission ID: {submission.id}")
+            logger.info(f"   - Score: {submission.grade}")
+            logger.info(
+                f"   - Grade Record Created: {'Yes' if grade else 'No'}")
+
+            return Response(response_data, status=status.HTTP_201_CREATED)
 
         except Assignment.DoesNotExist:
+            logger.error(f"Assignment {assignment_id} not found")
             return Response(
                 {"detail": "Assignment not found"},
                 status=status.HTTP_404_NOT_FOUND
             )
         except Exception as e:
-            print(f"❌ Error submitting assignment: {str(e)}")
+            logger.error(
+                f"❌ CRITICAL ERROR submitting assignment {assignment_id}: {str(e)}")
             import traceback
-            print(f"❌ Traceback: {traceback.format_exc()}")
+            logger.error(f"❌ Full traceback: {traceback.format_exc()}")
 
             return Response(
                 {"detail": "Internal server error"},
@@ -344,13 +442,19 @@ class StudentAssignmentSubmissionsView(APIView):
             ).prefetch_related(
                 'answers__question'
             ).order_by('-submission_date')
-            StudentActivity.objects.create(
-                student=request.user,
-                title=f"Mengumpulkan Assignment: {assignment.title}",
-                # description="Kamu telah mengumpulkan assignment.",
-                activity_type="assignment",
-                timestamp=timezone.now(),
-            )
+
+            # Log student activity
+            try:
+                StudentActivity.objects.create(
+                    student=request.user,
+                    title=f"Melihat Riwayat Assignment: {assignment.title}",
+                    description="Melihat riwayat pengumpulan assignment",
+                    activity_type="assignment",
+                    timestamp=timezone.now(),
+                )
+            except Exception as activity_error:
+                logger.error(
+                    f"Failed to log student activity: {str(activity_error)}")
 
             serializer = StudentAssignmentSubmissionSerializer(
                 submissions, many=True
@@ -363,14 +467,21 @@ class StudentAssignmentSubmissionsView(APIView):
                 {"detail": "Assignment not found"},
                 status=status.HTTP_404_NOT_FOUND
             )
+        except Exception as e:
+            logger.error(f"Error fetching submission history: {str(e)}")
+            return Response(
+                {"detail": "Internal server error"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class StudentAssignmentBySlugView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, assignment_slug):
+        """Get assignment by slug with submission data"""
         try:
-            # Cari assignment berdasarkan slug
+            # Find assignment by slug
             assignment = Assignment.objects.select_related(
                 'material__subject'
             ).prefetch_related('questions').get(slug=assignment_slug)
@@ -425,13 +536,63 @@ class StudentAssignmentBySlugView(APIView):
             }, status=status.HTTP_200_OK)
 
         except Assignment.DoesNotExist:
+            logger.error(f"Assignment with slug '{assignment_slug}' not found")
             return Response(
                 {"error": "Assignment not found"},
                 status=status.HTTP_404_NOT_FOUND
             )
         except Exception as e:
-            print(f"Error in StudentAssignmentBySlugView: {str(e)}")
+            logger.error(f"Error in StudentAssignmentBySlugView: {str(e)}")
             return Response(
-                {"error": str(e)},
+                {"error": "Internal server error"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class StudentAssignmentAnswersView(APIView):
+    """View untuk mengambil jawaban student pada assignment tertentu"""
+    permission_classes = [IsAuthenticated, IsStudentUser]
+
+    def get(self, request, assignment_id):
+        """Get student's answers for specific assignment"""
+        try:
+            assignment = Assignment.objects.get(id=assignment_id)
+
+            # Get submission for this assignment and student
+            submission = AssignmentSubmission.objects.filter(
+                assignment=assignment,
+                student=request.user
+            ).first()
+
+            if not submission:
+                return Response([])  # Return empty array if no submission
+
+            # Get answers for this submission
+            answers = AssignmentAnswer.objects.filter(
+                submission=submission
+            ).select_related('question')
+
+            answers_data = []
+            for answer in answers:
+                answers_data.append({
+                    'id': answer.id,
+                    'question': answer.question.id,
+                    'selected_choice': answer.selected_choice,
+                    'answer_text': answer.answer_text,
+                    'essay_answer': answer.essay_answer,
+                    'is_correct': answer.is_correct,
+                })
+
+            return Response(answers_data)
+
+        except Assignment.DoesNotExist:
+            return Response(
+                {"detail": "Assignment not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            logger.error(f"Error fetching student answers: {str(e)}")
+            return Response(
+                {"detail": "Internal server error"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )

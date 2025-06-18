@@ -24,8 +24,8 @@ const { RangePicker } = DatePicker;
 const { Text } = Typography;
 
 const GradeFilters = ({
-  subjects,
-  filters = {}, // Tambahkan default value di sini
+  subjects = [], // Tambahkan default value array kosong
+  filters = {},
   onApplyFilters,
   onClearFilters,
   loading = false,

@@ -22,7 +22,11 @@ import {
 
 const { Title, Text } = Typography;
 
-const PerformanceAnalytics = ({ grades, subjects, statistics }) => {
+const PerformanceAnalytics = ({
+  grades = [],
+  subjects = [],
+  statistics = {},
+}) => {
   // Calculate trends
   const calculateTrend = () => {
     if (grades.length < 2) return { trend: "stable", percentage: 0 };
@@ -139,14 +143,19 @@ const PerformanceAnalytics = ({ grades, subjects, statistics }) => {
 
     // Subject-specific insights
     const subjectPerf = getSubjectPerformance();
-    const bestSubject = subjectPerf.reduce((best, current) =>
-      current.average > best.average ? current : best
-    );
-    const weakestSubject = subjectPerf.reduce((worst, current) =>
-      current.average < worst.average ? current : worst
-    );
+    let bestSubject = null;
+    let weakestSubject = null;
 
-    if (bestSubject.average > 0) {
+    if (subjectPerf.length > 0) {
+      bestSubject = subjectPerf.reduce((best, current) =>
+        current.average > best.average ? current : best
+      );
+      weakestSubject = subjectPerf.reduce((worst, current) =>
+        current.average < worst.average ? current : worst
+      );
+    }
+
+    if (bestSubject && bestSubject.average > 0) {
       insights.push({
         type: "success",
         title: `Unggul di ${bestSubject.name} 🏆`,
@@ -156,7 +165,11 @@ const PerformanceAnalytics = ({ grades, subjects, statistics }) => {
       });
     }
 
-    if (weakestSubject.average > 0 && weakestSubject.average < 70) {
+    if (
+      weakestSubject &&
+      weakestSubject.average > 0 &&
+      weakestSubject.average < 70
+    ) {
       insights.push({
         type: "warning",
         title: `Focus on ${weakestSubject.name} 🎯`,

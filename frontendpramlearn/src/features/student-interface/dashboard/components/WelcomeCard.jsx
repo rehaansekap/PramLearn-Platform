@@ -28,7 +28,8 @@ const WelcomeCard = ({ user }) => {
     <Card
       style={{
         borderRadius: 16,
-        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        background:
+          "linear-gradient(135deg, #001529 0%, #3a3f5c 60%, #43cea2 100%)",
         border: "none",
         color: "white",
         boxShadow: "0 8px 32px rgba(102, 126, 234, 0.3)",

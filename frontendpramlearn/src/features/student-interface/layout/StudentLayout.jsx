@@ -138,16 +138,16 @@ const StudentLayout = () => {
       icon: <BarChartOutlined />,
       label: <Link to="/student/progress">My Progress</Link>,
     },
-    {
-      key: "/student/analytics",
-      icon: <BarChartOutlined />,
-      label: <Link to="/student/analytics">Learning Analytics</Link>,
-    },
-    {
-      key: "/student/group",
-      icon: <TeamOutlined />,
-      label: <Link to="/student/group">My Group</Link>,
-    },
+    // {
+    //   key: "/student/analytics",
+    //   icon: <BarChartOutlined />,
+    //   label: <Link to="/student/analytics">Learning Analytics</Link>,
+    // },
+    // {
+    //   key: "/student/group",
+    //   icon: <TeamOutlined />,
+    //   label: <Link to="/student/group">My Group</Link>,
+    // },
   ];
 
   // Profile dropdown menu

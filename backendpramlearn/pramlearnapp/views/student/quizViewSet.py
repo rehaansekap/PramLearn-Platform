@@ -3,9 +3,15 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from pramlearnapp.models import Quiz, Group, GroupMember, GroupQuiz, GroupQuizSubmission, GroupQuizResult
+from django.db import transaction
+from pramlearnapp.models import Quiz, Group, GroupMember, GroupQuiz, GroupQuizSubmission, GroupQuizResult, StudentActivity
 from pramlearnapp.decorators import student_required
 import traceback
+import logging
+# ✅ TAMBAHKAN IMPORT INI
+from pramlearnapp.services.gradeService import create_grade_from_group_quiz
+
+logger = logging.getLogger(__name__)
 
 
 class StudentGroupQuizListView(APIView):
@@ -258,8 +264,13 @@ class SubmitGroupQuizView(APIView):
     @student_required
     def post(self, request, quiz_slug):
         try:
+            user = request.user
+            logger.info(
+                f"🎯 Starting quiz submission for user: {user.username}")
+
             # Get quiz by slug
             quiz = get_object_or_404(Quiz, slug=quiz_slug, is_group_quiz=True)
+            logger.info(f"✅ Found quiz: {quiz.title}")
 
             # Get user's group
             user_group = GroupMember.objects.filter(
@@ -268,10 +279,14 @@ class SubmitGroupQuizView(APIView):
             ).first()
 
             if not user_group:
+                logger.error(
+                    f"❌ User {user.username} not in group for quiz {quiz.title}")
                 return Response(
                     {"error": "Anda tidak terdaftar dalam kelompok"},
                     status=status.HTTP_403_FORBIDDEN
                 )
+
+            logger.info(f"✅ User in group: {user_group.group.name}")
 
             # Get GroupQuiz
             group_quiz = get_object_or_404(
@@ -282,13 +297,86 @@ class SubmitGroupQuizView(APIView):
 
             # Check if already completed
             if group_quiz.is_completed:
+                logger.warning(f"⚠️ Quiz already completed")
                 return Response(
                     {"error": "Quiz sudah di-submit sebelumnya"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
-            # Calculate and save score
-            result = group_quiz.calculate_and_save_score()
+            # ✅ PENTING: Gunakan transaction.atomic untuk memastikan konsistensi
+            with transaction.atomic():
+                logger.info("🔄 Starting quiz submission transaction...")
+
+                # Calculate and save score
+                result = group_quiz.calculate_and_save_score()
+                logger.info(f"✅ Score calculated and saved: {result.score}")
+
+                # Mark as completed
+                group_quiz.is_completed = True
+                group_quiz.submitted_at = timezone.now()
+                group_quiz.save()
+                logger.info(
+                    f"✅ GroupQuiz marked as completed at {group_quiz.submitted_at}")
+
+                # ✅ TAMBAHKAN: Create grades for ALL group members
+                group_members = GroupMember.objects.filter(
+                    group=user_group.group
+                ).select_related('student')
+
+                logger.info(
+                    f"📊 Found {group_members.count()} group members for grade creation")
+
+                created_grades = []
+                failed_grades = []
+
+                for member in group_members:
+                    try:
+                        logger.info(
+                            f"🔄 Creating grade for member: {member.student.username}")
+
+                        # ✅ DEBUGGING: Log semua info sebelum create grade
+                        logger.info(f"📊 About to create grade with:")
+                        logger.info(f"   - GroupQuiz ID: {group_quiz.id}")
+                        logger.info(
+                            f"   - GroupQuiz submitted_at: {group_quiz.submitted_at}")
+                        logger.info(
+                            f"   - GroupQuiz is_completed: {group_quiz.is_completed}")
+                        logger.info(f"   - Student: {member.student.username}")
+                        logger.info(
+                            f"   - Student role: {member.student.role}")
+
+                        # Call grade creation function
+                        grade = create_grade_from_group_quiz(
+                            group_quiz, member.student)
+
+                        if grade:
+                            created_grades.append(grade)
+                            logger.info(
+                                f"✅ Grade created successfully for {member.student.username}: ID={grade.id}, Grade={grade.grade}")
+                        else:
+                            failed_grades.append(member.student.username)
+                            logger.error(
+                                f"❌ Grade creation returned None for {member.student.username}")
+
+                    except Exception as grade_error:
+                        failed_grades.append(member.student.username)
+                        logger.error(
+                            f"❌ Exception creating grade for {member.student.username}: {str(grade_error)}")
+                        logger.error(f"❌ Traceback: {traceback.format_exc()}")
+
+                # ✅ TAMBAHKAN: Log activity
+                try:
+                    StudentActivity.objects.create(
+                        student=user,
+                        title=f"Menyelesaikan Group Quiz: {quiz.title}",
+                        description=f"Group quiz diselesaikan dengan skor {result.score:.1f}",
+                        activity_type="group_quiz",
+                        timestamp=timezone.now(),
+                    )
+                    logger.info(f"✅ Activity logged for {user.username}")
+                except Exception as activity_error:
+                    logger.error(
+                        f"❌ Failed to log student activity: {str(activity_error)}")
 
             # Get detailed results
             submissions = GroupQuizSubmission.objects.filter(
@@ -298,6 +386,7 @@ class SubmitGroupQuizView(APIView):
             total_questions = quiz.questions.count()
             correct_answers = submissions.filter(is_correct=True).count()
 
+            # ✅ IMPROVED: Return detailed response with grade info
             results_data = {
                 'group_quiz_id': group_quiz.id,
                 'score': result.score,
@@ -305,14 +394,32 @@ class SubmitGroupQuizView(APIView):
                 'correct_answers': correct_answers,
                 'submitted_at': result.completed_at,
                 'group_name': user_group.group.name,
-                'is_completed': True
+                'is_completed': True,
+                'grades_created': len(created_grades),
+                'grades_failed': len(failed_grades),
+                'total_members': group_members.count(),
+                'message': 'Group quiz submitted successfully'
             }
+
+            if failed_grades:
+                results_data['failed_students'] = failed_grades
+                logger.warning(
+                    f"⚠️ Failed to create grades for: {failed_grades}")
+
+            logger.info(f"🎉 Quiz submission completed successfully!")
+            logger.info(f"📊 Summary:")
+            logger.info(f"   - Total group members: {group_members.count()}")
+            logger.info(f"   - Grades created: {len(created_grades)}")
+            logger.info(f"   - Grades failed: {len(failed_grades)}")
+            logger.info(f"   - Final score: {result.score}")
 
             return Response(results_data, status=status.HTTP_200_OK)
 
         except Exception as e:
+            logger.error(f"❌ CRITICAL ERROR in quiz submission: {str(e)}")
+            logger.error(f"❌ Full traceback: {traceback.format_exc()}")
             return Response(
-                {"error": str(e)},
+                {"error": "Internal server error during quiz submission"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 

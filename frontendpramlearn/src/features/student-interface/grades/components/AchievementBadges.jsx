@@ -1,5 +1,16 @@
 import React from "react";
-import { Card, Row, Col, Badge, Typography, Space, Tooltip, Progress, Tag, Statistic } from "antd";
+import {
+  Card,
+  Row,
+  Col,
+  Badge,
+  Typography,
+  Space,
+  Tooltip,
+  Progress,
+  Tag,
+  Statistic,
+} from "antd";
 import {
   TrophyOutlined,
   StarOutlined,
@@ -11,7 +22,7 @@ import {
 
 const { Title, Text } = Typography;
 
-const AchievementBadges = ({ grades, statistics }) => {
+const AchievementBadges = ({ grades = [], statistics = {} }) => {
   // Define achievement criteria and calculate progress
   const achievements = [
     {

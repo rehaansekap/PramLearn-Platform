@@ -16,6 +16,11 @@ from pramlearnapp.serializers.teacher.assignmentSerializer import (
     AssignmentSubmissionStudentInputSerializer,
 )
 from pramlearnapp.decorators import student_required  # Add this import
+from pramlearnapp.services.gradeService import create_grade_from_submission
+import traceback
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class AssignmentViewSet(viewsets.ModelViewSet):

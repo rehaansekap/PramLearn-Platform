@@ -29,7 +29,6 @@ const useAuth = () => {
     localStorage.removeItem("token");
     delete api.defaults.headers.common["Authorization"];
   };
-  use;
 
   return { token, error, login, logout };
 };
