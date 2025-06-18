@@ -18,10 +18,8 @@ const useStudentGrades = () => {
 
     try {
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      console.log("🔄 Fetching subjects...");
 
       const response = await api.get("/student/subjects/");
-      console.log("✅ Subjects response:", response.data);
 
       if (response.data && response.data.subjects) {
         setSubjects(response.data.subjects);
@@ -36,7 +34,6 @@ const useStudentGrades = () => {
   // Fetch grades dengan filtering
   const fetchGrades = useCallback(
     async (filters = {}) => {
-      console.log("🟢 fetchGrades called", { user, token, filters });
       if (!token || !user) {
         console.log("⚠️ No token or user, skipping fetchGrades");
         return;
@@ -61,13 +58,12 @@ const useStudentGrades = () => {
           ? `/student/grades/?${queryString}`
           : "/student/grades/";
 
-        console.log("🔄 Fetching grades from:", url);
-
         const response = await api.get(url);
-        console.log("✅ Grades response:", response.data);
 
         if (response.data) {
-          setGrades(response.data.grades || []);
+          // ✅ PASTIKAN GRADES ADALAH ARRAY
+          const gradesData = response.data.grades || [];
+          setGrades(gradesData);
           setStatistics(response.data.statistics || {});
         }
       } catch (err) {
@@ -87,10 +83,7 @@ const useStudentGrades = () => {
 
     try {
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
-      console.log("🔄 Fetching grade analytics...");
       const response = await api.get("/student/analytics/grade-trends/");
-      console.log("✅ Analytics response:", response.data);
 
       return response.data;
     } catch (err) {
@@ -106,10 +99,7 @@ const useStudentGrades = () => {
 
     try {
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
-      console.log("🔄 Fetching achievements...");
       const response = await api.get("/student/achievements/");
-      console.log("✅ Achievements response:", response.data);
 
       if (response.data) {
         setAchievements(response.data.achievements || []);
@@ -168,9 +158,7 @@ const useStudentGrades = () => {
 
   // Initial fetch
   useEffect(() => {
-    console.log("🟢 useStudentGrades useEffect triggered", { user, token });
     if (user && token) {
-      console.log("🚀 Starting fetchGrades and fetchAchievements");
       fetchGrades();
       fetchAchievements();
     } else {
@@ -180,11 +168,11 @@ const useStudentGrades = () => {
 
   // Utility functions
   const getGradeColor = useCallback((score) => {
-    if (score >= 90) return "#52c41a"; 
-    if (score >= 80) return "#1890ff"; 
-    if (score >= 70) return "#faad14"; 
-    if (score >= 60) return "#fa8c16"; 
-    return "#ff4d4f"; 
+    if (score >= 90) return "#52c41a";
+    if (score >= 80) return "#1890ff";
+    if (score >= 70) return "#faad14";
+    if (score >= 60) return "#fa8c16";
+    return "#ff4d4f";
   }, []);
 
   const getGradeLetter = useCallback((score) => {

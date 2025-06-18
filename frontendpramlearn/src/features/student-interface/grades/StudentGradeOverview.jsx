@@ -16,6 +16,8 @@ const StudentGradeOverview = () => {
     achievements,
     loading,
     error,
+    analytics,
+    subjects: subjectsToUse,
     fetchGrades,
     fetchAnalytics,
     exportGrades,
@@ -148,9 +150,14 @@ const StudentGradeOverview = () => {
               </div>
             ) : (
               <PerformanceAnalytics
-                analyticsData={analyticsData}
-                statistics={statistics}
-                getGradeColor={getGradeColor}
+                grades={
+                  analytics?.grades && analytics.grades.length > 0
+                    ? analytics.grades
+                    : grades
+                }
+                subjects={subjectsToUse}
+                statistics={analytics?.statistics || statistics}
+                loading={analyticsLoading}
               />
             )}
           </TabPane>

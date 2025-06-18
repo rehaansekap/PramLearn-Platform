@@ -10,14 +10,21 @@ import {
   Tag,
   Divider,
   Tooltip,
+  Empty,
+  Spin,
+  List,
+  Badge,
 } from "antd";
 import {
   ArrowUpOutlined,
   ArrowDownOutlined,
   StarOutlined,
-  AimOutlined, // Ganti dari TargetOutlined ke AimOutlined
+  AimOutlined,
   CalendarOutlined,
   BookOutlined,
+  TrophyOutlined,
+  BulbOutlined,
+  LineChartOutlined,
 } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
@@ -26,7 +33,59 @@ const PerformanceAnalytics = ({
   grades = [],
   subjects = [],
   statistics = {},
+  loading = false,
 }) => {
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div style={{ textAlign: "center", padding: "60px 0" }}>
+        <Spin size="large" tip="Memuat analytics..." />
+      </div>
+    );
+  }
+
+  if (!Array.isArray(grades) || grades.length === 0) {
+    return (
+      <Empty
+        image={Empty.PRESENTED_IMAGE_SIMPLE}
+        description={
+          <div>
+            <Text style={{ fontSize: 16, color: "#666" }}>
+              Belum ada data nilai untuk dianalisis
+            </Text>
+            <div style={{ marginTop: 12 }}>
+              <Text type="secondary" style={{ fontSize: 14 }}>
+                Analytics akan tersedia setelah ada nilai yang tercatat
+              </Text>
+            </div>
+          </div>
+        }
+      />
+    );
+  }
+
+  // ✅ PERBAIKI KONDISI EMPTY STATE
+  if (!grades || grades.length === 0) {
+    return (
+      <Empty
+        image={Empty.PRESENTED_IMAGE_SIMPLE}
+        description={
+          <div>
+            <Text style={{ fontSize: 16, color: "#666" }}>
+              Belum ada data nilai untuk dianalisis
+            </Text>
+            <div style={{ marginTop: 12 }}>
+              <Text type="secondary" style={{ fontSize: 14 }}>
+                Analytics akan tersedia setelah ada nilai yang tercatat
+              </Text>
+            </div>
+          </div>
+        }
+      />
+    );
+  }
+
   // Calculate trends
   const calculateTrend = () => {
     if (grades.length < 2) return { trend: "stable", percentage: 0 };
@@ -38,9 +97,9 @@ const PerformanceAnalytics = ({
       return { trend: "stable", percentage: 0 };
 
     const recentAvg =
-      recentGrades.reduce((sum, g) => sum + g, 0) / recentGrades.length;
+      recentGrades.reduce((a, b) => a + b, 0) / recentGrades.length;
     const olderAvg =
-      olderGrades.reduce((sum, g) => sum + g, 0) / olderGrades.length;
+      olderGrades.reduce((a, b) => a + b, 0) / olderGrades.length;
 
     const difference = recentAvg - olderAvg;
     const percentage = Math.abs((difference / olderAvg) * 100);
@@ -54,73 +113,82 @@ const PerformanceAnalytics = ({
 
   // Calculate subject performance
   const getSubjectPerformance = () => {
-    return subjects.map((subject) => {
-      const subjectGrades = grades.filter(
-        (g) => g.subject_name === subject.name
-      );
-      const average =
-        subjectGrades.length > 0
-          ? subjectGrades.reduce((sum, g) => sum + g.grade, 0) /
-            subjectGrades.length
-          : 0;
+    const subjectStats = {};
 
-      const quizGrades = subjectGrades.filter((g) => g.type === "quiz");
-      const assignmentGrades = subjectGrades.filter(
-        (g) => g.type === "assignment"
-      );
+    grades.forEach((grade) => {
+      const subjectName = grade.subject_name || "Unknown Subject";
+      if (!subjectStats[subjectName]) {
+        subjectStats[subjectName] = {
+          name: subjectName,
+          grades: [],
+          quizzes: [],
+          assignments: [],
+        };
+      }
 
-      return {
-        ...subject,
-        average,
-        totalAssessments: subjectGrades.length,
-        quizAverage:
-          quizGrades.length > 0
-            ? quizGrades.reduce((sum, g) => sum + g.grade, 0) /
-              quizGrades.length
-            : 0,
-        assignmentAverage:
-          assignmentGrades.length > 0
-            ? assignmentGrades.reduce((sum, g) => sum + g.grade, 0) /
-              assignmentGrades.length
-            : 0,
-        quizCount: quizGrades.length,
-        assignmentCount: assignmentGrades.length,
-      };
+      subjectStats[subjectName].grades.push(grade.grade);
+
+      if (grade.assessment_type === "quiz") {
+        subjectStats[subjectName].quizzes.push(grade.grade);
+      } else if (grade.assessment_type === "assignment") {
+        subjectStats[subjectName].assignments.push(grade.grade);
+      }
     });
+
+    return Object.values(subjectStats).map((subject) => ({
+      ...subject,
+      average:
+        subject.grades.length > 0
+          ? subject.grades.reduce((a, b) => a + b, 0) / subject.grades.length
+          : 0,
+      quizAverage:
+        subject.quizzes.length > 0
+          ? subject.quizzes.reduce((a, b) => a + b, 0) / subject.quizzes.length
+          : 0,
+      assignmentAverage:
+        subject.assignments.length > 0
+          ? subject.assignments.reduce((a, b) => a + b, 0) /
+            subject.assignments.length
+          : 0,
+      totalAssessments: subject.grades.length,
+    }));
   };
 
-  // Calculate monthly performance
+  // Get monthly performance
   const getMonthlyPerformance = () => {
     const monthlyData = {};
 
     grades.forEach((grade) => {
-      const month = new Date(grade.date).toISOString().slice(0, 7); // YYYY-MM
+      const month = new Date(grade.date || grade.created_at).toLocaleDateString(
+        "id-ID",
+        {
+          year: "numeric",
+          month: "long",
+        }
+      );
+
       if (!monthlyData[month]) {
-        monthlyData[month] = { grades: [], total: 0 };
+        monthlyData[month] = [];
       }
-      monthlyData[month].grades.push(grade.grade);
-      monthlyData[month].total += grade.grade;
+      monthlyData[month].push(grade.grade);
     });
 
     return Object.entries(monthlyData)
-      .map(([month, data]) => ({
+      .map(([month, gradesInMonth]) => ({
         month,
-        average: data.total / data.grades.length,
-        count: data.grades.length,
-        monthName: new Date(month + "-01").toLocaleDateString("id-ID", {
-          month: "long",
-          year: "numeric",
-        }),
+        average:
+          gradesInMonth.reduce((a, b) => a + b, 0) / gradesInMonth.length,
+        count: gradesInMonth.length,
       }))
-      .sort((a, b) => new Date(b.month) - new Date(a.month))
-      .slice(0, 6);
+      .sort((a, b) => new Date(a.month) - new Date(b.month));
   };
 
-  // Get performance insights
+  // Performance insights
   const getPerformanceInsights = () => {
     const insights = [];
     const trend = calculateTrend();
 
+    // Trend insights
     if (trend.trend === "up") {
       insights.push({
         type: "success",
@@ -172,7 +240,7 @@ const PerformanceAnalytics = ({
     ) {
       insights.push({
         type: "warning",
-        title: `Focus on ${weakestSubject.name} 🎯`,
+        title: `Focus pada ${weakestSubject.name} 🎯`,
         description: `Rata-rata ${weakestSubject.average.toFixed(
           1
         )} - Butuh lebih banyak latihan`,
@@ -194,7 +262,7 @@ const PerformanceAnalytics = ({
       case "down":
         return <ArrowDownOutlined style={{ color: "#ff4d4f" }} />;
       default:
-        return <AimOutlined style={{ color: "#faad14" }} />; // Ganti di sini
+        return <AimOutlined style={{ color: "#faad14" }} />;
     }
   };
 
@@ -211,6 +279,32 @@ const PerformanceAnalytics = ({
 
   return (
     <div>
+      {/* Header Analytics */}
+      <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+        <Col span={24}>
+          <Card
+            style={{
+              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              color: "white",
+            }}
+          >
+            <Row align="middle" justify="center">
+              <Col>
+                <div style={{ textAlign: "center" }}>
+                  <TrophyOutlined style={{ fontSize: 48, marginBottom: 16 }} />
+                  <Title level={3} style={{ color: "white", margin: 0 }}>
+                    Analytics Performa Akademik
+                  </Title>
+                  <Text style={{ color: "rgba(255,255,255,0.8)" }}>
+                    Analisis mendalam terhadap pencapaian belajar Anda
+                  </Text>
+                </div>
+              </Col>
+            </Row>
+          </Card>
+        </Col>
+      </Row>
+
       {/* Performance Trend */}
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
         <Col xs={24} sm={12} md={8}>
@@ -237,24 +331,19 @@ const PerformanceAnalytics = ({
           <Card>
             <Statistic
               title="Target Pencapaian"
-              value={((statistics.average_grade || 0) / 100) * 100}
+              value={75}
               suffix="/ 100"
-              prefix={<AimOutlined />} // Ganti di sini
+              prefix={<AimOutlined />}
               valueStyle={{
-                color:
-                  statistics.average_grade >= 80
-                    ? "#52c41a"
-                    : statistics.average_grade >= 60
-                    ? "#faad14"
-                    : "#ff4d4f",
+                color: statistics.average_grade >= 75 ? "#52c41a" : "#faad14",
               }}
             />
             <Progress
-              percent={statistics.average_grade || 0}
+              percent={((statistics.average_grade || 0) / 100) * 100}
               size="small"
               showInfo={false}
               strokeColor={
-                statistics.average_grade >= 80
+                statistics.average_grade >= 75
                   ? "#52c41a"
                   : statistics.average_grade >= 60
                   ? "#faad14"
@@ -307,24 +396,28 @@ const PerformanceAnalytics = ({
         </Row>
       </Card>
 
-      {/* Subject Performance Breakdown */}
+      {/* Subject Performance */}
       <Card title="📚 Performa per Mata Pelajaran" style={{ marginBottom: 24 }}>
         <Row gutter={[16, 16]}>
-          {subjectPerformance.map((subject) => (
-            <Col xs={24} sm={12} lg={8} key={subject.id}>
-              <Card size="small">
+          {subjectPerformance.map((subject, index) => (
+            <Col xs={24} sm={12} lg={8} key={index}>
+              <Card size="small" style={{ height: "100%" }}>
                 <div style={{ marginBottom: 12 }}>
-                  <Space>
-                    <BookOutlined style={{ color: "#11418b" }} />
-                    <Text strong>{subject.name}</Text>
-                  </Space>
-                </div>
-
-                <div style={{ marginBottom: 16 }}>
-                  <Text style={{ fontSize: 24, fontWeight: "bold" }}>
-                    {subject.average.toFixed(1)}
+                  <Text strong style={{ fontSize: 16 }}>
+                    {subject.name}
                   </Text>
-                  <Text type="secondary"> / 100</Text>
+                  <div style={{ float: "right" }}>
+                    <Badge
+                      status={
+                        subject.average >= 80
+                          ? "success"
+                          : subject.average >= 60
+                          ? "warning"
+                          : "error"
+                      }
+                      text={subject.average.toFixed(1)}
+                    />
+                  </div>
                 </div>
 
                 <Progress
@@ -367,35 +460,102 @@ const PerformanceAnalytics = ({
       {/* Monthly Performance */}
       <Card title="📅 Performa Bulanan" style={{ marginBottom: 24 }}>
         <Row gutter={[16, 16]}>
-          {monthlyPerformance.map((month) => (
-            <Col xs={12} sm={8} md={6} lg={4} key={month.month}>
+          {monthlyPerformance.map((month, index) => (
+            <Col xs={12} sm={8} md={6} key={index}>
               <Card size="small" style={{ textAlign: "center" }}>
-                <Text strong style={{ fontSize: 16 }}>
-                  {month.average.toFixed(1)}
-                </Text>
-                <br />
-                <Text type="secondary" style={{ fontSize: 12 }}>
-                  {month.monthName}
-                </Text>
-                <br />
-                <Tag size="small">{month.count} assessment</Tag>
-                <Progress
-                  percent={month.average}
-                  size="small"
-                  showInfo={false}
-                  strokeColor={
-                    month.average >= 80
-                      ? "#52c41a"
-                      : month.average >= 60
-                      ? "#faad14"
-                      : "#ff4d4f"
-                  }
-                  style={{ marginTop: 8 }}
+                <Statistic
+                  title={month.month}
+                  value={month.average.toFixed(1)}
+                  valueStyle={{
+                    color:
+                      month.average >= 80
+                        ? "#52c41a"
+                        : month.average >= 60
+                        ? "#faad14"
+                        : "#ff4d4f",
+                    fontSize: 16,
+                  }}
                 />
+                <Text type="secondary" style={{ fontSize: 11 }}>
+                  {month.count} assessment
+                </Text>
               </Card>
             </Col>
           ))}
         </Row>
+      </Card>
+
+      {/* Recent Grades */}
+      <Card title="📋 Nilai Terbaru" style={{ marginBottom: 24 }}>
+        <List
+          itemLayout="horizontal"
+          dataSource={grades.slice(0, 5)}
+          renderItem={(grade, index) => (
+            <List.Item>
+              <List.Item.Meta
+                avatar={
+                  <div
+                    style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: "50%",
+                      background:
+                        grade.grade >= 80
+                          ? "#52c41a"
+                          : grade.grade >= 60
+                          ? "#faad14"
+                          : "#ff4d4f",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "white",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {grade.grade}
+                  </div>
+                }
+                title={
+                  <div
+                    style={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <Text strong>
+                      {grade.subject_name || "Unknown Subject"}
+                    </Text>
+                    <Tag
+                      color={
+                        grade.assessment_type === "quiz" ? "blue" : "green"
+                      }
+                    >
+                      {grade.assessment_type || "Assessment"}
+                    </Tag>
+                  </div>
+                }
+                description={
+                  <div>
+                    <Text type="secondary">
+                      {new Date(
+                        grade.date || grade.created_at
+                      ).toLocaleDateString("id-ID", {
+                        weekday: "long",
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </Text>
+                    {grade.assignment_title && (
+                      <div>
+                        <Text style={{ fontSize: 12 }}>
+                          {grade.assignment_title}
+                        </Text>
+                      </div>
+                    )}
+                  </div>
+                }
+              />
+            </List.Item>
+          )}
+        />
       </Card>
     </div>
   );

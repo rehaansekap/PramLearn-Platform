@@ -6,17 +6,25 @@ import {
   PieChartOutlined,
   TrophyOutlined,
 } from "@ant-design/icons";
+import PerformanceAnalytics from "./PerformanceAnalytics";
 
 const { TabPane } = Tabs;
 
-const GradeChart = ({ grades, subjects = [], analytics, loading, compact = false }) => {
+const GradeChart = ({
+  grades,
+  subjects = [],
+  analytics,
+  analyticsLoading = false,
+  statistics = {},
+  loading,
+  compact = false,
+}) => {
   // Tambahkan state untuk subjects yang sudah diproses
   const [processedSubjects, setProcessedSubjects] = useState([]);
 
   // Generate subjects dari grades jika subjects kosong
   const getSubjectsToUse = () => {
     if (subjects && subjects.length > 0) {
-      console.log("✅ Using provided subjects:", subjects);
       return subjects;
     }
 
@@ -28,23 +36,10 @@ const GradeChart = ({ grades, subjects = [], analytics, loading, compact = false
       id: name,
       name: name,
     }));
-
-    console.log("🔄 Generated subjects from grades:", generatedSubjects);
     return generatedSubjects;
   };
 
   const subjectsToUse = getSubjectsToUse();
-
-  useEffect(() => {
-    console.log("🔍 GradeChart Debug:", {
-      grades: grades?.length || 0,
-      subjects: subjects?.length || 0,
-      analytics: analytics,
-      loading: loading,
-      gradesStructure: grades?.[0],
-      subjectsStructure: subjects?.[0],
-    });
-  }, [grades, subjects, analytics, loading]);
 
   if (loading) {
     return (
@@ -63,28 +58,6 @@ const GradeChart = ({ grades, subjects = [], analytics, loading, compact = false
       />
     );
   }
-
-  useEffect(() => {
-    console.log("🔍 GradeChart Debug Detail:", {
-      grades: {
-        count: grades?.length || 0,
-        sample: grades?.[0],
-        subjects_in_grades: [
-          ...new Set(grades?.map((g) => g.subject_name) || []),
-        ],
-      },
-      subjects: {
-        count: subjects?.length || 0,
-        sample: subjects?.[0],
-        list: subjects?.map((s) => s.name || s) || [],
-      },
-      subjectsToUse: {
-        count: subjectsToUse?.length || 0,
-        list: subjectsToUse?.map((s) => s.name || s) || [],
-      },
-      loading,
-    });
-  }, [grades, subjects, subjectsToUse, loading]);
 
   if (loading) {
     return (
@@ -126,16 +99,6 @@ const GradeChart = ({ grades, subjects = [], analytics, loading, compact = false
     if (score >= 60) return "#faad14";
     return "#ff4d4f";
   };
-
-  // Tambahkan debugging
-  useEffect(() => {
-    console.log("🔍 GradeChart Debug:", {
-      grades: grades?.length || 0,
-      subjects: subjects?.length || 0,
-      gradesStructure: grades?.[0],
-      subjectsStructure: subjects?.[0],
-    });
-  }, [grades, subjects]);
 
   if (compact) {
     // Compact version for dashboard
@@ -354,12 +317,6 @@ const GradeChart = ({ grades, subjects = [], analytics, loading, compact = false
               const avgScore =
                 subjectGrades.reduce((sum, g) => sum + (g.grade || 0), 0) /
                 subjectGrades.length;
-
-              console.log(
-                `📊 Subject: ${
-                  subject.name || subject
-                }, Avg: ${avgScore}, Count: ${subjectGrades.length}`
-              );
 
               return (
                 <Col

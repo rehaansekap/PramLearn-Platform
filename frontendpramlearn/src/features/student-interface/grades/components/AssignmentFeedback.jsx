@@ -59,7 +59,6 @@ const AssignmentFeedback = ({
       const response = await api.get(
         `student/assignment-submission/${submissionId}/feedback/`
       );
-      console.log("Assignment feedback response:", response.data);
       setFeedback(response.data);
     } catch (err) {
       setError(err);

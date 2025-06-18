@@ -56,7 +56,6 @@ const QuizResultsDetail = ({
       const response = await api.get(
         `student/quiz-attempt/${attemptId}/review/`
       );
-      console.log("Quiz review response:", response.data);
       setQuizReview(response.data);
     } catch (err) {
       setError(err);

@@ -351,9 +351,11 @@ const StudentGrades = () => {
         >
           <Card style={{ borderRadius: 8 }}>
             <GradeChart
-              grades={grades}
+              grades={grades} // ✅ PASTIKAN GRADES DITERUSKAN
               subjects={subjects}
-              loading={analyticsLoading}
+              analytics={analytics}
+              loading={loading}
+              analyticsLoading={analyticsLoading}
             />
           </Card>
         </TabPane>
