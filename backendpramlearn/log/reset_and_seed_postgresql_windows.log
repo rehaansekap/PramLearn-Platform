@@ -1782,3 +1782,182 @@ Step 13: Final verification...
 Reset and Seed Process Completed Successfully!
 Tue Jun 17 22:38:09 UTC 2025
 ===============================================
+===============================================
+Starting Django Reset and Seed Process (PostgreSQL - Windows)
+Thu Jun 19 08:35:49 UTC 2025
+===============================================
+Step 0: Checking PostgreSQL service...
+Step 1: Dropping and creating PostgreSQL database...
+DROP DATABASE
+CREATE DATABASE
+✓ Database created successfully
+Step 1.5: Creating PostgreSQL user...
+ERROR:  role "pramadmin" already exists
+GRANT
+GRANT
+ALTER ROLE
+✓ Database setup completed
+Step 2: Removing ALL migration files...
+Step 3: Removing existing SQLite databases...
+Step 4: Ensuring migrations directory...
+Step 5: Creating new migrations...
+/workspaces/pramlearn/venv/lib/python3.12/site-packages/rest_framework_simplejwt/__init__.py:1: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import DistributionNotFound, get_distribution
+Migrations for 'pramlearnapp':
+  pramlearnapp/migrations/0001_initial.py
+    - Create model Assignment
+    - Create model Class
+    - Create model File
+    - Create model Group
+    - Create model Role
+    - Create model Subject
+    - Create model CustomUser
+    - Create model AssignmentQuestion
+    - Create model AssignmentSubmission
+    - Create model AssignmentAnswer
+    - Create model Announcement
+    - Create model ClassStudent
+    - Create model GradeStatistics
+    - Create model GroupQuiz
+    - Create model GroupQuizResult
+    - Create model Material
+    - Add field material to group
+    - Add field material to assignment
+    - Create model MaterialYoutubeVideo
+    - Create model Quiz
+    - Create model Question
+    - Add field quiz to groupquiz
+    - Create model StudentActivity
+    - Create model StudentMotivationProfile
+    - Create model StudentQuizAttempt
+    - Create model Schedule
+    - Create model SubjectClass
+    - Add field subject_class to subject
+    - Create model Achievement
+    - Create model GroupMember
+    - Create model GroupQuizSubmission
+    - Alter unique_together for groupquiz (1 constraint(s))
+    - Create model Grade
+    - Create model StudentAssignmentDraft
+    - Create model StudentAttendance
+    - Create model StudentMaterialActivity
+    - Create model StudentMaterialBookmark
+    - Create model StudentMaterialProgress
+    - Create model StudentQuizAnswer
+✓ Migrations created successfully
+Step 6: Applying migrations...
+/workspaces/pramlearn/venv/lib/python3.12/site-packages/rest_framework_simplejwt/__init__.py:1: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import DistributionNotFound, get_distribution
+Operations to perform:
+  Apply all migrations: admin, auth, contenttypes, pramlearnapp, sessions
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0001_initial... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying pramlearnapp.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying sessions.0001_initial... OK
+✓ Migrations applied successfully
+Step 7: Verifying database tables...
+/workspaces/pramlearn/venv/lib/python3.12/site-packages/rest_framework_simplejwt/__init__.py:1: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import DistributionNotFound, get_distribution
+Found 36 pramlearnapp tables:
+  - pramlearnapp_achievement
+  - pramlearnapp_announcement
+  - pramlearnapp_assignment
+  - pramlearnapp_assignmentanswer
+  - pramlearnapp_assignmentquestion
+  - pramlearnapp_assignmentsubmission
+  - pramlearnapp_class
+  - pramlearnapp_classstudent
+  - pramlearnapp_customuser
+  - pramlearnapp_customuser_groups
+  - pramlearnapp_customuser_user_permissions
+  - pramlearnapp_file
+  - pramlearnapp_grade
+  - pramlearnapp_gradestatistics
+  - pramlearnapp_group
+  - pramlearnapp_groupmember
+  - pramlearnapp_groupquiz
+  - pramlearnapp_groupquizresult
+  - pramlearnapp_groupquizsubmission
+  - pramlearnapp_material
+  - pramlearnapp_material_pdf_files
+  - pramlearnapp_materialyoutubevideo
+  - pramlearnapp_question
+  - pramlearnapp_quiz
+  - pramlearnapp_role
+  - pramlearnapp_schedule
+  - pramlearnapp_studentactivity
+  - pramlearnapp_studentattendance
+  - pramlearnapp_studentmaterialactivity
+  - pramlearnapp_studentmaterialbookmark
+  - pramlearnapp_studentmaterialprogress
+  - pramlearnapp_studentmotivationprofile
+  - pramlearnapp_studentquizanswer
+  - pramlearnapp_studentquizattempt
+  - pramlearnapp_subject
+  - pramlearnapp_subjectclass
+✓ Database tables created successfully
+Step 8: Removing existing initial_data.json...
+Step 9: Generating initial_data.json...
+/workspaces/pramlearn/venv/lib/python3.12/site-packages/rest_framework_simplejwt/__init__.py:1: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import DistributionNotFound, get_distribution
+Generating basic initial data...
+- Generating roles...
+- Generating users...
+- Generating classes...
+- Generating subjects...
+- Generating subject classes...
+- Generating class students...
+- Writing to file...
+Generated 158 records successfully!
+- Roles: 3
+- Users: 62
+- Classes: 8
+- Subjects: 20
+- Subject Classes: 15
+- Class Students: 50
+
+✓ Basic data generated successfully!
+✓ Materials, Files, Assignments, Quizzes can be created manually via the application
+✓ Initial data generated successfully
+Step 10: Loading seed data...
+/workspaces/pramlearn/venv/lib/python3.12/site-packages/rest_framework_simplejwt/__init__.py:1: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import DistributionNotFound, get_distribution
+Installed 158 object(s) from 1 fixture(s)
+✓ Seed data loaded successfully
+Step 11: Generating ARCS CSV file...
+✓ ARCS CSV generated successfully
+Step 12: Creating superuser...
+/workspaces/pramlearn/venv/lib/python3.12/site-packages/rest_framework_simplejwt/__init__.py:1: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import DistributionNotFound, get_distribution
+✓ Superuser created successfully
+  Username: admin
+  Password: admin123
+  Email: admin@pramlearn.com
+Step 13: Final verification...
+/workspaces/pramlearn/venv/lib/python3.12/site-packages/rest_framework_simplejwt/__init__.py:1: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import DistributionNotFound, get_distribution
+✓ Final verification successful:
+  - Roles: 3
+  - Users: 63
+  - Classes: 8
+  - Subjects: 20
+===============================================
+Reset and Seed Process Completed Successfully!
+Thu Jun 19 08:36:21 UTC 2025
+===============================================

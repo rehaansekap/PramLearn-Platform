@@ -46,6 +46,7 @@ const GradeTable = ({
   const [selectedGrade, setSelectedGrade] = useState(null);
 
   const handleViewDetail = (record) => {
+    console.log("IsGroupQuiz:", record.is_group_quiz); // Debug log
     console.log("Viewing detail for:", record); // Debug log
     setSelectedGrade(record);
     setDetailModalVisible(true);
@@ -488,6 +489,8 @@ const GradeTable = ({
             size="small"
             icon={<EyeOutlined />}
             onClick={() => {
+              //console log isgroup quiz status
+              console.log("IsGroupQuiz:", record.is_group_quiz); // Debug log
               console.log("Button clicked for record:", record); // Debug log
               if (onViewDetail) {
                 onViewDetail(record);
@@ -546,6 +549,10 @@ const GradeTable = ({
           dataSource={grades.map((grade, index) => ({
             ...grade,
             key: grade.id || index,
+            is_group_quiz:
+              typeof grade.is_group_quiz !== "undefined"
+                ? grade.is_group_quiz
+                : !!grade.group_data,
           }))}
           onChange={handleTableChange}
           pagination={
@@ -579,9 +586,7 @@ const GradeTable = ({
           onClose={handleCloseDetail}
           attemptId={selectedGrade.attempt_id || selectedGrade.id}
           quizTitle={selectedGrade.title}
-          isGroupQuiz={
-            selectedGrade.title?.toLowerCase().includes("group") || false
-          } // PERBAIKAN: Deteksi group quiz
+          isGroupQuiz={selectedGrade.is_group_quiz || selectedGrade.group_data} // PERBAIKAN: Deteksi group quiz
           groupData={selectedGrade?.group_data || null}
         />
       )}

@@ -1,13 +1,19 @@
-import { useState, useCallback, useContext } from "react";
+import { useState, useCallback } from "react";
 import { message } from "antd";
-import { AuthContext } from "../../../../context/AuthContext";
-import api from "../../../../api"; // Import api instance
+import api from "../../../../api";
 
 const useQuizReview = () => {
-  const { user, token } = useContext(AuthContext);
   const [quizReview, setQuizReview] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const token = localStorage.getItem("token");
+
+  // Reset quiz review data
+  const resetQuizReview = useCallback(() => {
+    setQuizReview(null);
+    setError(null);
+  }, []);
 
   // Fetch quiz review details
   const fetchQuizReview = useCallback(
@@ -21,45 +27,29 @@ const useQuizReview = () => {
       setError(null);
 
       try {
-        api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
-        // PERBAIKAN: Gunakan endpoint yang sesuai
         const endpoint = isGroupQuiz
           ? `/student/group-quiz-review/${attemptId}/`
           : `/student/quiz-review/${attemptId}/`;
 
-        const response = await api.get(endpoint);
+        const response = await api.get(endpoint, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-        console.log("✅ Quiz review response:", response.data);
-
-        if (response.data) {
-          setQuizReview(response.data);
-          return response.data;
-        } else {
-          throw new Error("Data review quiz tidak ditemukan");
-        }
+        setQuizReview(response.data);
+        return response.data;
       } catch (err) {
-        console.error("❌ Error fetching quiz review:", err);
+        console.error("Error fetching quiz review:", err);
 
-        let errorMessage = "Terjadi kesalahan saat memuat review quiz";
+        let errorMessage = "Gagal memuat detail quiz";
 
-        if (err.response) {
-          const status = err.response.status;
-          const responseData = err.response.data;
-
-          if (status === 404) {
-            errorMessage = "Review quiz tidak ditemukan";
-          } else if (status === 403) {
-            errorMessage =
-              "Anda tidak memiliki akses untuk melihat review quiz ini";
-          } else if (status === 401) {
-            errorMessage = "Sesi Anda telah berakhir. Silakan login kembali";
-          } else {
-            errorMessage =
-              responseData?.message ||
-              responseData?.detail ||
-              `Error ${status}`;
-          }
+        if (err.response?.status === 404) {
+          errorMessage = "Data quiz tidak ditemukan";
+        } else if (err.response?.status === 403) {
+          errorMessage = "Anda tidak memiliki akses untuk melihat quiz ini";
+        } else if (err.response?.status === 401) {
+          errorMessage = "Sesi Anda telah berakhir. Silakan login kembali";
         } else if (err.request) {
           errorMessage = "Tidak dapat terhubung ke server";
         } else {
@@ -87,8 +77,8 @@ const useQuizReview = () => {
 
       try {
         const endpoint = isGroupQuiz
-          ? `/student/group-quiz-review/${attemptId}/download/`
-          : `/student/quiz-review/${attemptId}/download/`;
+          ? `/student/group-quiz-review/${attemptId}/`
+          : `/student/quiz-review/${attemptId}/`;
 
         const response = await api.get(endpoint, {
           params: { format },
@@ -133,12 +123,6 @@ const useQuizReview = () => {
     },
     [token]
   );
-
-  // Reset state
-  const resetQuizReview = useCallback(() => {
-    setQuizReview(null);
-    setError(null);
-  }, []);
 
   return {
     quizReview,

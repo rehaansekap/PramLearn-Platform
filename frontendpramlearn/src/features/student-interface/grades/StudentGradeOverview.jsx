@@ -59,7 +59,10 @@ const StudentGradeOverview = () => {
   const [selectedGrade, setSelectedGrade] = useState(null);
 
   const handleViewDetail = (grade) => {
-    console.log("Grade selected for detail:", grade); // Debug log
+    //console log IsGroupQuiz
+    if (grade.is_group_quiz) {
+      console.log("Grade heheheheh for detail:", grade); // Debug log
+    }
     setSelectedGrade(grade);
     setDetailModalVisible(true);
   };
@@ -425,6 +428,8 @@ const StudentGradeOverview = () => {
           visible={detailModalVisible}
           onClose={handleCloseDetail}
           attemptId={selectedGrade.attempt_id || selectedGrade.id}
+          // console log isGroupQuiz
+          isGroupQuiz={selectedGrade.is_group_quiz || false}
           quizTitle={selectedGrade.title}
         />
       )}

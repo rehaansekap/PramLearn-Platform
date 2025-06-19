@@ -466,14 +466,14 @@ const AssignmentFeedback = ({
       open={visible}
       onCancel={onClose}
       footer={[
-        <Button
-          key="download"
-          type="default"
-          icon={<DownloadOutlined />}
-          onClick={() => handleDownload("pdf")}
-        >
-          Download Report
-        </Button>,
+        // <Button
+        //   key="download"
+        //   type="default"
+        //   icon={<DownloadOutlined />}
+        //   onClick={() => handleDownload("pdf")}
+        // >
+        //   Download Report
+        // </Button>,
         <Button key="close" type="primary" onClick={onClose}>
           Tutup
         </Button>,

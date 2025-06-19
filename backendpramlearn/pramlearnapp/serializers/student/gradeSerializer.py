@@ -6,12 +6,24 @@ class GradeSerializer(serializers.ModelSerializer):
     subject_name = serializers.CharField(read_only=True)
     material_title = serializers.CharField(
         source='material.title', read_only=True)
+    is_group_quiz = serializers.SerializerMethodField()  # <-- TAMBAHKAN INI
+
+    def get_is_group_quiz(self, obj):
+        # Cek apakah quiz ini adalah group quiz
+        if obj.type == 'quiz':
+            # Cek dari relasi ke quiz
+            if hasattr(obj, 'quiz') and obj.quiz:
+                return getattr(obj.quiz, 'is_group_quiz', False)
+            # Atau fallback dari judul
+            return 'group' in obj.title.lower()
+        return False
 
     class Meta:
         model = Grade
         fields = [
             'id', 'type', 'title', 'subject_name', 'grade',
-            'max_grade', 'date', 'teacher_feedback', 'material_title'
+            'max_grade', 'date', 'teacher_feedback', 'material_title',
+            'is_group_quiz'
         ]
         read_only_fields = ['id', 'date']
 

@@ -655,23 +655,23 @@ class QuizReviewView(APIView):
     def get(self, request, attempt_id):
         """Get quiz review details"""
         download_format = request.GET.get('format')
-        
+
         if download_format:
             return self.download_quiz_report(request, attempt_id, download_format)
-        
+
         try:
             # Import model yang diperlukan
             from pramlearnapp.models.group import GroupQuiz, GroupQuizSubmission, GroupMember, GroupQuizResult
             from pramlearnapp.models.quiz import Quiz, Question
             from pramlearnapp.models import Grade
-            
+
             # PERBAIKAN: Coba cari data dengan berbagai cara
             attempt = None
             grade = None
             quiz = None
             is_group_quiz = False
             group_data = None
-            
+
             # Method 1: Cari berdasarkan Grade dengan tipe quiz
             try:
                 grade = get_object_or_404(
@@ -681,35 +681,36 @@ class QuizReviewView(APIView):
                     type='quiz'
                 )
                 logger.info(f"Found Grade {attempt_id} with type quiz")
-                
+
                 # PERBAIKAN: Deteksi apakah ini group quiz berdasarkan title
                 if grade.title and "group" in grade.title.lower():
                     is_group_quiz = True
                     logger.info("Detected as group quiz based on title")
-                    
+
                     # Cari quiz berdasarkan title matching
-                    quiz_title_clean = grade.title.replace('Quiz ', '').replace('(Group)', '').strip()
+                    quiz_title_clean = grade.title.replace(
+                        'Quiz ', '').replace('(Group)', '').strip()
                     possible_quiz = Quiz.objects.filter(
                         title__icontains=quiz_title_clean,
                         is_group_quiz=True
                     ).first()
-                    
+
                     if possible_quiz:
                         quiz = possible_quiz
                         logger.info(f"Found matching group quiz: {quiz.title}")
-                        
+
                         # Cari GroupMember untuk user ini
                         user_group_member = GroupMember.objects.filter(
                             student=request.user,
                             group__material=quiz.material
                         ).first()
-                        
+
                         if user_group_member:
                             # Build group_data
                             group_members = GroupMember.objects.filter(
                                 group=user_group_member.group
                             ).select_related('student')
-                            
+
                             group_data = {
                                 'id': user_group_member.group.id,
                                 'name': user_group_member.group.name,
@@ -725,9 +726,11 @@ class QuizReviewView(APIView):
                                     for m in group_members
                                 ]
                             }
-                            logger.info(f"Found group data: {group_data['name']} with {len(group_data['members'])} members")
+                            logger.info(
+                                f"Found group data: {group_data['name']} with {len(group_data['members'])} members")
                         else:
-                            logger.warning("User not found in any group for this quiz material")
+                            logger.warning(
+                                "User not found in any group for this quiz material")
                 else:
                     # Individual quiz
                     is_group_quiz = False
@@ -736,11 +739,12 @@ class QuizReviewView(APIView):
                         title__icontains=quiz_title_clean,
                         is_group_quiz=False
                     ).first()
-                    
+
                     if possible_quiz:
                         quiz = possible_quiz
-                        logger.info(f"Found matching individual quiz: {quiz.title}")
-                
+                        logger.info(
+                            f"Found matching individual quiz: {quiz.title}")
+
             except Exception as e:
                 logger.error(f"Error finding grade: {e}")
                 return Response(
@@ -761,33 +765,34 @@ class QuizReviewView(APIView):
                         student=request.user,
                         group__material=quiz.material
                     ).first()
-                    
+
                     if user_group_member:
                         group_quiz = GroupQuiz.objects.filter(
                             quiz=quiz,
                             group=user_group_member.group
                         ).first()
-                        
+
                         if group_quiz:
                             # Get submissions untuk group quiz ini
                             group_submissions = GroupQuizSubmission.objects.filter(
                                 group_quiz=group_quiz
                             ).select_related('question', 'student')
-                            
+
                             # Get all questions untuk quiz ini
                             all_questions = quiz.questions.all()
-                            
+
                             for question in all_questions:
                                 # Cari submission untuk question ini
-                                submission = group_submissions.filter(question=question).first()
-                                
+                                submission = group_submissions.filter(
+                                    question=question).first()
+
                                 if submission:
                                     is_correct = submission.is_correct
                                     if is_correct:
                                         correct_count += 1
                                     else:
                                         incorrect_count += 1
-                                    
+
                                     # User answer
                                     user_answer = None
                                     if submission.selected_choice:
@@ -798,7 +803,7 @@ class QuizReviewView(APIView):
                                             'D': question.choice_d
                                         }
                                         user_answer = f"{submission.selected_choice}. {choice_map.get(submission.selected_choice, '')}"
-                                    
+
                                     # Correct answer
                                     correct_answer = None
                                     if hasattr(question, 'correct_choice') and question.correct_choice:
@@ -809,7 +814,7 @@ class QuizReviewView(APIView):
                                             'D': question.choice_d
                                         }
                                         correct_answer = f"{question.correct_choice}. {choice_map.get(question.correct_choice, '')}"
-                                    
+
                                     questions_data.append({
                                         'id': submission.id,
                                         'question_id': question.id,
@@ -844,7 +849,7 @@ class QuizReviewView(APIView):
                                             'D': question.choice_d
                                         }
                                         correct_answer = f"{question.correct_choice}. {choice_map.get(question.correct_choice, '')}"
-                                    
+
                                     questions_data.append({
                                         'id': f"unanswered_{question.id}",
                                         'question_id': question.id,
@@ -867,38 +872,41 @@ class QuizReviewView(APIView):
                                         'answered_by_name': 'Tidak dijawab',
                                         'teacher_feedback': None
                                     })
-                            
-                            logger.info(f"Found {len(questions_data)} questions for group quiz")
+
+                            logger.info(
+                                f"Found {len(questions_data)} questions for group quiz")
                         else:
-                            logger.warning("GroupQuiz not found for user's group")
+                            logger.warning(
+                                "GroupQuiz not found for user's group")
                     else:
-                        logger.warning("User not in any group for this quiz material")
-                    
+                        logger.warning(
+                            "User not in any group for this quiz material")
+
                 except Exception as e:
                     logger.error(f"Error getting group quiz questions: {e}")
-                    
+
             elif quiz and not is_group_quiz:
                 # PERBAIKAN: Untuk individual quiz, cari dari StudentQuizAttempt jika ada
                 try:
                     # Coba cari StudentQuizAttempt berdasarkan quiz dan user
                     from pramlearnapp.models import StudentQuizAttempt, StudentQuizAnswer
-                    
+
                     quiz_attempt = StudentQuizAttempt.objects.filter(
                         quiz=quiz,
                         student=request.user
                     ).order_by('-completed_at').first()
-                    
+
                     if quiz_attempt:
                         # Get quiz answers
                         quiz_answers = StudentQuizAnswer.objects.filter(
                             quiz_attempt=quiz_attempt
                         ).select_related('question').order_by('question__id')
-                        
+
                         # Process answers
                         for answer in quiz_answers:
                             question = answer.question
                             is_correct = getattr(answer, 'is_correct', False)
-                            
+
                             if is_correct:
                                 correct_count += 1
                             elif getattr(answer, 'selected_choice', None) or getattr(answer, 'answer_text', None):
@@ -909,7 +917,8 @@ class QuizReviewView(APIView):
                             # Determine correct answer untuk multiple choice
                             correct_answer = None
                             if question.question_type == 'multiple_choice':
-                                correct_choice = getattr(question, 'correct_choice', None)
+                                correct_choice = getattr(
+                                    question, 'correct_choice', None)
                                 if correct_choice:
                                     choice_map = {
                                         'A': question.choice_a,
@@ -924,7 +933,7 @@ class QuizReviewView(APIView):
                             if getattr(answer, 'selected_choice', None):
                                 choice_map = {
                                     'A': question.choice_a,
-                                    'B': question.choice_b, 
+                                    'B': question.choice_b,
                                     'C': question.choice_c,
                                     'D': question.choice_d
                                 }
@@ -954,13 +963,16 @@ class QuizReviewView(APIView):
                                 'answered_by_name': request.user.get_full_name() or request.user.username,
                                 'teacher_feedback': getattr(answer, 'teacher_feedback', None)
                             })
-                        
-                        logger.info(f"Found {len(questions_data)} questions for individual quiz")
+
+                        logger.info(
+                            f"Found {len(questions_data)} questions for individual quiz")
                     else:
-                        logger.warning("No StudentQuizAttempt found for this quiz and user")
-                        
+                        logger.warning(
+                            "No StudentQuizAttempt found for this quiz and user")
+
                 except Exception as e:
-                    logger.error(f"Error getting individual quiz questions: {e}")
+                    logger.error(
+                        f"Error getting individual quiz questions: {e}")
 
             # Build final response
             # Hitung duration dari quiz jika ada start_time dan end_time
@@ -969,7 +981,8 @@ class QuizReviewView(APIView):
                 if hasattr(quiz, 'duration'):
                     duration = quiz.duration
                 elif hasattr(quiz, 'start_time') and hasattr(quiz, 'end_time') and quiz.start_time and quiz.end_time:
-                    duration = int((quiz.end_time - quiz.start_time).total_seconds() // 60)
+                    duration = int(
+                        (quiz.end_time - quiz.start_time).total_seconds() // 60)
 
             response_data = {
                 'quiz': {
@@ -1001,14 +1014,15 @@ class QuizReviewView(APIView):
                 'group_data': group_data
             }
 
-            logger.info(f"Quiz review for ID {attempt_id}: {correct_count}/{len(questions_data)} correct, is_group_quiz: {is_group_quiz}")
+            logger.info(
+                f"Quiz review for ID {attempt_id}: {correct_count}/{len(questions_data)} correct, is_group_quiz: {is_group_quiz}")
             return Response(response_data)
 
         except Exception as e:
             logger.error(f"Error in QuizReviewView: {e}")
             import traceback
             traceback.print_exc()
-            
+
             return Response(
                 {
                     'error': str(e),
@@ -1022,23 +1036,10 @@ class QuizReviewView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-
-class GroupQuizReviewView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, attempt_id):
-        """Get group quiz review details"""
-        download_format = request.GET.get('format')
-
-        if download_format:
-            return self.download_group_quiz_report(request, attempt_id, download_format)
-
+    def download_quiz_report(self, request, attempt_id, format_type='pdf'):
+        """Download quiz report"""
         try:
-            from pramlearnapp.models.group import GroupQuiz, GroupQuizSubmission, GroupMember
-            from pramlearnapp.models.quiz import Quiz, Question
-            from pramlearnapp.models import Grade
-
-            # 1. Cari Grade (pastikan type='quiz')
+            # Get grade data
             grade = get_object_or_404(
                 Grade,
                 id=attempt_id,
@@ -1046,166 +1047,10 @@ class GroupQuizReviewView(APIView):
                 type='quiz'
             )
 
-            # 2. Cari quiz yang sesuai
-            quiz = Quiz.objects.filter(title__icontains=grade.title).first()
-            if not quiz:
-                return Response({"error": "Quiz tidak ditemukan"}, status=404)
-
-            # 3. Cari group user
-            user_group_member = GroupMember.objects.filter(
-                student=request.user,
-                group__material=quiz.material
-            ).first()
-            if not user_group_member:
-                return Response({"error": "Anda tidak terdaftar dalam kelompok untuk quiz ini"}, status=404)
-
-            # 4. Cari GroupQuiz untuk group dan quiz ini
-            group_quiz = GroupQuiz.objects.filter(
-                quiz=quiz,
-                group=user_group_member.group
-            ).first()
-            if not group_quiz:
-                return Response({"error": "GroupQuiz tidak ditemukan"}, status=404)
-
-            # 5. Ambil semua soal
-            questions = quiz.questions.all()
-            # 6. Ambil semua jawaban group
-            submissions = GroupQuizSubmission.objects.filter(
-                group_quiz=group_quiz
-            ).select_related('question', 'student')
-
-            # 7. Build questions data
-            questions_data = []
-            correct_count = 0
-            incorrect_count = 0
-            unanswered_count = 0
-
-            for question in questions:
-                submission = submissions.filter(question=question).first()
-                if submission:
-                    is_correct = submission.is_correct
-                    if is_correct:
-                        correct_count += 1
-                    else:
-                        incorrect_count += 1
-
-                    # User answer
-                    user_answer = submission.selected_choice
-                    # Correct answer
-                    correct_answer = question.correct_choice
-
-                    questions_data.append({
-                        'id': submission.id,
-                        'question_id': question.id,
-                        'question_text': question.text,
-                        'question_type': 'multiple_choice',
-                        'choices': {
-                            'A': question.choice_a,
-                            'B': question.choice_b,
-                            'C': question.choice_c,
-                            'D': question.choice_d
-                        },
-                        'user_answer': user_answer,
-                        'selected_choice': user_answer,
-                        'correct_answer': correct_answer,
-                        'is_correct': is_correct,
-                        'points': 1 if is_correct else 0,
-                        'max_points': 1,
-                        'answered_by_name': f"{submission.student.first_name} {submission.student.last_name}".strip() or submission.student.username,
-                        'teacher_feedback': None
-                    })
-                else:
-                    unanswered_count += 1
-                    questions_data.append({
-                        'id': f"unanswered_{question.id}",
-                        'question_id': question.id,
-                        'question_text': question.text,
-                        'question_type': 'multiple_choice',
-                        'choices': {
-                            'A': question.choice_a,
-                            'B': question.choice_b,
-                            'C': question.choice_c,
-                            'D': question.choice_d
-                        },
-                        'user_answer': None,
-                        'selected_choice': None,
-                        'correct_answer': question.correct_choice,
-                        'is_correct': False,
-                        'points': 0,
-                        'max_points': 1,
-                        'answered_by_name': None,
-                        'teacher_feedback': None
-                    })
-
-            # 8. Build group_data
-            group_members = GroupMember.objects.filter(
-                group=user_group_member.group).select_related('student')
-            group_data = {
-                'id': user_group_member.group.id,
-                'name': user_group_member.group.name,
-                'code': user_group_member.group.code,
-                'members': [
-                    {
-                        'id': m.student.id,
-                        'name': f"{m.student.first_name} {m.student.last_name}".strip() or m.student.username,
-                        'username': m.student.username,
-                        'student_id': m.student.username,
-                        'is_current_user': m.student.id == request.user.id
-                    }
-                    for m in group_members
-                ]
-            }
-
-            # 9. Build response
-            response_data = {
-                'quiz': {
-                    'id': quiz.id,
-                    'title': quiz.title,
-                    'subject_name': quiz.material.subject.name if quiz.material and quiz.material.subject else None,
-                    'material_title': quiz.material.title if quiz.material else None,
-                    'duration': None,
-                    'total_questions': questions.count(),
-                    'description': quiz.content
-                },
-                'attempt': {
-                    'id': grade.id,
-                    'score': grade.grade,
-                    'completed_at': grade.date,
-                    'duration': None,
-                    'start_time': None,
-                    'teacher_feedback': grade.teacher_feedback
-                },
-                'questions': questions_data,
-                'summary': {
-                    'total_questions': questions.count(),
-                    'correct_answers': correct_count,
-                    'incorrect_answers': incorrect_count,
-                    'unanswered': unanswered_count,
-                    'accuracy_percentage': (correct_count / questions.count() * 100) if questions.count() else 0
-                },
-                'is_group_quiz': True,
-                'group_data': group_data
-            }
-            return Response(response_data)
-
-        except Exception as e:
-            import traceback
-            traceback.print_exc()
-            return Response({"error": str(e)}, status=500)
-
-    def download_group_quiz_report(self, request, attempt_id, format_type='pdf'):
-        """Download group quiz report - mirip individual tapi disesuaikan untuk group"""
-        try:
-            attempt = get_object_or_404(
-                StudentQuizAttempt,
-                id=attempt_id,
-                student=request.user
-            )
-
             if format_type == 'pdf':
-                return self.generate_quiz_pdf_report(attempt, request.user)
+                return self.generate_quiz_pdf_report(grade, request.user)
             else:
-                return self.generate_quiz_text_report(attempt, request.user)
+                return self.generate_quiz_text_report(grade, request.user)
 
         except Exception as e:
             logger.error(f"Error generating quiz report: {e}")
@@ -1214,8 +1059,8 @@ class GroupQuizReviewView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-    def generate_quiz_pdf_report(self, attempt, user):
-        """Generate PDF report untuk quiz mirip dengan assignment feedback"""
+    def generate_quiz_pdf_report(self, grade, user):
+        """Generate PDF report using reportlab mirip modal QuizResultsDetail"""
         try:
             from reportlab.lib.enums import TA_CENTER, TA_LEFT
             buffer = BytesIO()
@@ -1230,45 +1075,55 @@ class GroupQuizReviewView(APIView):
             styles = getSampleStyleSheet()
             story = []
 
-            # Header - mirip assignment feedback
+            # --- HEADER: Hasil Quiz ---
+            from reportlab.lib.colors import HexColor
+            from reportlab.platypus import Table, TableStyle
+
+            # Deteksi apakah group quiz
+            is_group_quiz = grade.title and "group" in grade.title.lower()
+            quiz_type = "Quiz Kelompok" if is_group_quiz else "Quiz"
+
             header_style = ParagraphStyle(
                 "Header",
                 parent=styles["Heading1"],
                 fontSize=18,
                 alignment=TA_CENTER,
-                textColor=colors.HexColor("#3a3f5c"),
+                textColor=HexColor(
+                    "#3a3f5c" if not is_group_quiz else "#722ed1"),
                 spaceAfter=12,
             )
-            story.append(Paragraph("Quiz Results Report", header_style))
+            story.append(
+                Paragraph(f"{quiz_type} Feedback Report", header_style))
             story.append(Spacer(1, 8))
 
             # Quiz title & subject
-            quiz = attempt.quiz
             story.append(Paragraph(
-                f'<b>{quiz.title}</b> - <font color="#888">{quiz.material.subject.name if quiz.material and quiz.material.subject else "Mata Pelajaran"}</font>',
+                f'<b>{grade.title or "Quiz"}</b> - <font color="#888">{getattr(grade, "subject_name", "") or "Mata Pelajaran"}</font>',
                 styles["Normal"]
             ))
             story.append(Spacer(1, 8))
 
-            # Status badge - mirip assignment
-            nilai = float(attempt.score or 0)
+            # Status badge
+            nilai = float(grade.grade or 0)
             if nilai >= 85:
                 badge = "🌟 Sangat Baik"
                 badge_color = "#52c41a"
+                bg_color = "#f6ffed"
             elif nilai >= 70:
                 badge = "👍 Baik"
                 badge_color = "#faad14"
+                bg_color = "#fffbe6"
             else:
                 badge = "📚 Perlu Perbaikan"
                 badge_color = "#ff4d4f"
+                bg_color = "#fff1f0"
 
             badge_table = Table(
                 [[Paragraph(
                     f'<font color="{badge_color}"><b>{badge}</b></font>', styles["Normal"])]],
                 style=[
-                    ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#f6ffed") if nilai >=
-                     85 else colors.HexColor("#fffbe6") if nilai >= 70 else colors.HexColor("#fff1f0")),
-                    ("BOX", (0, 0), (-1, -1), 1, colors.HexColor(badge_color)),
+                    ("BACKGROUND", (0, 0), (-1, -1), HexColor(bg_color)),
+                    ("BOX", (0, 0), (-1, -1), 1, HexColor(badge_color)),
                     ("ALIGN", (0, 0), (-1, -1), "CENTER"),
                     ("LEFTPADDING", (0, 0), (-1, -1), 8),
                     ("RIGHTPADDING", (0, 0), (-1, -1), 8),
@@ -1277,20 +1132,19 @@ class GroupQuizReviewView(APIView):
             story.append(badge_table)
             story.append(Spacer(1, 12))
 
-            # Quiz feedback
+            # --- FEEDBACK QUIZ ---
             feedback_text = getattr(
-                attempt, 'teacher_feedback', None) or "Quiz telah diselesaikan dengan baik."
-            feedback_color = "#e6f7ff"
+                grade, "teacher_feedback", None) or "Quiz telah diselesaikan dengan baik."
+            feedback_icon = "⭐" if is_group_quiz else "📝"
             feedback_para = Paragraph(
-                f'📝 <b>Feedback Quiz:</b><br/><font color="#888"><i>{feedback_text}</i></font>',
+                f'{feedback_icon} <b>Feedback {quiz_type}:</b><br/><font color="#888"><i>{feedback_text}</i></font>',
                 styles["Normal"]
             )
             feedback_table = Table(
                 [[feedback_para]],
                 style=[
-                    ("BACKGROUND", (0, 0), (-1, -1),
-                     colors.HexColor(feedback_color)),
-                    ("BOX", (0, 0), (-1, -1), 1, colors.HexColor("#91d5ff")),
+                    ("BACKGROUND", (0, 0), (-1, -1), HexColor("#e6f7ff")),
+                    ("BOX", (0, 0), (-1, -1), 1, HexColor("#91d5ff")),
                     ("LEFTPADDING", (0, 0), (-1, -1), 8),
                     ("RIGHTPADDING", (0, 0), (-1, -1), 8),
                 ]
@@ -1298,34 +1152,36 @@ class GroupQuizReviewView(APIView):
             story.append(feedback_table)
             story.append(Spacer(1, 16))
 
-            # Detail Penilaian Quiz (2 kolom) - mirip assignment
+            # --- DETAIL HASIL QUIZ (2 kolom) ---
             info_style = ParagraphStyle(
                 "info", parent=styles["Normal"], fontSize=11, spaceAfter=4)
 
-            # Kiri: Informasi Penilaian
-            info_penilaian = [
-                [Paragraph('<b>📊 Informasi Penilaian</b>', styles["BodyText"])],
+            # Kiri: Informasi Skor
+            info_skor = [
+                [Paragraph('<b>📊 Informasi Skor</b>', styles["BodyText"])],
                 [Paragraph(
-                    f'Skor Akhir: <font color="#52c41a"><b>{nilai:.1f}/100</b></font>', info_style)],
+                    f'Skor Akhir: <font color="{badge_color}"><b>{nilai:.1f}/100</b></font>', info_style)],
                 [Paragraph(
                     f'Grade: <b>{("A" if nilai >= 90 else "B" if nilai >= 80 else "C" if nilai >= 70 else "D" if nilai >= 60 else "E")}</b>', info_style)],
                 [Paragraph(
                     'Status: <font color="#52c41a"><b>Selesai</b></font>', info_style)],
             ]
 
-            # Kanan: Timeline Quiz
-            tgl_selesai = attempt.completed_at.strftime(
-                "%d %B %Y") if attempt.completed_at else "-"
-            durasi = getattr(attempt, 'duration_minutes', quiz.duration)
+            # Kanan: Timeline
+            tgl_selesai = grade.date.strftime(
+                "%d %B %Y") if grade.date else "-"
             timeline = [
                 [Paragraph('<b>📅 Timeline Quiz</b>', styles["BodyText"])],
                 [Paragraph(f'Diselesaikan: <b>{tgl_selesai}</b>', info_style)],
-                [Paragraph(f'Durasi: <b>{durasi} menit</b>', info_style)],
-                [Paragraph('Tipe: <b>Quiz Individual</b>', info_style)],
+                [Paragraph('Durasi: <b>N/A menit</b>', info_style)],
             ]
 
+            if is_group_quiz:
+                timeline.append(
+                    [Paragraph('Kelompok: <b>Tim</b>', info_style)])
+
             detail_table = Table(
-                [[Table(info_penilaian), Table(timeline)]],
+                [[Table(info_skor), Table(timeline)]],
                 colWidths=[240, 240],
                 style=[
                     ("VALIGN", (0, 0), (-1, -1), "TOP"),
@@ -1336,108 +1192,117 @@ class GroupQuizReviewView(APIView):
             story.append(detail_table)
             story.append(Spacer(1, 16))
 
-            # Review Jawaban
-            quiz_answers = StudentQuizAnswer.objects.filter(
-                quiz_attempt=attempt).select_related('question')
-            if quiz_answers.exists():
-                story.append(
-                    Paragraph('<b>Review Jawaban</b>', styles["BodyText"]))
-
-                correct_count = 0
-                for idx, answer in enumerate(quiz_answers, 1):
-                    question = answer.question
-                    is_correct = answer.is_correct
-                    if is_correct:
-                        correct_count += 1
-
-                    # User answer
-                    user_answer = "Tidak dijawab"
-                    if answer.selected_choice:
-                        choice_map = {
-                            'A': question.choice_a, 'B': question.choice_b,
-                            'C': question.choice_c, 'D': question.choice_d
-                        }
-                        user_answer = f"{answer.selected_choice}: {choice_map.get(answer.selected_choice, '')}"
-                    elif answer.answer_text:
-                        user_answer = answer.answer_text
-
-                    # Correct answer
-                    correct_answer = "N/A"
-                    if question.question_type == 'multiple_choice' and hasattr(question, 'correct_choice'):
-                        choice_map = {
-                            'A': question.choice_a, 'B': question.choice_b,
-                            'C': question.choice_c, 'D': question.choice_d
-                        }
-                        correct_answer = f"{question.correct_choice}: {choice_map.get(question.correct_choice, '')}"
-
-                    # Box untuk setiap soal
-                    soal_table = Table(
-                        [
-                            [Paragraph(
-                                f"<b>Soal {idx}:</b> {question.text}", info_style)],
-                            [Paragraph(
-                                f"<b>Jawaban Anda:</b> {user_answer}", info_style)],
-                            [Paragraph(
-                                f"<b>Jawaban Benar:</b> {correct_answer}", info_style)],
-                            [Paragraph(
-                                f"<b>Status:</b> {'Benar ✓' if is_correct else 'Salah ✗'}", info_style)],
-                        ],
-                        style=[
-                            ("BOX", (0, 0), (-1, -1), 1,
-                             colors.HexColor("#52c41a" if is_correct else "#ff4d4f")),
-                            ("BACKGROUND", (0, 0), (-1, -1),
-                             colors.HexColor("#f6ffed" if is_correct else "#fff2f0")),
-                            ("LEFTPADDING", (0, 0), (-1, -1), 8),
-                            ("RIGHTPADDING", (0, 0), (-1, -1), 8),
-                            ("TOPPADDING", (0, 0), (-1, -1), 4),
-                            ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
-                        ]
-                    )
-                    story.append(soal_table)
-                    story.append(Spacer(1, 8))
-
-                # Summary
-                total_questions = quiz_answers.count()
-                story.append(Spacer(1, 8))
-                summary_para = Paragraph(
-                    f'<b>Ringkasan:</b> {correct_count} benar dari {total_questions} soal ({(correct_count/total_questions*100):.1f}%)',
-                    info_style
-                )
-                story.append(summary_para)
-            else:
-                story.append(Paragraph(
-                    '<font color="#888">Detail jawaban tidak tersedia untuk quiz ini.</font>', info_style))
-
-            # Saran Pengembangan - mirip assignment
-            story.append(Spacer(1, 16))
-            if nilai >= 90:
-                saran = ["Selamat! Hasil quiz sangat memuaskan.",
-                         "Pertahankan prestasi belajar yang baik.", "Bantu teman-teman yang membutuhkan bantuan."]
-                saran_color = "#f6ffed"
-            elif nilai >= 75:
-                saran = ["Hasil quiz cukup baik.", "Review kembali materi yang belum dikuasai.",
-                         "Latihan soal tambahan untuk memperkuat pemahaman."]
-                saran_color = "#e6f7ff"
-            else:
-                saran = ["Perlu perbaikan untuk quiz selanjutnya.", "Pelajari kembali materi dasar.",
-                         "Konsultasi dengan guru untuk penjelasan lebih detail."]
-                saran_color = "#fffbe6"
-
-            saran_table = Table(
-                [[Paragraph(
-                    "<br/>".join([f"💡 <b>Saran Pengembangan:</b>"] + saran), info_style)]],
+            # --- STATISTIK RINGKASAN ---
+            stats_data = [
+                ['Statistik', 'Benar', 'Salah', 'Tidak Dijawab', 'Total Soal'],
+                ['Jumlah', '0', '0', '0', '0']
+            ]
+            stats_table = Table(
+                stats_data,
                 style=[
-                    ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor(saran_color)),
-                    ("BOX", (0, 0), (-1, -1), 1, colors.HexColor("#d9d9d9")),
+                    ("BACKGROUND", (0, 0), (-1, 0), HexColor("#f0f0f0")),
+                    ("GRID", (0, 0), (-1, -1), 1, HexColor("#d9d9d9")),
+                    ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+                    ("FONTSIZE", (0, 0), (-1, -1), 10),
                     ("LEFTPADDING", (0, 0), (-1, -1), 8),
                     ("RIGHTPADDING", (0, 0), (-1, -1), 8),
                 ]
             )
-            story.append(saran_table)
+            story.append(
+                Paragraph('<b>📊 Ringkasan Statistik</b>', styles["BodyText"]))
+            story.append(stats_table)
+            story.append(Spacer(1, 16))
 
-            # Footer
+            # --- REVIEW SOAL ---
+            story.append(
+                Paragraph('<b>📝 Review Jawaban</b>', styles["BodyText"]))
+            story.append(Paragraph(
+                '<font color="#888">Detail soal dan jawaban tidak tersedia untuk quiz ini.</font>', info_style))
+            story.append(Paragraph(
+                '<font size=9 color="#888">💡 Tips: Hubungi guru untuk mendapatkan review detail jawaban dan penjelasan materi.</font>', info_style))
+            story.append(Spacer(1, 16))
+
+            # --- Saran Pengembangan ---
+            if nilai >= 90:
+                saran = [
+                    f"Selamat! {'Tim telah' if is_group_quiz else 'Anda telah'} menunjukkan {'kerja sama dan ' if is_group_quiz else ''}pemahaman yang sangat baik pada quiz ini.",
+                    "Saran untuk langkah selanjutnya:",
+                    "- Pertahankan konsistensi belajar yang sudah baik" +
+                    (" dan kerja sama tim" if is_group_quiz else ""),
+                    "- Bantu " +
+                    ("kelompok lain" if is_group_quiz else "teman-teman") +
+                    " yang membutuhkan bantuan",
+                    "- Eksplorasi materi tambahan untuk memperdalam pemahaman" +
+                    (" secara bersama-sama" if is_group_quiz else "")
+                ]
+                saran_color = "#f6ffed"
+            elif nilai >= 75:
+                saran = [
+                    f"{'Tim telah' if is_group_quiz else 'Anda telah'} menunjukkan {'kerja sama dan ' if is_group_quiz else ''}pemahaman yang cukup baik pada quiz ini.",
+                    "Saran untuk perbaikan:",
+                    "- Review kembali materi yang terkait dengan quiz" +
+                    (" bersama anggota tim" if is_group_quiz else ""),
+                    "- Konsultasi dengan guru untuk klarifikasi konsep yang belum jelas",
+                    "- Latihan soal tambahan untuk memperkuat pemahaman" +
+                    (" dan strategi tim" if is_group_quiz else "")
+                ]
+                saran_color = "#e6f7ff"
+            else:
+                saran = [
+                    f"Ada beberapa area yang perlu diperbaiki {'dalam kerja sama dan pemahaman tim ' if is_group_quiz else ''}untuk quiz ini.",
+                    "Langkah yang disarankan:",
+                    "- Pelajari kembali materi dasar yang terkait" +
+                    (" secara bersama-sama" if is_group_quiz else ""),
+                    "- Minta bantuan guru untuk " +
+                    ("mentoring kelompok" if is_group_quiz else "penjelasan lebih detail"),
+                    "- Buat " +
+                    ("jadwal study group" if is_group_quiz else "catatan ringkasan") +
+                    " yang teratur",
+                    "- Jangan ragu untuk bertanya jika ada yang tidak dipahami"
+                ]
+                saran_color = "#fffbe6"
+
+            saran_table = Table(
+                [[Paragraph("<br/>".join(saran), info_style)]],
+                style=[
+                    ("BACKGROUND", (0, 0), (-1, -1), HexColor(saran_color)),
+                    ("BOX", (0, 0), (-1, -1), 1, HexColor("#d9d9d9")),
+                    ("LEFTPADDING", (0, 0), (-1, -1), 8),
+                    ("RIGHTPADDING", (0, 0), (-1, -1), 8),
+                ]
+            )
+            story.append(Spacer(1, 8))
+            story.append(Paragraph(
+                f'<b>💡 Saran Pengembangan {"Tim" if is_group_quiz else ""}</b>', styles["BodyText"]))
+            story.append(saran_table)
+            story.append(Spacer(1, 16))
+
+            # --- Contact Section ---
+            contact_para = Paragraph(
+                f'<b>💬 Butuh Penjelasan Lebih Lanjut?</b><br/>'
+                f'Hubungi guru mata pelajaran untuk diskusi {"strategi kelompok dan " if is_group_quiz else ""}review materi lebih detail.',
+                info_style
+            )
+            contact_table = Table(
+                [[contact_para]],
+                style=[
+                    ("BACKGROUND", (0, 0), (-1, -1), HexColor("#f0f8ff")),
+                    ("BOX", (0, 0), (-1, -1), 2, HexColor("#d9d9d9"), 'DASHED'),
+                    ("LEFTPADDING", (0, 0), (-1, -1), 8),
+                    ("RIGHTPADDING", (0, 0), (-1, -1), 8),
+                ]
+            )
+            story.append(contact_table)
+            story.append(Spacer(1, 16))
+
+            # --- Footer ---
             footer_style = ParagraphStyle(
-                'Footer', parent=styles['Normal'], fontSize=9, textColor=colors.gray, alignment=TA_CENTER)
+                'Footer',
+                parent=styles['Normal'],
+                fontSize=9,
+                textColor=colors.gray,
+                alignment=TA_CENTER
+            )
             story.append(Spacer(1, 20))
             story.append(
                 Paragraph("Generated by PramLearn System", footer_style))
@@ -1449,40 +1314,369 @@ class GroupQuizReviewView(APIView):
             buffer.close()
 
             response = HttpResponse(content_type='application/pdf')
-            response['Content-Disposition'] = f'attachment; filename="quiz-report-{attempt.id}.pdf"'
+            response['Content-Disposition'] = f'attachment; filename="quiz-report-{grade.id}.pdf"'
             response.write(pdf_data)
             return response
 
         except Exception as e:
             logger.error(f"Error generating quiz PDF: {e}")
-            return self.generate_quiz_text_report(attempt, user)
+            return HttpResponse("Error generating PDF report", status=500)
 
-    def generate_quiz_text_report(self, attempt, user):
-        """Generate simple text report sebagai fallback"""
+
+class GroupQuizReviewView(APIView):
+    """API untuk mendapatkan detail review quiz attempt"""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, attempt_id):
+        """Get quiz review details"""
+        download_format = request.GET.get('format')
+
+        if download_format:
+            return self.download_quiz_report(request, attempt_id, download_format)
+
         try:
-            quiz = attempt.quiz
-            report_content = f"""Quiz Results Report
-==================
+            # Import model yang diperlukan
+            from pramlearnapp.models.group import GroupQuiz, GroupQuizSubmission, GroupMember, GroupQuizResult
+            from pramlearnapp.models.quiz import Quiz, Question
+            from pramlearnapp.models import Grade
 
-Student: {user.get_full_name() or user.username}
-Quiz: {quiz.title}
-Subject: {quiz.material.subject.name if quiz.material and quiz.material.subject else 'N/A'}
-Score: {attempt.score}/100
-Completed: {attempt.completed_at.strftime('%d %B %Y, %H:%M') if attempt.completed_at else 'N/A'}
+            # PERBAIKAN: Coba cari data dengan berbagai cara
+            attempt = None
+            grade = None
+            quiz = None
+            is_group_quiz = True  # Karena ini khusus untuk group quiz
+            group_data = None
 
-Generated by PramLearn System
-Generated on {datetime.datetime.now().strftime('%d %B %Y at %H:%M')}
-"""
+            # Method 1: Cari berdasarkan Grade dengan tipe quiz dan group keyword
+            try:
+                grade = get_object_or_404(
+                    Grade,
+                    id=attempt_id,
+                    student=request.user,
+                    type='quiz'
+                )
+                logger.info(f"Found Grade {attempt_id} with type quiz")
 
-            response = HttpResponse(report_content.encode(
-                'utf-8'), content_type='text/plain')
-            response['Content-Disposition'] = f'attachment; filename="quiz-report-{attempt.id}.txt"'
-            return response
+                # PERBAIKAN: Deteksi group quiz berdasarkan title atau langsung cari
+                if grade.title and "group" in grade.title.lower():
+                    # Cari quiz berdasarkan title matching
+                    quiz_title_clean = grade.title.replace(
+                        'Quiz ', '').replace('(Group)', '').strip()
+                    possible_quiz = Quiz.objects.filter(
+                        title__icontains=quiz_title_clean,
+                        is_group_quiz=True
+                    ).first()
+
+                    if possible_quiz:
+                        quiz = possible_quiz
+                        logger.info(f"Found matching group quiz: {quiz.title}")
+
+                        # Cari GroupMember untuk user ini
+                        user_group_member = GroupMember.objects.filter(
+                            student=request.user,
+                            group__material=quiz.material
+                        ).first()
+
+                        if user_group_member:
+                            # Build group_data
+                            group_members = GroupMember.objects.filter(
+                                group=user_group_member.group
+                            ).select_related('student')
+
+                            group_data = {
+                                'id': user_group_member.group.id,
+                                'name': user_group_member.group.name,
+                                'code': user_group_member.group.code,
+                                'members': [
+                                    {
+                                        'id': m.student.id,
+                                        'name': f"{m.student.first_name} {m.student.last_name}".strip() or m.student.username,
+                                        'username': m.student.username,
+                                        'student_id': m.student.username,
+                                        'is_current_user': m.student.id == request.user.id
+                                    }
+                                    for m in group_members
+                                ]
+                            }
+                            logger.info(
+                                f"Found group data: {group_data['name']} with {len(group_data['members'])} members")
+                        else:
+                            logger.warning(
+                                "User not found in any group for this quiz material")
+                else:
+                    # Fallback: coba cari berdasarkan title tanpa "group" keyword
+                    quiz_title_clean = grade.title.replace('Quiz ', '').strip()
+                    possible_quiz = Quiz.objects.filter(
+                        title__icontains=quiz_title_clean,
+                        is_group_quiz=True
+                    ).first()
+
+                    if possible_quiz:
+                        quiz = possible_quiz
+                        logger.info(f"Found matching group quiz: {quiz.title}")
+
+            except Exception as e:
+                logger.error(f"Error finding grade: {e}")
+                return Response(
+                    {'error': f'No quiz data found with ID {attempt_id}'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
+            # Build questions data untuk group quiz
+            questions_data = []
+            correct_count = 0
+            incorrect_count = 0
+            unanswered_count = 0
+
+            if quiz:
+                try:
+                    # Cari user's group member
+                    user_group_member = GroupMember.objects.filter(
+                        student=request.user,
+                        group__material=quiz.material
+                    ).first()
+
+                    if user_group_member:
+                        # Cari GroupQuiz
+                        group_quiz = GroupQuiz.objects.filter(
+                            quiz=quiz,
+                            group=user_group_member.group
+                        ).first()
+
+                        if group_quiz:
+                            # Get submissions untuk group quiz ini
+                            group_submissions = GroupQuizSubmission.objects.filter(
+                                group_quiz=group_quiz
+                            ).select_related('question', 'student')
+
+                            # Get all questions untuk quiz ini
+                            all_questions = quiz.questions.all()
+
+                            for question in all_questions:
+                                # Cari submission untuk question ini
+                                submission = group_submissions.filter(
+                                    question=question).first()
+
+                                if submission:
+                                    is_correct = submission.is_correct
+                                    if is_correct:
+                                        correct_count += 1
+                                    else:
+                                        incorrect_count += 1
+
+                                    # User answer
+                                    user_answer = None
+                                    if submission.selected_choice:
+                                        choice_map = {
+                                            'A': question.choice_a,
+                                            'B': question.choice_b,
+                                            'C': question.choice_c,
+                                            'D': question.choice_d
+                                        }
+                                        user_answer = f"{submission.selected_choice}. {choice_map.get(submission.selected_choice, '')}"
+
+                                    # Correct answer
+                                    correct_answer = None
+                                    if hasattr(question, 'correct_choice') and question.correct_choice:
+                                        choice_map = {
+                                            'A': question.choice_a,
+                                            'B': question.choice_b,
+                                            'C': question.choice_c,
+                                            'D': question.choice_d
+                                        }
+                                        correct_answer = f"{question.correct_choice}. {choice_map.get(question.correct_choice, '')}"
+
+                                    questions_data.append({
+                                        'id': submission.id,
+                                        'question_id': question.id,
+                                        'question_text': question.text,
+                                        'question_image': getattr(question, 'image_url', None),
+                                        'question_type': 'multiple_choice',
+                                        'choices': {
+                                            'A': question.choice_a,
+                                            'B': question.choice_b,
+                                            'C': question.choice_c,
+                                            'D': question.choice_d
+                                        },
+                                        'user_answer': user_answer,
+                                        'selected_choice': submission.selected_choice,
+                                        'correct_answer': correct_answer,
+                                        'is_correct': is_correct,
+                                        'points': 1 if is_correct else 0,
+                                        'max_points': 1,
+                                        'explanation': getattr(question, 'explanation', None),
+                                        'answered_by_name': f"{submission.student.first_name} {submission.student.last_name}".strip() or submission.student.username,
+                                        'teacher_feedback': None
+                                    })
+                                else:
+                                    # Question tidak dijawab
+                                    unanswered_count += 1
+                                    correct_answer = None
+                                    if hasattr(question, 'correct_choice') and question.correct_choice:
+                                        choice_map = {
+                                            'A': question.choice_a,
+                                            'B': question.choice_b,
+                                            'C': question.choice_c,
+                                            'D': question.choice_d
+                                        }
+                                        correct_answer = f"{question.correct_choice}. {choice_map.get(question.correct_choice, '')}"
+
+                                    questions_data.append({
+                                        'id': f"unanswered_{question.id}",
+                                        'question_id': question.id,
+                                        'question_text': question.text,
+                                        'question_image': getattr(question, 'image_url', None),
+                                        'question_type': 'multiple_choice',
+                                        'choices': {
+                                            'A': question.choice_a,
+                                            'B': question.choice_b,
+                                            'C': question.choice_c,
+                                            'D': question.choice_d
+                                        },
+                                        'user_answer': None,
+                                        'selected_choice': None,
+                                        'correct_answer': correct_answer,
+                                        'is_correct': False,
+                                        'points': 0,
+                                        'max_points': 1,
+                                        'explanation': getattr(question, 'explanation', None),
+                                        'answered_by_name': 'Tidak dijawab',
+                                        'teacher_feedback': None
+                                    })
+
+                            # Get GroupQuizResult untuk informasi tambahan
+                            try:
+                                group_quiz_result = GroupQuizResult.objects.get(
+                                    group_quiz=group_quiz
+                                )
+                                completed_at = group_quiz_result.completed_at
+                                final_score = group_quiz_result.score
+                            except GroupQuizResult.DoesNotExist:
+                                completed_at = group_quiz.submitted_at
+                                final_score = grade.grade
+
+                            logger.info(
+                                f"Found {len(questions_data)} questions for group quiz")
+                        else:
+                            logger.warning(
+                                "GroupQuiz not found for user's group")
+                    else:
+                        logger.warning(
+                            "User not in any group for this quiz material")
+
+                except Exception as e:
+                    logger.error(f"Error getting group quiz questions: {e}")
+
+            # Build final response
+            # Hitung duration dari quiz jika ada start_time dan end_time
+            duration = None
+            if quiz:
+                if hasattr(quiz, 'duration'):
+                    duration = quiz.duration
+                elif group_quiz and group_quiz.start_time and group_quiz.end_time:
+                    duration = int(
+                        (group_quiz.end_time - group_quiz.start_time).total_seconds() // 60)
+
+            # PERBAIKAN: Gunakan field yang sesuai dengan model GroupQuiz
+            response_data = {
+                'quiz': {
+                    'id': quiz.id if quiz else grade.id,
+                    'title': quiz.title if quiz else grade.title,
+                    'subject_name': getattr(grade, 'subject_name', None) or (quiz.material.subject.name if quiz and quiz.material and quiz.material.subject else 'Unknown Subject'),
+                    'material_title': getattr(grade, 'material_title', None) or (quiz.material.title if quiz and quiz.material else 'Unknown Material'),
+                    'duration': duration,
+                    'total_questions': len(questions_data),
+                    'description': quiz.content if quiz else 'Quiz details not available'
+                },
+                'attempt': {
+                    'id': grade.id,
+                    'score': final_score if 'final_score' in locals() else grade.grade,
+                    'completed_at': completed_at if 'completed_at' in locals() else grade.date,
+                    'duration': duration,
+                    'started_at': group_quiz.start_time if 'group_quiz' in locals() and group_quiz else None,
+                    'submitted_at': group_quiz.submitted_at if 'group_quiz' in locals() and group_quiz else grade.date,
+                    'teacher_feedback': getattr(grade, 'teacher_feedback', None)
+                },
+                'questions': questions_data,
+                'summary': {
+                    'total_questions': len(questions_data),
+                    'correct_answers': correct_count,
+                    'incorrect_answers': incorrect_count,
+                    'unanswered': unanswered_count,
+                    'accuracy_percentage': (correct_count / len(questions_data) * 100) if questions_data else 0
+                },
+                'is_group_quiz': is_group_quiz,
+                'group_data': group_data,
+                # TAMBAHAN: Informasi spesifik group quiz
+                'group_quiz_info': {
+                    'group_name': group_data['name'] if group_data else None,
+                    'group_code': group_data['code'] if group_data else None,
+                    'total_members': len(group_data['members']) if group_data else 0,
+                    'quiz_started_at': group_quiz.start_time if 'group_quiz' in locals() and group_quiz else None,
+                    'quiz_submitted_at': group_quiz.submitted_at if 'group_quiz' in locals() and group_quiz else None,
+                    'is_completed': group_quiz.is_completed if 'group_quiz' in locals() and group_quiz else True,
+                } if group_data else None
+            }
+
+            logger.info(
+                f"Group Quiz review for ID {attempt_id}: {correct_count}/{len(questions_data)} correct, group: {group_data['name'] if group_data else 'Unknown'}")
+            return Response(response_data)
 
         except Exception as e:
-            logger.error(f"Error generating text report: {e}")
-            return HttpResponse("Error generating report", status=500)
+            logger.error(f"Error in GroupQuizReviewView: {e}")
+            import traceback
+            traceback.print_exc()
 
+            return Response(
+                {
+                    'error': str(e),
+                    'detail': f'No group quiz data found with ID {attempt_id} for user {request.user.id}',
+                    'suggestions': [
+                        'Check if the quiz ID is correct',
+                        'Verify that the user has access to this group quiz',
+                        'Ensure the user is a member of the group for this quiz',
+                        'Contact administrator if the issue persists'
+                    ]
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+
+    def download_group_quiz_report(self, request, attempt_id, format_type='pdf'):
+        """Download group quiz report"""
+        try:
+            # Get grade data for group quiz
+            grade = get_object_or_404(
+                Grade,
+                id=attempt_id,
+                student=request.user,
+                type='quiz'
+            )
+
+            # Verify it's a group quiz
+            if not (grade.title and "group" in grade.title.lower()):
+                return Response(
+                    {'error': 'This is not a group quiz'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            if format_type == 'pdf':
+                return self.generate_group_quiz_pdf_report(grade, request.user)
+            else:
+                return self.generate_group_quiz_text_report(grade, request.user)
+
+        except Exception as e:
+            logger.error(f"Error generating group quiz report: {e}")
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    def generate_group_quiz_pdf_report(self, grade, user):
+        """Generate Group Quiz PDF report - menggunakan method yang sama dengan individual quiz tapi dengan penyesuaian"""
+        # Menggunakan method yang sama dari QuizReviewView dengan flag group quiz
+        quiz_review_view = QuizReviewView()
+        return quiz_review_view.generate_quiz_pdf_report(grade, user)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

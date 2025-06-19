@@ -34,7 +34,6 @@ import {
 } from "@ant-design/icons";
 import useQuizReview from "../hooks/useQuizReview";
 import dayjs from "dayjs";
-import api from "../../../../api";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -45,8 +44,6 @@ const QuizResultsDetail = ({
   quizTitle,
   isGroupQuiz,
   groupData,
-  
-  onDownloadReport,
 }) => {
   const {
     quizReview,
@@ -60,7 +57,7 @@ const QuizResultsDetail = ({
   // Fetch quiz review details
   useEffect(() => {
     if (visible && attemptId) {
-      fetchQuizReview(attemptId, isGroupQuiz); // Pass isGroupQuiz parameter
+      fetchQuizReview(attemptId, isGroupQuiz);
     }
 
     if (!visible) {
@@ -68,58 +65,13 @@ const QuizResultsDetail = ({
     }
   }, [visible, attemptId, isGroupQuiz, fetchQuizReview, resetQuizReview]);
 
-  // Update handleDownload:
+  // Handle download
   const handleDownload = async (format = "pdf") => {
-    if (onDownloadReport) {
-      onDownloadReport(format);
-    } else {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          throw new Error("Token tidak ditemukan");
-        }
-
-        // PERBAIKAN: Gunakan endpoint yang sesuai
-        const endpoint = isGroupQuiz
-          ? `/student/group-quiz-review/${attemptId}/`
-          : `/student/quiz-review/${attemptId}/`;
-
-        const response = await api.get(endpoint, {
-          params: { download: format },
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          responseType: "blob", // Important untuk download file
-        });
-
-        // Create download link
-        const blob = new Blob([response.data], {
-          type:
-            format === "pdf"
-              ? "application/pdf"
-              : "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.style.display = "none";
-        a.href = url;
-        a.download = `${
-          isGroupQuiz ? "group-" : ""
-        }quiz-feedback-${attemptId}.${format}`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-
-        message.success("Report berhasil didownload");
-      } catch (err) {
-        console.error("Error downloading quiz report:", err);
-        if (err.response?.status === 404) {
-          message.error("Download tidak tersedia untuk quiz ini");
-        } else {
-          message.error("Gagal mengunduh laporan quiz");
-        }
-      }
+    try {
+      await downloadQuizReport(attemptId, format, isGroupQuiz);
+    } catch (error) {
+      console.error("Error downloading quiz report:", error);
+      message.error("Gagal mendownload laporan quiz");
     }
   };
 
@@ -354,14 +306,14 @@ const QuizResultsDetail = ({
       open={visible}
       onCancel={onClose}
       footer={[
-        <Button
-          key="download"
-          type="default"
-          icon={<DownloadOutlined />}
-          onClick={() => handleDownload("pdf")}
-        >
-          Download Report
-        </Button>,
+        // <Button
+        //   key="download"
+        //   type="default"
+        //   icon={<DownloadOutlined />}
+        //   onClick={() => handleDownload("pdf")}
+        // >
+        //   Download Report
+        // </Button>,
         <Button key="close" type="primary" onClick={onClose}>
           Tutup
         </Button>,
