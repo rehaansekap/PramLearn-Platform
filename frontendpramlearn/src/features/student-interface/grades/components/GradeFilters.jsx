@@ -7,12 +7,12 @@ import {
   DatePicker,
   Button,
   Space,
-  Form,
   Typography,
+  Input,
 } from "antd";
 import {
   FilterOutlined,
-  ClearOutlined,
+  SearchOutlined,
   CalendarOutlined,
   BookOutlined,
   FileTextOutlined,
@@ -24,14 +24,12 @@ const { RangePicker } = DatePicker;
 const { Text } = Typography;
 
 const GradeFilters = ({
-  subjects = [], // Tambahkan default value array kosong
+  subjects = [],
   filters = {},
   onApplyFilters,
   onClearFilters,
   loading = false,
 }) => {
-  const [form] = Form.useForm();
-
   const handleFilterChange = (field, value) => {
     const newFilters = { ...filters, [field]: value };
     if (typeof onApplyFilters === "function") {
@@ -62,6 +60,7 @@ const GradeFilters = ({
     if (safeFilters.subject_id) count++;
     if (safeFilters.type && safeFilters.type !== "all") count++;
     if (safeFilters.date_from || safeFilters.date_to) count++;
+    if (safeFilters.search) count++;
     return count;
   };
 
@@ -69,16 +68,79 @@ const GradeFilters = ({
 
   return (
     <Card
-      title={
-        <Space>
-          <FilterOutlined style={{ color: "#11418b" }} />
-          <Text strong>Filter Nilai</Text>
-          {activeFilterCount > 0 && (
+      style={{
+        borderRadius: 12,
+        marginBottom: 24,
+        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+      }}
+      bodyStyle={{ padding: "16px 24px" }}
+    >
+      <Row gutter={[16, 16]} align="middle">
+        <Col xs={24} sm={12} md={8}>
+          <Input
+            placeholder="Cari assessment..."
+            prefix={<SearchOutlined />}
+            value={filters.search}
+            onChange={(e) => handleFilterChange("search", e.target.value)}
+            allowClear
+            style={{ width: "100%" }}
+          />
+        </Col>
+        <Col xs={24} sm={12} md={6}>
+          <Select
+            placeholder="Mata pelajaran"
+            allowClear
+            value={filters.subject_id}
+            onChange={(value) => handleFilterChange("subject_id", value)}
+            disabled={loading}
+            style={{ width: "100%" }}
+            suffixIcon={<BookOutlined />}
+          >
+            {subjects.map((subject) => (
+              <Option key={subject.id} value={subject.id}>
+                {subject.name}
+              </Option>
+            ))}
+          </Select>
+        </Col>
+        <Col xs={24} sm={12} md={6}>
+          <Select
+            placeholder="Jenis penilaian"
+            value={filters.type}
+            onChange={(value) => handleFilterChange("type", value)}
+            disabled={loading}
+            style={{ width: "100%" }}
+            suffixIcon={<FileTextOutlined />}
+          >
+            <Option value="all">Semua</Option>
+            <Option value="quiz">Quiz</Option>
+            <Option value="assignment">Assignment</Option>
+          </Select>
+        </Col>
+        <Col xs={24} sm={12} md={4}>
+          <Button
+            icon={<FilterOutlined />}
+            onClick={handleClearFilters}
+            disabled={loading || activeFilterCount === 0}
+            style={{ width: "100%" }}
+          >
+            Reset
+          </Button>
+        </Col>
+      </Row>
+
+      {/* Active Filter Indicator */}
+      {activeFilterCount > 0 && (
+        <div style={{ marginTop: 12 }}>
+          <Space wrap>
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              Filter aktif:
+            </Text>
             <span
               style={{
                 backgroundColor: "#11418b",
                 color: "white",
-                borderRadius: "50%",
+                borderRadius: "12px",
                 padding: "2px 8px",
                 fontSize: 12,
                 fontWeight: "bold",
@@ -86,146 +148,9 @@ const GradeFilters = ({
             >
               {activeFilterCount}
             </span>
-          )}
-        </Space>
-      }
-      size="small"
-      style={{ marginBottom: 16 }}
-    >
-      <Form form={form} layout="vertical">
-        <Row gutter={[16, 16]}>
-          {/* Subject Filter */}
-          <Col xs={24} sm={12} md={6}>
-            <Form.Item label="Mata Pelajaran" style={{ marginBottom: 8 }}>
-              <Select
-                placeholder="Semua mata pelajaran"
-                allowClear
-                value={filters.subject_id}
-                onChange={(value) => handleFilterChange("subject_id", value)}
-                disabled={loading}
-                style={{ width: "100%" }}
-                suffixIcon={<BookOutlined />}
-              >
-                {subjects.map((subject) => (
-                  <Option key={subject.id} value={subject.id}>
-                    {subject.name}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
-          </Col>
-
-          {/* Assessment Type Filter */}
-          <Col xs={24} sm={12} md={6}>
-            <Form.Item label="Jenis Penilaian" style={{ marginBottom: 8 }}>
-              <Select
-                placeholder="Semua jenis"
-                value={filters.type}
-                onChange={(value) => handleFilterChange("type", value)}
-                disabled={loading}
-                style={{ width: "100%" }}
-                suffixIcon={<FileTextOutlined />}
-              >
-                <Option value="all">Semua</Option>
-                <Option value="quiz">Quiz</Option>
-                <Option value="assignment">Assignment</Option>
-              </Select>
-            </Form.Item>
-          </Col>
-
-          {/* Date Range Filter */}
-          <Col xs={24} sm={12} md={8}>
-            <Form.Item label="Rentang Tanggal" style={{ marginBottom: 8 }}>
-              <RangePicker
-                style={{ width: "100%" }}
-                placeholder={["Tanggal mulai", "Tanggal akhir"]}
-                value={
-                  filters.date_from && filters.date_to
-                    ? [dayjs(filters.date_from), dayjs(filters.date_to)]
-                    : null
-                }
-                onChange={handleDateRangeChange}
-                disabled={loading}
-                suffixIcon={<CalendarOutlined />}
-                format="DD/MM/YYYY"
-              />
-            </Form.Item>
-          </Col>
-
-          {/* Clear Button */}
-          <Col xs={24} sm={12} md={4}>
-            <Form.Item
-              label=" "
-              style={{ marginBottom: 8, visibility: "hidden" }}
-            >
-              <div style={{ visibility: "visible" }}>
-                <Button
-                  icon={<ClearOutlined />}
-                  onClick={handleClearFilters}
-                  disabled={loading || activeFilterCount === 0}
-                  style={{ width: "100%" }}
-                >
-                  Reset Filter
-                </Button>
-              </div>
-            </Form.Item>
-          </Col>
-        </Row>
-
-        {/* Quick Filters */}
-        <Row style={{ marginTop: 8 }}>
-          <Col span={24}>
-            <Text type="secondary" style={{ fontSize: 12, marginBottom: 8 }}>
-              Filter Cepat:
-            </Text>
-            <Space wrap>
-              <Button
-                size="small"
-                onClick={() =>
-                  handleDateRangeChange([dayjs().subtract(7, "day"), dayjs()])
-                }
-                disabled={loading}
-              >
-                7 Hari Terakhir
-              </Button>
-              <Button
-                size="small"
-                onClick={() =>
-                  handleDateRangeChange([dayjs().subtract(1, "month"), dayjs()])
-                }
-                disabled={loading}
-              >
-                1 Bulan Terakhir
-              </Button>
-              <Button
-                size="small"
-                onClick={() =>
-                  handleDateRangeChange([dayjs().subtract(3, "month"), dayjs()])
-                }
-                disabled={loading}
-              >
-                3 Bulan Terakhir
-              </Button>
-              <Button
-                size="small"
-                onClick={() => handleFilterChange("type", "quiz")}
-                disabled={loading}
-                type={filters.type === "quiz" ? "primary" : "default"}
-              >
-                Quiz Saja
-              </Button>
-              <Button
-                size="small"
-                onClick={() => handleFilterChange("type", "assignment")}
-                disabled={loading}
-                type={filters.type === "assignment" ? "primary" : "default"}
-              >
-                Assignment Saja
-              </Button>
-            </Space>
-          </Col>
-        </Row>
-      </Form>
+          </Space>
+        </div>
+      )}
     </Card>
   );
 };
