@@ -27,6 +27,8 @@ import {
   FilterOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
+import QuizResultsDetail from "./QuizResultsDetail";
+import AssignmentFeedback from "./AssignmentFeedback";
 
 const { Text } = Typography;
 
@@ -40,6 +42,20 @@ const GradeTable = ({
 }) => {
   const [sortedInfo, setSortedInfo] = useState({});
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [detailModalVisible, setDetailModalVisible] = useState(false);
+  const [selectedGrade, setSelectedGrade] = useState(null);
+
+  const handleViewDetail = (record) => {
+    console.log("Viewing detail for:", record); // Debug log
+    setSelectedGrade(record);
+    setDetailModalVisible(true);
+  };
+
+  // Handler untuk menutup modal
+  const handleCloseDetail = () => {
+    setDetailModalVisible(false);
+    setSelectedGrade(null);
+  };
 
   React.useEffect(() => {
     const handleResize = () => {
@@ -284,7 +300,17 @@ const GradeTable = ({
                       <Button
                         type="primary"
                         icon={<EyeOutlined />}
-                        onClick={() => onViewDetail && onViewDetail(grade)}
+                        onClick={() => {
+                          console.log(
+                            "Mobile button clicked for grade:",
+                            grade
+                          ); // Debug log
+                          if (onViewDetail) {
+                            onViewDetail(grade);
+                          } else {
+                            handleViewDetail(grade);
+                          }
+                        }}
                         style={{
                           width: "100%",
                           borderRadius: 8,
@@ -461,7 +487,14 @@ const GradeTable = ({
             type="primary"
             size="small"
             icon={<EyeOutlined />}
-            onClick={() => onViewDetail && onViewDetail(record)}
+            onClick={() => {
+              console.log("Button clicked for record:", record); // Debug log
+              if (onViewDetail) {
+                onViewDetail(record);
+              } else {
+                handleViewDetail(record);
+              }
+            }}
             style={{
               borderRadius: 6,
               fontWeight: 500,
@@ -531,6 +564,27 @@ const GradeTable = ({
           size="middle"
         />
       </Card>
+      {/* Modal Components */}
+      {selectedGrade && selectedGrade.type === "assignment" && (
+        <AssignmentFeedback
+          visible={detailModalVisible}
+          onClose={handleCloseDetail}
+          gradeId={selectedGrade.id} // Ubah nama prop untuk lebih jelas
+          assignmentTitle={selectedGrade.title}
+        />
+      )}
+      {selectedGrade && selectedGrade.type === "quiz" && (
+        <QuizResultsDetail
+          visible={detailModalVisible}
+          onClose={handleCloseDetail}
+          attemptId={selectedGrade.attempt_id || selectedGrade.id}
+          quizTitle={selectedGrade.title}
+          isGroupQuiz={
+            selectedGrade.title?.toLowerCase().includes("group") || false
+          } // PERBAIKAN: Deteksi group quiz
+          groupData={selectedGrade?.group_data || null}
+        />
+      )}
     </div>
   );
 };

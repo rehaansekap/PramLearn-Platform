@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from django.db.models import Avg, Count, Q
 from django.utils import timezone
+from django.shortcuts import get_object_or_404
 from datetime import datetime, timedelta
 from pramlearnapp.decorators import student_required
 # Replace the wildcard import with specific imports

@@ -27,6 +27,8 @@ import GradeChart from "./components/GradeChart";
 import PerformanceAnalytics from "./components/PerformanceAnalytics";
 import AchievementBadges from "./components/AchievementBadges";
 import useStudentGrades from "./hooks/useStudentGrades";
+import QuizResultsDetail from "./components/QuizResultsDetail";
+import AssignmentFeedback from "./components/AssignmentFeedback";
 
 const { TabPane } = Tabs;
 const { Title, Text } = Typography;
@@ -53,6 +55,19 @@ const StudentGradeOverview = () => {
   const [filters, setFilters] = useState({});
   const [analyticsData, setAnalyticsData] = useState(null);
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
+  const [detailModalVisible, setDetailModalVisible] = useState(false);
+  const [selectedGrade, setSelectedGrade] = useState(null);
+
+  const handleViewDetail = (grade) => {
+    console.log("Grade selected for detail:", grade); // Debug log
+    setSelectedGrade(grade);
+    setDetailModalVisible(true);
+  };
+
+  const handleCloseDetail = () => {
+    setDetailModalVisible(false);
+    setSelectedGrade(null);
+  };
 
   // Handle filter changes
   const handleFilterChange = (newFilters) => {
@@ -358,6 +373,7 @@ const StudentGradeOverview = () => {
                 grades={grades}
                 getGradeColor={getGradeColor}
                 getGradeLetter={getGradeLetter}
+                onViewDetail={handleViewDetail} // Pass handler ke GradeTable
                 onExport={handleExport}
                 loading={loading}
               />
@@ -404,6 +420,24 @@ const StudentGradeOverview = () => {
           </Tabs>
         )}
       </Card>
+      {selectedGrade && selectedGrade.type === "quiz" && (
+        <QuizResultsDetail
+          visible={detailModalVisible}
+          onClose={handleCloseDetail}
+          attemptId={selectedGrade.attempt_id || selectedGrade.id}
+          quizTitle={selectedGrade.title}
+        />
+      )}
+
+      {selectedGrade && selectedGrade.type === "assignment" && (
+        <AssignmentFeedback
+          visible={detailModalVisible}
+          onClose={handleCloseDetail}
+          submissionId={selectedGrade.submission_id || selectedGrade.id}
+          gradeId={selectedGrade.id} // Tambahkan gradeId
+          assignmentTitle={selectedGrade.title}
+        />
+      )}
     </div>
   );
 };
