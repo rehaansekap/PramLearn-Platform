@@ -25,7 +25,7 @@ from pramlearnapp.views.student.materialProgressView import StudentMaterialProgr
 #     QuizAttemptReviewView, AssignmentSubmissionFeedbackView
 # )
 from pramlearnapp.views.student.studentGradeView import (
-    StudentGradeView, StudentGradeAnalyticsView, StudentAchievementView, student_analytics
+    StudentGradeView, StudentGradeAnalyticsView, StudentAchievementView, AssignmentFeedbackByGradeView, QuizReviewView, GroupQuizReviewView, student_analytics,
 )
 
 from pramlearnapp.views.teacher.teacherViewSet import TeacherViewSet
@@ -64,7 +64,7 @@ __all__ = [
     "MaterialAttendanceListView", "update_attendance", "bulk_create_attendance",
     "StudentAvailableAssignmentsView", "StudentAssignmentQuestionsView", "StudentAssignmentDraftView",
     "StudentAssignmentSubmitView", "StudentAssignmentSubmissionsView", "StudentAssignmentBySlugView",
-    "StudentGradesView", "StudentGradeAnalyticsView", "QuizAttemptReviewView", "AssignmentSubmissionFeedbackView",
+    "StudentGradesView", "StudentGradeAnalyticsView", "QuizAttemptReviewView", "AssignmentFeedbackByGradeView", "QuizReviewView", "GroupQuizReviewView",
     "ScheduleViewSet", "StudentActivityViewSet", "StudentUpcomingDeadlinesView", "StudentQuickActionsView",
     "StudentMaterialProgressView", "StudentMaterialBookmarkView", "StudentMaterialAccessView", "StudentMaterialActivityView",
     "GroupQuizDetailView", "SubmitGroupQuizView", "GroupQuizResultsView", "StudentGroupQuizListView", "SaveGroupQuizAnswerView",

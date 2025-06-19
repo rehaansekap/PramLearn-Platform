@@ -3,21 +3,25 @@ import {
   Card,
   Row,
   Col,
-  Badge,
   Typography,
-  Space,
-  Tooltip,
   Progress,
+  Space,
+  Empty,
+  List,
   Tag,
-  Statistic,
+  Tooltip,
+  Badge,
 } from "antd";
 import {
-  TrophyOutlined,
-  StarOutlined,
-  FireOutlined,
-  ThunderboltOutlined,
   CrownOutlined,
+  StarOutlined,
+  ThunderboltOutlined,
   GiftOutlined,
+  TrophyOutlined,
+  FireOutlined,
+  LockOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
 } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
@@ -34,11 +38,12 @@ const AchievementBadges = ({ grades = [], statistics = {} }) => {
       bgColor: "#FFF8DC",
       criteria: () => grades.some((g) => g.grade === 100),
       progress: () => {
-        const perfectScores = grades.filter((g) => g.grade === 100).length;
+        const perfectScores = grades.filter(g => g.grade === 100).length;
         return {
           current: perfectScores,
           target: 1,
           percentage: perfectScores > 0 ? 100 : 0,
+          description: perfectScores > 0 ? `${perfectScores} nilai sempurna` : "Belum ada nilai 100"
         };
       },
     },
@@ -50,13 +55,33 @@ const AchievementBadges = ({ grades = [], statistics = {} }) => {
       color: "#52c41a",
       bgColor: "#f6ffed",
       criteria: () => {
-        const recent = grades.slice(0, 5);
-        return recent.length >= 5 && recent.every((g) => g.grade >= 80);
+        const sortedGrades = [...grades].sort((a, b) => new Date(a.date) - new Date(b.date));
+        for (let i = 0; i <= sortedGrades.length - 5; i++) {
+          const consecutive = sortedGrades.slice(i, i + 5);
+          if (consecutive.every(g => g.grade >= 80)) return true;
+        }
+        return false;
       },
       progress: () => {
-        const recent = grades.slice(0, 5);
-        const above80 = recent.filter((g) => g.grade >= 80).length;
-        return { current: above80, target: 5, percentage: (above80 / 5) * 100 };
+        const sortedGrades = [...grades].sort((a, b) => new Date(a.date) - new Date(b.date));
+        let maxConsecutive = 0;
+        let current = 0;
+        
+        for (const grade of sortedGrades) {
+          if (grade.grade >= 80) {
+            current++;
+            maxConsecutive = Math.max(maxConsecutive, current);
+          } else {
+            current = 0;
+          }
+        }
+        
+        return {
+          current: maxConsecutive,
+          target: 5,
+          percentage: Math.min((maxConsecutive / 5) * 100, 100),
+          description: `${maxConsecutive}/5 assessment berturut-turut`
+        };
       },
     },
     {
@@ -68,11 +93,12 @@ const AchievementBadges = ({ grades = [], statistics = {} }) => {
       bgColor: "#e6f7ff",
       criteria: () => (statistics.quiz_average || 0) >= 85,
       progress: () => {
-        const avg = statistics.quiz_average || 0;
+        const quizAverage = statistics.quiz_average || 0;
         return {
-          current: avg.toFixed(1),
+          current: quizAverage.toFixed(1),
           target: 85,
-          percentage: (avg / 85) * 100,
+          percentage: Math.min((quizAverage / 85) * 100, 100),
+          description: `Rata-rata quiz: ${quizAverage.toFixed(1)}/85`
         };
       },
     },
@@ -85,11 +111,12 @@ const AchievementBadges = ({ grades = [], statistics = {} }) => {
       bgColor: "#f9f0ff",
       criteria: () => (statistics.assignment_average || 0) >= 85,
       progress: () => {
-        const avg = statistics.assignment_average || 0;
+        const assignmentAverage = statistics.assignment_average || 0;
         return {
-          current: avg.toFixed(1),
+          current: assignmentAverage.toFixed(1),
           target: 85,
-          percentage: (avg / 85) * 100,
+          percentage: Math.min((assignmentAverage / 85) * 100, 100),
+          description: `Rata-rata assignment: ${assignmentAverage.toFixed(1)}/85`
         };
       },
     },
@@ -102,11 +129,12 @@ const AchievementBadges = ({ grades = [], statistics = {} }) => {
       bgColor: "#fff7e6",
       criteria: () => (statistics.average_grade || 0) >= 90,
       progress: () => {
-        const avg = statistics.average_grade || 0;
+        const overallAverage = statistics.average_grade || 0;
         return {
-          current: avg.toFixed(1),
+          current: overallAverage.toFixed(1),
           target: 90,
-          percentage: (avg / 90) * 100,
+          percentage: Math.min((overallAverage / 90) * 100, 100),
+          description: `Rata-rata keseluruhan: ${overallAverage.toFixed(1)}/90`
         };
       },
     },
@@ -117,13 +145,14 @@ const AchievementBadges = ({ grades = [], statistics = {} }) => {
       icon: <FireOutlined />,
       color: "#eb2f96",
       bgColor: "#fff0f6",
-      criteria: () => (statistics.completed_assessments || 0) >= 20,
+      criteria: () => (statistics.completed_assessments || grades.length) >= 20,
       progress: () => {
-        const completed = statistics.completed_assessments || 0;
+        const completed = statistics.completed_assessments || grades.length;
         return {
           current: completed,
           target: 20,
-          percentage: (completed / 20) * 100,
+          percentage: Math.min((completed / 20) * 100, 100),
+          description: `${completed}/20 assessment diselesaikan`
         };
       },
     },
@@ -147,261 +176,299 @@ const AchievementBadges = ({ grades = [], statistics = {} }) => {
     const progress = achievement.progress();
     const isEarned = status === "earned";
     const isInProgress = status === "inProgress";
+    const isLocked = status === "locked";
 
     return (
-      <Tooltip
-        title={
-          <div>
-            <div style={{ fontWeight: "bold", marginBottom: 4 }}>
-              {achievement.title}
-            </div>
-            <div style={{ marginBottom: 8 }}>{achievement.description}</div>
-            {!isEarned && (
-              <div>
-                Progress: {progress.current} / {progress.target}
-              </div>
-            )}
-          </div>
-        }
-        placement="top"
+      <Card
+        style={{
+          borderRadius: 12,
+          textAlign: "center",
+          border: isEarned ? `2px solid ${achievement.color}` : "1px solid #f0f0f0",
+          background: isEarned ? achievement.bgColor : isLocked ? "#f8f8f8" : "white",
+          opacity: isLocked ? 0.7 : 1,
+          transition: "all 0.3s ease",
+          position: "relative",
+          overflow: "hidden",
+        }}
+        bodyStyle={{ padding: 16 }}
+        onMouseEnter={(e) => {
+          if (!isLocked) {
+            e.currentTarget.style.transform = "translateY(-4px)";
+            e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.12)";
+          }
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = "translateY(0)";
+          e.currentTarget.style.boxShadow = "none";
+        }}
       >
-        <Card
-          size="small"
-          style={{
-            background: isEarned
-              ? achievement.bgColor
-              : isInProgress
-              ? "#fafafa"
-              : "#f5f5f5",
-            border: `2px solid ${
-              isEarned
-                ? achievement.color
-                : isInProgress
-                ? "#d9d9d9"
-                : "#e8e8e8"
-            }`,
-            borderRadius: 12,
-            textAlign: "center",
-            opacity: isEarned ? 1 : isInProgress ? 0.8 : 0.5,
-            transition: "all 0.3s ease",
-            cursor: "pointer",
-          }}
-          hoverable
-          className="achievement-card"
-        >
-          <div style={{ marginBottom: 8 }}>
-            <div
-              style={{
-                fontSize: 32,
-                color: isEarned ? achievement.color : "#bfbfbf",
-                marginBottom: 8,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                height: 40,
-              }}
-            >
-              {achievement.icon}
-            </div>
-
-            {isEarned && (
-              <Badge
-                count="✓"
-                style={{
-                  backgroundColor: achievement.color,
-                  position: "absolute",
-                  top: 8,
-                  right: 8,
-                }}
-              />
-            )}
+        {/* Status Badge */}
+        {isEarned && (
+          <div style={{
+            position: "absolute",
+            top: 8,
+            right: 8,
+            background: achievement.color,
+            borderRadius: "50%",
+            width: 24,
+            height: 24,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center"
+          }}>
+            <CheckCircleOutlined style={{ color: "white", fontSize: 12 }} />
           </div>
+        )}
 
-          <Title
-            level={5}
-            style={{
-              margin: 0,
-              fontSize: 12,
-              color: isEarned ? achievement.color : "#666",
-              fontWeight: "bold",
-            }}
-          >
-            {achievement.title}
-          </Title>
+        {isInProgress && (
+          <div style={{
+            position: "absolute",
+            top: 8,
+            right: 8,
+            background: "#faad14",
+            borderRadius: "50%",
+            width: 24,
+            height: 24,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center"
+          }}>
+            <ClockCircleOutlined style={{ color: "white", fontSize: 12 }} />
+          </div>
+        )}
 
-          <Text
-            type="secondary"
-            style={{
-              fontSize: 10,
-              display: "block",
+        {isLocked && (
+          <div style={{
+            position: "absolute",
+            top: 8,
+            right: 8,
+            background: "#d9d9d9",
+            borderRadius: "50%",
+            width: 24,
+            height: 24,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center"
+          }}>
+            <LockOutlined style={{ color: "white", fontSize: 12 }} />
+          </div>
+        )}
+
+        {/* Achievement Icon */}
+        <div style={{
+          fontSize: 32,
+          color: isLocked ? "#bfbfbf" : achievement.color,
+          marginBottom: 12,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: 48
+        }}>
+          {isLocked ? <LockOutlined /> : achievement.icon}
+        </div>
+
+        {/* Achievement Title */}
+        <Title level={5} style={{ 
+          margin: "0 0 8px 0", 
+          color: isLocked ? "#bfbfbf" : "#11418b",
+          fontSize: 14,
+          fontWeight: "bold"
+        }}>
+          {achievement.title}
+        </Title>
+
+        {/* Achievement Description */}
+        <Text 
+          type={isLocked ? "secondary" : "default"}
+          style={{ 
+            fontSize: 12, 
+            display: "block", 
+            marginBottom: 12,
+            color: isLocked ? "#bfbfbf" : "#666"
+          }}
+        >
+          {achievement.description}
+        </Text>
+
+        {/* Progress Section */}
+        {!isEarned && (
+          <div style={{ marginBottom: 8 }}>
+            <Progress
+              percent={progress.percentage}
+              strokeColor={isLocked ? "#d9d9d9" : achievement.color}
+              trailColor="#f0f0f0"
+              showInfo={false}
+              size="small"
+            />
+            <Text style={{ 
+              fontSize: 11, 
+              color: isLocked ? "#bfbfbf" : "#666",
               marginTop: 4,
-              height: 32,
-              overflow: "hidden",
-            }}
-          >
-            {achievement.description}
-          </Text>
+              display: "block"
+            }}>
+              {progress.description}
+            </Text>
+          </div>
+        )}
 
-          {!isEarned && progress.percentage > 0 && (
-            <div style={{ marginTop: 8 }}>
-              <Progress
-                percent={Math.min(progress.percentage, 100)}
-                size="small"
-                showInfo={false}
-                strokeColor={achievement.color}
-              />
-              <Text style={{ fontSize: 10, color: "#666" }}>
-                {progress.current} / {progress.target}
-              </Text>
-            </div>
-          )}
-
-          {isEarned && (
-            <Tag
+        {/* Earned Badge */}
+        {isEarned && (
+          <div style={{ marginTop: 8 }}>
+            <Tag 
               color={achievement.color}
-              style={{
-                margin: "8px 0 0 0",
-                fontSize: 10,
-                padding: "2px 6px",
+              style={{ 
+                borderRadius: 12,
+                fontWeight: "bold",
+                fontSize: 11
               }}
             >
-              EARNED
+              ✓ Tercapai
             </Tag>
-          )}
-        </Card>
-      </Tooltip>
+          </div>
+        )}
+
+        {/* Progress Badge */}
+        {isInProgress && (
+          <div style={{ marginTop: 8 }}>
+            <Tag 
+              color="orange"
+              style={{ 
+                borderRadius: 12,
+                fontWeight: "bold",
+                fontSize: 11
+              }}
+            >
+              {progress.percentage.toFixed(0)}% Progress
+            </Tag>
+          </div>
+        )}
+      </Card>
     );
   };
 
+  if (grades.length === 0) {
+    return (
+      <div style={{ textAlign: "center", padding: "60px 24px" }}>
+        <Empty
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          description={
+            <div>
+              <Text style={{ fontSize: 16, color: "#666" }}>
+                Belum ada pencapaian
+              </Text>
+              <div style={{ marginTop: 12 }}>
+                <Text type="secondary" style={{ fontSize: 14 }}>
+                  Mulai mengerjakan quiz dan assignment untuk mendapatkan achievement
+                </Text>
+              </div>
+            </div>
+          }
+        />
+      </div>
+    );
+  }
+
   return (
     <div>
-      {/* Summary */}
-      <Card style={{ marginBottom: 24, textAlign: "center" }}>
-        <Row gutter={16}>
-          <Col span={8}>
-            <Statistic
-              title="🏆 Earned"
-              value={earnedAchievements.length}
-              suffix={`/ ${achievements.length}`}
-              valueStyle={{ color: "#52c41a", fontSize: 24 }}
-            />
-          </Col>
-          <Col span={8}>
-            <Statistic
-              title="⏳ In Progress"
-              value={inProgressAchievements.length}
-              valueStyle={{ color: "#faad14", fontSize: 24 }}
-            />
-          </Col>
-          <Col span={8}>
-            <Statistic
-              title="🔒 Locked"
-              value={lockedAchievements.length}
-              valueStyle={{ color: "#bfbfbf", fontSize: 24 }}
-            />
-          </Col>
-        </Row>
-      </Card>
+      {/* Summary Stats */}
+      <Row gutter={[16, 16]} style={{ marginBottom: 32 }}>
+        <Col xs={24} sm={8}>
+          <Card style={{ borderRadius: 12, textAlign: "center", background: "linear-gradient(135deg, #52c41a 0%, #73d13d 100%)", color: "white" }}>
+            <TrophyOutlined style={{ fontSize: 32, marginBottom: 8 }} />
+            <div style={{ fontSize: 24, fontWeight: "bold", marginBottom: 4 }}>
+              {earnedAchievements.length}
+            </div>
+            <div style={{ fontSize: 14, opacity: 0.9 }}>
+              Achievement Tercapai
+            </div>
+          </Card>
+        </Col>
+        <Col xs={24} sm={8}>
+          <Card style={{ borderRadius: 12, textAlign: "center", background: "linear-gradient(135deg, #faad14 0%, #ffc53d 100%)", color: "white" }}>
+            <ClockCircleOutlined style={{ fontSize: 32, marginBottom: 8 }} />
+            <div style={{ fontSize: 24, fontWeight: "bold", marginBottom: 4 }}>
+              {inProgressAchievements.length}
+            </div>
+            <div style={{ fontSize: 14, opacity: 0.9 }}>
+              Sedang Progress
+            </div>
+          </Card>
+        </Col>
+        <Col xs={24} sm={8}>
+          <Card style={{ borderRadius: 12, textAlign: "center", background: "linear-gradient(135deg, #722ed1 0%, #9254de 100%)", color: "white" }}>
+            <StarOutlined style={{ fontSize: 32, marginBottom: 8 }} />
+            <div style={{ fontSize: 24, fontWeight: "bold", marginBottom: 4 }}>
+              {achievements.length}
+            </div>
+            <div style={{ fontSize: 14, opacity: 0.9 }}>
+              Total Achievement
+            </div>
+          </Card>
+        </Col>
+      </Row>
 
       {/* Earned Achievements */}
       {earnedAchievements.length > 0 && (
-        <Card
-          title={
-            <Space>
-              <TrophyOutlined style={{ color: "#FFD700" }} />
-              <Text strong>
-                Pencapaian yang Diraih ({earnedAchievements.length})
-              </Text>
-            </Space>
-          }
-          style={{ marginBottom: 24 }}
-        >
-          <Row gutter={[16, 16]}>
-            {earnedAchievements.map((achievement) => (
-              <Col xs={12} sm={8} md={6} lg={4} key={achievement.id}>
+        <div style={{ marginBottom: 32 }}>
+          <Title level={4} style={{ marginBottom: 16, color: "#11418b" }}>
+            <Badge count={earnedAchievements.length} style={{ backgroundColor: "#52c41a" }}>
+              <TrophyOutlined style={{ marginRight: 8, color: "#52c41a" }} />
+            </Badge>
+            Achievement Tercapai
+          </Title>
+          <List
+            grid={{ gutter: 16, xs: 1, sm: 2, md: 3, lg: 4 }}
+            dataSource={earnedAchievements}
+            renderItem={(achievement) => (
+              <List.Item>
                 <AchievementCard achievement={achievement} status="earned" />
-              </Col>
-            ))}
-          </Row>
-        </Card>
+              </List.Item>
+            )}
+          />
+        </div>
       )}
 
       {/* In Progress Achievements */}
       {inProgressAchievements.length > 0 && (
-        <Card
-          title={
-            <Space>
-              <StarOutlined style={{ color: "#faad14" }} />
-              <Text strong>
-                Sedang Dalam Progress ({inProgressAchievements.length})
-              </Text>
-            </Space>
-          }
-          style={{ marginBottom: 24 }}
-        >
-          <Row gutter={[16, 16]}>
-            {inProgressAchievements.map((achievement) => (
-              <Col xs={12} sm={8} md={6} lg={4} key={achievement.id}>
-                <AchievementCard
-                  achievement={achievement}
-                  status="inProgress"
-                />
-              </Col>
-            ))}
-          </Row>
-        </Card>
+        <div style={{ marginBottom: 32 }}>
+          <Title level={4} style={{ marginBottom: 16, color: "#11418b" }}>
+            <Badge count={inProgressAchievements.length} style={{ backgroundColor: "#faad14" }}>
+              <ClockCircleOutlined style={{ marginRight: 8, color: "#faad14" }} />
+            </Badge>
+            Sedang Dikerjakan
+          </Title>
+          <List
+            grid={{ gutter: 16, xs: 1, sm: 2, md: 3, lg: 4 }}
+            dataSource={inProgressAchievements}
+            renderItem={(achievement) => (
+              <List.Item>
+                <AchievementCard achievement={achievement} status="inProgress" />
+              </List.Item>
+            )}
+          />
+        </div>
       )}
 
       {/* Locked Achievements */}
       {lockedAchievements.length > 0 && (
-        <Card
-          title={
-            <Space>
-              <GiftOutlined style={{ color: "#bfbfbf" }} />
-              <Text strong>
-                Pencapaian Terkunci ({lockedAchievements.length})
-              </Text>
-            </Space>
-          }
-        >
-          <Row gutter={[16, 16]}>
-            {lockedAchievements.map((achievement) => (
-              <Col xs={12} sm={8} md={6} lg={4} key={achievement.id}>
+        <div>
+          <Title level={4} style={{ marginBottom: 16, color: "#11418b" }}>
+            <Badge count={lockedAchievements.length} style={{ backgroundColor: "#d9d9d9" }}>
+              <LockOutlined style={{ marginRight: 8, color: "#bfbfbf" }} />
+            </Badge>
+            Belum Terbuka
+          </Title>
+          <List
+            grid={{ gutter: 16, xs: 1, sm: 2, md: 3, lg: 4 }}
+            dataSource={lockedAchievements}
+            renderItem={(achievement) => (
+              <List.Item>
                 <AchievementCard achievement={achievement} status="locked" />
-              </Col>
-            ))}
-          </Row>
-        </Card>
+              </List.Item>
+            )}
+          />
+        </div>
       )}
-
-      {/* Achievement Tips */}
-      <Card title="💡 Tips untuk Meraih Pencapaian" size="small">
-        <ul style={{ margin: 0, paddingLeft: 20 }}>
-          <li>
-            <Text type="secondary">
-              Kerjakan quiz dan assignment secara konsisten untuk unlock badge
-              "Dedicated Learner"
-            </Text>
-          </li>
-          <li>
-            <Text type="secondary">
-              Pertahankan nilai di atas 80 untuk mendapatkan "Consistent
-              Performer"
-            </Text>
-          </li>
-          <li>
-            <Text type="secondary">
-              Focus pada persiapan quiz untuk mencapai "Quiz Master"
-            </Text>
-          </li>
-          <li>
-            <Text type="secondary">
-              Kualitas pengerjaan assignment sangat penting untuk "Assignment
-              Expert"
-            </Text>
-          </li>
-        </ul>
-      </Card>
     </div>
   );
 };

@@ -1,13 +1,30 @@
-import React, { useEffect, useState } from "react";
-import { Card, Row, Col, Spin, Empty, Tabs, Statistic, Progress } from "antd";
+import React, { useState } from "react";
 import {
-  LineChartOutlined,
-  BarChartOutlined,
-  PieChartOutlined,
+  Card,
+  Row,
+  Col,
+  Progress,
+  Typography,
+  Space,
+  Statistic,
+  Empty,
+  Spin,
+  Tabs,
+  List,
+  Tag,
+} from "antd";
+import {
   TrophyOutlined,
+  BookOutlined,
+  FileTextOutlined,
+  BarChartOutlined,
+  RiseOutlined,
+  FallOutlined,
+  MinusOutlined,
+  StarOutlined,
 } from "@ant-design/icons";
-import PerformanceAnalytics from "./PerformanceAnalytics";
 
+const { Title, Text } = Typography;
 const { TabPane } = Tabs;
 
 const GradeChart = ({
@@ -19,7 +36,6 @@ const GradeChart = ({
   loading,
   compact = false,
 }) => {
-  // Tambahkan state untuk subjects yang sudah diproses
   const [processedSubjects, setProcessedSubjects] = useState([]);
 
   // Generate subjects dari grades jika subjects kosong
@@ -27,48 +43,55 @@ const GradeChart = ({
     if (subjects && subjects.length > 0) {
       return subjects;
     }
-
-    // Generate dari grades
-    const uniqueSubjects = [
-      ...new Set(grades?.map((g) => g.subject_name) || []),
-    ];
-    const generatedSubjects = uniqueSubjects.map((name) => ({
-      id: name,
+    
+    const uniqueSubjects = [...new Set(grades.map(g => g.subject_name))];
+    return uniqueSubjects.map((name, index) => ({
+      id: index + 1,
       name: name,
     }));
-    return generatedSubjects;
   };
 
   const subjectsToUse = getSubjectsToUse();
 
   if (loading) {
     return (
-      <div style={{ textAlign: "center", padding: "40px 0" }}>
-        <Spin size="large" tip="Loading analytics..." />
+      <div style={{ textAlign: "center", padding: "60px 0" }}>
+        <Spin size="large" tip="Memuat data chart..." />
       </div>
     );
   }
 
-  // Add fallback for empty analytics
   if (!analytics && (!grades || grades.length === 0)) {
     return (
-      <Empty
-        description="No analytics data available yet"
-        image={Empty.PRESENTED_IMAGE_SIMPLE}
-      />
-    );
-  }
-
-  if (loading) {
-    return (
-      <div style={{ textAlign: "center", padding: "40px 0" }}>
-        <Spin size="large" tip="Loading chart..." />
+      <div style={{ textAlign: "center", padding: "60px 24px" }}>
+        <Empty
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          description={
+            <div>
+              <Text style={{ fontSize: 16, color: "#666" }}>
+                Belum ada data untuk ditampilkan
+              </Text>
+              <div style={{ marginTop: 12 }}>
+                <Text type="secondary" style={{ fontSize: 14 }}>
+                  Chart akan muncul setelah ada nilai quiz atau assignment
+                </Text>
+              </div>
+            </div>
+          }
+        />
       </div>
     );
   }
 
   if (!grades || grades.length === 0) {
-    return <Empty description="No grade data available" />;
+    return (
+      <div style={{ textAlign: "center", padding: "60px 24px" }}>
+        <Empty
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          description="Belum ada data nilai untuk chart"
+        />
+      </div>
+    );
   }
 
   // Calculate stats
@@ -95,363 +118,380 @@ const GradeChart = ({
 
   // Simple trend visualization using progress bars
   const getGradeColor = (score) => {
-    if (score >= 80) return "#52c41a";
-    if (score >= 60) return "#faad14";
+    if (score >= 90) return "#52c41a";
+    if (score >= 80) return "#1890ff";
+    if (score >= 70) return "#faad14";
+    if (score >= 60) return "#fa8c16";
     return "#ff4d4f";
   };
 
-  if (compact) {
-    // Compact version for dashboard
-    return (
-      <div style={{ padding: 16 }}>
-        <Row gutter={16}>
-          <Col span={8}>
-            <div style={{ textAlign: "center" }}>
-              <div
-                style={{
-                  fontSize: 24,
-                  fontWeight: "bold",
-                  color: getGradeColor(overallAvg),
-                }}
-              >
-                {overallAvg.toFixed(1)}
-              </div>
-              <div style={{ fontSize: 12, color: "#666" }}>Overall</div>
-            </div>
-          </Col>
-          <Col span={8}>
-            <div style={{ textAlign: "center" }}>
-              <div
-                style={{
-                  fontSize: 24,
-                  fontWeight: "bold",
-                  color: getGradeColor(quizAvg),
-                }}
-              >
-                {quizAvg.toFixed(1)}
-              </div>
-              <div style={{ fontSize: 12, color: "#666" }}>Quiz</div>
-            </div>
-          </Col>
-          <Col span={8}>
-            <div style={{ textAlign: "center" }}>
-              <div
-                style={{
-                  fontSize: 24,
-                  fontWeight: "bold",
-                  color: getGradeColor(assignmentAvg),
-                }}
-              >
-                {assignmentAvg.toFixed(1)}
-              </div>
-              <div style={{ fontSize: 12, color: "#666" }}>Assignment</div>
-            </div>
-          </Col>
-        </Row>
+  // Calculate trend
+  const calculateTrend = () => {
+    if (grades.length < 5) return { trend: "stable", percentage: 0 };
+    
+    const recent = grades.slice(0, Math.floor(grades.length / 2));
+    const older = grades.slice(Math.floor(grades.length / 2));
+    
+    const recentAvg = recent.reduce((sum, g) => sum + (g.grade || 0), 0) / recent.length;
+    const olderAvg = older.reduce((sum, g) => sum + (g.grade || 0), 0) / older.length;
+    
+    const difference = recentAvg - olderAvg;
+    const percentage = Math.abs((difference / olderAvg) * 100);
+    
+    let trend = "stable";
+    if (difference > 2) trend = "increasing";
+    else if (difference < -2) trend = "decreasing";
+    
+    return { trend, percentage: percentage.toFixed(1) };
+  };
 
-        <div style={{ marginTop: 16 }}>
-          <Progress
-            percent={overallAvg}
-            strokeColor={getGradeColor(overallAvg)}
-            showInfo={false}
-          />
-        </div>
-      </div>
+  const trendData = calculateTrend();
+
+  const getTrendIcon = () => {
+    switch (trendData.trend) {
+      case "increasing":
+        return <RiseOutlined style={{ color: "#52c41a" }} />;
+      case "decreasing":
+        return <FallOutlined style={{ color: "#ff4d4f" }} />;
+      default:
+        return <MinusOutlined style={{ color: "#faad14" }} />;
+    }
+  };
+
+  const getTrendText = () => {
+    switch (trendData.trend) {
+      case "increasing":
+        return "Meningkat";
+      case "decreasing":
+        return "Menurun";
+      default:
+        return "Stabil";
+    }
+  };
+
+  // Get subject performance
+  const getSubjectPerformance = () => {
+    return subjectsToUse.map(subject => {
+      const subjectGrades = grades.filter(g => g.subject_name === subject.name);
+      const average = subjectGrades.length > 0 
+        ? subjectGrades.reduce((sum, g) => sum + (g.grade || 0), 0) / subjectGrades.length 
+        : 0;
+      
+      return {
+        name: subject.name,
+        average: average,
+        count: subjectGrades.length,
+        color: getGradeColor(average)
+      };
+    }).filter(s => s.count > 0);
+  };
+
+  const subjectPerformance = getSubjectPerformance();
+
+  if (compact) {
+    return (
+      <Row gutter={[16, 16]}>
+        <Col xs={24} sm={12} md={8}>
+          <Card style={{ borderRadius: 12, textAlign: "center" }}>
+            <Statistic
+              title="Rata-rata Keseluruhan"
+              value={overallAvg.toFixed(1)}
+              prefix={<TrophyOutlined style={{ color: getGradeColor(overallAvg) }} />}
+              valueStyle={{ color: getGradeColor(overallAvg), fontSize: 28 }}
+            />
+            <Progress
+              percent={overallAvg}
+              strokeColor={getGradeColor(overallAvg)}
+              showInfo={false}
+              style={{ marginTop: 8 }}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} md={8}>
+          <Card style={{ borderRadius: 12, textAlign: "center" }}>
+            <Statistic
+              title="Rata-rata Quiz"
+              value={quizAvg.toFixed(1)}
+              prefix={<BookOutlined style={{ color: getGradeColor(quizAvg) }} />}
+              valueStyle={{ color: getGradeColor(quizAvg), fontSize: 24 }}
+            />
+            <div style={{ marginTop: 8 }}>
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                Dari {quizGrades.length} quiz
+              </Text>
+            </div>
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} md={8}>
+          <Card style={{ borderRadius: 12, textAlign: "center" }}>
+            <Statistic
+              title="Rata-rata Assignment"
+              value={assignmentAvg.toFixed(1)}
+              prefix={<FileTextOutlined style={{ color: getGradeColor(assignmentAvg) }} />}
+              valueStyle={{ color: getGradeColor(assignmentAvg), fontSize: 24 }}
+            />
+            <div style={{ marginTop: 8 }}>
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                Dari {assignmentGrades.length} assignment
+              </Text>
+            </div>
+          </Card>
+        </Col>
+      </Row>
     );
   }
 
   // Full version with tabs
   return (
-    <Tabs defaultActiveKey="overview" type="card">
-      <TabPane
-        tab={
-          <span>
-            <LineChartOutlined />
-            Overview
-          </span>
-        }
-        key="overview"
-      >
-        <Row gutter={16} style={{ marginBottom: 24 }}>
-          <Col span={8}>
-            <Card size="small" style={{ textAlign: "center" }}>
-              <Statistic
-                title="Quiz Average"
-                value={quizAvg}
-                precision={1}
-                suffix="/100"
-                valueStyle={{ color: "#1890ff" }}
-              />
-              <Progress
-                percent={quizAvg}
-                strokeColor="#1890ff"
-                showInfo={false}
-                size="small"
-                style={{ marginTop: 8 }}
-              />
-            </Card>
-          </Col>
-          <Col span={8}>
-            <Card size="small" style={{ textAlign: "center" }}>
-              <Statistic
-                title="Assignment Average"
-                value={assignmentAvg}
-                precision={1}
-                suffix="/100"
-                valueStyle={{ color: "#52c41a" }}
-              />
-              <Progress
-                percent={assignmentAvg}
-                strokeColor="#52c41a"
-                showInfo={false}
-                size="small"
-                style={{ marginTop: 8 }}
-              />
-            </Card>
-          </Col>
-          <Col span={8}>
-            <Card size="small" style={{ textAlign: "center" }}>
-              <Statistic
-                title="Overall Average"
-                value={overallAvg}
-                precision={1}
-                suffix="/100"
-                valueStyle={{ color: "#722ed1" }}
-              />
-              <Progress
-                percent={overallAvg}
-                strokeColor="#722ed1"
-                showInfo={false}
-                size="small"
-                style={{ marginTop: 8 }}
-              />
-            </Card>
-          </Col>
-        </Row>
-
-        {/* Recent Grades Timeline */}
-        <Card title="Recent Grades" size="small">
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {grades.slice(0, 5).map((grade, index) => (
-              <div
-                key={index}
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  padding: "8px 12px",
-                  backgroundColor: index % 2 === 0 ? "#fafafa" : "#fff",
-                  borderRadius: 4,
-                }}
-              >
-                <div>
-                  <div style={{ fontWeight: 500 }}>{grade.title}</div>
-                  <div style={{ fontSize: 12, color: "#666" }}>
-                    {grade.subject_name} • {grade.type}
-                  </div>
-                </div>
-                <div style={{ textAlign: "right" }}>
-                  <div
-                    style={{
-                      fontWeight: "bold",
-                      color: getGradeColor(grade.grade),
-                      fontSize: 16,
-                    }}
-                  >
-                    {grade.grade?.toFixed(1)}
-                  </div>
-                  <div style={{ fontSize: 12, color: "#666" }}>
-                    {new Date(grade.date).toLocaleDateString()}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
-      </TabPane>
-
-      <TabPane
-        tab={
-          <span>
-            <BarChartOutlined />
-            Subject Performance
-          </span>
-        }
-        key="subjects"
-      >
-        {loading ? (
-          <div style={{ textAlign: "center", padding: "40px 0" }}>
-            <Spin size="large" tip="Loading subject performance..." />
-          </div>
-        ) : subjectsToUse.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "40px 0" }}>
-            <Empty
-              description="No subjects data available"
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-            />
-            <p style={{ color: "#666", marginTop: 16 }}>
-              Subjects count: {subjects.length}
-              <br />
-              Grades count: {grades?.length || 0}
-              <br />
-              Available subjects from grades:{" "}
-              {[...new Set(grades?.map((g) => g.subject_name) || [])].join(
-                ", "
-              )}
-            </p>
-          </div>
-        ) : (
-          <Row gutter={16}>
-            {subjectsToUse.map((subject) => {
-              const subjectGrades = grades.filter(
-                (g) => g.subject_name === (subject.name || subject)
-              );
-
-              if (subjectGrades.length === 0) {
-                console.log(
-                  `⚠️ No grades found for subject: ${subject.name || subject}`
-                );
-                return null;
-              }
-
-              const avgScore =
-                subjectGrades.reduce((sum, g) => sum + (g.grade || 0), 0) /
-                subjectGrades.length;
-
-              return (
-                <Col
-                  xs={24}
-                  sm={12}
-                  md={8}
-                  key={subject.id || subject}
-                  style={{ marginBottom: 16 }}
-                >
-                  <Card size="small">
-                    <div style={{ marginBottom: 12 }}>
-                      <div style={{ fontWeight: 500, marginBottom: 4 }}>
-                        {subject.name || subject}
-                      </div>
-                      <div style={{ fontSize: 12, color: "#666" }}>
-                        {subjectGrades.length} assessments
-                      </div>
-                    </div>
-
-                    <div style={{ textAlign: "center", marginBottom: 12 }}>
-                      <div
-                        style={{
-                          fontSize: 24,
-                          fontWeight: "bold",
-                          color: getGradeColor(avgScore),
-                        }}
-                      >
-                        {avgScore.toFixed(1)}
-                      </div>
-                    </div>
-
-                    <Progress
-                      percent={avgScore}
-                      strokeColor={getGradeColor(avgScore)}
-                      showInfo={false}
-                    />
-                  </Card>
-                </Col>
-              );
-            })}
-          </Row>
-        )}
-      </TabPane>
-
-      <TabPane
-        tab={
-          <span>
-            <PieChartOutlined />
-            Grade Distribution
-          </span>
-        }
-        key="distribution"
-      >
-        <Card title="Grade Distribution Analysis">
-          <Row
-            gutter={16}
-            style={{
-              // make it center
-              justifyContent: "center",
+    <div>
+      {/* Overview Cards */}
+      <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+        <Col xs={24} sm={8}>
+          <Card 
+            style={{ 
+              borderRadius: 12, 
               textAlign: "center",
+              background: "linear-gradient(135deg, #11418b 0%, #1677ff 100%)",
+              color: "white"
             }}
           >
-            {["A", "B", "C", "D", "E"].map((letter) => {
-              const count = grades.filter((g) => {
-                const score = g.grade || 0;
-                if (letter === "A") return score >= 90;
-                if (letter === "B") return score >= 80 && score < 90;
-                if (letter === "C") return score >= 70 && score < 80;
-                if (letter === "D") return score >= 60 && score < 70;
-                return score < 60;
-              }).length;
+            <div style={{ color: "white" }}>
+              <TrophyOutlined style={{ fontSize: 32, marginBottom: 8 }} />
+              <div style={{ fontSize: 24, fontWeight: "bold", marginBottom: 4 }}>
+                {overallAvg.toFixed(1)}
+              </div>
+              <div style={{ fontSize: 14, opacity: 0.9 }}>
+                Rata-rata Keseluruhan
+              </div>
+              <Progress
+                percent={overallAvg}
+                strokeColor="rgba(255,255,255,0.8)"
+                trailColor="rgba(255,255,255,0.2)"
+                showInfo={false}
+                style={{ marginTop: 8 }}
+              />
+            </div>
+          </Card>
+        </Col>
 
-              const percentage =
-                grades.length > 0 ? (count / grades.length) * 100 : 0;
+        <Col xs={24} sm={8}>
+          <Card style={{ borderRadius: 12, textAlign: "center" }}>
+            <Space direction="vertical" style={{ width: "100%" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                {getTrendIcon()}
+                <Text strong style={{ fontSize: 16 }}>
+                  Tren Performa
+                </Text>
+              </div>
+              <div style={{ fontSize: 20, fontWeight: "bold", color: trendData.trend === "increasing" ? "#52c41a" : trendData.trend === "decreasing" ? "#ff4d4f" : "#faad14" }}>
+                {getTrendText()}
+              </div>
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                {trendData.percentage}% dari periode sebelumnya
+              </Text>
+            </Space>
+          </Card>
+        </Col>
 
-              return (
-                <Col
-                  xs={24}
-                  sm={8}
-                  md={4}
-                  key={letter}
-                  style={{ marginBottom: 16 }}
-                >
-                  <Card size="small" style={{ textAlign: "center" }}>
-                    <div
-                      style={{
-                        fontSize: 32,
-                        fontWeight: "bold",
-                        marginBottom: 8,
-                      }}
-                    >
-                      {count}
+        <Col xs={24} sm={8}>
+          <Card style={{ borderRadius: 12, textAlign: "center" }}>
+            <Statistic
+              title="Total Assessment"
+              value={grades.length}
+              prefix={<BarChartOutlined style={{ color: "#722ed1" }} />}
+              valueStyle={{ color: "#722ed1", fontSize: 24 }}
+            />
+            <div style={{ marginTop: 8 }}>
+              <Space>
+                <Tag color="blue">{quizGrades.length} Quiz</Tag>
+                <Tag color="green">{assignmentGrades.length} Assignment</Tag>
+              </Space>
+            </div>
+          </Card>
+        </Col>
+      </Row>
+
+      {/* Detailed Charts */}
+      <Tabs type="card" style={{ background: "white", borderRadius: 12, padding: "0 24px" }}>
+        <TabPane 
+          tab={
+            <Space>
+              <BarChartOutlined />
+              <span>Performa per Mata Pelajaran</span>
+            </Space>
+          } 
+          key="subjects"
+        >
+          <Card style={{ borderRadius: 12, marginTop: 16 }}>
+            <Title level={4} style={{ marginBottom: 24 }}>
+              Rata-rata Nilai per Mata Pelajaran
+            </Title>
+            
+            <List
+              grid={{ gutter: 16, xs: 1, sm: 2, md: 2, lg: 3 }}
+              dataSource={subjectPerformance}
+              renderItem={(subject) => (
+                <List.Item>
+                  <Card 
+                    size="small" 
+                    style={{ 
+                      borderRadius: 8,
+                      border: `2px solid ${subject.color}`,
+                      textAlign: "center"
+                    }}
+                  >
+                    <div style={{ marginBottom: 12 }}>
+                      <BookOutlined style={{ fontSize: 24, color: subject.color, marginBottom: 8 }} />
+                      <div style={{ fontWeight: "bold", fontSize: 14, marginBottom: 4 }}>
+                        {subject.name}
+                      </div>
+                      <Text type="secondary" style={{ fontSize: 12 }}>
+                        {subject.count} assessment
+                      </Text>
                     </div>
-                    <div
-                      style={{
-                        fontSize: 18,
-                        fontWeight: "bold",
-                        color:
-                          letter === "A"
-                            ? "#52c41a"
-                            : letter === "B"
-                            ? "#1890ff"
-                            : letter === "C"
-                            ? "#faad14"
-                            : "#ff4d4f",
-                        marginBottom: 8,
-                      }}
-                    >
-                      Grade {letter}
+                    
+                    <div style={{ fontSize: 20, fontWeight: "bold", color: subject.color, marginBottom: 8 }}>
+                      {subject.average.toFixed(1)}
+                    </div>
+                    
+                    <Progress
+                      percent={subject.average}
+                      strokeColor={subject.color}
+                      showInfo={false}
+                      size="small"
+                    />
+                  </Card>
+                </List.Item>
+              )}
+            />
+          </Card>
+        </TabPane>
+
+        <TabPane 
+          tab={
+            <Space>
+              <StarOutlined />
+              <span>Distribusi Nilai</span>
+            </Space>
+          } 
+          key="distribution"
+        >
+          <Card style={{ borderRadius: 12, marginTop: 16 }}>
+            <Title level={4} style={{ marginBottom: 24 }}>
+              Distribusi Nilai Berdasarkan Grade
+            </Title>
+            
+            <Row gutter={[16, 16]}>
+              {[
+                { grade: "A (90-100)", count: grades.filter(g => g.grade >= 90).length, color: "#52c41a" },
+                { grade: "B (80-89)", count: grades.filter(g => g.grade >= 80 && g.grade < 90).length, color: "#1890ff" },
+                { grade: "C (70-79)", count: grades.filter(g => g.grade >= 70 && g.grade < 80).length, color: "#faad14" },
+                { grade: "D (60-69)", count: grades.filter(g => g.grade >= 60 && g.grade < 70).length, color: "#fa8c16" },
+                { grade: "E (<60)", count: grades.filter(g => g.grade < 60).length, color: "#ff4d4f" },
+              ].map((item, index) => (
+                <Col xs={24} sm={12} md={8} lg={4} key={index}>
+                  <Card size="small" style={{ textAlign: "center", borderRadius: 8 }}>
+                    <div style={{ color: item.color, fontSize: 20, fontWeight: "bold", marginBottom: 8 }}>
+                      {item.count}
+                    </div>
+                    <div style={{ fontSize: 12, color: "#666", marginBottom: 8 }}>
+                      {item.grade}
                     </div>
                     <Progress
-                      percent={percentage}
-                      size="small"
+                      percent={(item.count / grades.length) * 100}
+                      strokeColor={item.color}
                       showInfo={false}
-                      strokeColor={
-                        letter === "A"
-                          ? "#52c41a"
-                          : letter === "B"
-                          ? "#1890ff"
-                          : letter === "C"
-                          ? "#faad14"
-                          : "#ff4d4f"
-                      }
+                      size="small"
                     />
-                    <div style={{ fontSize: 12, color: "#666", marginTop: 4 }}>
-                      {percentage.toFixed(1)}%
+                    <div style={{ fontSize: 11, color: "#999", marginTop: 4 }}>
+                      {((item.count / grades.length) * 100).toFixed(1)}%
                     </div>
                   </Card>
                 </Col>
-              );
-            })}
-          </Row>
-        </Card>
-      </TabPane>
-    </Tabs>
+              ))}
+            </Row>
+          </Card>
+        </TabPane>
+
+        <TabPane 
+          tab={
+            <Space>
+              <FileTextOutlined />
+              <span>Quiz vs Assignment</span>
+            </Space>
+          } 
+          key="comparison"
+        >
+          <Card style={{ borderRadius: 12, marginTop: 16 }}>
+            <Title level={4} style={{ marginBottom: 24 }}>
+              Perbandingan Performa Quiz vs Assignment
+            </Title>
+            
+            <Row gutter={[24, 24]}>
+              <Col xs={24} md={12}>
+                <Card 
+                  size="small" 
+                  style={{ 
+                    textAlign: "center", 
+                    borderRadius: 8,
+                    background: "linear-gradient(135deg, #1890ff 0%, #40a9ff 100%)",
+                    color: "white"
+                  }}
+                >
+                  <BookOutlined style={{ fontSize: 32, marginBottom: 12 }} />
+                  <div style={{ fontSize: 24, fontWeight: "bold", marginBottom: 8 }}>
+                    {quizAvg.toFixed(1)}
+                  </div>
+                  <div style={{ fontSize: 16, marginBottom: 12 }}>
+                    Rata-rata Quiz
+                  </div>
+                  <div style={{ fontSize: 14, opacity: 0.9 }}>
+                    Dari {quizGrades.length} quiz yang sudah dikerjakan
+                  </div>
+                  <Progress
+                    percent={quizAvg}
+                    strokeColor="rgba(255,255,255,0.8)"
+                    trailColor="rgba(255,255,255,0.2)"
+                    showInfo={false}
+                    style={{ marginTop: 12 }}
+                  />
+                </Card>
+              </Col>
+              
+              <Col xs={24} md={12}>
+                <Card 
+                  size="small" 
+                  style={{ 
+                    textAlign: "center", 
+                    borderRadius: 8,
+                    background: "linear-gradient(135deg, #52c41a 0%, #73d13d 100%)",
+                    color: "white"
+                  }}
+                >
+                  <FileTextOutlined style={{ fontSize: 32, marginBottom: 12 }} />
+                  <div style={{ fontSize: 24, fontWeight: "bold", marginBottom: 8 }}>
+                    {assignmentAvg.toFixed(1)}
+                  </div>
+                  <div style={{ fontSize: 16, marginBottom: 12 }}>
+                    Rata-rata Assignment
+                  </div>
+                  <div style={{ fontSize: 14, opacity: 0.9 }}>
+                    Dari {assignmentGrades.length} assignment yang sudah dikerjakan
+                  </div>
+                  <Progress
+                    percent={assignmentAvg}
+                    strokeColor="rgba(255,255,255,0.8)"
+                    trailColor="rgba(255,255,255,0.2)"
+                    showInfo={false}
+                    style={{ marginTop: 12 }}
+                  />
+                </Card>
+              </Col>
+            </Row>
+          </Card>
+        </TabPane>
+      </Tabs>
+    </div>
   );
 };
 
