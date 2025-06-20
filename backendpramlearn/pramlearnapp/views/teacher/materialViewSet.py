@@ -13,7 +13,7 @@ class MaterialViewSet(viewsets.ModelViewSet):
     queryset = Material.objects.all()
     serializer_class = MaterialSerializer
     permission_classes = [permissions.IsAuthenticated]
-    lookup_field = 'slug'
+    lookup_field = 'pk'
 
     def perform_create(self, serializer):
         subject_id = self.kwargs.get('subject_id')
@@ -34,9 +34,22 @@ class MaterialViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def get_serializer_class(self):
+        # Gunakan serializer detail jika ada slug di query param
         if self.action == "retrieve":
             return MaterialDetailSerializer
-        return MaterialSerializer
+        if self.request and self.request.query_params.get("slug"):
+            return MaterialDetailSerializer
+        return super().get_serializer_class()
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        slug = self.request.query_params.get("slug")
+        if slug:
+            queryset = queryset.filter(slug=slug)
+        # Prefetch quizzes dan assignments jika slug ada
+        if slug:
+            queryset = queryset.prefetch_related("quizzes", "assignments")
+        return queryset
 
 
 class MaterialDetailView(generics.RetrieveAPIView):

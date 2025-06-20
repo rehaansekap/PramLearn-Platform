@@ -70,15 +70,14 @@ const useStudentMaterialAccess = (materialSlug) => {
           return;
         }
 
-        // Fetch material
-        const materialResponse = await api.get(`materials/${materialSlug}/`);
+        // PERBAIKAN: Fetch material by slug via query param
+        const materialResponse = await api.get(
+          `materials/?slug=${materialSlug}`
+        );
+        const foundMaterial = Array.isArray(materialResponse.data)
+          ? materialResponse.data.find((m) => m.slug === materialSlug)
+          : null;
 
-        if (!materialResponse.data || materialResponse.data.length === 0) {
-          setError(new Error("Material not found"));
-          return;
-        }
-
-        const foundMaterial = materialResponse.data;
         if (!foundMaterial) {
           setError(new Error("Material not found"));
           return;
@@ -114,7 +113,6 @@ const useStudentMaterialAccess = (materialSlug) => {
             .catch(console.error);
         } catch (fetchError) {
           console.error("Error fetching progress/bookmarks:", fetchError);
-          // Continue with default values
         }
       } catch (err) {
         console.error("Error fetching material:", err);

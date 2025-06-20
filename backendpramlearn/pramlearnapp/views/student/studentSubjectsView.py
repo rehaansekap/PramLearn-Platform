@@ -48,6 +48,7 @@ class StudentSubjectsView(APIView):
             completed_count = 0
             last_accessed_material = None
             material_list = []
+            total_progress = 0  # PERBAIKAN: Tambahkan ini untuk menghitung total progress
 
             for m in materials:
                 try:
@@ -73,6 +74,9 @@ class StudentSubjectsView(APIView):
                     "last_accessed": last_accessed.isoformat() if last_accessed else None,
                 })
 
+                # PERBAIKAN: Tambahkan progress material ke total
+                total_progress += progress_percent
+
                 if completed:
                     completed_count += 1
 
@@ -84,9 +88,14 @@ class StudentSubjectsView(APIView):
                         'last_accessed': last_accessed
                     }
 
-            # Hitung progress subject
-            progress = int((completed_count / len(material_list))
-                           * 100) if material_list else 0
+            # PERBAIKAN: Hitung progress subject berdasarkan rata-rata progress materials
+            subject_progress = int(
+                total_progress / len(material_list)) if material_list else 0
+
+            print(f"📊 Subject: {subject.name}")
+            print(f"📊 Materials: {len(material_list)}")
+            print(f"📊 Total progress: {total_progress}")
+            print(f"📊 Subject progress: {subject_progress}%")
 
             # Ambil nama guru dari subject (pastikan ada relasi teacher pada model Subject)
             subject_class = SubjectClass.objects.filter(
@@ -114,7 +123,7 @@ class StudentSubjectsView(APIView):
                 "id": subject.id,
                 "name": subject.name,
                 "teacher_name": teacher_name,
-                "progress": progress,
+                "progress": subject_progress,
                 "material_count": len(material_list),
                 "last_material_title": last_accessed_material['title'] if last_accessed_material else None,
                 "last_material_slug": last_accessed_material['slug'] if last_accessed_material else None,
