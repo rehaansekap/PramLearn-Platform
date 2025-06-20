@@ -7,7 +7,7 @@ from django.utils import timezone
 from pramlearnapp.models import (
     AssignmentSubmission, Assignment, Material, Quiz,
     GroupQuiz, GroupMember, Announcement, Schedule,
-    ClassStudent, Subject, SubjectClass  # Ganti ClassEnrollment dengan ClassStudent
+    ClassStudent, Subject, SubjectClass
 )
 
 
@@ -34,8 +34,8 @@ class StudentQuickActionsView(APIView):
             quick_actions = {
                 'submit_assignment': {
                     'count': pending_assignments['count'],
-                    'label': 'Submit Assignment',
-                    'description': f"{pending_assignments['count']} pending",
+                    'label': 'Submit Tugas',
+                    'description': f"{pending_assignments['count']} tertunda",
                     'icon': 'download',
                     'color': '#ff4d4f',
                     'route': '/student/assignments',
@@ -43,8 +43,8 @@ class StudentQuickActionsView(APIView):
                 },
                 'browse_materials': {
                     'count': available_materials['count'],
-                    'label': 'Browse Materials',
-                    'description': f"{available_materials['count']} available",
+                    'label': 'Jelajahi Materi',
+                    'description': f"{available_materials['count']} tersedia",
                     'icon': 'file-text',
                     'color': '#1890ff',
                     'route': '/student/subjects',
@@ -52,8 +52,8 @@ class StudentQuickActionsView(APIView):
                 },
                 'announcements': {
                     'count': new_announcements['count'],
-                    'label': 'Announcements',
-                    'description': f"{new_announcements['count']} new",
+                    'label': 'Pengumuman',
+                    'description': f"{new_announcements['count']} baru",
                     'icon': 'bell',
                     'color': '#faad14',
                     'route': '/student/announcements',
@@ -61,8 +61,8 @@ class StudentQuickActionsView(APIView):
                 },
                 'schedule': {
                     'count': upcoming_schedule['count'],
-                    'label': 'My Schedule',
-                    'description': f"{upcoming_schedule['count']} upcoming",
+                    'label': 'Jadwal Saya',
+                    'description': f"{upcoming_schedule['count']} akan datang",
                     'icon': 'calendar',
                     'color': '#52c41a',
                     'route': '/student/schedule',
@@ -73,234 +73,237 @@ class StudentQuickActionsView(APIView):
             return Response(quick_actions)
 
         except Exception as e:
-            return Response({
-                'error': str(e),
-                'quick_actions': self.get_default_quick_actions()
-            }, status=500)
+            print(f"❌ Error in StudentQuickActionsView: {e}")
+            return Response(self.get_default_quick_actions())
 
     def get_pending_assignments(self, user):
         """Get assignments yang belum dikumpulkan oleh student"""
         try:
-            # Get user's classes menggunakan ClassStudent
-            user_classes = ClassStudent.objects.filter(
-                student=user).values_list('class_id', flat=True)
-
-            # Get subject_class IDs from user's classes
-            subject_class_ids = SubjectClass.objects.filter(
-                class_id__in=user_classes
-            ).values_list('id', flat=True)
-
-            # Get subject IDs
-            subject_ids = Subject.objects.filter(
-                subject_class_id__in=subject_class_ids
-            ).values_list('id', flat=True)
-
-            # Get material IDs
-            material_ids = Material.objects.filter(
-                subject_id__in=subject_ids
-            ).values_list('id', flat=True)
-
-            # Get assignments yang belum expired dan belum dikumpulkan
-            assignments = Assignment.objects.filter(
-                material_id__in=material_ids,
+            print(f"🔍 Getting pending assignments for user: {user.username}")
+            
+            # PERBAIKAN: Coba beberapa pendekatan untuk mendapatkan assignments
+            
+            # Pendekatan 1: Langsung dari semua assignments yang aktif
+            active_assignments = Assignment.objects.filter(
                 due_date__gte=timezone.now()
-            ).exclude(
-                # Exclude assignments yang sudah dikumpulkan
-                assignmentsubmission__student=user
-            ).distinct()[:10]
-
+            ).select_related('material', 'material__subject')
+            
+            print(f"📋 Total active assignments: {active_assignments.count()}")
+            
+            # Filter assignments yang belum dikumpulkan
+            pending_assignments = []
+            for assignment in active_assignments:
+                # Cek apakah sudah ada submission final (bukan draft)
+                has_submission = AssignmentSubmission.objects.filter(
+                    student=user,
+                    assignment=assignment,
+                    is_draft=False
+                ).exists()
+                
+                if not has_submission:
+                    pending_assignments.append(assignment)
+                    print(f"✅ Pending assignment found: {assignment.title}")
+            
+            print(f"📊 Pending assignments count: {len(pending_assignments)}")
+            
+            # Jika tidak ada dari pendekatan pertama, coba pendekatan kedua
+            if not pending_assignments:
+                print("🔄 Trying alternative approach...")
+                
+                # Get user's classes
+                user_classes = ClassStudent.objects.filter(
+                    student=user
+                ).values_list('class_id', flat=True)
+                
+                print(f"👥 User classes: {list(user_classes)}")
+                
+                if user_classes.exists():
+                    # Get subject_class IDs from user's classes
+                    subject_class_ids = SubjectClass.objects.filter(
+                        class_id__in=user_classes
+                    ).values_list('id', flat=True)
+                    
+                    print(f"📚 Subject class IDs: {list(subject_class_ids)}")
+                    
+                    # Get subject IDs
+                    subject_ids = Subject.objects.filter(
+                        subject_class_id__in=subject_class_ids
+                    ).values_list('id', flat=True)
+                    
+                    print(f"📖 Subject IDs: {list(subject_ids)}")
+                    
+                    # Get material IDs
+                    material_ids = Material.objects.filter(
+                        subject_id__in=subject_ids
+                    ).values_list('id', flat=True)
+                    
+                    print(f"📄 Material IDs: {list(material_ids)}")
+                    
+                    # Get assignments from these materials
+                    assignments_by_class = Assignment.objects.filter(
+                        material_id__in=material_ids,
+                        due_date__gte=timezone.now()
+                    ).select_related('material', 'material__subject')
+                    
+                    print(f"📋 Assignments by class: {assignments_by_class.count()}")
+                    
+                    # Filter yang belum dikumpulkan
+                    for assignment in assignments_by_class:
+                        has_submission = AssignmentSubmission.objects.filter(
+                            student=user,
+                            assignment=assignment,
+                            is_draft=False
+                        ).exists()
+                        
+                        if not has_submission:
+                            pending_assignments.append(assignment)
+            
+            # Prepare assignment data
             assignment_data = []
-            for assignment in assignments:
+            for assignment in pending_assignments[:10]:  # Limit to 10
+                days_left = (assignment.due_date.date() - timezone.now().date()).days
                 assignment_data.append({
                     'id': assignment.id,
                     'title': assignment.title,
                     'description': assignment.description,
                     'due_date': assignment.due_date.isoformat(),
-                    'subject_name': assignment.material.subject.name if assignment.material.subject else 'Unknown',
-                    'material_title': assignment.material.title,
-                    'days_left': (assignment.due_date.date() - timezone.now().date()).days
+                    'subject_name': assignment.material.subject.name if assignment.material and assignment.material.subject else 'Unknown',
+                    'material_title': assignment.material.title if assignment.material else 'Unknown',
+                    'days_left': max(0, days_left)
                 })
 
+            print(f"✅ Final pending assignments: {len(assignment_data)}")
+            
             return {
                 'count': len(assignment_data),
                 'assignments': assignment_data
             }
+            
         except Exception as e:
-            print(f"Error getting pending assignments: {e}")
+            print(f"❌ Error getting pending assignments: {e}")
+            import traceback
+            print(traceback.format_exc())
             return {'count': 0, 'assignments': []}
 
     def get_available_materials(self, user):
         """Get materials yang tersedia untuk student"""
         try:
+            # Get user's classes
             user_classes = ClassStudent.objects.filter(
-                student=user).values_list('class_id', flat=True)
+                student=user
+            ).values_list('class_id', flat=True)
 
-            # Get subject_class IDs from user's classes
+            if not user_classes.exists():
+                return {'count': 0, 'materials': []}
+
+            # Get subject_class IDs
             subject_class_ids = SubjectClass.objects.filter(
                 class_id__in=user_classes
             ).values_list('id', flat=True)
 
-            # Get subject IDs
+            # Get subjects
             subject_ids = Subject.objects.filter(
                 subject_class_id__in=subject_class_ids
             ).values_list('id', flat=True)
 
+            # Get materials
             materials = Material.objects.filter(
                 subject_id__in=subject_ids
-            ).distinct()[:10]
+            ).select_related('subject')[:10]
 
             material_data = []
             for material in materials:
                 material_data.append({
                     'id': material.id,
                     'title': material.title,
-                    'description': material.description if hasattr(material, 'description') else '',
                     'subject_name': material.subject.name if material.subject else 'Unknown',
-                    'slug': material.slug,
-                    'created_at': material.created_at.isoformat() if hasattr(material, 'created_at') else ''
+                    'content_type': getattr(material, 'content_type', 'document')
                 })
 
             return {
                 'count': len(material_data),
                 'materials': material_data
             }
+
         except Exception as e:
-            print(f"Error getting available materials: {e}")
+            print(f"❌ Error getting available materials: {e}")
             return {'count': 0, 'materials': []}
 
     def get_new_announcements(self, user):
         """Get announcements baru untuk student"""
         try:
-            # Announcements dari 7 hari terakhir
-            week_ago = timezone.now() - timedelta(days=7)
+            # Get user's classes
             user_classes = ClassStudent.objects.filter(
-                student=user).values_list('class_id', flat=True)
+                student=user
+            ).values_list('class_id', flat=True)
 
-            # Jika ada model Announcement, gunakan itu
-            try:
-                announcements = Announcement.objects.filter(
-                    created_at__gte=week_ago
-                )[:10]
+            if not user_classes.exists():
+                return {'count': 0, 'announcements': []}
 
-                announcement_data = []
-                for announcement in announcements:
-                    announcement_data.append({
-                        'id': announcement.id,
-                        'title': announcement.title,
-                        'content': announcement.content[:100] + '...' if len(announcement.content) > 100 else announcement.content,
-                        'created_at': announcement.created_at.isoformat(),
-                        'author': f"{announcement.author.first_name} {announcement.author.last_name}".strip() or announcement.author.username if hasattr(announcement, 'author') else 'System'
-                    })
+            # Get announcements from last 30 days
+            since_date = timezone.now() - timedelta(days=30)
+            announcements = Announcement.objects.filter(
+                class_id__in=user_classes,
+                created_at__gte=since_date
+            ).order_by('-created_at')[:5]
 
-                return {
-                    'count': len(announcement_data),
-                    'announcements': announcement_data
-                }
-            except:
-                # Fallback: use recent assignments as "announcements"
-                subject_class_ids = SubjectClass.objects.filter(
-                    class_id__in=user_classes
-                ).values_list('id', flat=True)
+            announcement_data = []
+            for announcement in announcements:
+                announcement_data.append({
+                    'id': announcement.id,
+                    'title': announcement.title,
+                    'content': announcement.content[:100] + '...' if len(announcement.content) > 100 else announcement.content,
+                    'created_at': announcement.created_at.isoformat(),
+                    'is_urgent': getattr(announcement, 'is_urgent', False)
+                })
 
-                subject_ids = Subject.objects.filter(
-                    subject_class_id__in=subject_class_ids
-                ).values_list('id', flat=True)
-
-                material_ids = Material.objects.filter(
-                    subject_id__in=subject_ids
-                ).values_list('id', flat=True)
-
-                recent_assignments = Assignment.objects.filter(
-                    material_id__in=material_ids,
-                    created_at__gte=week_ago
-                ).distinct()[:5]
-
-                announcement_data = []
-                for assignment in recent_assignments:
-                    announcement_data.append({
-                        'id': f"assignment_{assignment.id}",
-                        'title': f"New Assignment: {assignment.title}",
-                        'content': assignment.description[:100] + '...' if assignment.description and len(assignment.description) > 100 else assignment.description or '',
-                        'created_at': assignment.created_at.isoformat() if hasattr(assignment, 'created_at') else '',
-                        'author': 'System'
-                    })
-
-                return {
-                    'count': len(announcement_data),
-                    'announcements': announcement_data
-                }
+            return {
+                'count': len(announcement_data),
+                'announcements': announcement_data
+            }
 
         except Exception as e:
-            print(f"Error getting announcements: {e}")
+            print(f"❌ Error getting new announcements: {e}")
             return {'count': 0, 'announcements': []}
 
     def get_upcoming_schedule(self, user):
         """Get jadwal upcoming untuk student"""
         try:
-            tomorrow = timezone.now().date() + timedelta(days=1)
+            # Get user's classes
             user_classes = ClassStudent.objects.filter(
-                student=user).values_list('class_id', flat=True)
+                student=user
+            ).values_list('class_id', flat=True)
 
-            # Jika ada model Schedule, gunakan itu
-            try:
-                schedules = Schedule.objects.filter(
-                    day_of_week=timezone.now().weekday(),
-                    class_obj__in=user_classes
-                ).distinct()[:10]
+            if not user_classes.exists():
+                return {'count': 0, 'schedules': []}
 
-                schedule_data = []
-                for schedule in schedules:
-                    schedule_data.append({
-                        'id': schedule.id,
-                        'title': schedule.activity,
-                        'description': f"Kelas {schedule.activity}",
-                        'time': schedule.time.strftime('%H:%M') if schedule.time else None,
-                        'subject_name': schedule.activity,
-                        'class_name': 'Today Schedule'
-                    })
+            # Get schedules for next 7 days
+            start_date = timezone.now().date()
+            end_date = start_date + timedelta(days=7)
+            
+            schedules = Schedule.objects.filter(
+                class_id__in=user_classes,
+                date__range=[start_date, end_date]
+            ).order_by('date', 'start_time')[:10]
 
-                return {
-                    'count': len(schedule_data),
-                    'schedules': schedule_data
-                }
-            except:
-                # Fallback: use upcoming assignment due dates as schedule
-                subject_class_ids = SubjectClass.objects.filter(
-                    class_id__in=user_classes
-                ).values_list('id', flat=True)
+            schedule_data = []
+            for schedule in schedules:
+                schedule_data.append({
+                    'id': schedule.id,
+                    'subject': getattr(schedule, 'subject', 'Unknown'),
+                    'date': schedule.date.isoformat(),
+                    'start_time': schedule.start_time.strftime('%H:%M') if schedule.start_time else '00:00',
+                    'end_time': schedule.end_time.strftime('%H:%M') if schedule.end_time else '00:00',
+                    'room': getattr(schedule, 'room', 'TBA')
+                })
 
-                subject_ids = Subject.objects.filter(
-                    subject_class_id__in=subject_class_ids
-                ).values_list('id', flat=True)
-
-                material_ids = Material.objects.filter(
-                    subject_id__in=subject_ids
-                ).values_list('id', flat=True)
-
-                upcoming_assignments = Assignment.objects.filter(
-                    material_id__in=material_ids,
-                    due_date__date__gte=timezone.now().date(),
-                    due_date__date__lte=tomorrow
-                ).distinct()[:5]
-
-                schedule_data = []
-                for assignment in upcoming_assignments:
-                    schedule_data.append({
-                        'id': f"assignment_due_{assignment.id}",
-                        'title': f"Assignment Due: {assignment.title}",
-                        'description': f"Due date for {assignment.title}",
-                        'time': assignment.due_date.time().strftime('%H:%M'),
-                        'subject_name': assignment.material.subject.name if assignment.material.subject else 'Unknown',
-                        'class_name': 'Assignment Deadline'
-                    })
-
-                return {
-                    'count': len(schedule_data),
-                    'schedules': schedule_data
-                }
+            return {
+                'count': len(schedule_data),
+                'schedules': schedule_data
+            }
 
         except Exception as e:
-            print(f"Error getting schedule: {e}")
+            print(f"❌ Error getting upcoming schedule: {e}")
             return {'count': 0, 'schedules': []}
 
     def get_default_quick_actions(self):
@@ -308,8 +311,8 @@ class StudentQuickActionsView(APIView):
         return {
             'submit_assignment': {
                 'count': 0,
-                'label': 'Submit Assignment',
-                'description': '0 pending',
+                'label': 'Submit Tugas',
+                'description': '0 tertunda',
                 'icon': 'download',
                 'color': '#ff4d4f',
                 'route': '/student/assignments',
@@ -317,8 +320,8 @@ class StudentQuickActionsView(APIView):
             },
             'browse_materials': {
                 'count': 0,
-                'label': 'Browse Materials',
-                'description': '0 available',
+                'label': 'Jelajahi Materi',
+                'description': '0 tersedia',
                 'icon': 'file-text',
                 'color': '#1890ff',
                 'route': '/student/subjects',
@@ -326,8 +329,8 @@ class StudentQuickActionsView(APIView):
             },
             'announcements': {
                 'count': 0,
-                'label': 'Announcements',
-                'description': '0 new',
+                'label': 'Pengumuman',
+                'description': '0 baru',
                 'icon': 'bell',
                 'color': '#faad14',
                 'route': '/student/announcements',
@@ -335,8 +338,8 @@ class StudentQuickActionsView(APIView):
             },
             'schedule': {
                 'count': 0,
-                'label': 'My Schedule',
-                'description': '0 upcoming',
+                'label': 'Jadwal Saya',
+                'description': '0 akan datang',
                 'icon': 'calendar',
                 'color': '#52c41a',
                 'route': '/student/schedule',

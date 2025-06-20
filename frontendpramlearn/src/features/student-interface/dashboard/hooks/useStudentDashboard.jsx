@@ -19,7 +19,6 @@ const useStudentDashboard = () => {
       setError(null);
     } catch (err) {
       setError(err);
-      console.error("Error fetching student dashboard:", err);
     } finally {
       setLoading(false);
     }

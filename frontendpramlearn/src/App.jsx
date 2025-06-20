@@ -184,10 +184,9 @@ const AppRoutes = () => {
               path="assignments/:assignmentSlug/results"
               element={<StudentAssignments />}
             />
-
             <Route path="grades" element={<StudentGradeOverview />} />
-            <Route path="progress" element={<StudentAnalytics />} />
-            <Route path="group" element={<StudentGroupDashboard />} />
+            {/* <Route path="progress" element={<StudentAnalytics />} />
+            <Route path="group" element={<StudentGroupDashboard />} /> */}
             {/* Individual Quiz Routes (existing) */}
             <Route path="quiz/:quizSlug" element={<QuizTakingInterface />} />
             <Route
@@ -204,10 +203,10 @@ const AppRoutes = () => {
               path="group-quiz/:quizSlug/results"
               element={<GroupQuizResults />}
             />
-            <Route
+            {/* <Route
               path="notifications"
               element={<StudentNotificationCenter />}
-            />
+            /> */}
             {/* Student 404 Route */}
             <Route path="*" element={<NotFound />} />
           </Route>

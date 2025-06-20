@@ -30,10 +30,9 @@ const useUpcomingDeadlines = () => {
         high_priority_count: response.data.high_priority_count || 0,
       });
     } catch (err) {
-      console.error("Error fetching upcoming deadlines:", err);
       setError(err);
 
-      // Fallback to mock data if API fails
+      // Fallback data jika API gagal
       const mockDeadlines = [
         {
           id: 1,
@@ -50,7 +49,7 @@ const useUpcomingDeadlines = () => {
         },
         {
           id: 2,
-          title: "Quiz Logika Proposisi",
+          title: "Kuis Logika Proposisi",
           type: "quiz",
           due_date: new Date(
             Date.now() + 5 * 24 * 60 * 60 * 1000

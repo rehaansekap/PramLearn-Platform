@@ -21,13 +21,17 @@ const TodayScheduleCard = ({ schedule = [], loading }) => {
     const diffMinutes = scheduleTime.diff(now, "minute");
 
     if (diffMinutes < -30) {
-      return { status: "finished", color: "#d9d9d9", text: "Finished" };
+      return { status: "finished", color: "#d9d9d9", text: "Sudah Selesai" };
     } else if (diffMinutes <= 0 && diffMinutes > -30) {
-      return { status: "ongoing", color: "#52c41a", text: "Ongoing" };
+      return {
+        status: "ongoing",
+        color: "#52c41a",
+        text: "Sedang Berlangsung",
+      };
     } else if (diffMinutes <= 60) {
-      return { status: "soon", color: "#faad14", text: "Starting Soon" };
+      return { status: "soon", color: "#faad14", text: "Akan Segera Dimulai" };
     } else {
-      return { status: "scheduled", color: "#1677ff", text: "Scheduled" };
+      return { status: "scheduled", color: "#1677ff", text: "Dijadwalkan" };
     }
   };
 
@@ -37,7 +41,7 @@ const TodayScheduleCard = ({ schedule = [], loading }) => {
         title={
           <Space>
             <ClockCircleOutlined style={{ color: "#11418b" }} />
-            <Text strong>Today's Schedule</Text>
+            <Text strong>Jadwal Hari Ini</Text>
           </Space>
         }
         style={{ borderRadius: 12 }}
@@ -60,7 +64,7 @@ const TodayScheduleCard = ({ schedule = [], loading }) => {
       title={
         <Space>
           <ClockCircleOutlined />
-          <Text strong>Today's Schedule</Text>
+          <Text strong>Jadwal Hari Ini</Text>
         </Space>
       }
       style={{ borderRadius: 12, marginBottom: 16 }}

@@ -17,8 +17,8 @@ const QuickActionsCard = ({ quickActions, loading }) => {
   const actionItems = [
     {
       key: "submit_assignment",
-      title: quickActions?.submit_assignment?.label || "Submit Assignment",
-      description: quickActions?.submit_assignment?.description || "0 pending",
+      title: quickActions?.submit_assignment?.label || "Submit Tugas",
+      description: quickActions?.submit_assignment?.description || "0 tertunda",
       icon: <UploadOutlined />,
       color: quickActions?.submit_assignment?.color || "#ff4d4f",
       action: () => navigate("/student/assignments"),
@@ -26,8 +26,8 @@ const QuickActionsCard = ({ quickActions, loading }) => {
     },
     {
       key: "browse_materials",
-      title: quickActions?.browse_materials?.label || "Browse Materials",
-      description: quickActions?.browse_materials?.description || "0 available",
+      title: quickActions?.browse_materials?.label || "Jelajahi Materi",
+      description: quickActions?.browse_materials?.description || "0 tersedia",
       icon: <BookOutlined />,
       color: quickActions?.browse_materials?.color || "#1677ff",
       action: () => navigate("/student/subjects"),
@@ -35,8 +35,8 @@ const QuickActionsCard = ({ quickActions, loading }) => {
     },
     {
       key: "announcements",
-      title: quickActions?.announcements?.label || "Announcements",
-      description: quickActions?.announcements?.description || "0 new",
+      title: quickActions?.announcements?.label || "Pengumuman",
+      description: quickActions?.announcements?.description || "0 baru",
       icon: <BellOutlined />,
       color: quickActions?.announcements?.color || "#faad14",
       action: () => navigate("/student/announcements"),
@@ -44,8 +44,8 @@ const QuickActionsCard = ({ quickActions, loading }) => {
     },
     {
       key: "schedule",
-      title: quickActions?.schedule?.label || "My Schedule",
-      description: quickActions?.schedule?.description || "0 upcoming",
+      title: quickActions?.schedule?.label || "Jadwal Saya",
+      description: quickActions?.schedule?.description || "0 akan datang",
       icon: <CalendarOutlined />,
       color: quickActions?.schedule?.color || "#52c41a",
       action: () => navigate("/student/schedule"),
@@ -58,11 +58,12 @@ const QuickActionsCard = ({ quickActions, loading }) => {
       title={
         <Space>
           <FileTextOutlined style={{ color: "#11418b" }} />
-          <Text strong>Quick Actions</Text>
+          <Text strong>Aksi Cepat</Text>
         </Space>
       }
       style={{ borderRadius: 12 }}
       size="large"
+      loading={loading}
     >
       <Row gutter={[12, 12]}>
         {actionItems.map((item) => (
@@ -71,7 +72,6 @@ const QuickActionsCard = ({ quickActions, loading }) => {
               <Button
                 block
                 onClick={item.action}
-                loading={loading}
                 style={{
                   height: "auto",
                   minHeight: 80,

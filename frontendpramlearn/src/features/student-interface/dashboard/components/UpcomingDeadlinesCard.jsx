@@ -14,23 +14,23 @@ const getStatus = (dueDate, isOverdue) => {
   const due = dayjs(dueDate);
 
   if (due.isBefore(now))
-    return { text: "Overdue", color: "red", bg: "#fff1f0" };
+    return { text: "Terlambat", color: "red", bg: "#fff1f0" };
   if (due.isSame(now, "day"))
-    return { text: "Due Today", color: "orange", bg: "#fffbe6" };
+    return { text: "Hari Ini", color: "orange", bg: "#fffbe6" };
   if (due.diff(now.startOf("day"), "day") === 1)
-    return { text: "Due Tomorrow", color: "gold", bg: "#fffbe6" };
-  return { text: `Scheduled`, color: "blue", bg: "#e6f7ff" };
+    return { text: "Besok", color: "gold", bg: "#fffbe6" };
+  return { text: `Terjadwal`, color: "blue", bg: "#e6f7ff" };
 };
 
 const getTypeIcon = (type) =>
   type === "quiz" ? (
-    <Tooltip title="Quiz">
+    <Tooltip title="Kuis">
       <QuestionCircleOutlined
         style={{ color: "#faad14", fontSize: 18, marginRight: 6 }}
       />
     </Tooltip>
   ) : (
-    <Tooltip title="Assignment">
+    <Tooltip title="Tugas">
       <FileTextOutlined
         style={{ color: "#ff4d4f", fontSize: 18, marginRight: 6 }}
       />
@@ -43,9 +43,7 @@ const UpcomingDeadlinesCard = ({ deadlines = [] }) => {
   const [page, setPage] = useState(1);
 
   // Filter: hanya tampilkan yang belum dikerjakan/submit
-  const filteredDeadlines = deadlines.filter(
-    (item) => !item.is_submitted // atau !item.submitted, sesuaikan dengan struktur data Anda
-  );
+  const filteredDeadlines = deadlines.filter((item) => !item.is_submitted);
 
   // Sort: overdue dulu, lalu due date terdekat
   const sortedDeadlines = [...filteredDeadlines].sort((a, b) => {
@@ -63,10 +61,9 @@ const UpcomingDeadlinesCard = ({ deadlines = [] }) => {
       title={
         <Space>
           <ExclamationCircleOutlined style={{ color: "#ff4d4f" }} />
-          <Text strong>Upcoming Deadlines</Text>
+          <Text strong>Deadline Mendatang</Text>
         </Space>
       }
-      // extra={<a href="/student/deadlines">View All</a>}
       style={{ borderRadius: 12 }}
       bodyStyle={{ padding: 0 }}
     >

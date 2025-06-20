@@ -9,26 +9,32 @@ const useQuickActions = () => {
   const [error, setError] = useState(null);
 
   const fetchQuickActions = async () => {
-    if (!user || !token) return;
+    if (!user || !token) {
+      setLoading(false);
+      return;
+    }
 
     try {
       setLoading(true);
       setError(null);
 
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+      console.log("🔄 Fetching quick actions for user:", user.username);
       const response = await api.get("student/quick-actions/");
 
+      console.log("✅ Quick actions response:", response.data);
       setQuickActions(response.data);
     } catch (err) {
-      console.error("Error fetching quick actions:", err);
-      setError(err.message || "Failed to fetch quick actions");
+      console.error("❌ Error fetching quick actions:", err);
+      setError(err.message || "Gagal memuat aksi cepat");
 
-      // Set default fallback data
+      // Fallback data jika API gagal
       setQuickActions({
         submit_assignment: {
           count: 0,
-          label: "Submit Assignment",
-          description: "0 pending",
+          label: "Submit Tugas",
+          description: "0 tertunda",
           icon: "download",
           color: "#ff4d4f",
           route: "/student/assignments",
@@ -36,8 +42,8 @@ const useQuickActions = () => {
         },
         browse_materials: {
           count: 0,
-          label: "Browse Materials",
-          description: "0 available",
+          label: "Jelajahi Materi",
+          description: "0 tersedia",
           icon: "file-text",
           color: "#1890ff",
           route: "/student/subjects",
@@ -45,8 +51,8 @@ const useQuickActions = () => {
         },
         announcements: {
           count: 0,
-          label: "Announcements",
-          description: "0 new",
+          label: "Pengumuman",
+          description: "0 baru",
           icon: "bell",
           color: "#faad14",
           route: "/student/announcements",
@@ -54,8 +60,8 @@ const useQuickActions = () => {
         },
         schedule: {
           count: 0,
-          label: "My Schedule",
-          description: "0 upcoming",
+          label: "Jadwal Saya",
+          description: "0 akan datang",
           icon: "calendar",
           color: "#52c41a",
           route: "/student/schedule",

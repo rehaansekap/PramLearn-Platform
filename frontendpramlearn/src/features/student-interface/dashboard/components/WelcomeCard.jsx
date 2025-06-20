@@ -57,8 +57,7 @@ const WelcomeCard = ({ user }) => {
                 fontSize: "clamp(20px, 4vw, 28px)",
               }}
             >
-              {getGreeting()}, {user?.first_name || user?.username || "Student"}
-              !
+              {getGreeting()}, {user?.first_name || user?.username || "Siswa"}!
             </Title>
             <Text
               style={{
