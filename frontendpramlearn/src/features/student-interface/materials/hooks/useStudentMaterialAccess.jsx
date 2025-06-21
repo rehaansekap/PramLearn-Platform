@@ -12,7 +12,6 @@ const useStudentMaterialAccess = (materialSlug) => {
     time_spent: 0,
     last_position: 0,
   });
-  const [bookmarks, setBookmarks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isActive, setIsActive] = useState(true);
@@ -22,7 +21,7 @@ const useStudentMaterialAccess = (materialSlug) => {
     progressRef.current = progress;
   }, [progress]);
 
-  // Track user activity untuk menentukan apakah user sedang aktif
+  // Track user activity
   useEffect(() => {
     let inactivityTimer;
 
@@ -31,10 +30,9 @@ const useStudentMaterialAccess = (materialSlug) => {
       setIsActive(true);
       inactivityTimer = setTimeout(() => {
         setIsActive(false);
-      }, 5 * 60 * 1000); // 5 menit inaktif
+      }, 5 * 60 * 1000); // 5 menit tidak aktif
     };
 
-    // Event listeners untuk aktivitas user
     const events = [
       "mousedown",
       "mousemove",
@@ -46,10 +44,8 @@ const useStudentMaterialAccess = (materialSlug) => {
       document.addEventListener(event, resetInactivityTimer, true);
     });
 
-    // Initialize timer
     resetInactivityTimer();
 
-    // Cleanup
     return () => {
       clearTimeout(inactivityTimer);
       events.forEach((event) => {
@@ -61,16 +57,16 @@ const useStudentMaterialAccess = (materialSlug) => {
   // Fetch material data
   useEffect(() => {
     const fetchMaterial = async () => {
+      if (!materialSlug) {
+        setError(new Error("Material slug diperlukan"));
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
         setError(null);
 
-        if (!materialSlug) {
-          setError(new Error("Material slug is required"));
-          return;
-        }
-
-        // PERBAIKAN: Fetch material by slug via query param
         const materialResponse = await api.get(
           `materials/?slug=${materialSlug}`
         );
@@ -79,43 +75,21 @@ const useStudentMaterialAccess = (materialSlug) => {
           : null;
 
         if (!foundMaterial) {
-          setError(new Error("Material not found"));
+          setError(new Error("Materi tidak ditemukan"));
           return;
         }
+
         setMaterial(foundMaterial);
         setMaterialId(foundMaterial.id);
 
-        // Fetch progress and bookmarks
-        try {
-          const [progressRes, bookmarksRes] = await Promise.all([
-            api
-              .get(`/student/materials/${foundMaterial.id}/progress/`)
-              .catch(() => ({
-                data: {
-                  completion_percentage: 0,
-                  time_spent: 0,
-                  last_position: 0,
-                },
-              })),
-            api
-              .get(`/student/materials/${foundMaterial.id}/bookmarks/`)
-              .catch(() => ({
-                data: [],
-              })),
-          ]);
-
-          setProgress(progressRes.data);
-          setBookmarks(bookmarksRes.data);
-
-          // Record material access
-          await api
-            .post(`/student/materials/${foundMaterial.id}/access/`)
-            .catch(console.error);
-        } catch (fetchError) {
-          console.error("Error fetching progress/bookmarks:", fetchError);
-        }
+        // Fetch progress dan aktivitas yang sudah diselesaikan
+        await Promise.all([
+          fetchProgress(foundMaterial.id),
+          fetchCompletedActivities(foundMaterial.id),
+          recordMaterialAccess(foundMaterial.id),
+        ]);
       } catch (err) {
-        console.error("Error fetching material:", err);
+        console.error("Gagal mengambil data materi:", err);
         setError(err);
       } finally {
         setLoading(false);
@@ -125,60 +99,63 @@ const useStudentMaterialAccess = (materialSlug) => {
     fetchMaterial();
   }, [materialSlug]);
 
-  // Fetch completed activities dari backend saat load
-  useEffect(() => {
-    const fetchCompletedActivities = async () => {
-      if (!materialId) return;
+  const fetchProgress = async (materialId) => {
+    try {
+      const response = await api.get(
+        `/student/materials/${materialId}/progress/`
+      );
+      setProgress(response.data);
+    } catch (error) {
+      setProgress({
+        completion_percentage: 0,
+        time_spent: 0,
+        last_position: 0,
+      });
+    }
+  };
 
-      try {
-        // API call untuk get aktivitas yang sudah completed
-        const response = await api.get(
-          `/student/materials/${materialId}/activities/`
-        );
-        const activities = response.data;
+  const fetchCompletedActivities = async (materialId) => {
+    try {
+      const response = await api.get(
+        `/student/materials/${materialId}/activities/`
+      );
+      const activities = response.data;
 
-        // 🔧 PERBAIKAN: Consistent key generation untuk frontend
-        const activityKeys = new Set(
-          activities.map((activity) => {
-            // Gunakan format yang sama dengan recordActivity
-            if (activity.activity_type === "video_played") {
-              return `video_played_${activity.content_index}`;
-            } else if (activity.activity_type === "pdf_opened") {
-              return `pdf_opened_${activity.content_index}`;
-            } else {
-              return `${activity.activity_type}_${activity.content_index}`;
-            }
-          })
-        );
+      const activityKeys = new Set(
+        activities.map((activity) => {
+          return `${activity.activity_type}_${activity.content_index}`;
+        })
+      );
 
-        setCompletedActivities(activityKeys);
-        console.log(
-          `📋 Loaded completed activities:`,
-          Array.from(activityKeys)
-        );
-      } catch (error) {
-        console.error("Failed to fetch completed activities:", error);
-        // Continue dengan set kosong
-        setCompletedActivities(new Set());
-      }
-    };
+      setCompletedActivities(activityKeys);
+    } catch (error) {
+      console.error(
+        "Gagal mengambil aktivitas yang sudah diselesaikan:",
+        error
+      );
+      setCompletedActivities(new Set());
+    }
+  };
 
-    fetchCompletedActivities();
-  }, [materialId]);
+  const recordMaterialAccess = async (materialId) => {
+    try {
+      await api.post(`/student/materials/${materialId}/access/`);
+    } catch (error) {
+      console.error("Gagal mencatat akses materi:", error);
+    }
+  };
 
-  // Update progress function
   const updateProgress = useCallback(
     async (progressDataOrUpdater) => {
       if (!materialId) return;
+
+      // Ambil progress terbaru dari ref
       let progressData = progressDataOrUpdater;
+      let baseProgress = progressRef.current;
       if (typeof progressDataOrUpdater === "function") {
-        progressData = progressDataOrUpdater(progress);
+        progressData = progressDataOrUpdater(baseProgress);
       }
 
-      // DEBUG: Log data yang akan dikirim
-      console.log("🔍 Raw progressData:", progressData);
-
-      // PERBAIKAN: Filter hanya field yang diizinkan backend
       const allowedFields = [
         "completion_percentage",
         "time_spent",
@@ -186,22 +163,26 @@ const useStudentMaterialAccess = (materialSlug) => {
       ];
       const cleanData = {};
 
+      // PERBAIKAN: Hanya kirim field yang benar-benar berubah
       allowedFields.forEach((field) => {
         if (progressData[field] !== undefined) {
-          cleanData[field] = progressData[field];
+          if (field === "completion_percentage") {
+            const currentValue = baseProgress[field] || 0;
+            const newValue = progressData[field] || 0;
+            if (Math.abs(newValue - currentValue) > 0.01) {
+              // Toleransi 0.01%
+              cleanData[field] = newValue;
+            }
+          } else {
+            if (progressData[field] !== baseProgress[field]) {
+              cleanData[field] = progressData[field];
+            }
+          }
         }
       });
-
-      // Patch: selalu kirim completion_percentage terakhir jika tidak ada di payload
-      if (cleanData.completion_percentage === undefined) {
-        cleanData.completion_percentage = progress.completion_percentage || 0;
+      if (Object.keys(cleanData).length === 0) {
+        return baseProgress;
       }
-      if (cleanData.last_position === undefined) {
-        cleanData.last_position = progress.last_position || 0;
-      }
-
-      // DEBUG: Log data yang sudah dibersihkan
-      console.log("🧹 Clean data to send:", cleanData);
 
       try {
         const response = await api.put(
@@ -211,124 +192,72 @@ const useStudentMaterialAccess = (materialSlug) => {
         setProgress(response.data);
         return response.data;
       } catch (error) {
-        console.error("Failed to update progress:", error);
+        console.error("Gagal memperbarui progress:", error);
         throw error;
       }
     },
-    [materialId, progress]
+    [materialId]
   );
 
-  // Alias untuk backward compatibility
-  const onProgressUpdate = useCallback(
-    (progressData) => {
-      return updateProgress(progressData);
-    },
-    [updateProgress]
-  );
+  const calculateDynamicProgress = useCallback((material, activityType) => {
+    if (!material) return 0;
 
-  // Fungsi untuk menghitung progress dinamis
-  const calculateDynamicProgress = useCallback(
-    (material, activityType, contentIndex) => {
-      if (!material) return 0;
+    const totalPDFs = material.pdf_files?.length || 0;
+    const totalVideos =
+      material.youtube_videos?.filter((v) => v.url)?.length || 0;
+    const totalComponents = totalPDFs + totalVideos;
 
-      // Hitung total komponen dalam materi
-      const totalPDFs = material.pdf_files?.length || 0;
-      const totalVideos =
-        material.youtube_videos?.filter((v) => v.url)?.length || 0;
-      const totalComponents = totalPDFs + totalVideos;
+    if (totalComponents === 0) return 0;
 
-      if (totalComponents === 0) return 0;
+    return 100 / totalComponents;
+  }, []);
 
-      // Setiap komponen bernilai sama
-      const progressPerComponent = 100 / totalComponents;
-
-      console.log(
-        `📊 Dynamic Progress: ${progressPerComponent.toFixed(
-          1
-        )}% per component (${totalComponents} total) - ${activityType} index ${contentIndex}`
-      );
-
-      return progressPerComponent;
-    },
-    []
-  );
-
-  // Record activity ke backend
   const recordActivityToBackend = useCallback(
     async (activityType, contentIndex) => {
       if (!materialId) return false;
 
       try {
-        const response = await api.post(
-          `/student/materials/${materialId}/activities/`,
-          {
-            activity_type: activityType,
-            content_index: contentIndex,
-            // 🔧 PERBAIKAN: Gunakan content_id yang konsisten
-            content_id: `${activityType}_${contentIndex}`,
-          }
-        );
-
-        console.log(`📝 Activity recorded to backend:`, response.data);
+        await api.post(`/student/materials/${materialId}/activities/`, {
+          activity_type: activityType,
+          content_index: contentIndex,
+          content_id: `${activityType}_${contentIndex}`,
+        });
         return true;
       } catch (error) {
-        console.error("Failed to record activity to backend:", error);
+        console.error("Gagal mencatat aktivitas ke backend:", error);
         return false;
       }
     },
     [materialId]
   );
 
-  // Update recordActivity function
   const recordActivity = useCallback(
     async (activityType, activityData = {}) => {
-      console.log("recordActivity called:", activityType, activityData);
-
       if (!materialId || !material) return;
 
-      let progressIncrement = 0;
-      let timeIncrement = activityData.timeIncrement || 10;
       const contentIndex = activityData.position || 0;
-
-      // Activity key generation
-      let activityKey;
-      if (activityType === "video_played") {
-        activityKey = `video_played_${contentIndex}`;
-      } else if (activityType === "pdf_opened") {
-        activityKey = `pdf_opened_${contentIndex}`;
-      } else {
-        activityKey = `${activityType}_${contentIndex}`;
-      }
-
-      console.log(`🔑 Generated activity key: ${activityKey}`);
+      const activityKey = `${activityType}_${contentIndex}`;
 
       // Cek apakah aktivitas sudah pernah dilakukan
       if (
         activityType !== "time_spent" &&
         completedActivities.has(activityKey)
       ) {
-        console.log(
-          `⚠️ Activity ${activityKey} already completed, skipping progress increment`
-        );
         return;
       }
 
-      // Hitung progress increment
+      let progressIncrement = 0;
+      const timeIncrement = activityData.timeIncrement || 10;
+
       switch (activityType) {
         case "pdf_opened":
         case "video_played":
-          progressIncrement = calculateDynamicProgress(
-            material,
-            activityType,
-            contentIndex
-          );
-          console.log(`🎯 Activity: +${progressIncrement.toFixed(1)}%`);
+          progressIncrement = calculateDynamicProgress(material, activityType);
           break;
         default:
           progressIncrement = 0;
       }
 
-      // 🔧 PERBAIKAN: Gunakan progressRef.current untuk mendapatkan nilai terkini
       if (progressIncrement > 0) {
         try {
           const backendRecorded = await recordActivityToBackend(
@@ -336,7 +265,6 @@ const useStudentMaterialAccess = (materialSlug) => {
             contentIndex
           );
 
-          // Gunakan progressRef untuk nilai terkini
           const currentProgress =
             progressRef.current.completion_percentage || 0;
           const newCompletion = Math.min(
@@ -344,33 +272,17 @@ const useStudentMaterialAccess = (materialSlug) => {
             currentProgress + progressIncrement
           );
 
-          console.log(
-            `🔢 Current progress from ref: ${currentProgress.toFixed(1)}%`
-          );
-          console.log(
-            `🔢 Calculated new progress: ${newCompletion.toFixed(1)}%`
-          );
-
-          const updatedProgress = await updateProgress({
-            time_spent: (progressRef.current.time_spent || 0) + timeIncrement,
+          await updateProgress({
+            time_spent: (progressRef.current.time_spent || 0) + 1,
             completion_percentage: newCompletion,
             last_position: contentIndex,
           });
 
           if (backendRecorded) {
             setCompletedActivities((prev) => new Set([...prev, activityKey]));
-            console.log(`🎯 Activity marked as completed: ${activityKey}`);
           }
-
-          console.log(
-            `✅ Progress updated: ${currentProgress.toFixed(
-              1
-            )}% → ${newCompletion.toFixed(1)}%`
-          );
-
-          return updatedProgress;
         } catch (error) {
-          console.error("Failed to record activity:", error);
+          console.error("Gagal mencatat aktivitas:", error);
         }
       }
     },
@@ -384,14 +296,13 @@ const useStudentMaterialAccess = (materialSlug) => {
     ]
   );
 
-  // Simple time tracking (hanya untuk waktu, tidak auto-increment progress)
+  // Time tracking
   useEffect(() => {
     if (!isActive || !materialId) return;
 
     const interval = setInterval(() => {
-      // Hanya record time activity tanpa auto-increment progress
       recordActivity("time_spent", {
-        timeSpent: 120, // 2 menit
+        timeSpent: 120,
         timeIncrement: 10,
       });
     }, 120000); // Setiap 2 menit
@@ -399,87 +310,10 @@ const useStudentMaterialAccess = (materialSlug) => {
     return () => clearInterval(interval);
   }, [isActive, materialId, recordActivity]);
 
-  // Add bookmark
-  const addBookmark = useCallback(
-    async (bookmarkData) => {
-      if (!materialId) return;
-
-      try {
-        const response = await api.post(
-          `/student/materials/${materialId}/bookmarks/`,
-          {
-            ...bookmarkData,
-            material: materialId,
-            student: user?.id,
-          }
-        );
-
-        setBookmarks((prev) => [...prev, response.data]);
-        console.log("📌 Bookmark added:", response.data);
-
-        return response.data;
-      } catch (error) {
-        console.error("Failed to add bookmark:", error);
-        throw error;
-      }
-    },
-    [materialId, user?.id]
-  );
-
-  // Remove bookmark
-  const removeBookmark = useCallback(
-    async (bookmarkId) => {
-      if (!materialId) return;
-
-      try {
-        await api.delete(
-          `/student/materials/${materialId}/bookmarks/${bookmarkId}/`
-        );
-
-        setBookmarks((prev) => prev.filter((b) => b.id !== bookmarkId));
-        console.log("🗑️ Bookmark removed:", bookmarkId);
-      } catch (error) {
-        console.error("Failed to remove bookmark:", error);
-        throw error;
-      }
-    },
-    [materialId]
-  );
-
-  // Manual progress completion (untuk testing)
-  const markAsCompleted = useCallback(async () => {
-    if (!materialId) return;
-
-    try {
-      const updatedProgress = await updateProgress({
-        time_spent: progress.time_spent || 0,
-        completion_percentage: 100,
-        last_position: progress.last_position || 0,
-      });
-
-      console.log("✅ Material marked as completed");
-      return updatedProgress;
-    } catch (error) {
-      console.error("Failed to mark as completed:", error);
-    }
-  }, [materialId, progress, updateProgress]);
-
-  // Helper function untuk cek apakah aktivitas sudah completed
   const isActivityCompleted = useCallback(
     (activityType, contentIndex) => {
-      // 🔧 PERBAIKAN: Gunakan format key yang sama
-      let activityKey;
-      if (activityType === "video_played") {
-        activityKey = `video_played_${contentIndex}`;
-      } else if (activityType === "pdf_opened") {
-        activityKey = `pdf_opened_${contentIndex}`;
-      } else {
-        activityKey = `${activityType}_${contentIndex}`;
-      }
-
-      const isCompleted = completedActivities.has(activityKey);
-      console.log(`🔍 Activity ${activityKey} completed:`, isCompleted);
-      return isCompleted;
+      const activityKey = `${activityType}_${contentIndex}`;
+      return completedActivities.has(activityKey);
     },
     [completedActivities]
   );
@@ -489,7 +323,6 @@ const useStudentMaterialAccess = (materialSlug) => {
     material,
     materialId,
     progress,
-    bookmarks,
     loading,
     error,
     isActive,
@@ -497,13 +330,7 @@ const useStudentMaterialAccess = (materialSlug) => {
 
     // Actions
     updateProgress,
-    onProgressUpdate,
     recordActivity,
-    addBookmark,
-    removeBookmark,
-    markAsCompleted,
-
-    // Helper functions
     isActivityCompleted,
 
     // Computed values

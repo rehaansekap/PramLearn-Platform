@@ -26,9 +26,9 @@ import {
   TrophyOutlined,
 } from "@ant-design/icons";
 import useStudentMaterialAccess from "./hooks/useStudentMaterialAccess";
-import StudentPDFViewer from "./components/StudentPDFViewer";
-import StudentVideoPlayer from "./components/StudentVideoPlayer";
-import MaterialProgressTracker from "./components/MaterialProgressTracker";
+import StudentPDFViewer from "./components/pdfviewer/StudentPDFViewer";
+import StudentVideoPlayer from "./components/videoplayer/StudentVideoPlayer";
+import MaterialProgressTracker from "./components/progress/MaterialProgressTracker";
 import MaterialQuizList from "./components/MaterialQuizList";
 import MaterialAssignmentList from "./components/MaterialAssignmentList";
 import api from "../../../api";
@@ -37,41 +37,40 @@ const { TabPane } = Tabs;
 const { Title, Text } = Typography;
 
 const StudentMaterialViewer = () => {
+  const isMobile = window.innerWidth <= 768;
   const { materialSlug } = useParams();
   const {
     material,
     materialId,
     progress,
-    bookmarks,
     loading,
     error,
     updateProgress,
     recordActivity,
-    addBookmark,
-    removeBookmark,
     isActivityCompleted,
   } = useStudentMaterialAccess(materialSlug);
 
   const [activeTab, setActiveTab] = useState("1");
   const [subjectData, setSubjectData] = useState(null);
 
-  // Fetch subject data untuk info
   useEffect(() => {
     const fetchSubjectData = async () => {
-      if (material && material.subject) {
+      if (material?.subject) {
         try {
           const response = await api.get(`subjects/${material.subject}/`);
           setSubjectData(response.data);
         } catch (error) {
-          console.error("Failed to fetch subject data:", error);
+          console.error("Gagal mengambil data mata pelajaran:", error);
         }
       }
     };
     fetchSubjectData();
   }, [material]);
 
-  const handleBack = () => {
-    window.history.back();
+  const getProgressColor = (percent) => {
+    if (percent >= 80) return "#52c41a";
+    if (percent >= 60) return "#faad14";
+    return "#ff4d4f";
   };
 
   if (loading) {
@@ -92,7 +91,7 @@ const StudentMaterialViewer = () => {
     );
   }
 
-  if (error) {
+  if (error || !material) {
     return (
       <div
         style={{
@@ -103,23 +102,26 @@ const StudentMaterialViewer = () => {
         }}
       >
         <Alert
-          message="Gagal memuat materi"
+          message={error ? "Gagal memuat materi" : "Materi tidak ditemukan"}
           description={
-            error.message || "Terjadi kesalahan saat mengambil data materi."
+            error?.message ||
+            "Materi yang Anda cari tidak tersedia atau terjadi kesalahan."
           }
-          type="error"
+          type={error ? "error" : "warning"}
           showIcon
           style={{ borderRadius: 12 }}
           action={
             <Space>
-              <Button
-                size="small"
-                danger
-                onClick={() => window.location.reload()}
-              >
-                Coba Lagi
-              </Button>
-              <Button size="small" onClick={handleBack}>
+              {error && (
+                <Button
+                  size="small"
+                  danger
+                  onClick={() => window.location.reload()}
+                >
+                  Coba Lagi
+                </Button>
+              )}
+              <Button size="small" onClick={() => window.history.back()}>
                 Kembali
               </Button>
             </Space>
@@ -129,39 +131,11 @@ const StudentMaterialViewer = () => {
     );
   }
 
-  if (!material) {
-    return (
-      <div
-        style={{
-          margin: "24px",
-          maxWidth: 1200,
-          marginLeft: "auto",
-          marginRight: "auto",
-        }}
-      >
-        <Alert
-          message="Materi tidak ditemukan"
-          description="Materi yang Anda cari tidak tersedia."
-          type="warning"
-          showIcon
-          style={{ borderRadius: 12 }}
-        />
-      </div>
-    );
-  }
-
-  const hasPDFs = material.pdf_files && material.pdf_files.length > 0;
-  const hasVideos =
-    material.youtube_videos && material.youtube_videos.some((v) => v.url);
+  const hasPDFs = material.pdf_files?.length > 0;
+  const hasVideos = material.youtube_videos?.some((v) => v.url);
   const hasGoogleForms =
     material.google_form_embed_arcs_awal ||
     material.google_form_embed_arcs_akhir;
-
-  const getProgressColor = (percent) => {
-    if (percent >= 80) return "#52c41a";
-    if (percent >= 60) return "#faad14";
-    return "#ff4d4f";
-  };
 
   return (
     <div
@@ -172,7 +146,7 @@ const StudentMaterialViewer = () => {
         minHeight: "calc(100vh - 64px)",
       }}
     >
-      {/* Breadcrumb - Konsisten dengan halaman lain */}
+      {/* Breadcrumb */}
       <Breadcrumb
         style={{ marginBottom: 24 }}
         items={[
@@ -190,7 +164,7 @@ const StudentMaterialViewer = () => {
             title: (
               <Space>
                 <BookOutlined />
-                <span>My Subjects</span>
+                <span>Mata Pelajaran Saya</span>
               </Space>
             ),
           },
@@ -205,11 +179,11 @@ const StudentMaterialViewer = () => {
         ]}
       />
 
-      {/* Header Section - Konsisten dengan subjects */}
+      {/* Header Section */}
       <div
         style={{
           background:
-            "linear-gradient(135deg, #001529 0%, #3a3f5c 60%, #43cea2 100%)", // Sama dengan StudentLayout
+            "linear-gradient(135deg, #001529 0%, #3a3f5c 60%, #43cea2 100%)",
           borderRadius: 16,
           padding: "32px 24px",
           marginBottom: 32,
@@ -218,6 +192,7 @@ const StudentMaterialViewer = () => {
           overflow: "hidden",
         }}
       >
+        {/* Background Decorations */}
         <div
           style={{
             position: "absolute",
@@ -245,7 +220,7 @@ const StudentMaterialViewer = () => {
           <Col xs={24} md={18}>
             <Button
               icon={<ArrowLeftOutlined />}
-              onClick={handleBack}
+              onClick={() => window.history.back()}
               style={{
                 background: "rgba(255, 255, 255, 0.15)",
                 border: "1px solid rgba(255, 255, 255, 0.3)",
@@ -269,8 +244,9 @@ const StudentMaterialViewer = () => {
               wrap
               style={{
                 marginBottom: 16,
-                justifyContent: "center",
-                width: "100%",
+                // ismobile set center
+                alignItems: isMobile ? "center" : "flex-start",
+                justifyContent: isMobile ? "center" : "flex-start",
               }}
             >
               {subjectData && (
@@ -293,20 +269,15 @@ const StudentMaterialViewer = () => {
             </Space>
 
             {/* Progress Section */}
-            <div
-              style={{
-                marginBottom: 16,
-                justifyContent: "center",
-                width: "100%",
-              }}
-            >
-              <Space size={8} style={{ marginBottom: 8, marginRight: 16 }}>
+            <div style={{ marginBottom: 16 }}>
+              <Space size={8} style={{ marginBottom: 8 }}>
                 <TrophyOutlined />
                 <Text
                   style={{
                     color: "rgba(255,255,255,0.9)",
                     fontSize: 14,
                     fontWeight: 500,
+                    marginRight: isMobile ? 0 : 8,
                   }}
                 >
                   Progress Pembelajaran
@@ -319,19 +290,14 @@ const StudentMaterialViewer = () => {
                 )}
                 trailColor="rgba(255, 255, 255, 0.2)"
                 showInfo={true}
-                style={{
-                  maxWidth: 400,
-                  // Styling untuk teks persentase
-                  color: "white",
-                }}
-                // Format teks persentase dengan style khusus
+                style={{ maxWidth: 400 }}
                 format={(percent) => (
                   <span
                     style={{
                       color: "white",
                       fontWeight: 500,
                       fontSize: 14,
-                      textShadow: "0 1px 2px rgba(0,0,0,0.3)", // Tambah shadow untuk kontras
+                      textShadow: "0 1px 2px rgba(0,0,0,0.3)",
                     }}
                   >
                     {percent}%
@@ -358,7 +324,7 @@ const StudentMaterialViewer = () => {
         </Row>
       </div>
 
-      {/* Content Tabs - Redesigned */}
+      {/* Content Tabs */}
       <Card
         style={{
           borderRadius: 16,
@@ -429,7 +395,7 @@ const StudentMaterialViewer = () => {
             tab={
               <Space>
                 <BookOutlined />
-                <span>Quiz</span>
+                <span>Kuis</span>
                 <Tag color="purple">{(material.quizzes || []).length}</Tag>
               </Space>
             }
@@ -438,7 +404,7 @@ const StudentMaterialViewer = () => {
             <div style={{ padding: "24px" }}>
               <MaterialQuizList
                 quizzes={material.quizzes || []}
-                material={material} // TAMBAHKAN INI - Pass material data
+                material={material}
               />
             </div>
           </TabPane>
@@ -447,7 +413,7 @@ const StudentMaterialViewer = () => {
             tab={
               <Space>
                 <FileTextOutlined />
-                <span>Assignment</span>
+                <span>Tugas</span>
                 <Tag color="orange">{(material.assignments || []).length}</Tag>
               </Space>
             }
@@ -456,7 +422,7 @@ const StudentMaterialViewer = () => {
             <div style={{ padding: "24px" }}>
               <MaterialAssignmentList
                 assignments={material.assignments || []}
-                material={material} // TAMBAHKAN INI - Pass material data
+                material={material}
               />
             </div>
           </TabPane>
@@ -551,7 +517,6 @@ const StudentMaterialViewer = () => {
         </Tabs>
       </Card>
 
-      {/* Progress Tracker - Updated position */}
       <MaterialProgressTracker
         progress={progress}
         updateProgress={updateProgress}
