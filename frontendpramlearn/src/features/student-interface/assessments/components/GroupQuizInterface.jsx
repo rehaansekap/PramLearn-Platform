@@ -171,7 +171,7 @@ const GroupQuizInterface = () => {
     );
   }
 
-  if (!quiz) {
+  if (!quiz || !Array.isArray(quiz.questions) || quiz.questions.length === 0) {
     return (
       <div
         style={{
@@ -180,7 +180,11 @@ const GroupQuizInterface = () => {
           padding: "24px 16px",
         }}
       >
-        <Alert message="Quiz tidak ditemukan" type="warning" showIcon />
+        <Alert
+          message="Quiz tidak ditemukan atau tidak memiliki soal"
+          type="warning"
+          showIcon
+        />
       </div>
     );
   }
