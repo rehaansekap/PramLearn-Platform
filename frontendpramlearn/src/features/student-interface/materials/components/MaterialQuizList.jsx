@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 import { Row, Col } from "antd";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -14,16 +14,120 @@ import QuizHeader from "./quiz/QuizHeader";
 import QuizLoadingState from "./quiz/QuizLoadingState";
 import QuizEmptyState from "./quiz/QuizEmptyState";
 import QuizCard from "./quiz/QuizCard";
-import QuizUnavailableCard from "./quiz/QuizUnavailableCard";
 
 // Configure dayjs
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
-dayjs.locale("id");
 
-const MaterialQuizList = ({ quizzes, material }) => {
+const MaterialQuizList = ({
+  quizzes,
+  material,
+  recordQuizCompletion,
+  completedActivities = new Set(),
+}) => {
   const { enrichedQuizzes, loading } = useQuizEnhancement(quizzes, material);
   const { getTimeRemaining, getTimeRemainingColor } = useQuizTimer();
+
+  // ✅ IMPROVED: Better tracking with more specific refs
+  const recordedQuizzes = useRef(new Set());
+  const recordingInProgress = useRef(new Set());
+  const initialLoadComplete = useRef(false);
+
+  // ✅ THROTTLED RECORD FUNCTION
+  const throttledRecordQuizCompletion = useCallback(
+    async (quizId, isGroupQuiz) => {
+      const quizKey = `${quizId}_${isGroupQuiz}`;
+
+      // Skip if already recorded or currently recording
+      if (
+        recordedQuizzes.current.has(quizKey) ||
+        recordingInProgress.current.has(quizKey)
+      ) {
+        console.log(
+          `⚠️ Quiz ${quizId} already recorded or recording, skipping...`
+        );
+        return;
+      }
+
+      // Mark as recording
+      recordingInProgress.current.add(quizKey);
+
+      try {
+        console.log(
+          `🎯 Recording quiz completion: ${quizId} (group: ${isGroupQuiz})`
+        );
+        await recordQuizCompletion(quizId, isGroupQuiz);
+        recordedQuizzes.current.add(quizKey);
+        console.log(`✅ Quiz ${quizId} recorded successfully`);
+      } catch (error) {
+        console.error(`❌ Failed to record quiz ${quizId}:`, error);
+      } finally {
+        // Remove from recording progress
+        recordingInProgress.current.delete(quizKey);
+      }
+    },
+    [recordQuizCompletion]
+  );
+
+  // ✅ IMPROVED: Auto-record with better deduplication
+  useEffect(() => {
+    if (
+      !enrichedQuizzes ||
+      !recordQuizCompletion ||
+      !initialLoadComplete.current
+    ) {
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
+      enrichedQuizzes.forEach((quiz) => {
+        const quizKey = `${quiz.id}_${quiz.is_group_quiz || false}`;
+        const activityKey = `quiz_completed_${quiz.id}`;
+
+        // ✅ PERBAIKAN: Cek dari berbagai sumber completion
+        const isCompletedByActivity = completedActivities.has(activityKey);
+        const isCompletedByQuizData =
+          quiz.completed === true || quiz.is_completed === true;
+        const isCompletedByAttempt = quiz.student_attempt?.submitted_at;
+
+        const shouldRecord =
+          (isCompletedByQuizData || isCompletedByAttempt) &&
+          !isCompletedByActivity &&
+          !recordedQuizzes.current.has(quizKey) &&
+          !recordingInProgress.current.has(quizKey);
+
+        console.log(`🎯 Quiz ${quiz.id} auto-record check:`, {
+          quiz_id: quiz.id,
+          isCompletedByActivity,
+          isCompletedByQuizData,
+          isCompletedByAttempt,
+          shouldRecord,
+          quizKey,
+          activityKey,
+        });
+
+        if (shouldRecord) {
+          throttledRecordQuizCompletion(quiz.id, quiz.is_group_quiz || false);
+        }
+      });
+    }, 100);
+
+    return () => clearTimeout(timeoutId);
+  }, [enrichedQuizzes, throttledRecordQuizCompletion, completedActivities]);
+
+  // ✅ INITIAL LOAD TRACKING
+  useEffect(() => {
+    if (enrichedQuizzes && enrichedQuizzes.length > 0) {
+      initialLoadComplete.current = true;
+    }
+  }, [enrichedQuizzes]);
+
+  // ✅ RESET SAAT MATERIAL BERUBAH
+  // useEffect(() => {
+  //   recordedQuizzes.current.clear();
+  //   recordingInProgress.current.clear();
+  //   initialLoadComplete.current = false;
+  // }, [material?.id]);
 
   if (loading) {
     return <QuizLoadingState />;
@@ -39,17 +143,8 @@ const MaterialQuizList = ({ quizzes, material }) => {
 
       <Row gutter={[16, 16]}>
         {enrichedQuizzes.map((quiz) => {
-          // Skip quiz yang tidak tersedia untuk user
-          if (quiz.not_available) {
-            return (
-              <Col xs={24} sm={24} md={12} lg={12} xl={12} key={quiz.id}>
-                <QuizUnavailableCard quiz={quiz} />
-              </Col>
-            );
-          }
-
           const timeRemaining = getTimeRemaining(quiz.end_time);
-          const timeColor = getTimeRemainingColor(quiz.end_time);
+          const timeColor = getTimeRemainingColor(timeRemaining);
 
           return (
             <Col xs={24} sm={24} md={12} lg={12} xl={12} key={quiz.id}>

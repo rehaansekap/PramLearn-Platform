@@ -47,6 +47,9 @@ const StudentMaterialViewer = () => {
     error,
     updateProgress,
     recordActivity,
+    recordQuizCompletion,
+    recordAssignmentSubmission,
+    completedActivities,
     isActivityCompleted,
   } = useStudentMaterialAccess(materialSlug);
 
@@ -405,6 +408,8 @@ const StudentMaterialViewer = () => {
               <MaterialQuizList
                 quizzes={material.quizzes || []}
                 material={material}
+                recordQuizCompletion={recordQuizCompletion}
+                completedActivities={completedActivities}
               />
             </div>
           </TabPane>
@@ -423,6 +428,8 @@ const StudentMaterialViewer = () => {
               <MaterialAssignmentList
                 assignments={material.assignments || []}
                 material={material}
+                recordAssignmentSubmission={recordAssignmentSubmission}
+                completedActivities={completedActivities}
               />
             </div>
           </TabPane>

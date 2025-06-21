@@ -4,6 +4,8 @@ import {
   ClockCircleTwoTone,
   FileTextOutlined,
   YoutubeOutlined,
+  BookOutlined,
+  EditOutlined,
 } from "@ant-design/icons";
 import { List, Typography, Space, Progress } from "antd";
 
@@ -15,7 +17,7 @@ const ProgressChecklist = ({ material, isActivityCompleted }) => {
   // Daftar aktivitas PDF
   const pdfItems = (material.pdf_files || []).map((pdf, idx) => ({
     key: `pdf_opened_${idx}`,
-    label: pdf.name || `PDF ${idx + 1}`,
+    label: pdf.name || pdf.original_filename || `PDF ${idx + 1}`,
     type: "pdf",
     completed: isActivityCompleted("pdf_opened", idx),
   }));
@@ -30,7 +32,68 @@ const ProgressChecklist = ({ material, isActivityCompleted }) => {
       completed: isActivityCompleted("video_played", idx),
     }));
 
-  const items = [...pdfItems, ...videoItems];
+  // ✅ TAMBAHAN: Daftar Quiz
+  const quizItems = (material.quizzes || []).map((quiz, idx) => {
+    let isCompleted = false;
+
+    // ✅ PERBAIKAN: Gunakan isActivityCompleted untuk konsistensi
+    const activityKey = `quiz_completed_${quiz.id}`;
+    const completedByActivity = isActivityCompleted("quiz_completed", quiz.id);
+
+    if (completedByActivity) {
+      isCompleted = true;
+    }
+    // Fallback ke property quiz
+    else if (quiz.completed !== undefined) {
+      isCompleted = quiz.completed;
+    } else if (quiz.is_completed !== undefined) {
+      isCompleted = quiz.is_completed;
+    } else if (quiz.student_attempt?.submitted_at) {
+      isCompleted = true;
+    }
+
+    console.log(`🎯 Quiz ${quiz.id} completion check:`, {
+      quiz_id: quiz.id,
+      activityKey,
+      completedByActivity,
+      quiz_completed: quiz.completed,
+      quiz_is_completed: quiz.is_completed,
+      student_attempt: quiz.student_attempt?.submitted_at,
+      final_isCompleted: isCompleted,
+    });
+
+    return {
+      key: activityKey,
+      label: quiz.title || `Quiz ${idx + 1}`,
+      type: "quiz",
+      completed: isCompleted,
+      isGroupQuiz: quiz.is_group_quiz || quiz.quiz_type === "group",
+    };
+  });
+
+  // ✅ TAMBAHAN: Daftar Assignment
+  const assignmentItems = (material.assignments || []).map(
+    (assignment, idx) => {
+      let isCompleted = false;
+      if (assignment.completed !== undefined) {
+        isCompleted = assignment.completed;
+      } else if (assignment.is_submitted) {
+        isCompleted = true;
+      } else if (assignment.submitted_at) {
+        isCompleted = true;
+      }
+      return {
+        key: `assignment_submitted_${assignment.id}`,
+        label: assignment.title || `Assignment ${idx + 1}`,
+        type: "assignment",
+        completed: isCompleted,
+        grade: assignment.grade,
+      };
+    }
+  );
+
+  // ✅ GABUNGKAN SEMUA ITEMS
+  const items = [...pdfItems, ...videoItems, ...quizItems, ...assignmentItems];
   const completedCount = items.filter((item) => item.completed).length;
   const completionRate =
     items.length > 0 ? (completedCount / items.length) * 100 : 0;
@@ -42,6 +105,100 @@ const ProgressChecklist = ({ material, isActivityCompleted }) => {
       </div>
     );
   }
+
+  // ✅ FUNGSI UNTUK MENDAPATKAN ICON BERDASARKAN TYPE
+  const getTypeIcon = (type, isGroupQuiz = false) => {
+    switch (type) {
+      case "pdf":
+        return (
+          <div
+            style={{
+              background: "#1976d2",
+              color: "white",
+              borderRadius: "50%",
+              width: 24,
+              height: 24,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <FileTextOutlined style={{ fontSize: 12 }} />
+          </div>
+        );
+      case "video":
+        return (
+          <div
+            style={{
+              background: "#d32f2f",
+              color: "white",
+              borderRadius: "50%",
+              width: 24,
+              height: 24,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <YoutubeOutlined style={{ fontSize: 12 }} />
+          </div>
+        );
+      case "quiz":
+        return (
+          <div
+            style={{
+              background: isGroupQuiz ? "#7b1fa2" : "#388e3c",
+              color: "white",
+              borderRadius: "50%",
+              width: 24,
+              height: 24,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <BookOutlined style={{ fontSize: 12 }} />
+          </div>
+        );
+      case "assignment":
+        return (
+          <div
+            style={{
+              background: "#f57c00",
+              color: "white",
+              borderRadius: "50%",
+              width: 24,
+              height: 24,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <EditOutlined style={{ fontSize: 12 }} />
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  // ✅ FUNGSI UNTUK MENDAPATKAN LABEL TYPE
+  const getTypeLabel = (type, isGroupQuiz = false, grade = null) => {
+    switch (type) {
+      case "pdf":
+        return "PDF";
+      case "video":
+        return "Video";
+      case "quiz":
+        return isGroupQuiz ? "Quiz Kelompok" : "Quiz";
+      case "assignment":
+        return grade !== null && grade !== undefined
+          ? `Assignment (${grade.toFixed(1)})`
+          : "Assignment";
+      default:
+        return "Unknown";
+    }
+  };
 
   return (
     <div>
@@ -127,37 +284,7 @@ const ProgressChecklist = ({ material, isActivityCompleted }) => {
 
               {/* Type Icon */}
               <div style={{ flexShrink: 0 }}>
-                {item.type === "pdf" ? (
-                  <div
-                    style={{
-                      background: "#1976d2",
-                      color: "white",
-                      borderRadius: "50%",
-                      width: 24,
-                      height: 24,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <FileTextOutlined style={{ fontSize: 12 }} />
-                  </div>
-                ) : (
-                  <div
-                    style={{
-                      background: "#d32f2f",
-                      color: "white",
-                      borderRadius: "50%",
-                      width: 24,
-                      height: 24,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <YoutubeOutlined style={{ fontSize: 12 }} />
-                  </div>
-                )}
+                {getTypeIcon(item.type, item.isGroupQuiz)}
               </div>
 
               {/* Content */}
@@ -169,9 +296,20 @@ const ProgressChecklist = ({ material, isActivityCompleted }) => {
                     color: item.completed ? "#2e7d32" : "#ef6c00",
                     textDecoration: item.completed ? "line-through" : "none",
                     opacity: item.completed ? 0.8 : 1,
+                    display: "block",
+                    marginBottom: 2,
                   }}
                 >
                   {item.label}
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 11,
+                    color: item.completed ? "#4caf50" : "#ff9800",
+                    fontWeight: 500,
+                  }}
+                >
+                  {getTypeLabel(item.type, item.isGroupQuiz, item.grade)}
                 </Text>
               </div>
 

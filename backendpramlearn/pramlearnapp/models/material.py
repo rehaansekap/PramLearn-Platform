@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from django.db.models.signals import m2m_changed, post_save, post_delete
 from django.dispatch import receiver
+from django.utils import timezone
 
 
 User = get_user_model()
@@ -106,6 +107,33 @@ class StudentMaterialActivity(models.Model):
     def __str__(self):
         return f"{self.student.username} - {self.activity_type} - {self.content_index}"
 
+    def save(self, *args, **kwargs):
+        is_new = self._state.adding
+        super().save(*args, **kwargs)
+        if is_new:
+            try:
+                from pramlearnapp.views.student.materialProgressView import StudentMaterialProgressView
+                progress_view = StudentMaterialProgressView()
+                total_completion = progress_view.calculate_total_completion(
+                    self.student, self.material
+                )
+                progress, created = StudentMaterialProgress.objects.get_or_create(
+                    student=self.student,
+                    material=self.material,
+                    defaults={'completion_percentage': total_completion}
+                )
+                if total_completion > progress.completion_percentage:
+                    progress.completion_percentage = total_completion
+                    if progress.completion_percentage >= 100 and not progress.completed_at:
+                        progress.completed_at = timezone.now()
+                    progress.save()
+            except Exception as e:
+                # Log but don't prevent saving
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(
+                    f"Error updating progress after activity save: {e}")
+
 
 def recalculate_all_student_progress(material):
     from .material import StudentMaterialProgress, StudentMaterialActivity
@@ -115,11 +143,9 @@ def recalculate_all_student_progress(material):
     total_components = total_pdfs + total_videos
     if total_components == 0:
         return
-
     progresses = StudentMaterialProgress.objects.filter(material=material)
     for progress in progresses:
         student = progress.student
-        # Hitung aktivitas unik yang sudah dilakukan (pdf_opened dan video_played)
         pdf_acts = StudentMaterialActivity.objects.filter(
             student=student,
             material=material,

@@ -92,8 +92,68 @@ class MaterialDetailSerializer(serializers.ModelSerializer):
         quizzes = Quiz.objects.filter(material=obj).select_related(
             'material', 'material__subject')
         quiz_data = []
+
+        # Get current user untuk cek completion status
+        user = self.context['request'].user if self.context.get(
+            'request') else None
+
         for quiz in quizzes:
             quiz_dict = QuizSerializer(quiz).data
+
+            # ✅ TAMBAHAN: Cek quiz completion status untuk user
+            if user and user.is_authenticated:
+                try:
+                    is_completed = False
+
+                    if quiz.is_group_quiz:
+                        # Group quiz - cek GroupQuiz.is_completed
+                        from pramlearnapp.models.group import GroupMember, GroupQuiz
+                        user_group = GroupMember.objects.filter(
+                            student=user,
+                            group__material=obj
+                        ).first()
+
+                        if user_group:
+                            group_quiz = GroupQuiz.objects.filter(
+                                quiz=quiz,
+                                group=user_group.group,
+                                is_completed=True
+                            ).exists()
+
+                            if group_quiz:
+                                is_completed = True
+                    else:
+                        # Individual quiz - cek StudentQuizAttempt.submitted_at
+                        from pramlearnapp.models.quiz import StudentQuizAttempt
+                        attempt = StudentQuizAttempt.objects.filter(
+                            student=user,
+                            quiz=quiz,
+                            submitted_at__isnull=False
+                        ).first()
+
+                        if attempt:
+                            is_completed = True
+                            quiz_dict['student_attempt'] = {
+                                'submitted_at': attempt.submitted_at.isoformat() if attempt.submitted_at else None,
+                                'score': attempt.score
+                            }
+
+                    # ✅ SET COMPLETION STATUS
+                    quiz_dict['completed'] = is_completed
+                    quiz_dict['is_completed'] = is_completed
+
+                    print(
+                        f"✅ Quiz {quiz.id} completion for user {user.username}: {is_completed}")
+
+                except Exception as e:
+                    print(
+                        f"🚨 Error checking quiz completion for quiz {quiz.id}: {e}")
+                    quiz_dict['completed'] = False
+                    quiz_dict['is_completed'] = False
+            else:
+                quiz_dict['completed'] = False
+                quiz_dict['is_completed'] = False
+
             # Tambahkan informasi subject dan material
             quiz_dict['subject_name'] = obj.subject.name if obj.subject else None
             quiz_dict['subject_id'] = obj.subject.id if obj.subject else None
@@ -101,6 +161,7 @@ class MaterialDetailSerializer(serializers.ModelSerializer):
             quiz_dict['material_id'] = obj.id
             quiz_dict['material_slug'] = obj.slug
             quiz_data.append(quiz_dict)
+
         return quiz_data
 
     def get_assignments(self, obj):
