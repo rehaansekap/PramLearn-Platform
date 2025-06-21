@@ -18,7 +18,7 @@ from pramlearnapp.views import (RoleViewSet, UserViewSet, RegisterView, LoginVie
                                 AutoGroupStudentsView, AssignQuizToGroupsView, GroupQuizViewSet, SubmitAssignmentView, RelatedUsersForTeacherView,
                                 MaterialAttendanceListView, update_attendance, bulk_create_attendance, QuizRankingView, StudentDashboardView, StudentSubjectsView,
                                 StudentAvailableAssignmentsView, StudentAssignmentQuestionsView, StudentAssignmentDraftView, StudentAssignmentSubmitView, StudentAssignmentSubmissionsView,
-                                StudentGradeAnalyticsView, ScheduleViewSet, StudentActivityViewSet,
+                                StudentAssignmentAnswersView, StudentGradeAnalyticsView, ScheduleViewSet, StudentActivityViewSet,
                                 MaterialAccessView, StudentUpcomingDeadlinesView, StudentQuickActionsView, StudentMaterialProgressView, StudentMaterialBookmarkView, StudentMaterialAccessView,
                                 StudentMaterialActivityView, GroupQuizDetailView, SubmitGroupQuizView, GroupQuizResultsView, StudentGroupQuizListView, SaveGroupQuizAnswerView,
                                 AssignmentSubmissionDetailView, StudentAssignmentBySlugView, StudentAchievementView, StudentGradeView, AssignmentFeedbackByGradeView, QuizReviewView, GroupQuizReviewView,
@@ -75,6 +75,9 @@ urlpatterns = [
 
     path('api/assignment-answers/', AssignmentAnswerViewSet.as_view(),
          name='assignment-answers'),
+    path('api/student/assignment/<int:assignment_id>/answers/',
+         StudentAssignmentAnswersView.as_view(),
+         name='student-assignment-answers'),
     path('api/student/assignments/available/',
          StudentAvailableAssignmentsView.as_view(),
          name='student-available-assignments'),

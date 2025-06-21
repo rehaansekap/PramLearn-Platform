@@ -10,7 +10,7 @@ from pramlearnapp.views.student.attendanceView import MaterialAttendanceListView
 from pramlearnapp.views.student.studentAssignmentViewSet import (
     StudentAvailableAssignmentsView, StudentAssignmentQuestionsView,
     StudentAssignmentDraftView, StudentAssignmentSubmitView,
-    StudentAssignmentSubmissionsView, StudentAssignmentBySlugView
+    StudentAssignmentSubmissionsView, StudentAssignmentBySlugView, StudentAssignmentAnswersView
 )
 from pramlearnapp.views.student.studentUpcomingDeadlinesView import StudentUpcomingDeadlinesView
 from pramlearnapp.views.student.studentQuickActionsView import StudentQuickActionsView
@@ -63,7 +63,7 @@ __all__ = [
     "StudentMotivationProfileView", "UploadARCSCSVView", "StudentViewSet",
     "MaterialAttendanceListView", "update_attendance", "bulk_create_attendance",
     "StudentAvailableAssignmentsView", "StudentAssignmentQuestionsView", "StudentAssignmentDraftView",
-    "StudentAssignmentSubmitView", "StudentAssignmentSubmissionsView", "StudentAssignmentBySlugView",
+    "StudentAssignmentSubmitView", "StudentAssignmentSubmissionsView", "StudentAssignmentBySlugView", "StudentAssignmentAnswersView",
     "StudentGradesView", "StudentGradeAnalyticsView", "QuizAttemptReviewView", "AssignmentFeedbackByGradeView", "QuizReviewView", "GroupQuizReviewView",
     "ScheduleViewSet", "StudentActivityViewSet", "StudentUpcomingDeadlinesView", "StudentQuickActionsView",
     "StudentMaterialProgressView", "StudentMaterialBookmarkView", "StudentMaterialAccessView", "StudentMaterialActivityView",

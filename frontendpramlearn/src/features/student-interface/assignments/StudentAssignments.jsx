@@ -28,22 +28,29 @@ const StudentAssignments = () => {
     submitting,
     draftSaving,
     isDraftDirty,
-    // onAnswerChange, // Remove this line - it doesn't exist in the hook
-    // onFileChange,   // Remove this line - it doesn't exist in the hook
-    // onFileRemove,   // Remove this line - it doesn't exist in the hook
-    // onSaveDraft,    // Remove this line - it doesn't exist in the hook
-    // onSubmit,       // Remove this line - it doesn't exist in the hook
     refreshAssignments,
     fetchAssignmentQuestions,
     updateAnswer,
     addUploadedFile,
     removeUploadedFile,
+    fetchSubmissionHistory,
     saveDraft,
     submitAssignment,
   } = useStudentAssignmentSubmission();
 
   const [currentView, setCurrentView] = useState("list");
   const [notFound, setNotFound] = useState(false);
+
+  // Fetch submission history saat view berubah ke history
+  useEffect(() => {
+    if (currentView === "history" && selectedAssignment?.id) {
+      console.log(
+        "🔄 Fetching submission history for results view:",
+        selectedAssignment.id
+      );
+      fetchSubmissionHistory(selectedAssignment.id);
+    }
+  }, [currentView, selectedAssignment?.id, fetchSubmissionHistory]);
 
   // Otomatis pilih assignment jika akses langsung via slug
   useEffect(() => {
@@ -121,29 +128,22 @@ const StudentAssignments = () => {
       const status = getAssignmentStatus(assignment);
       if (status.status === "submitted" || status.status === "graded") {
         setCurrentView("history");
+        // ✅ TAMBAHKAN: Fetch submissions sebelum navigate
+        fetchSubmissionHistory(assignment.id);
         navigate(
-          `/student/assignments/${
-            assignment.slug ||
-            assignment.title
-              .toLowerCase()
-              .replace(/\s+/g, "-")
-              .replace(/[^a-z0-9-]/g, "")
-          }/results`
+          `/student/assignments/${assignment.slug || assignment.id}/results`
         );
       } else {
         setCurrentView("submit");
-        navigate(
-          `/student/assignments/${
-            assignment.slug ||
-            assignment.title
-              .toLowerCase()
-              .replace(/\s+/g, "-")
-              .replace(/[^a-z0-9-]/g, "")
-          }`
-        );
+        navigate(`/student/assignments/${assignment.slug || assignment.id}`);
       }
     },
-    [getAssignmentStatus, navigate, setSelectedAssignment]
+    [
+      getAssignmentStatus,
+      navigate,
+      setSelectedAssignment,
+      fetchSubmissionHistory,
+    ]
   );
 
   // Render error jika assignment tidak ditemukan

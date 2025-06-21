@@ -383,6 +383,7 @@ const useStudentAssignmentSubmission = () => {
     refreshAssignments: fetchAvailableAssignments, // Add alias
     fetchAssignmentQuestions,
     setSelectedAssignment,
+    fetchSubmissionHistory,
 
     // Utilities
     getAssignmentStatus,

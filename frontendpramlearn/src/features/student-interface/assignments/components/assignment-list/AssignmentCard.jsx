@@ -1,41 +1,35 @@
 import React from "react";
-import { Card, Typography, Button, Tag, Space, Progress } from "antd";
+import { useNavigate } from "react-router-dom";
+import { Card, Typography, Tag, Button, Space, Progress } from "antd";
 import {
   FileTextOutlined,
   ClockCircleOutlined,
-  QuestionCircleOutlined,
-  BookOutlined,
   TrophyOutlined,
+  BookOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
-import { useNavigate } from "react-router-dom";
 import {
-  getAssignmentStatus,
+  getStatusIcon,
+  getStatusColor,
   getButtonText,
-  getButtonStyle,
-} from "../../utils/assignmentStatusUtils";
+  getAssignmentSlug,
+} from "../../utils/assignmentUtils";
 
 const { Title, Text } = Typography;
 
-const AssignmentCard = ({ assignment, timeRemaining }) => {
+const AssignmentCard = ({ assignment, status, timeRemaining, isMobile }) => {
   const navigate = useNavigate();
-  const status = getAssignmentStatus(assignment);
-  const isMobile = window.innerWidth <= 768;
 
-  const handleClick = () => {
-    const assignmentSlug = assignment.slug || assignment.id;
+  const handleCardClick = () => {
+    // Use the status prop that's already passed to the component
     if (status.status === "submitted" || status.status === "graded") {
-      navigate(`/student/assignments/${assignmentSlug}/results`);
+      navigate(
+        `/student/assignments/${assignment.slug || assignment.id}/results`
+      );
     } else {
-      navigate(`/student/assignments/${assignmentSlug}`);
+      navigate(`/student/assignments/${assignment.slug || assignment.id}`);
     }
   };
-
-  const isDisabled =
-    status.status === "overdue" && !assignment.allow_late_submission;
-
-  const buttonText = getButtonText(status, timeRemaining, assignment);
-  const buttonStyle = getButtonStyle(status, timeRemaining);
 
   return (
     <Card
@@ -71,8 +65,8 @@ const AssignmentCard = ({ assignment, timeRemaining }) => {
         }}
       >
         <Tag
-          icon={status.icon}
-          color={status.color}
+          icon={getStatusIcon(status)}
+          color={getStatusColor(status)}
           style={{
             fontWeight: 600,
             fontSize: isMobile ? 10 : 11,
@@ -141,7 +135,7 @@ const AssignmentCard = ({ assignment, timeRemaining }) => {
                 fontWeight: 500,
               }}
             >
-              Assignment
+              Tugas
             </Tag>
           </Space>
         </div>
@@ -164,34 +158,25 @@ const AssignmentCard = ({ assignment, timeRemaining }) => {
             : assignment.title}
         </Title>
 
-        {/* Subject & Material Info */}
-        <div style={{ position: "relative", zIndex: 1 }}>
-          {assignment.subject_name && (
-            <div style={{ marginTop: 8 }}>
-              <Text
-                style={{
-                  color: "rgba(255, 255, 255, 0.8)",
-                  fontSize: 12,
-                }}
-              >
-                Mata Pelajaran: {assignment.subject_name}
-              </Text>
-            </div>
-          )}
-
-          {assignment.material_name && (
-            <div style={{ marginTop: 4 }}>
-              <Text
-                style={{
-                  color: "rgba(255, 255, 255, 0.7)",
-                  fontSize: 11,
-                }}
-              >
-                Materi: {assignment.material_name}
-              </Text>
-            </div>
-          )}
-        </div>
+        {/* Subject Info */}
+        {assignment.subject_name && (
+          <div
+            style={{
+              marginTop: 8,
+              position: "relative",
+              zIndex: 1,
+            }}
+          >
+            <Text
+              style={{
+                color: "rgba(255, 255, 255, 0.8)",
+                fontSize: 12,
+              }}
+            >
+              Mata Pelajaran: {assignment.subject_name}
+            </Text>
+          </div>
+        )}
       </div>
 
       {/* Content Section */}
@@ -222,7 +207,7 @@ const AssignmentCard = ({ assignment, timeRemaining }) => {
           </div>
         )}
 
-        {/* Grade Display for Graded Assignment */}
+        {/* Grade Display untuk Graded Assignment */}
         {status.status === "graded" &&
           assignment.grade !== null &&
           assignment.grade !== undefined && (
@@ -260,7 +245,7 @@ const AssignmentCard = ({ assignment, timeRemaining }) => {
                 </div>
                 <div>
                   <Text strong style={{ fontSize: 15, color: "#52c41a" }}>
-                    Assignment Dinilai
+                    Tugas Dinilai
                   </Text>
                   <div
                     style={{
@@ -292,100 +277,94 @@ const AssignmentCard = ({ assignment, timeRemaining }) => {
           )}
 
         {/* Due Date Countdown */}
-        {assignment.due_date && (
+        <div
+          style={{
+            background: timeRemaining.expired
+              ? "linear-gradient(135deg, #fff2f0 0%, #ffebe6 100%)"
+              : "linear-gradient(135deg, #f6ffed 0%, #e6fffb 100%)",
+            border: `2px solid ${
+              timeRemaining.expired ? "#ffccc7" : "#b7eb8f"
+            }`,
+            borderRadius: 12,
+            padding: "16px",
+            marginBottom: 16,
+            textAlign: "center",
+          }}
+        >
           <div
             style={{
-              background: timeRemaining.expired
-                ? "linear-gradient(135deg, #fff2f0 0%, #ffebe6 100%)"
-                : "linear-gradient(135deg, #f6ffed 0%, #e6fffb 100%)",
-              border: `2px solid ${
-                timeRemaining.expired ? "#ffccc7" : "#b7eb8f"
-              }`,
-              borderRadius: 12,
-              padding: "16px",
-              marginBottom: 16,
-              textAlign: "center",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 8,
+              marginBottom: 8,
             }}
           >
             <div
               style={{
+                background: timeRemaining.expired ? "#ff4d4f" : "#52c41a",
+                borderRadius: "50%",
+                width: 24,
+                height: 24,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                gap: 8,
-                marginBottom: 8,
               }}
             >
-              <div
-                style={{
-                  background: timeRemaining.expired ? "#ff4d4f" : "#52c41a",
-                  borderRadius: "50%",
-                  width: 24,
-                  height: 24,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <ClockCircleOutlined style={{ color: "white", fontSize: 12 }} />
-              </div>
-              <Text
-                style={{
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: "#666",
-                }}
-              >
-                {timeRemaining.expired ? "Terlambat" : "Deadline"}
-              </Text>
+              <ClockCircleOutlined style={{ color: "white", fontSize: 12 }} />
             </div>
-
-            <div
+            <Text
               style={{
-                fontSize: 18,
-                fontWeight: 700,
-                color: timeRemaining.color,
-                marginBottom: 4,
+                fontSize: 13,
+                fontWeight: 600,
+                color: "#666",
               }}
             >
-              {timeRemaining.text}
-            </div>
-
-            <Text style={{ fontSize: 12, color: "#999" }}>
-              Due: {dayjs(assignment.due_date).format("DD MMM YYYY, HH:mm")}
+              {timeRemaining.expired ? "Terlambat" : "Batas Waktu"}
             </Text>
           </div>
-        )}
+
+          <div
+            style={{
+              fontSize: 18,
+              fontWeight: 700,
+              color: timeRemaining.color,
+              marginBottom: 4,
+            }}
+          >
+            {timeRemaining.text}
+          </div>
+
+          <Text style={{ fontSize: 12, color: "#999" }}>
+            Batas: {dayjs(assignment.due_date).format("DD MMM YYYY, HH:mm")}
+          </Text>
+        </div>
 
         {/* Assignment Meta Information */}
         <div style={{ marginBottom: 16 }}>
           <Space wrap size={8}>
-            {assignment.questions_count > 0 && (
-              <div
+            <div
+              style={{
+                background: "#f0f8ff",
+                border: "1px solid #d1e9ff",
+                borderRadius: 8,
+                padding: "6px 12px",
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+              }}
+            >
+              <FileTextOutlined style={{ color: "#1890ff", fontSize: 12 }} />
+              <Text
                 style={{
-                  background: "#f0f8ff",
-                  border: "1px solid #d1e9ff",
-                  borderRadius: 8,
-                  padding: "6px 12px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 6,
+                  fontSize: 12,
+                  color: "#1890ff",
+                  fontWeight: 500,
                 }}
               >
-                <QuestionCircleOutlined
-                  style={{ color: "#1890ff", fontSize: 12 }}
-                />
-                <Text
-                  style={{
-                    fontSize: 12,
-                    color: "#1890ff",
-                    fontWeight: 500,
-                  }}
-                >
-                  {assignment.questions_count} Soal
-                </Text>
-              </div>
-            )}
+                {assignment.questions?.length || 0} Soal
+              </Text>
+            </div>
             {assignment.subject_name && (
               <div
                 style={{
@@ -416,9 +395,11 @@ const AssignmentCard = ({ assignment, timeRemaining }) => {
         {/* Action Button */}
         <Button
           type="primary"
-          icon={status.icon}
-          onClick={handleClick}
-          disabled={isDisabled}
+          icon={getStatusIcon(status)}
+          onClick={handleCardClick}
+          disabled={
+            status.status === "overdue" && !assignment.allow_late_submission
+          }
           size="large"
           style={{
             width: "100%",
@@ -426,26 +407,33 @@ const AssignmentCard = ({ assignment, timeRemaining }) => {
             borderRadius: 10,
             fontWeight: 600,
             fontSize: 13,
-            ...buttonStyle,
+            background:
+              status.status === "graded"
+                ? "linear-gradient(135deg, #ffec3d 0%, #faad14 50%, #ff8c00 100%)"
+                : "linear-gradient(135deg, #001529 0%, #3a3f5c 60%, #43cea2 100%)",
+            border: "none",
+            boxShadow:
+              status.status === "graded"
+                ? "0 4px 12px rgba(255, 173, 20, 0.4)"
+                : "0 4px 12px rgba(0, 21, 41, 0.2)",
             transition: "all 0.3s ease",
           }}
           onMouseEnter={(e) => {
-            if (!isDisabled) {
-              e.currentTarget.style.transform = "translateY(-2px)";
-              e.currentTarget.style.boxShadow =
-                status.status === "graded"
-                  ? "0 6px 16px rgba(255, 173, 20, 0.5)"
-                  : "0 6px 16px rgba(0, 21, 41, 0.3)";
-            }
+            e.currentTarget.style.transform = "translateY(-2px)";
+            e.currentTarget.style.boxShadow =
+              status.status === "graded"
+                ? "0 6px 16px rgba(255, 173, 20, 0.5)"
+                : "0 6px 16px rgba(0, 21, 41, 0.3)";
           }}
           onMouseLeave={(e) => {
-            if (!isDisabled) {
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow = buttonStyle.boxShadow;
-            }
+            e.currentTarget.style.transform = "translateY(0)";
+            e.currentTarget.style.boxShadow =
+              status.status === "graded"
+                ? "0 4px 12px rgba(255, 173, 20, 0.4)"
+                : "0 4px 12px rgba(0, 21, 41, 0.2)";
           }}
         >
-          {buttonText}
+          {getButtonText(status, assignment)}
         </Button>
 
         {/* Submission timestamp */}
@@ -459,7 +447,7 @@ const AssignmentCard = ({ assignment, timeRemaining }) => {
               fontSize: 12,
             }}
           >
-            Submitted:{" "}
+            Dikirim:{" "}
             {dayjs(assignment.submitted_at).format("DD MMM YYYY, HH:mm")}
           </Text>
         )}
