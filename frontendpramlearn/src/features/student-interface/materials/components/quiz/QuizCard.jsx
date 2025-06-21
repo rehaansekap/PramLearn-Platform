@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, Typography, Button, Tag, Space, Progress } from "antd";
 import {
   BookOutlined,
@@ -14,8 +15,9 @@ import { getQuizStatus, getButtonAction } from "../../utils/quizStatusUtils";
 const { Title, Text } = Typography;
 
 const QuizCard = ({ quiz, timeRemaining, timeColor }) => {
+  const navigate = useNavigate();
   const status = getQuizStatus(quiz);
-  const buttonAction = getButtonAction(quiz, status);
+  const buttonAction = getButtonAction(quiz, status, navigate);
   const isExpired = timeRemaining === "EXPIRED";
   const isMobile = window.innerWidth <= 768;
 

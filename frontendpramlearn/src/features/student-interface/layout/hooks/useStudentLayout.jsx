@@ -1,6 +1,7 @@
 import { useState, useContext, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../../../../context/AuthContext";
+import api from "../../../../api";
 import Swal from "sweetalert2";
 
 export const useStudentLayout = () => {
@@ -66,18 +67,66 @@ export const useStudentLayout = () => {
     });
   };
 
-  // Dapatkan kunci menu yang dipilih dari path saat ini
+  // ✅ PERBAIKAN: Fungsi untuk mendapatkan menu key yang tepat berdasarkan path
   const getMenuKeyFromPath = (pathname) => {
-    if (pathname === "/student" || pathname === "/student/") return "/student";
-    if (pathname.startsWith("/student/subjects")) return "/student/subjects";
-    if (pathname.startsWith("/student/assessments"))
+    const pathSegments = pathname.split("/").filter(Boolean);
+
+    // Base case - dashboard
+    if (pathname === "/student" || pathname === "/student/") {
+      return "/student";
+    }
+
+    // ✅ HANDLE MATERIALS ROUTE - materials berasal dari subjects
+    if (pathSegments[1] === "materials") {
+      return "/student/subjects"; // Material adalah bagian dari subjects
+    }
+
+    // ✅ HANDLE QUIZ ROUTES - quiz berasal dari assessments
+    if (pathSegments[1] === "quiz" || pathSegments[1] === "group-quiz") {
+      return "/student/assessments"; // Quiz adalah bagian dari assessments
+    }
+
+    // ✅ HANDLE SUBJECTS ROUTES
+    if (pathSegments[1] === "subjects") {
+      return "/student/subjects";
+    }
+
+    // ✅ HANDLE ASSESSMENTS ROUTES
+    if (pathSegments[1] === "assessments") {
       return "/student/assessments";
-    if (pathname.startsWith("/student/assignments"))
+    }
+
+    // ✅ HANDLE ASSIGNMENTS ROUTES
+    if (pathSegments[1] === "assignments") {
       return "/student/assignments";
-    if (pathname.startsWith("/student/grades")) return "/student/grades";
-    if (pathname.startsWith("/student/progress")) return "/student/progress";
-    if (pathname.startsWith("/student/group")) return "/student/group";
-    if (pathname.startsWith("/student/analytics")) return "/student/analytics";
+    }
+
+    // ✅ HANDLE GRADES ROUTES
+    if (pathSegments[1] === "grades") {
+      return "/student/grades";
+    }
+
+    // ✅ HANDLE PROGRESS ROUTES (jika ada)
+    if (pathSegments[1] === "progress") {
+      return "/student/progress";
+    }
+
+    // ✅ HANDLE GROUP ROUTES (jika ada)
+    if (pathSegments[1] === "group") {
+      return "/student/group";
+    }
+
+    // ✅ HANDLE ANALYTICS ROUTES (jika ada)
+    if (pathSegments[1] === "analytics") {
+      return "/student/analytics";
+    }
+
+    // ✅ HANDLE NOTIFICATIONS ROUTES (jika ada)
+    if (pathSegments[1] === "notifications") {
+      return "/student/notifications";
+    }
+
+    // Default fallback ke dashboard
     return "/student";
   };
 
@@ -92,9 +141,11 @@ export const useStudentLayout = () => {
     token,
     selectedMenuKey,
 
-    // Actions
+    // Setters
     setCollapsed,
     setMobileDrawerOpen,
+
+    // Handlers
     handleLogout,
   };
 };

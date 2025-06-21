@@ -1,14 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { Drawer, Button, Menu, Avatar, Badge, Typography } from "antd";
 import {
   DashboardOutlined,
   BookOutlined,
   FileTextOutlined,
   TrophyOutlined,
   LogoutOutlined,
-  CloseOutlined,
+  EditOutlined,
 } from "@ant-design/icons";
-import { Button, Drawer, Menu, Avatar, Badge, Typography } from "antd";
 
 const { Text } = Typography;
 
@@ -19,6 +19,7 @@ const StudentMobileDrawer = ({
   selectedMenuKey,
   onLogout,
 }) => {
+  // ✅ MENU ITEMS YANG SAMA DENGAN SIDEBAR DESKTOP
   const menuItems = [
     {
       key: "/student",
@@ -28,16 +29,16 @@ const StudentMobileDrawer = ({
     {
       key: "/student/subjects",
       icon: <BookOutlined />,
-      label: <Link to="/student/subjects">Mata Pelajaran Saya</Link>,
+      label: <Link to="/student/subjects">Mata Pelajaran</Link>,
     },
     {
       key: "/student/assessments",
       icon: <FileTextOutlined />,
-      label: <Link to="/student/assessments">Penilaian</Link>,
+      label: <Link to="/student/assessments">Kuis & Penilaian</Link>,
     },
     {
       key: "/student/assignments",
-      icon: <FileTextOutlined />,
+      icon: <EditOutlined />,
       label: <Link to="/student/assignments">Tugas</Link>,
     },
     {
@@ -51,128 +52,49 @@ const StudentMobileDrawer = ({
     <Drawer
       title={null}
       placement="left"
-      open={open}
       onClose={onClose}
-      closable={false}
-      headerStyle={{ display: "none" }}
+      open={open}
+      width={280}
       bodyStyle={{
-        background: "#001529",
         padding: 0,
-        display: "flex",
-        flexDirection: "column",
-        height: "100%",
+        background: "#001529",
       }}
-      width={300}
+      headerStyle={{ display: "none" }}
+      closable={false}
     >
-      {/* Header Drawer Custom */}
       <div
         style={{
-          background:
-            "linear-gradient(135deg, #001529 0%, #3a3f5c 60%, #43cea2 100%)",
-          padding: "16px",
+          height: "100vh",
           display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+          flexDirection: "column",
+          background: "#001529",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: "8px",
-              background: "linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-            }}
-          >
-            <span
-              style={{
-                fontSize: "20px",
-                fontWeight: "800",
-                background: "linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-            >
-              P
-            </span>
-          </div>
-          <div>
-            <div
-              style={{
-                color: "#fff",
-                fontSize: "16px",
-                fontWeight: "700",
-                lineHeight: "18px",
-              }}
-            >
-              PramLearn
-            </div>
-            <div
-              style={{
-                color: "rgba(255, 255, 255, 0.8)",
-                fontSize: "11px",
-                fontWeight: "500",
-                lineHeight: "14px",
-              }}
-            >
-              Portal Siswa
-            </div>
-          </div>
-        </div>
-        <Button
-          type="text"
-          icon={<CloseOutlined />}
-          onClick={onClose}
+        {/* HEADER PROFIL */}
+        <div
           style={{
-            color: "#fff",
-            fontSize: 16,
-            padding: 0,
-            width: 32,
-            height: 32,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        />
-      </div>
-
-      {/* Kartu Profil Pengguna */}
-      <div
-        style={{
-          padding: "20px 16px",
-          display: "flex",
-          alignItems: "center",
-          gap: 12,
-          background: "rgba(255, 255, 255, 0.05)",
-          margin: "0 16px 16px",
-          borderRadius: 12,
-          marginTop: 16,
-        }}
-      >
-        <Avatar
-          size={48}
-          style={{
-            background: "linear-gradient(135deg, #1890ff 0%, #52c41a 100%)",
-            color: "#fff",
-            fontWeight: "bold",
-            fontSize: "18px",
+            padding: "24px 16px",
+            borderBottom: "1px solid #303030",
+            textAlign: "center",
           }}
         >
-          {user?.username?.charAt(0)?.toUpperCase() || "S"}
-        </Avatar>
-        <div>
+          <Avatar
+            size={64}
+            style={{
+              background: "linear-gradient(135deg, #1890ff 0%, #52c41a 100%)",
+              marginBottom: 12,
+              fontSize: "24px",
+              fontWeight: "bold",
+            }}
+          >
+            {user?.username?.charAt(0)?.toUpperCase() || "S"}
+          </Avatar>
           <div
             style={{
               color: "#fff",
               fontWeight: 600,
-              fontSize: "15px",
-              marginBottom: 2,
+              fontSize: "16px",
+              marginBottom: 4,
             }}
           >
             {user?.username || user?.first_name || "Siswa"}
@@ -190,68 +112,67 @@ const StudentMobileDrawer = ({
             </span>
           </div>
         </div>
-      </div>
 
-      {/* NAVIGASI MENU */}
-      <div style={{ padding: "0 16px", marginBottom: 8 }}>
-        <Text
+        {/* NAVIGASI MENU */}
+        <div style={{ padding: "0 16px", marginBottom: 8 }}>
+          <Text
+            style={{
+              color: "rgba(255, 255, 255, 0.5)",
+              fontSize: 12,
+              fontWeight: 500,
+            }}
+          >
+            NAVIGASI SISWA
+          </Text>
+        </div>
+
+        {/* Menu yang Ditingkatkan */}
+        <div style={{ flex: 1, overflowY: "auto", padding: "0 16px" }}>
+          <Menu
+            theme="dark"
+            mode="inline"
+            selectedKeys={[selectedMenuKey]}
+            style={{
+              borderRight: 0,
+              background: "transparent",
+              fontSize: "14px",
+            }}
+            items={menuItems.map((item) => ({
+              ...item,
+              style: {
+                marginBottom: 4,
+                borderRadius: 8,
+                height: 44,
+              },
+              onClick: onClose,
+            }))}
+          />
+        </div>
+
+        {/* Tombol Keluar */}
+        <div
           style={{
-            color: "rgba(255, 255, 255, 0.5)",
-            fontSize: 12,
-            fontWeight: 500,
+            padding: "16px",
+            marginTop: "auto",
+            borderTop: "1px solid rgba(255, 255, 255, 0.1)",
           }}
         >
-          NAVIGASI SISWA
-        </Text>
-      </div>
-
-      {/* Menu yang Ditingkatkan */}
-      <div style={{ flex: 1, overflowY: "auto", padding: "0 16px" }}>
-        <Menu
-          theme="dark"
-          mode="inline"
-          selectedKeys={[selectedMenuKey]}
-          style={{
-            borderRight: 0,
-            background: "transparent",
-            fontSize: "14px",
-          }}
-          items={menuItems.map((item) => ({
-            ...item,
-            style: {
-              marginBottom: 4,
-              borderRadius: 8,
-              height: 44,
-            },
-            onClick: onClose,
-          }))}
-        />
-      </div>
-
-      {/* Tombol Keluar */}
-      <div
-        style={{
-          padding: "16px",
-          marginTop: "auto",
-          borderTop: "1px solid rgba(255, 255, 255, 0.1)",
-        }}
-      >
-        <Button
-          type="primary"
-          danger
-          size="large"
-          icon={<LogoutOutlined />}
-          onClick={onLogout}
-          block
-          style={{
-            height: 46,
-            fontSize: 16,
-            fontWeight: 600,
-            borderRadius: 8,
-          }}
-        >
-          Keluar
-        </Button>
+          <Button
+            type="primary"
+            danger
+            size="large"
+            icon={<LogoutOutlined />}
+            onClick={onLogout}
+            block
+            style={{
+              height: 46,
+              fontWeight: 600,
+              fontSize: "14px",
+            }}
+          >
+            Keluar
+          </Button>
+        </div>
       </div>
     </Drawer>
   );

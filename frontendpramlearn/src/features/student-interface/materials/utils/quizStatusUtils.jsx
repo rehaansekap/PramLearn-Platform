@@ -5,12 +5,7 @@ import {
   TrophyOutlined,
 } from "@ant-design/icons";
 
-//setup use navigate
-import { useParams, useLocation, useNavigate } from "react-router-dom";
-
 export const getQuizStatus = (quiz) => {
-  const navigate = useNavigate();
-
   if (quiz.quiz_type === "group" || quiz.is_group_quiz) {
     if (quiz.is_completed) {
       return {
@@ -52,7 +47,7 @@ export const getQuizStatus = (quiz) => {
   };
 };
 
-export const getButtonAction = (quiz, status) => {
+export const getButtonAction = (quiz, status, navigate) => {
   if (status.status === "completed") {
     return {
       text: "Lihat Hasil",
@@ -83,9 +78,12 @@ export const getButtonAction = (quiz, status) => {
       type: "primary",
       icon: <PlayCircleOutlined />,
       onClick: () =>
-        (window.location.href = quiz.is_group_quiz
-          ? `/student/group-quiz/${quiz.slug}`
-          : `/student/quiz/${quiz.slug}`),
+        navigate(
+          quiz.is_group_quiz
+            ? `/student/group-quiz/${quiz.slug}`
+            : `/student/quiz/${quiz.slug}`,
+          { replace: true }
+        ),
       style: {
         background:
           "linear-gradient(135deg, #001529 0%, #3a3f5c 60%, #43cea2 100%)",
@@ -98,8 +96,11 @@ export const getButtonAction = (quiz, status) => {
     type: "primary",
     icon: <PlayCircleOutlined />,
     onClick: () =>
-      (window.location.href = quiz.is_group_quiz
-        ? `/student/group-quiz/${quiz.slug}`
-        : `/student/quiz/${quiz.slug}`),
+      navigate(
+        quiz.is_group_quiz
+          ? `/student/group-quiz/${quiz.slug}`
+          : `/student/quiz/${quiz.slug}`,
+        { replace: true }
+      ),
   };
 };

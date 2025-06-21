@@ -1,7 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { Breadcrumb } from "antd";
 import { Link, useLocation } from "react-router-dom";
-import { HomeOutlined } from "@ant-design/icons";
+import {
+  HomeOutlined,
+  BookOutlined,
+  FileTextOutlined,
+  QuestionCircleOutlined,
+  EditOutlined,
+  TrophyOutlined,
+  TeamOutlined,
+  BarChartOutlined,
+  BellOutlined,
+} from "@ant-design/icons";
 import api from "../../../api";
 
 const StudentBreadcrumb = () => {
@@ -14,7 +24,7 @@ const StudentBreadcrumb = () => {
       const baseCrumbs = [
         {
           path: "/student",
-          breadcrumbName: "Student Portal",
+          breadcrumbName: "Dashboard",
           icon: <HomeOutlined />,
         },
       ];
@@ -23,23 +33,28 @@ const StudentBreadcrumb = () => {
       if (pathSnippets[1] === "materials" && pathSnippets[2]) {
         const materialSlug = pathSnippets[2];
         try {
-          const materialRes = await api.get(`materials/${materialSlug}/`);
-          const material = materialRes.data.find(
-            (m) => m.slug === materialSlug
-          );
+          const materialRes = await api.get(`materials/?slug=${materialSlug}`);
+          const material = Array.isArray(materialRes.data)
+            ? materialRes.data.find((m) => m.slug === materialSlug)
+            : materialRes.data;
 
           if (material && material.subject) {
             const subjectRes = await api.get(`subjects/${material.subject}/`);
             setDynamicCrumbs([
               ...baseCrumbs,
-              { path: "/student/subjects", breadcrumbName: "My Subjects" },
+              {
+                path: "/student/subjects",
+                breadcrumbName: "Mata Pelajaran",
+                icon: <BookOutlined />,
+              },
               {
                 path: `/student/subjects/${subjectRes.data.slug}`,
                 breadcrumbName: subjectRes.data.name,
               },
               {
                 path: location.pathname,
-                breadcrumbName: "Material",
+                breadcrumbName: material.title,
+                icon: <FileTextOutlined />,
               },
             ]);
             return;
@@ -51,8 +66,16 @@ const StudentBreadcrumb = () => {
         // Fallback jika gagal fetch
         setDynamicCrumbs([
           ...baseCrumbs,
-          { path: "/student/subjects", breadcrumbName: "My Subjects" },
-          { path: location.pathname, breadcrumbName: "Material" },
+          {
+            path: "/student/subjects",
+            breadcrumbName: "Mata Pelajaran",
+            icon: <BookOutlined />,
+          },
+          {
+            path: location.pathname,
+            breadcrumbName: "Materi",
+            icon: <FileTextOutlined />,
+          },
         ]);
         return;
       }
@@ -62,7 +85,11 @@ const StudentBreadcrumb = () => {
         if (pathSnippets.length === 2) {
           setDynamicCrumbs([
             ...baseCrumbs,
-            { path: "/student/subjects", breadcrumbName: "My Subjects" },
+            {
+              path: "/student/subjects",
+              breadcrumbName: "Mata Pelajaran",
+              icon: <BookOutlined />,
+            },
           ]);
         } else if (pathSnippets[2]) {
           // Dynamic subject detail
@@ -70,43 +97,275 @@ const StudentBreadcrumb = () => {
             const subjectRes = await api.get(`subjects/${pathSnippets[2]}/`);
             setDynamicCrumbs([
               ...baseCrumbs,
-              { path: "/student/subjects", breadcrumbName: "My Subjects" },
+              {
+                path: "/student/subjects",
+                breadcrumbName: "Mata Pelajaran",
+                icon: <BookOutlined />,
+              },
               {
                 path: `/student/subjects/${pathSnippets[2]}`,
-                breadcrumbName: `${subjectRes.data.name}`,
+                breadcrumbName: subjectRes.data.name,
               },
             ]);
           } catch {
             setDynamicCrumbs([
               ...baseCrumbs,
-              { path: "/student/subjects", breadcrumbName: "My Subjects" },
-              { path: location.pathname, breadcrumbName: "Subject Detail" },
+              {
+                path: "/student/subjects",
+                breadcrumbName: "Mata Pelajaran",
+                icon: <BookOutlined />,
+              },
+              {
+                path: location.pathname,
+                breadcrumbName: "Detail Mata Pelajaran",
+              },
             ]);
           }
         }
         return;
       }
 
-      // Other static routes
-      const routeMap = {
-        dashboard: "Dashboard",
-        assessments: "Assessments",
-        progress: "Progress",
-        group: "My Group",
-      };
+      // Handle assignments routes: /student/assignments
+      if (pathSnippets[1] === "assignments") {
+        if (pathSnippets.length === 2) {
+          setDynamicCrumbs([
+            ...baseCrumbs,
+            {
+              path: "/student/assignments",
+              breadcrumbName: "Tugas Saya",
+              icon: <EditOutlined />,
+            },
+          ]);
+        } else if (pathSnippets[2]) {
+          const assignmentSlug = pathSnippets[2];
+          const isResultsPage = pathSnippets[3] === "results";
 
-      if (pathSnippets[1] && routeMap[pathSnippets[1]]) {
+          try {
+            // Fetch assignment data
+            const assignmentsRes = await api.get(
+              "/student/assignments/available/"
+            );
+            const assignment = assignmentsRes.data.find(
+              (a) =>
+                a.slug === assignmentSlug ||
+                a.title
+                  .toLowerCase()
+                  .replace(/\s+/g, "-")
+                  .replace(/[^a-z0-9-]/g, "") === assignmentSlug
+            );
+
+            if (assignment) {
+              const crumbs = [
+                ...baseCrumbs,
+                {
+                  path: "/student/assignments",
+                  breadcrumbName: "Tugas Saya",
+                  icon: <EditOutlined />,
+                },
+                {
+                  path: `/student/assignments/${assignmentSlug}`,
+                  breadcrumbName: assignment.title,
+                },
+              ];
+
+              if (isResultsPage) {
+                crumbs.push({
+                  path: location.pathname,
+                  breadcrumbName: "Riwayat Pengumpulan",
+                  icon: <TrophyOutlined />,
+                });
+              }
+
+              setDynamicCrumbs(crumbs);
+              return;
+            }
+          } catch (error) {
+            console.error("Failed to fetch assignment data:", error);
+          }
+
+          // Fallback
+          const crumbs = [
+            ...baseCrumbs,
+            {
+              path: "/student/assignments",
+              breadcrumbName: "Tugas Saya",
+              icon: <EditOutlined />,
+            },
+            {
+              path: location.pathname,
+              breadcrumbName: isResultsPage
+                ? "Riwayat Pengumpulan"
+                : "Detail Tugas",
+            },
+          ];
+          setDynamicCrumbs(crumbs);
+        }
+        return;
+      }
+
+      // Handle assessments/quiz routes: /student/assessments, /student/quiz/:quizSlug
+      if (pathSnippets[1] === "assessments") {
         setDynamicCrumbs([
           ...baseCrumbs,
           {
-            path: `/student/${pathSnippets[1]}`,
-            breadcrumbName: routeMap[pathSnippets[1]],
+            path: "/student/assessments",
+            breadcrumbName: "Kuis & Penilaian",
+            icon: <QuestionCircleOutlined />,
           },
         ]);
         return;
       }
 
-      // Default fallback
+      // Handle quiz routes: /student/quiz/:quizSlug
+      if (pathSnippets[1] === "quiz" && pathSnippets[2]) {
+        const quizSlug = pathSnippets[2];
+        const isResultsPage = pathSnippets[3] === "results";
+
+        try {
+          // Fetch quiz data
+          const quizRes = await api.get(`/student/quiz/${quizSlug}/`);
+          const quiz = quizRes.data;
+
+          const crumbs = [
+            ...baseCrumbs,
+            {
+              path: "/student/assessments",
+              breadcrumbName: "Kuis & Penilaian",
+              icon: <QuestionCircleOutlined />,
+            },
+            {
+              path: `/student/quiz/${quizSlug}`,
+              breadcrumbName: quiz.title || "Quiz",
+            },
+          ];
+
+          if (isResultsPage) {
+            crumbs.push({
+              path: location.pathname,
+              breadcrumbName: "Hasil Kuis",
+              icon: <TrophyOutlined />,
+            });
+          }
+
+          setDynamicCrumbs(crumbs);
+          return;
+        } catch (error) {
+          console.error("Failed to fetch quiz data:", error);
+        }
+
+        // Fallback
+        const crumbs = [
+          ...baseCrumbs,
+          {
+            path: "/student/assessments",
+            breadcrumbName: "Kuis & Penilaian",
+            icon: <QuestionCircleOutlined />,
+          },
+          {
+            path: location.pathname,
+            breadcrumbName: isResultsPage ? "Hasil Kuis" : "Detail Kuis",
+          },
+        ];
+        setDynamicCrumbs(crumbs);
+        return;
+      }
+
+      // Handle group quiz routes: /student/group-quiz/:quizSlug
+      if (pathSnippets[1] === "group-quiz" && pathSnippets[2]) {
+        const quizSlug = pathSnippets[2];
+        const isResultsPage = pathSnippets[3] === "results";
+
+        try {
+          // Fetch group quiz data
+          const quizRes = await api.get(`/student/group-quiz/${quizSlug}/`);
+          const quiz = quizRes.data;
+
+          const crumbs = [
+            ...baseCrumbs,
+            {
+              path: "/student/assessments",
+              breadcrumbName: "Kuis & Penilaian",
+              icon: <QuestionCircleOutlined />,
+            },
+            {
+              path: `/student/group-quiz/${quizSlug}`,
+              breadcrumbName: `${quiz.title || "Group Quiz"} (Kelompok)`,
+              icon: <TeamOutlined />,
+            },
+          ];
+
+          if (isResultsPage) {
+            crumbs.push({
+              path: location.pathname,
+              breadcrumbName: "Hasil Kuis Kelompok",
+              icon: <TrophyOutlined />,
+            });
+          }
+
+          setDynamicCrumbs(crumbs);
+          return;
+        } catch (error) {
+          console.error("Failed to fetch group quiz data:", error);
+        }
+
+        // Fallback
+        const crumbs = [
+          ...baseCrumbs,
+          {
+            path: "/student/assessments",
+            breadcrumbName: "Kuis & Penilaian",
+            icon: <QuestionCircleOutlined />,
+          },
+          {
+            path: location.pathname,
+            breadcrumbName: isResultsPage
+              ? "Hasil Kuis Kelompok"
+              : "Kuis Kelompok",
+            icon: <TeamOutlined />,
+          },
+        ];
+        setDynamicCrumbs(crumbs);
+        return;
+      }
+
+      // Handle other static routes
+      const routeMap = {
+        grades: {
+          breadcrumbName: "Nilai Saya",
+          icon: <TrophyOutlined />,
+        },
+        progress: {
+          breadcrumbName: "Progress Belajar",
+          icon: <BarChartOutlined />,
+        },
+        group: {
+          breadcrumbName: "Kelompok Saya",
+          icon: <TeamOutlined />,
+        },
+        analytics: {
+          breadcrumbName: "Analitik",
+          icon: <BarChartOutlined />,
+        },
+        notifications: {
+          breadcrumbName: "Notifikasi",
+          icon: <BellOutlined />,
+        },
+      };
+
+      if (pathSnippets[1] && routeMap[pathSnippets[1]]) {
+        const route = routeMap[pathSnippets[1]];
+        setDynamicCrumbs([
+          ...baseCrumbs,
+          {
+            path: `/student/${pathSnippets[1]}`,
+            breadcrumbName: route.breadcrumbName,
+            icon: route.icon,
+          },
+        ]);
+        return;
+      }
+
+      // Default fallback - hanya dashboard
       setDynamicCrumbs(baseCrumbs);
     };
 
