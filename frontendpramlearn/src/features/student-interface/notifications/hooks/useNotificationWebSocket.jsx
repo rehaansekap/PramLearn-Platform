@@ -26,7 +26,6 @@ const useNotificationWebSocket = (onNotificationReceived) => {
       wsRef.current.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
-          console.log("📢 Notification received:", data);
 
           if (data.type === "notification") {
             // Add to notifications list

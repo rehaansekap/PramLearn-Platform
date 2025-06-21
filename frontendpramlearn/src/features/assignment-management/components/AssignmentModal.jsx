@@ -63,9 +63,6 @@ const AssignmentModal = ({
   }, [editingAssignment, setFormData, open, form]);
 
   const onFinish = async (values) => {
-    console.log("Form submitted with values:", values);
-    console.log("Current formData:", formData);
-
     if (!formData.title || !formData.description || !formData.due_date) {
       Swal.fire("Error", "Semua field wajib diisi!", "error");
       return;
@@ -89,7 +86,6 @@ const AssignmentModal = ({
   };
 
   const handleDatePickerChange = (date, dateString) => {
-    console.log("DatePicker changed:", { date, dateString });
     setFormData((prev) => ({
       ...prev,
       due_date: date ? date.toISOString() : "",

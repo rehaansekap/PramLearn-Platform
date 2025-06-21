@@ -55,10 +55,8 @@ const MaterialAssignmentList = ({
       recordingInProgress.current.add(assignmentKey);
 
       try {
-        console.log(`🎯 Recording assignment submission: ${assignmentId}`);
         await recordAssignmentSubmission(assignmentId);
         recordedAssignments.current.add(assignmentKey);
-        console.log(`✅ Assignment ${assignmentId} recorded successfully`);
       } catch (error) {
         console.error(`❌ Failed to record assignment ${assignmentId}:`, error);
       } finally {

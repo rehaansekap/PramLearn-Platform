@@ -144,7 +144,6 @@ const MaterialDetailPage = () => {
   };
 
   const handleViewRanking = (quiz) => {
-    console.log("View ranking for quiz:", quiz);
   };
 
   // Loading state untuk MaterialDetail

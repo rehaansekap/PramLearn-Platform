@@ -10,12 +10,6 @@ import { useNavigate } from "react-router-dom";
 
 const QuickStatsCard = ({ stats, loading }) => {
   const navigate = useNavigate();
-
-  // Debug logging
-  React.useEffect(() => {
-    console.log("📊 QuickStatsCard received stats:", stats);
-  }, [stats]);
-
   const statsData = [
     {
       title: "Mata Pelajaran",

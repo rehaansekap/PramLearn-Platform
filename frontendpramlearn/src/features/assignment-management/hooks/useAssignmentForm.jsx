@@ -61,13 +61,6 @@ const useAssignmentForm = (materialId, onSuccess, editingAssignment) => {
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       const { title, description, due_date, questions } = formData;
 
-      console.log("Submitting assignment:", {
-        title,
-        description,
-        due_date,
-        questions,
-      });
-
       // PERBAIKAN: Format due_date ke ISO format
       let formattedDueDate = due_date;
       if (due_date) {
@@ -86,13 +79,9 @@ const useAssignmentForm = (materialId, onSuccess, editingAssignment) => {
         }
       }
 
-      console.log("Formatted due_date:", formattedDueDate);
-
       let assignmentId;
 
       if (isEdit) {
-        // Update assignment
-        console.log("Updating assignment with ID:", editingAssignment.id);
         await api.put(`assignments/${editingAssignment.id}/`, {
           material: materialId,
           title,
@@ -146,8 +135,6 @@ const useAssignmentForm = (materialId, onSuccess, editingAssignment) => {
           )
         );
       } else {
-        // CREATE assignment
-        console.log("Creating new assignment");
         const assignmentPayload = {
           material: materialId,
           title,
@@ -155,15 +142,11 @@ const useAssignmentForm = (materialId, onSuccess, editingAssignment) => {
           due_date: formattedDueDate,
         };
 
-        console.log("Assignment payload:", assignmentPayload);
-
         const res = await api.post("assignments/", assignmentPayload);
         assignmentId = res.data.id;
-        console.log("Assignment created with ID:", assignmentId);
 
         // Create questions
         if (questions && questions.length > 0) {
-          console.log("Creating questions for new assignment:", questions);
           await Promise.all(
             questions.map((q) =>
               api.post("assignment-questions/", {
@@ -177,11 +160,9 @@ const useAssignmentForm = (materialId, onSuccess, editingAssignment) => {
               })
             )
           );
-          console.log("All questions created successfully");
         }
       }
 
-      console.log("Assignment submission completed successfully");
       if (onSuccess) onSuccess();
       return true;
     } catch (err) {

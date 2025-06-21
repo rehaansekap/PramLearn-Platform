@@ -42,7 +42,6 @@ export const OnlineStatusProvider = ({ children }) => {
         ws.onmessage = (event) => {
           try {
             const data = JSON.parse(event.data);
-            console.log("📩 Received real-time status update:", data);
 
             if (data.type === "user_status_update") {
               setUserStatuses((prev) => ({

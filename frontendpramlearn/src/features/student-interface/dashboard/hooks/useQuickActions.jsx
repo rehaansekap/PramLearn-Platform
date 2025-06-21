@@ -22,8 +22,6 @@ const useQuickActions = () => {
 
       console.log("🔄 Fetching quick actions for user:", user.username);
       const response = await api.get("student/quick-actions/");
-
-      console.log("✅ Quick actions response:", response.data);
       setQuickActions(response.data);
     } catch (err) {
       console.error("❌ Error fetching quick actions:", err);

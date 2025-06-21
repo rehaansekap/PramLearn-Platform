@@ -112,9 +112,6 @@ const useStudentMaterialAccess = (materialSlug) => {
       if (response.data.completion_percentage >= 100) {
         console.log("⭐ Material already 100% completed!");
         // Make sure we mark it as completed locally
-        if (response.data.completed_at) {
-          console.log(`Completion date: ${response.data.completed_at}`);
-        }
       }
 
       setProgress(response.data);
@@ -296,8 +293,6 @@ const useStudentMaterialAccess = (materialSlug) => {
         return;
       }
 
-      console.log(`🎯 Recording new activity: ${activityKey}`);
-
       let progressIncrement = 0;
       const timeIncrement = activityData.timeIncrement || 10;
 
@@ -310,9 +305,6 @@ const useStudentMaterialAccess = (materialSlug) => {
               material,
               activityType
             );
-            console.log(
-              `📄 ${activityType} - Progress increment: ${progressIncrement}%`
-            );
             break;
 
           case "quiz_completed":
@@ -320,18 +312,12 @@ const useStudentMaterialAccess = (materialSlug) => {
               material,
               activityType
             );
-            console.log(
-              `🎯 Quiz completed (ID: ${activityData.quiz_id}) - Progress increment: ${progressIncrement}%`
-            );
             break;
 
           case "assignment_submitted":
             progressIncrement = calculateDynamicProgress(
               material,
               activityType
-            );
-            console.log(
-              `📝 Assignment submitted (ID: ${activityData.assignment_id}) - Progress increment: ${progressIncrement}%`
             );
             break;
 
@@ -344,11 +330,6 @@ const useStudentMaterialAccess = (materialSlug) => {
                   material,
                   "video_played"
                 );
-                console.log(
-                  `📺 Video ${watchPercentage.toFixed(
-                    1
-                  )}% watched - Progress increment: ${progressIncrement}%`
-                );
               }
             }
             break;
@@ -357,9 +338,6 @@ const useStudentMaterialAccess = (materialSlug) => {
             const timeSpentMinutes = (progressRef.current.time_spent || 0) / 60;
             if (timeSpentMinutes > 0 && timeSpentMinutes % 5 === 0) {
               progressIncrement = 2.5;
-              console.log(
-                `⏱️ Time milestone (${timeSpentMinutes}min) - Progress increment: ${progressIncrement}%`
-              );
             }
             break;
 
@@ -412,8 +390,6 @@ const useStudentMaterialAccess = (materialSlug) => {
                 (prev.time_spent || 0) + (activityData.timeIncrement || 10),
             };
           });
-
-          console.log(`Updated progress: ${JSON.stringify(newProgress)}`);
         }
 
         // Always update local activity set jika sukses
@@ -463,9 +439,6 @@ const useStudentMaterialAccess = (materialSlug) => {
       globalRecordingQuizzes.add(globalKey);
 
       try {
-        console.log(
-          `🎯 Recording quiz completion: ${quizId} (group: ${isGroupQuiz})`
-        );
         await recordActivity("quiz_completed", {
           quiz_id: quizId,
           is_group_quiz: isGroupQuiz,
@@ -503,7 +476,6 @@ const useStudentMaterialAccess = (materialSlug) => {
       globalRecordingAssignments.add(globalKey);
 
       try {
-        console.log(`🎯 Recording assignment submission: ${assignmentId}`);
         await recordActivity("assignment_submitted", {
           assignment_id: assignmentId,
         });
@@ -538,15 +510,6 @@ const useStudentMaterialAccess = (materialSlug) => {
     (activityType, contentIndex) => {
       const activityKey = `${activityType}_${contentIndex}`;
       const isCompleted = completedActivities.has(activityKey);
-
-      // ✅ DEBUG LOG untuk quiz
-      if (activityType === "quiz_completed") {
-        console.log(`🎯 Quiz ${contentIndex} activity check:`, {
-          activityKey,
-          isCompleted,
-          allActivities: Array.from(completedActivities),
-        });
-      }
 
       return isCompleted;
     },

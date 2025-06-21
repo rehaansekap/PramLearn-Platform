@@ -262,12 +262,10 @@ const useStudentAnalytics = () => {
   const applyFilters = (newFilters) => {
     setFilters(newFilters);
     // In real implementation, this would trigger API call with filters
-    console.log("Applying filters:", newFilters);
   };
 
   const clearFilters = () => {
     setFilters({});
-    console.log("Clearing filters");
   };
 
   const refreshAnalytics = async () => {

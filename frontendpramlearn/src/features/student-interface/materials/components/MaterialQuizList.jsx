@@ -53,9 +53,6 @@ const MaterialQuizList = ({
       recordingInProgress.current.add(quizKey);
 
       try {
-        console.log(
-          `🎯 Recording quiz completion: ${quizId} (group: ${isGroupQuiz})`
-        );
         await recordQuizCompletion(quizId, isGroupQuiz);
         recordedQuizzes.current.add(quizKey);
         console.log(`✅ Quiz ${quizId} recorded successfully`);
@@ -95,16 +92,6 @@ const MaterialQuizList = ({
           !isCompletedByActivity &&
           !recordedQuizzes.current.has(quizKey) &&
           !recordingInProgress.current.has(quizKey);
-
-        console.log(`🎯 Quiz ${quiz.id} auto-record check:`, {
-          quiz_id: quiz.id,
-          isCompletedByActivity,
-          isCompletedByQuizData,
-          isCompletedByAttempt,
-          shouldRecord,
-          quizKey,
-          activityKey,
-        });
 
         if (shouldRecord) {
           throttledRecordQuizCompletion(quiz.id, quiz.is_group_quiz || false);

@@ -11,7 +11,6 @@ const useClassStudents = (classId) => {
 
   useEffect(() => {
     if (!classId) {
-      console.log("useClassStudents: classId belum ada");
       return;
     }
 
@@ -24,8 +23,6 @@ const useClassStudents = (classId) => {
         const response = await api.get(
           `class-students/${classId}/with-profile/`
         );
-
-        console.log("Class students with profile:", response.data);
 
         // Data response sudah langsung berisi profil motivasi
         setStudentDetails(response.data);

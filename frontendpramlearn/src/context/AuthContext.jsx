@@ -155,8 +155,6 @@ const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (username, password) => {
-    console.log("🔐 Attempting login for:", username);
-
     try {
       const response = await api.post("login/", { username, password });
       const { access: token } = response.data;
@@ -176,7 +174,6 @@ const AuthProvider = ({ children }) => {
       });
 
       console.log("✅ Login successful for user:", userRes.data.username);
-      console.log("👤 User role:", userRes.data.role);
 
       // Return user data untuk redirect handling di component
       return userRes.data;
@@ -187,8 +184,6 @@ const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
-    console.log("🚪 Logging out user:", user?.username);
-
     // Set offline SEBELUM clear token dan user
     if (token && user) {
       try {

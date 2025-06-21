@@ -22,7 +22,6 @@ const ClassDetailPage = () => {
           );
           if (filteredClass) {
             setClassId(filteredClass.id);
-            console.log(`Class ID set to: ${filteredClass.id}`);
           } else {
             console.error("No class found with the given slug");
           }

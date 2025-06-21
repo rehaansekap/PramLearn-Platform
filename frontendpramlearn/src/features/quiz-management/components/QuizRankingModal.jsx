@@ -71,7 +71,6 @@ const QuizRankingModal = ({ open, onClose, quiz, materialId }) => {
 
       wsRef.current.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        console.log("📨 Quiz ranking WebSocket message:", data);
 
         if (data.type === "ranking_update") {
           setRankings(data.rankings);

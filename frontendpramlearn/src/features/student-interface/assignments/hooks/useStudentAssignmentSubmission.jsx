@@ -30,7 +30,6 @@ const useStudentAssignmentSubmission = () => {
     try {
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       const response = await api.get("student/assignments/available/");
-      console.log("Assignments response:", response.data);
       setAssignments(Array.isArray(response.data) ? response.data : []);
     } catch (err) {
       setError(err);
@@ -51,8 +50,6 @@ const useStudentAssignmentSubmission = () => {
         const response = await api.get(
           `/student/assignment/${assignmentId}/questions/`
         );
-
-        console.log("Questions response:", response.data);
 
         // PERBAIKAN: Extract questions dari response yang benar
         if (response.data && response.data.questions) {
@@ -87,7 +84,6 @@ const useStudentAssignmentSubmission = () => {
         const response = await api.get(
           `student/assignment/${assignmentId}/submissions/`
         );
-        console.log("Submissions response:", response.data);
         setSubmissions(Array.isArray(response.data) ? response.data : []);
       } catch (err) {
         console.error("Error fetching submission history:", err);
@@ -107,7 +103,6 @@ const useStudentAssignmentSubmission = () => {
         const response = await api.get(
           `student/assignment/${assignmentId}/draft/`
         );
-        console.log("Draft response:", response.data);
 
         if (response.data) {
           setAnswers(response.data.draft_answers || {});
@@ -322,7 +317,6 @@ const useStudentAssignmentSubmission = () => {
   // Select assignment
   const selectAssignment = useCallback(
     async (assignment) => {
-      console.log("Selecting assignment:", assignment);
       setSelectedAssignment(assignment);
       setCurrentSubmission(null);
 

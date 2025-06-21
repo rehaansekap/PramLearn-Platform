@@ -54,8 +54,6 @@ const CommunicationHub = () => {
 
   const handleSendMessage = async (values) => {
     try {
-      // API call to send message
-      console.log("Sending message:", values);
       message.success("Message sent successfully!");
       form.resetFields();
       setMessageModalVisible(false);

@@ -5,7 +5,6 @@ const { Text } = Typography;
 
 const ProgressDebugger = ({ progress, recordActivity, materialId }) => {
   const handleTestActivity = async (activityType, data = {}) => {
-    console.log(`🧪 Testing ${activityType}:`, data);
     await recordActivity(activityType, data);
   };
 

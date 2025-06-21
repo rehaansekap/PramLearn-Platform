@@ -52,16 +52,6 @@ const ProgressChecklist = ({ material, isActivityCompleted }) => {
       isCompleted = true;
     }
 
-    console.log(`🎯 Quiz ${quiz.id} completion check:`, {
-      quiz_id: quiz.id,
-      activityKey,
-      completedByActivity,
-      quiz_completed: quiz.completed,
-      quiz_is_completed: quiz.is_completed,
-      student_attempt: quiz.student_attempt?.submitted_at,
-      final_isCompleted: isCompleted,
-    });
-
     return {
       key: activityKey,
       label: quiz.title || `Quiz ${idx + 1}`,

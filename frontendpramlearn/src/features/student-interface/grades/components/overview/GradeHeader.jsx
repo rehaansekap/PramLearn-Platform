@@ -13,7 +13,7 @@ const GradeHeader = ({ statistics, totalGrades }) => {
   return (
     <>
       {/* Breadcrumb */}
-      <Breadcrumb
+      {/* <Breadcrumb
         style={{ marginBottom: 24 }}
         items={[
           {
@@ -34,7 +34,7 @@ const GradeHeader = ({ statistics, totalGrades }) => {
             ),
           },
         ]}
-      />
+      /> */}
 
       {/* Header Section */}
       <div

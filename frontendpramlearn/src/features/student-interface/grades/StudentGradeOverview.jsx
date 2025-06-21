@@ -100,7 +100,11 @@ const StudentGradeOverview = () => {
     >
       <GradeHeader statistics={statistics} totalGrades={totalGrades} />
 
-      <GradeStats statistics={statistics} achievements={achievements} />
+      <GradeStats
+        statistics={statistics}
+        achievements={achievements}
+        grades={grades}
+      />
 
       <GradeContent
         grades={grades}

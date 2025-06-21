@@ -53,8 +53,6 @@ const useGroupQuizCollaboration = (quizSlug) => {
 
       if (!mountedRef.current) return;
 
-      console.log("🔍 Quiz data received:", quizData);
-
       setQuiz(quizData);
       setGroupMembers(quizData.group?.members || []);
       setAnswers(quizData.current_answers || {});
@@ -155,7 +153,6 @@ const useGroupQuizCollaboration = (quizSlug) => {
                 break;
 
               case "current_state":
-                console.log("📊 Received current state:", data.answers);
                 setAnswers((prev) => ({
                   ...prev,
                   ...data.answers,
@@ -210,7 +207,6 @@ const useGroupQuizCollaboration = (quizSlug) => {
                 break;
 
               case "quiz_submitted":
-                console.log("🎯 Received quiz submission broadcast:", data);
                 message.success(data.message, 3);
                 setIsSubmitted(true);
 
@@ -416,7 +412,6 @@ const useGroupQuizCollaboration = (quizSlug) => {
   // 🔧 IMPROVED: Better data fetching and WebSocket initialization
   useEffect(() => {
     if (quizSlug && mountedRef.current) {
-      console.log("🚀 Starting quiz data fetch for:", quizSlug);
       fetchQuizData();
     }
   }, [quizSlug, fetchQuizData]);

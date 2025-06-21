@@ -12,9 +12,7 @@ const useStudentGroupQuizzes = () => {
       setError(null);
 
       try {
-        console.log("🔍 Fetching group quizzes...");
         const response = await api.get("/student/group-quiz/");
-        console.log("📊 Group quizzes response:", response.data);
         setGroupQuizzes(response.data);
       } catch (err) {
         console.error("❌ Error fetching group quizzes:", err);

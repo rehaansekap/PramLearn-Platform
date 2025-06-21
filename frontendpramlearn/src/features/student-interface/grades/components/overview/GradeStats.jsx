@@ -7,7 +7,7 @@ import {
   StarOutlined,
 } from "@ant-design/icons";
 
-const GradeStats = ({ statistics, achievements }) => {
+const GradeStats = ({ statistics, achievements, grades = [] }) => {
   // Konversi rata-rata ke skala 100 untuk sekolah
   const averageScore = statistics.average_grade || 0;
 
@@ -22,6 +22,11 @@ const GradeStats = ({ statistics, achievements }) => {
     return ((averageScore / 4) * 100).toFixed(1);
   };
 
+  const getHighestGrade = () => {
+    if (!grades || grades.length === 0) return 0;
+    return Math.max(...grades.map((g) => g.grade || 0));
+  };
+
   const statsData = [
     {
       title: "Nilai Rata-rata",
@@ -32,20 +37,20 @@ const GradeStats = ({ statistics, achievements }) => {
     },
     {
       title: "Total Tugas & Kuis",
-      value: statistics.total_assessments || 0,
+      value: statistics.total_assessments || grades.length || 0,
       prefix: <FileTextOutlined style={{ color: "#52c41a" }} />,
       color: "#52c41a",
     },
     {
       title: "Nilai Tertinggi",
-      value: statistics.highest_grade?.toFixed(0) || "0",
+      value: getHighestGrade().toFixed(0),
       suffix: "/100",
       prefix: <BarChartOutlined style={{ color: "#faad14" }} />,
       color: "#faad14",
     },
     {
       title: "Prestasi Dicapai",
-      value: achievements.length || 0,
+      value: achievements?.length || 0,
       prefix: <StarOutlined style={{ color: "#722ed1" }} />,
       color: "#722ed1",
     },

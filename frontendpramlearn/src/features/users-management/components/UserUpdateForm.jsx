@@ -55,7 +55,6 @@ const UserUpdateForm = ({ userId }) => {
         is_staff: isStaff,
         is_superuser: isSuperuser,
       };
-      console.log("Sending data:", userData);
       const response = await api.put(`users/${userId}/`, userData);
       setMessage("User updated successfully!");
     } catch (error) {

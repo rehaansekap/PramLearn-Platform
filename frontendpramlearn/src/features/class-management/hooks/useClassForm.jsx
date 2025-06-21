@@ -27,7 +27,6 @@ const useClassForm = (classId, onSuccess) => {
             id: stu.classstudent_id || null, // id relasi classstudent
             username: stu.username,
           }));
-          console.log("Fetched students for class:", students);
           setFormData({
             name: response.data.name,
             students,
@@ -66,10 +65,8 @@ const useClassForm = (classId, onSuccess) => {
       setRemovedStudents((prevRemoved) => {
         const updated = [...prevRemoved, studentToRemove];
         // ref juga diupdate di useEffect di atas
-        console.log("RemovedStudents after remove:", updated);
         return updated;
       });
-      console.log("Student to remove (will DELETE):", studentToRemove);
     }
     setFormData((prevData) => {
       const newStudents = [...prevData.students];
@@ -146,18 +143,11 @@ const useClassForm = (classId, onSuccess) => {
           throw error;
         }
       }
-
-      // Remove students that were deleted from the class
-      console.log(
-        "Removed students before delete:",
-        removedStudentsRef.current
-      );
       await Promise.all(
         removedStudentsRef.current
           .filter((student) => student.id)
           .map(async (student) => {
             try {
-              console.log("Deleting student:", student);
               await api.delete(
                 `class-students/class/${classId}/student/${student.student}/`
               );

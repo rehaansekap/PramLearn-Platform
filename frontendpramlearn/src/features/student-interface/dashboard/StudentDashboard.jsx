@@ -12,16 +12,6 @@ import TodayScheduleCard from "./components/TodayScheduleCard";
 const StudentDashboard = () => {
   const { dashboard, loading, error, user } = useStudentDashboard();
 
-  // Debug logging
-  React.useEffect(() => {
-    console.log("🏠 StudentDashboard state:", {
-      dashboard,
-      loading,
-      error,
-      user,
-    });
-  }, [dashboard, loading, error, user]);
-
   if (error && !dashboard) {
     return (
       <div

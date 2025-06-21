@@ -19,11 +19,6 @@ const { Text } = Typography;
 const RecentActivitiesCard = ({ activities, loading }) => {
   const isMobile = useMediaQuery({ maxWidth: 768 });
 
-  // Debug logging
-  React.useEffect(() => {
-    console.log("📝 RecentActivitiesCard received activities:", activities);
-  }, [activities]);
-
   const getActivityIcon = (type) => {
     switch (type) {
       case "material":

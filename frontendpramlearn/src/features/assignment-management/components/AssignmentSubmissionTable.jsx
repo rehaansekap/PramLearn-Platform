@@ -69,9 +69,6 @@ const AssignmentSubmissionTable = ({
       title: "Nama Siswa",
       key: "nama",
       render: (_, record) => {
-        console.log("record for Nama Siswa:", record);
-        console.log("STUDENT DETAIL:", record.student_detail);
-
         // 1. Gunakan student_detail jika ada
         if (record.student_detail) {
           const { first_name, last_name, username } = record.student_detail;
