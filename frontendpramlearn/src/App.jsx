@@ -27,7 +27,7 @@ import StudentAssessments from "./features/student-interface/assessments/Student
 import StudentMaterialViewer from "./features/student-interface/materials/StudentMaterialViewer";
 import StudentQuizList from "./features/student-interface/assessments/StudentQuizList";
 import QuizTakingInterface from "./features/student-interface/assessments/components/quiz-taking/QuizTakingInterface";
-import QuizResultsPage from "./features/student-interface/assessments/components/QuizResultsPage";
+import QuizResultsPage from "./features/student-interface/assessments/components/quiz-results/QuizResultsPage";
 import StudentAssignments from "./features/student-interface/assignments/StudentAssignments";
 import AssignmentSubmissionForm from "./features/student-interface/assignments/components/AssignmentSubmissionForm";
 import StudentGradeOverview from "./features/student-interface/grades/StudentGradeOverview";
@@ -35,7 +35,7 @@ import StudentAnalytics from "./features/student-interface/analytics/StudentAnal
 import StudentGroupDashboard from "./features/student-interface/group/StudentGroupDashboard";
 import StudentNotificationCenter from "./features/student-interface/notifications/StudentNotificationCenter";
 import GroupQuizInterface from "./features/student-interface/assessments/components/groupquiz/GroupQuizInterface";
-import GroupQuizResults from "./features/student-interface/group/components/GroupQuizResults";
+import GroupQuizResults from "./features/student-interface/assessments/components/group-quiz-results/GroupQuizResults";
 import SubmissionHistory from "./features/student-interface/assignments/components/SubmissionHistory";
 
 // Anti Design theme configuration

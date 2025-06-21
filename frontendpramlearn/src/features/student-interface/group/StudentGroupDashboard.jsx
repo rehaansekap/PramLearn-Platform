@@ -30,7 +30,7 @@ import {
 
 import useStudentGroup from "./hooks/useStudentGroup";
 import GroupMembersView from "./components/GroupMembersView";
-import GroupQuizResults from "./components/GroupQuizResults";
+import GroupQuizResults from "../assessments/components/group-quiz-results/GroupQuizResults";
 import GroupActivities from "./components/GroupActivities";
 import GroupPerformanceChart from "./components/GroupPerformanceChart";
 
