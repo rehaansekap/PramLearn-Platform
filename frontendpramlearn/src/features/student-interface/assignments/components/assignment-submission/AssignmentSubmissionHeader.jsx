@@ -21,7 +21,7 @@ const AssignmentSubmissionHeader = ({
   onBack,
 }) => (
   <>
-    <Breadcrumb
+    {/* <Breadcrumb
       style={{ marginBottom: 24 }}
       items={[
         {
@@ -51,7 +51,7 @@ const AssignmentSubmissionHeader = ({
           ),
         },
       ]}
-    />
+    /> */}
 
     {/* Back Button */}
     <div style={{ marginBottom: 16 }}>

@@ -16,7 +16,7 @@ const GroupQuizHeader = ({
   onTimeUp,
 }) => (
   <>
-    <Breadcrumb
+    {/* <Breadcrumb
       style={{ marginBottom: 24 }}
       items={[
         {
@@ -46,7 +46,7 @@ const GroupQuizHeader = ({
           ),
         },
       ]}
-    />
+    /> */}
 
     <div
       style={{

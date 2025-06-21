@@ -8,7 +8,7 @@ const QuizListHeader = ({ totalQuizzes }) => {
   return (
     <>
       {/* Breadcrumb */}
-      <Breadcrumb
+      {/* <Breadcrumb
         style={{ marginBottom: 24 }}
         items={[
           {
@@ -29,7 +29,7 @@ const QuizListHeader = ({ totalQuizzes }) => {
             ),
           },
         ]}
-      />
+      /> */}
 
       {/* Header Section */}
       <div

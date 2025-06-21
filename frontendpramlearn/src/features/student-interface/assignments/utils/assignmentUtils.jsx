@@ -8,7 +8,7 @@ import {
 export const getStatusIcon = (status) => {
   switch (status.status) {
     case "graded":
-      return <TrophyOutlined style={{ color: "#52c41a" }} />;
+      return <TrophyOutlined style={{ color: "#ffffff" }} />;
     case "submitted":
       return <CheckCircleOutlined style={{ color: "#1890ff" }} />;
     case "overdue":

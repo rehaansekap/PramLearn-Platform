@@ -8,7 +8,7 @@ const AssignmentListHeader = ({ totalAssignments }) => {
   return (
     <>
       {/* Breadcrumb */}
-      <Breadcrumb
+      {/* <Breadcrumb
         style={{ marginBottom: 24 }}
         items={[
           {
@@ -29,7 +29,7 @@ const AssignmentListHeader = ({ totalAssignments }) => {
             ),
           },
         ]}
-      />
+      /> */}
 
       {/* Header Section */}
       <div

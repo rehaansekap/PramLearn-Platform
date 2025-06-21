@@ -5,7 +5,12 @@ import {
   TrophyOutlined,
 } from "@ant-design/icons";
 
+//setup use navigate
+import { useParams, useLocation, useNavigate } from "react-router-dom";
+
 export const getQuizStatus = (quiz) => {
+  const navigate = useNavigate();
+
   if (quiz.quiz_type === "group" || quiz.is_group_quiz) {
     if (quiz.is_completed) {
       return {
@@ -54,9 +59,12 @@ export const getButtonAction = (quiz, status) => {
       type: "default",
       icon: <TrophyOutlined />,
       onClick: () =>
-        (window.location.href = quiz.is_group_quiz
-          ? `/student/group-quiz/${quiz.slug}/results`
-          : `/student/quiz/${quiz.slug}/results`),
+        navigate(
+          quiz.is_group_quiz
+            ? `/student/group-quiz/${quiz.slug}/results`
+            : `/student/quiz/${quiz.slug}/results`,
+          { replace: true }
+        ),
       style: {
         background:
           "linear-gradient(135deg, #ffec3d 0%, #faad14 50%, #ff8c00 100%)",

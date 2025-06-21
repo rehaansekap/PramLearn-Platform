@@ -14,7 +14,7 @@ const GroupQuizHeader = ({ results, onBack }) => {
   return (
     <>
       {/* Breadcrumb */}
-      <Breadcrumb
+      {/* <Breadcrumb
         style={{ marginBottom: 24 }}
         items={[
           {
@@ -44,7 +44,7 @@ const GroupQuizHeader = ({ results, onBack }) => {
             ),
           },
         ]}
-      />
+      /> */}
 
       {/* Header Section */}
       <div
