@@ -13,7 +13,6 @@ export const useStudentLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Validasi role - redirect jika bukan siswa
   useEffect(() => {
     if (user && user.role !== 3) {
       Swal.fire({
@@ -27,7 +26,6 @@ export const useStudentLayout = () => {
     }
   }, [user, navigate]);
 
-  // Handler responsif
   useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth <= 768;
@@ -35,7 +33,7 @@ export const useStudentLayout = () => {
       if (!mobile) {
         setMobileDrawerOpen(false);
       }
-      // Auto-collapse pada layar kecil
+
       if (mobile) {
         setCollapsed(true);
       }
@@ -67,73 +65,59 @@ export const useStudentLayout = () => {
     });
   };
 
-  // ✅ PERBAIKAN: Fungsi untuk mendapatkan menu key yang tepat berdasarkan path
   const getMenuKeyFromPath = (pathname) => {
     const pathSegments = pathname.split("/").filter(Boolean);
 
-    // Base case - dashboard
     if (pathname === "/student" || pathname === "/student/") {
       return "/student";
     }
 
-    // ✅ HANDLE MATERIALS ROUTE - materials berasal dari subjects
     if (pathSegments[1] === "materials") {
-      return "/student/subjects"; // Material adalah bagian dari subjects
+      return "/student/subjects";
     }
 
-    // ✅ HANDLE QUIZ ROUTES - quiz berasal dari assessments
     if (pathSegments[1] === "quiz" || pathSegments[1] === "group-quiz") {
-      return "/student/assessments"; // Quiz adalah bagian dari assessments
+      return "/student/assessments";
     }
 
-    // ✅ HANDLE SUBJECTS ROUTES
     if (pathSegments[1] === "subjects") {
       return "/student/subjects";
     }
 
-    // ✅ HANDLE ASSESSMENTS ROUTES
     if (pathSegments[1] === "assessments") {
       return "/student/assessments";
     }
 
-    // ✅ HANDLE ASSIGNMENTS ROUTES
     if (pathSegments[1] === "assignments") {
       return "/student/assignments";
     }
 
-    // ✅ HANDLE GRADES ROUTES
     if (pathSegments[1] === "grades") {
       return "/student/grades";
     }
 
-    // ✅ HANDLE PROGRESS ROUTES (jika ada)
     if (pathSegments[1] === "progress") {
       return "/student/progress";
     }
 
-    // ✅ HANDLE GROUP ROUTES (jika ada)
     if (pathSegments[1] === "group") {
       return "/student/group";
     }
 
-    // ✅ HANDLE ANALYTICS ROUTES (jika ada)
     if (pathSegments[1] === "analytics") {
       return "/student/analytics";
     }
 
-    // ✅ HANDLE NOTIFICATIONS ROUTES (jika ada)
     if (pathSegments[1] === "notifications") {
       return "/student/notifications";
     }
 
-    // Default fallback ke dashboard
     return "/student";
   };
 
   const selectedMenuKey = getMenuKeyFromPath(location.pathname);
 
   return {
-    // State
     collapsed,
     isMobile,
     mobileDrawerOpen,
@@ -141,11 +125,9 @@ export const useStudentLayout = () => {
     token,
     selectedMenuKey,
 
-    // Setters
     setCollapsed,
     setMobileDrawerOpen,
 
-    // Handlers
     handleLogout,
   };
 };

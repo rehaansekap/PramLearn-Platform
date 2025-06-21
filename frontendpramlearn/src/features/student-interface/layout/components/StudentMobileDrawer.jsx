@@ -19,7 +19,6 @@ const StudentMobileDrawer = ({
   selectedMenuKey,
   onLogout,
 }) => {
-  // ✅ MENU ITEMS YANG SAMA DENGAN SIDEBAR DESKTOP
   const menuItems = [
     {
       key: "/student",
