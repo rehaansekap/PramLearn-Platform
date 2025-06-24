@@ -2,7 +2,7 @@ from rest_framework import viewsets, permissions, generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.http import Http404
-from pramlearnapp.models import Class, SubjectClass
+from pramlearnapp.models import Class, SubjectClass, ClassStudent
 from pramlearnapp.serializers import ClassSerializer, ClassDetailSerializer, SubjectClassSerializer
 
 

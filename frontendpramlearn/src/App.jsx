@@ -10,13 +10,15 @@ import { ConfigProvider } from "antd";
 import Login from "./features/authentication/Login";
 import PrivateRoute from "./features/navigation/components/PrivateRoute";
 import StudentPrivateRoute from "./features/student-interface/components/StudentPrivateRoute";
+import TeacherPrivateRoute from "./features/teacher-interface/components/TeacherPrivateRoute";
 import Sidebar from "./features/navigation/components/SideBar";
 import StudentLayout from "./features/student-interface/layout/StudentLayout";
+import TeacherLayout from "./features/teacher-interface/layout/TeacherLayout";
 import NotFound from "./pages/NotFound";
 
 // Management Components
 import Home from "./pages/Home";
-import ManagementPage from "./pages/ManagementPage"; // Import ManagementPage
+import ManagementPage from "./pages/ManagementPage";
 import SubjectDetailPage from "./features/subject-management/SubjectDetailPage";
 import MaterialDetailPage from "./features/material-management/MaterialDetailPage";
 
@@ -29,14 +31,16 @@ import StudentQuizList from "./features/student-interface/assessments/StudentQui
 import QuizTakingInterface from "./features/student-interface/assessments/components/quiz-taking/QuizTakingInterface";
 import QuizResultsPage from "./features/student-interface/assessments/components/quiz-results/QuizResultsPage";
 import StudentAssignments from "./features/student-interface/assignments/StudentAssignments";
-import AssignmentSubmissionForm from "./features/student-interface/assignments/components/AssignmentSubmissionForm";
 import StudentGradeOverview from "./features/student-interface/grades/StudentGradeOverview";
-import StudentAnalytics from "./features/student-interface/analytics/StudentAnalytics";
-import StudentGroupDashboard from "./features/student-interface/group/StudentGroupDashboard";
-import StudentNotificationCenter from "./features/student-interface/notifications/StudentNotificationCenter";
 import GroupQuizInterface from "./features/student-interface/assessments/components/groupquiz/GroupQuizInterface";
 import GroupQuizResults from "./features/student-interface/assessments/components/group-quiz-results/GroupQuizResults";
-import SubmissionHistory from "./features/student-interface/assignments/components/SubmissionHistory";
+
+// Teacher Interface Components
+import TeacherDashboard from "./features/teacher-interface/dashboard/TeacherDashboard";
+import TeacherClasses from "./features/teacher-interface/classes/TeacherClasses";
+import TeacherClassDetail from "./features/teacher-interface/classes/TeacherClassDetail";
+import TeacherSubjects from "./features/teacher-interface/subjects/TeacherSubjects";
+import TeacherSubjectDetail from "./features/teacher-interface/subjects/TeacherSubjectDetail";
 
 // Anti Design theme configuration
 const antdTheme = {
@@ -168,13 +172,11 @@ const AppRoutes = () => {
               element={<StudentMaterialViewer />}
             />
             <Route path="assessments" element={<StudentQuizList />} />
-
             <Route path="quiz/:quizSlug" element={<QuizTakingInterface />} />
             <Route
               path="quiz/:quizSlug/results"
               element={<QuizResultsPage />}
             />
-
             <Route path="assignments" element={<StudentAssignments />} />
             <Route
               path="assignments/:assignmentSlug"
@@ -185,16 +187,6 @@ const AppRoutes = () => {
               element={<StudentAssignments />}
             />
             <Route path="grades" element={<StudentGradeOverview />} />
-            {/* <Route path="progress" element={<StudentAnalytics />} />
-            <Route path="group" element={<StudentGroupDashboard />} /> */}
-            {/* Individual Quiz Routes (existing) */}
-            <Route path="quiz/:quizSlug" element={<QuizTakingInterface />} />
-            <Route
-              path="quiz/:quizSlug/results"
-              element={<QuizResultsPage />}
-            />
-
-            {/* Group Quiz Routes (new - 100% menggunakan Group models) */}
             <Route
               path="group-quiz/:quizSlug"
               element={<GroupQuizInterface />}
@@ -203,11 +195,37 @@ const AppRoutes = () => {
               path="group-quiz/:quizSlug/results"
               element={<GroupQuizResults />}
             />
-            {/* <Route
-              path="notifications"
-              element={<StudentNotificationCenter />}
+            <Route path="*" element={<NotFound />} />
+          </Route>
+
+          {/* Teacher Routes */}
+          <Route
+            path="/teacher/*"
+            element={
+              <TeacherPrivateRoute allowedRoles={[1, 2]}>
+                <TeacherLayout />
+              </TeacherPrivateRoute>
+            }
+          >
+            <Route index element={<TeacherDashboard />} />
+            <Route path="management" element={<ManagementPage />} />
+            <Route path="classes" element={<TeacherClasses />} />
+            <Route path="classes/:classSlug" element={<TeacherClassDetail />} />
+            <Route path="subjects" element={<TeacherSubjects />} />
+            <Route
+              path="subjects/:subjectSlug"
+              element={<TeacherSubjectDetail />}
+            />
+            <Route path="management" element={<ManagementPage />} />
+            <Route
+              path="management/material/:materialSlug"
+              element={<MaterialDetailPage />}
+            />
+            {/* <Route path="subjects" element={<TeacherSubjects />} />
+            <Route
+              path="subjects/:subjectSlug"
+              element={<TeacherSubjectDetail />}
             /> */}
-            {/* Student 404 Route */}
             <Route path="*" element={<NotFound />} />
           </Route>
 
@@ -222,30 +240,6 @@ const AppRoutes = () => {
           >
             <Route index element={<Home />} />
             <Route path="management" element={<ManagementPage />} />
-            {/* PERBAIKI ROUTE INI */}
-            <Route
-              path="management/material/:materialSlug"
-              element={<MaterialDetailPage />}
-            />
-            <Route
-              path="management/subject/:subjectSlug"
-              element={<SubjectDetailPage />}
-            />
-            <Route path="*" element={<NotFound />} />
-          </Route>
-
-          {/* Teacher Routes */}
-          <Route
-            path="/teacher/*"
-            element={
-              <PrivateRoute allowedRoles={[2]}>
-                <Sidebar />
-              </PrivateRoute>
-            }
-          >
-            <Route index element={<Home />} />
-            <Route path="management" element={<ManagementPage />} />
-            {/* PERBAIKI ROUTE INI JUGA */}
             <Route
               path="management/material/:materialSlug"
               element={<MaterialDetailPage />}

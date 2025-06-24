@@ -22,8 +22,15 @@ from pramlearnapp.views import (RoleViewSet, UserViewSet, RegisterView, LoginVie
                                 MaterialAccessView, StudentUpcomingDeadlinesView, StudentQuickActionsView, StudentMaterialProgressView, StudentMaterialBookmarkView, StudentMaterialAccessView,
                                 StudentMaterialActivityView, GroupQuizDetailView, SubmitGroupQuizView, GroupQuizResultsView, StudentGroupQuizListView, SaveGroupQuizAnswerView,
                                 AssignmentSubmissionDetailView, StudentAssignmentBySlugView, StudentAchievementView, StudentGradeView, AssignmentFeedbackByGradeView, QuizReviewView, GroupQuizReviewView,
+                                
                                 )
 from pramlearnapp.views.teacher.relatedUsersView import CurrentUserView
+from pramlearnapp.views.teacher.dashboard.teacherDashboardView import TeacherDashboardView
+from pramlearnapp.views.teacher.classes.teacherClassesListView import TeacherClassesListView
+from pramlearnapp.views.teacher.classes.teacherClassDetailView import TeacherClassDetailView 
+from pramlearnapp.views.teacher.subjects.teacherSubjectsView import TeacherSubjectsView
+from pramlearnapp.views.teacher.subjects.teacherSubjectDetailView import TeacherSubjectDetailView
+
 
 router = DefaultRouter()
 router.register(r'student-activities', StudentActivityViewSet,
@@ -137,6 +144,13 @@ urlpatterns = [
          StudentMaterialAccessView.as_view(), name='student-material-access'),
     path('api/student/materials/<int:material_id>/activities/',
          StudentMaterialActivityView.as_view()),
+
+
+     path('api/teacher/dashboard/', TeacherDashboardView.as_view(), name='teacher-dashboard'),
+     path('api/teacher/classes/', TeacherClassesListView.as_view(), name='teacher-classes-list'),
+     path('api/teacher/classes/<str:class_slug>/', TeacherClassDetailView.as_view(), name='teacher-class-detail'),
+     path('api/teacher/subjects/', TeacherSubjectsView.as_view(), name='teacher-subjects'),
+     path('api/teacher/subjects/<str:subject_slug>/', TeacherSubjectDetailView.as_view(), name='teacher-subject-detail'),
 
     #     path('api/student/quiz-attempt/<int:attempt_id>/review/',
     #          QuizAttemptReviewView.as_view(), name='quiz-attempt-review'),

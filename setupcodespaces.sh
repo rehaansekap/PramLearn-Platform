@@ -13,6 +13,7 @@ sudo service postgresql start
 sudo -u postgres psql -c "CREATE USER pramadmin WITH PASSWORD '123123123';"
 sudo -u postgres psql -c "CREATE DATABASE pramlearn_db OWNER pramadmin;"
 sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE pramlearn_db TO pramadmin;"
+sudo -u postgres psql -c "ALTER USER pramadmin WITH SUPERUSER;"
 sudo -u postgres psql -c "ALTER USER postgres PASSWORD '123123123';"
 
 

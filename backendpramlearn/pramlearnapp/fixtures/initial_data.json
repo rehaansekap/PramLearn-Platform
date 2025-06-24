@@ -64,8 +64,8 @@
             "username": "teacher1",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "teacher1@pramlearn.com",
-            "first_name": "Nicholas",
-            "last_name": "Martinez",
+            "first_name": "Christopher",
+            "last_name": "Mora",
             "role": 2,
             "is_staff": false,
             "is_superuser": false,
@@ -81,8 +81,8 @@
             "username": "teacher2",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "teacher2@pramlearn.com",
-            "first_name": "David",
-            "last_name": "Choi",
+            "first_name": "Devin",
+            "last_name": "Ellison",
             "role": 2,
             "is_staff": false,
             "is_superuser": false,
@@ -98,8 +98,8 @@
             "username": "teacher3",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "teacher3@pramlearn.com",
-            "first_name": "Carol",
-            "last_name": "Diaz",
+            "first_name": "Misty",
+            "last_name": "Freeman",
             "role": 2,
             "is_staff": false,
             "is_superuser": false,
@@ -115,8 +115,8 @@
             "username": "teacher4",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "teacher4@pramlearn.com",
-            "first_name": "Megan",
-            "last_name": "Peters",
+            "first_name": "Joshua",
+            "last_name": "Watson",
             "role": 2,
             "is_staff": false,
             "is_superuser": false,
@@ -132,8 +132,8 @@
             "username": "teacher5",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "teacher5@pramlearn.com",
-            "first_name": "Cristina",
-            "last_name": "Bates",
+            "first_name": "Luis",
+            "last_name": "Dunn",
             "role": 2,
             "is_staff": false,
             "is_superuser": false,
@@ -149,8 +149,8 @@
             "username": "teacher6",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "teacher6@pramlearn.com",
-            "first_name": "Maria",
-            "last_name": "Goodman",
+            "first_name": "James",
+            "last_name": "Patel",
             "role": 2,
             "is_staff": false,
             "is_superuser": false,
@@ -166,8 +166,8 @@
             "username": "teacher7",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "teacher7@pramlearn.com",
-            "first_name": "Jeffery",
-            "last_name": "Perez",
+            "first_name": "Daniel",
+            "last_name": "Mccarthy",
             "role": 2,
             "is_staff": false,
             "is_superuser": false,
@@ -183,8 +183,8 @@
             "username": "teacher8",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "teacher8@pramlearn.com",
-            "first_name": "Jessica",
-            "last_name": "Parker",
+            "first_name": "Hector",
+            "last_name": "Rice",
             "role": 2,
             "is_staff": false,
             "is_superuser": false,
@@ -200,8 +200,8 @@
             "username": "teacher9",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "teacher9@pramlearn.com",
-            "first_name": "Jacqueline",
-            "last_name": "Reynolds",
+            "first_name": "Cheryl",
+            "last_name": "Roth",
             "role": 2,
             "is_staff": false,
             "is_superuser": false,
@@ -217,8 +217,8 @@
             "username": "teacher10",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "teacher10@pramlearn.com",
-            "first_name": "Terri",
-            "last_name": "Howard",
+            "first_name": "Stephanie",
+            "last_name": "Fox",
             "role": 2,
             "is_staff": false,
             "is_superuser": false,
@@ -234,8 +234,8 @@
             "username": "student1",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student1@pramlearn.com",
-            "first_name": "Jason",
-            "last_name": "Alexander",
+            "first_name": "Kelly",
+            "last_name": "Hurst",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -251,8 +251,8 @@
             "username": "student2",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student2@pramlearn.com",
-            "first_name": "Ryan",
-            "last_name": "Lee",
+            "first_name": "Karen",
+            "last_name": "Higgins",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -268,8 +268,8 @@
             "username": "student3",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student3@pramlearn.com",
-            "first_name": "April",
-            "last_name": "Cochran",
+            "first_name": "Mary",
+            "last_name": "Garza",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -285,8 +285,8 @@
             "username": "student4",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student4@pramlearn.com",
-            "first_name": "Ian",
-            "last_name": "Harris",
+            "first_name": "John",
+            "last_name": "Mora",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -302,8 +302,8 @@
             "username": "student5",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student5@pramlearn.com",
-            "first_name": "Alexis",
-            "last_name": "Ramsey",
+            "first_name": "Luke",
+            "last_name": "Kelley",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -319,8 +319,8 @@
             "username": "student6",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student6@pramlearn.com",
-            "first_name": "Samantha",
-            "last_name": "Lynn",
+            "first_name": "Frances",
+            "last_name": "Walters",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -336,8 +336,8 @@
             "username": "student7",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student7@pramlearn.com",
-            "first_name": "Javier",
-            "last_name": "Garcia",
+            "first_name": "Sarah",
+            "last_name": "Johnson",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -353,8 +353,8 @@
             "username": "student8",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student8@pramlearn.com",
-            "first_name": "Joseph",
-            "last_name": "Mendez",
+            "first_name": "Erin",
+            "last_name": "Collins",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -370,8 +370,8 @@
             "username": "student9",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student9@pramlearn.com",
-            "first_name": "James",
-            "last_name": "White",
+            "first_name": "William",
+            "last_name": "Carr",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -387,8 +387,8 @@
             "username": "student10",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student10@pramlearn.com",
-            "first_name": "Christopher",
-            "last_name": "Anderson",
+            "first_name": "Shawn",
+            "last_name": "Le",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -404,8 +404,8 @@
             "username": "student11",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student11@pramlearn.com",
-            "first_name": "Robyn",
-            "last_name": "Dominguez",
+            "first_name": "Carl",
+            "last_name": "Robertson",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -421,8 +421,8 @@
             "username": "student12",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student12@pramlearn.com",
-            "first_name": "Pamela",
-            "last_name": "Mccall",
+            "first_name": "Gloria",
+            "last_name": "Glover",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -438,8 +438,8 @@
             "username": "student13",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student13@pramlearn.com",
-            "first_name": "Timothy",
-            "last_name": "Nichols",
+            "first_name": "James",
+            "last_name": "Howard",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -455,8 +455,8 @@
             "username": "student14",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student14@pramlearn.com",
-            "first_name": "Debbie",
-            "last_name": "Quinn",
+            "first_name": "James",
+            "last_name": "Case",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -472,8 +472,8 @@
             "username": "student15",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student15@pramlearn.com",
-            "first_name": "Alec",
-            "last_name": "Houston",
+            "first_name": "David",
+            "last_name": "Everett",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -489,8 +489,8 @@
             "username": "student16",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student16@pramlearn.com",
-            "first_name": "Julie",
-            "last_name": "Johnson",
+            "first_name": "Sarah",
+            "last_name": "Wyatt",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -506,8 +506,8 @@
             "username": "student17",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student17@pramlearn.com",
-            "first_name": "Amy",
-            "last_name": "Bennett",
+            "first_name": "Mary",
+            "last_name": "Barr",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -523,8 +523,8 @@
             "username": "student18",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student18@pramlearn.com",
-            "first_name": "Brittany",
-            "last_name": "Reynolds",
+            "first_name": "Jessica",
+            "last_name": "Harrington",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -540,8 +540,8 @@
             "username": "student19",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student19@pramlearn.com",
-            "first_name": "Ashley",
-            "last_name": "Hughes",
+            "first_name": "Michelle",
+            "last_name": "Miller",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -557,8 +557,8 @@
             "username": "student20",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student20@pramlearn.com",
-            "first_name": "Ronald",
-            "last_name": "Gregory",
+            "first_name": "Barbara",
+            "last_name": "Barnes",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -574,8 +574,8 @@
             "username": "student21",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student21@pramlearn.com",
-            "first_name": "Mary",
-            "last_name": "Tucker",
+            "first_name": "Savannah",
+            "last_name": "Wilkins",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -591,8 +591,8 @@
             "username": "student22",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student22@pramlearn.com",
-            "first_name": "Amanda",
-            "last_name": "Ray",
+            "first_name": "Matthew",
+            "last_name": "Williams",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -608,8 +608,8 @@
             "username": "student23",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student23@pramlearn.com",
-            "first_name": "Kathleen",
-            "last_name": "Daniel",
+            "first_name": "Robert",
+            "last_name": "Haas",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -625,8 +625,8 @@
             "username": "student24",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student24@pramlearn.com",
-            "first_name": "Sean",
-            "last_name": "Cain",
+            "first_name": "Anna",
+            "last_name": "Taylor",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -642,8 +642,8 @@
             "username": "student25",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student25@pramlearn.com",
-            "first_name": "Dwayne",
-            "last_name": "Hernandez",
+            "first_name": "Rachel",
+            "last_name": "Harris",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -659,8 +659,8 @@
             "username": "student26",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student26@pramlearn.com",
-            "first_name": "Sara",
-            "last_name": "Webster",
+            "first_name": "Angel",
+            "last_name": "Singleton",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -676,8 +676,8 @@
             "username": "student27",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student27@pramlearn.com",
-            "first_name": "Mackenzie",
-            "last_name": "Stewart",
+            "first_name": "Eric",
+            "last_name": "Keith",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -693,8 +693,8 @@
             "username": "student28",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student28@pramlearn.com",
-            "first_name": "Brianna",
-            "last_name": "Brown",
+            "first_name": "Brian",
+            "last_name": "Jennings",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -710,8 +710,8 @@
             "username": "student29",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student29@pramlearn.com",
-            "first_name": "Pamela",
-            "last_name": "Flores",
+            "first_name": "Alicia",
+            "last_name": "Rios",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -727,8 +727,8 @@
             "username": "student30",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student30@pramlearn.com",
-            "first_name": "Catherine",
-            "last_name": "Callahan",
+            "first_name": "Michael",
+            "last_name": "Anderson",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -744,8 +744,8 @@
             "username": "student31",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student31@pramlearn.com",
-            "first_name": "Clinton",
-            "last_name": "Castro",
+            "first_name": "Steven",
+            "last_name": "Harrison",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -761,8 +761,8 @@
             "username": "student32",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student32@pramlearn.com",
-            "first_name": "Stacy",
-            "last_name": "Webb",
+            "first_name": "Samantha",
+            "last_name": "Ray",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -778,7 +778,7 @@
             "username": "student33",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student33@pramlearn.com",
-            "first_name": "Kayla",
+            "first_name": "Christine",
             "last_name": "King",
             "role": 3,
             "is_staff": false,
@@ -795,8 +795,8 @@
             "username": "student34",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student34@pramlearn.com",
-            "first_name": "James",
-            "last_name": "Figueroa",
+            "first_name": "April",
+            "last_name": "Wade",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -812,8 +812,8 @@
             "username": "student35",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student35@pramlearn.com",
-            "first_name": "Douglas",
-            "last_name": "Burke",
+            "first_name": "Megan",
+            "last_name": "Morgan",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -829,8 +829,8 @@
             "username": "student36",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student36@pramlearn.com",
-            "first_name": "Jesse",
-            "last_name": "Rogers",
+            "first_name": "Ronnie",
+            "last_name": "Harrison",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -846,8 +846,8 @@
             "username": "student37",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student37@pramlearn.com",
-            "first_name": "Victoria",
-            "last_name": "Howell",
+            "first_name": "Kelsey",
+            "last_name": "Price",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -863,8 +863,8 @@
             "username": "student38",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student38@pramlearn.com",
-            "first_name": "Matthew",
-            "last_name": "Snyder",
+            "first_name": "Tanner",
+            "last_name": "Brown",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -880,8 +880,8 @@
             "username": "student39",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student39@pramlearn.com",
-            "first_name": "Brooke",
-            "last_name": "Perez",
+            "first_name": "Jennifer",
+            "last_name": "Cox",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -897,8 +897,8 @@
             "username": "student40",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student40@pramlearn.com",
-            "first_name": "Lindsay",
-            "last_name": "Ingram",
+            "first_name": "Grant",
+            "last_name": "Norman",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -914,8 +914,8 @@
             "username": "student41",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student41@pramlearn.com",
-            "first_name": "Earl",
-            "last_name": "Maddox",
+            "first_name": "Frank",
+            "last_name": "Parsons",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -931,8 +931,8 @@
             "username": "student42",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student42@pramlearn.com",
-            "first_name": "Sarah",
-            "last_name": "Stuart",
+            "first_name": "Justin",
+            "last_name": "Sparks",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -948,8 +948,8 @@
             "username": "student43",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student43@pramlearn.com",
-            "first_name": "Julia",
-            "last_name": "Doyle",
+            "first_name": "Sally",
+            "last_name": "Pope",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -965,8 +965,8 @@
             "username": "student44",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student44@pramlearn.com",
-            "first_name": "Michael",
-            "last_name": "Waller",
+            "first_name": "Edgar",
+            "last_name": "Jones",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -982,8 +982,8 @@
             "username": "student45",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student45@pramlearn.com",
-            "first_name": "Jeremy",
-            "last_name": "Peterson",
+            "first_name": "Leslie",
+            "last_name": "Hall",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -999,8 +999,8 @@
             "username": "student46",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student46@pramlearn.com",
-            "first_name": "Michelle",
-            "last_name": "Stewart",
+            "first_name": "Alyssa",
+            "last_name": "Hunt",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -1016,8 +1016,8 @@
             "username": "student47",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student47@pramlearn.com",
-            "first_name": "Patricia",
-            "last_name": "Gonzalez",
+            "first_name": "William",
+            "last_name": "Gutierrez",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -1033,8 +1033,8 @@
             "username": "student48",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student48@pramlearn.com",
-            "first_name": "Steven",
-            "last_name": "Buck",
+            "first_name": "Katie",
+            "last_name": "Owens",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -1050,8 +1050,8 @@
             "username": "student49",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student49@pramlearn.com",
-            "first_name": "Lee",
-            "last_name": "Kirk",
+            "first_name": "Cynthia",
+            "last_name": "Kim",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -1067,8 +1067,8 @@
             "username": "student50",
             "password": "pbkdf2_sha256$600000$dummy$dummy",
             "email": "student50@pramlearn.com",
-            "first_name": "Tonya",
-            "last_name": "Howard",
+            "first_name": "Carol",
+            "last_name": "Medina",
             "role": 3,
             "is_staff": false,
             "is_superuser": false,
@@ -1325,18 +1325,18 @@
         "model": "pramlearnapp.subjectclass",
         "pk": 1,
         "fields": {
-            "teacher": 9,
-            "class_id": 6,
-            "subject": 6
+            "teacher": 13,
+            "class_id": 4,
+            "subject": 13
         }
     },
     {
         "model": "pramlearnapp.subjectclass",
         "pk": 2,
         "fields": {
-            "teacher": 7,
-            "class_id": 1,
-            "subject": 13
+            "teacher": 15,
+            "class_id": 3,
+            "subject": 16
         }
     },
     {
@@ -1344,16 +1344,16 @@
         "pk": 3,
         "fields": {
             "teacher": 7,
-            "class_id": 4,
-            "subject": 9
+            "class_id": 8,
+            "subject": 12
         }
     },
     {
         "model": "pramlearnapp.subjectclass",
         "pk": 4,
         "fields": {
-            "teacher": 15,
-            "class_id": 6,
+            "teacher": 7,
+            "class_id": 2,
             "subject": 3
         }
     },
@@ -1362,105 +1362,105 @@
         "pk": 5,
         "fields": {
             "teacher": 11,
-            "class_id": 8,
-            "subject": 4
+            "class_id": 3,
+            "subject": 17
         }
     },
     {
         "model": "pramlearnapp.subjectclass",
         "pk": 6,
         "fields": {
-            "teacher": 14,
-            "class_id": 3,
-            "subject": 14
+            "teacher": 7,
+            "class_id": 4,
+            "subject": 19
         }
     },
     {
         "model": "pramlearnapp.subjectclass",
         "pk": 7,
         "fields": {
-            "teacher": 14,
-            "class_id": 3,
-            "subject": 6
+            "teacher": 9,
+            "class_id": 5,
+            "subject": 2
         }
     },
     {
         "model": "pramlearnapp.subjectclass",
         "pk": 8,
         "fields": {
-            "teacher": 11,
-            "class_id": 7,
-            "subject": 18
+            "teacher": 7,
+            "class_id": 6,
+            "subject": 16
         }
     },
     {
         "model": "pramlearnapp.subjectclass",
         "pk": 9,
         "fields": {
-            "teacher": 9,
-            "class_id": 8,
-            "subject": 11
+            "teacher": 15,
+            "class_id": 7,
+            "subject": 19
         }
     },
     {
         "model": "pramlearnapp.subjectclass",
         "pk": 10,
         "fields": {
-            "teacher": 13,
-            "class_id": 2,
-            "subject": 6
+            "teacher": 7,
+            "class_id": 4,
+            "subject": 10
         }
     },
     {
         "model": "pramlearnapp.subjectclass",
         "pk": 11,
         "fields": {
-            "teacher": 9,
-            "class_id": 1,
-            "subject": 16
+            "teacher": 11,
+            "class_id": 2,
+            "subject": 9
         }
     },
     {
         "model": "pramlearnapp.subjectclass",
         "pk": 12,
         "fields": {
-            "teacher": 7,
-            "class_id": 2,
-            "subject": 10
+            "teacher": 13,
+            "class_id": 6,
+            "subject": 3
         }
     },
     {
         "model": "pramlearnapp.subjectclass",
         "pk": 13,
         "fields": {
-            "teacher": 12,
-            "class_id": 7,
-            "subject": 13
+            "teacher": 14,
+            "class_id": 3,
+            "subject": 1
         }
     },
     {
         "model": "pramlearnapp.subjectclass",
         "pk": 14,
         "fields": {
-            "teacher": 14,
-            "class_id": 7,
-            "subject": 5
+            "teacher": 12,
+            "class_id": 5,
+            "subject": 4
         }
     },
     {
         "model": "pramlearnapp.subjectclass",
         "pk": 15,
         "fields": {
-            "teacher": 15,
-            "class_id": 3,
-            "subject": 14
+            "teacher": 12,
+            "class_id": 7,
+            "subject": 3
         }
     },
     {
         "model": "pramlearnapp.classstudent",
         "pk": 1,
         "fields": {
-            "student": 52,
+            "student": 37,
             "class_id": 1
         }
     },
@@ -1468,7 +1468,7 @@
         "model": "pramlearnapp.classstudent",
         "pk": 2,
         "fields": {
-            "student": 51,
+            "student": 45,
             "class_id": 5
         }
     },
@@ -1476,7 +1476,7 @@
         "model": "pramlearnapp.classstudent",
         "pk": 3,
         "fields": {
-            "student": 34,
+            "student": 26,
             "class_id": 2
         }
     },
@@ -1484,205 +1484,37 @@
         "model": "pramlearnapp.classstudent",
         "pk": 4,
         "fields": {
-            "student": 30,
-            "class_id": 6
+            "student": 21,
+            "class_id": 2
         }
     },
     {
         "model": "pramlearnapp.classstudent",
         "pk": 5,
         "fields": {
-            "student": 56,
-            "class_id": 6
+            "student": 19,
+            "class_id": 3
         }
     },
     {
         "model": "pramlearnapp.classstudent",
         "pk": 6,
         "fields": {
-            "student": 38,
-            "class_id": 3
+            "student": 44,
+            "class_id": 1
         }
     },
     {
         "model": "pramlearnapp.classstudent",
         "pk": 7,
         "fields": {
-            "student": 35,
-            "class_id": 7
+            "student": 16,
+            "class_id": 2
         }
     },
     {
         "model": "pramlearnapp.classstudent",
         "pk": 8,
-        "fields": {
-            "student": 27,
-            "class_id": 1
-        }
-    },
-    {
-        "model": "pramlearnapp.classstudent",
-        "pk": 9,
-        "fields": {
-            "student": 20,
-            "class_id": 5
-        }
-    },
-    {
-        "model": "pramlearnapp.classstudent",
-        "pk": 10,
-        "fields": {
-            "student": 41,
-            "class_id": 8
-        }
-    },
-    {
-        "model": "pramlearnapp.classstudent",
-        "pk": 11,
-        "fields": {
-            "student": 14,
-            "class_id": 4
-        }
-    },
-    {
-        "model": "pramlearnapp.classstudent",
-        "pk": 12,
-        "fields": {
-            "student": 60,
-            "class_id": 5
-        }
-    },
-    {
-        "model": "pramlearnapp.classstudent",
-        "pk": 13,
-        "fields": {
-            "student": 28,
-            "class_id": 7
-        }
-    },
-    {
-        "model": "pramlearnapp.classstudent",
-        "pk": 14,
-        "fields": {
-            "student": 18,
-            "class_id": 8
-        }
-    },
-    {
-        "model": "pramlearnapp.classstudent",
-        "pk": 15,
-        "fields": {
-            "student": 59,
-            "class_id": 1
-        }
-    },
-    {
-        "model": "pramlearnapp.classstudent",
-        "pk": 16,
-        "fields": {
-            "student": 53,
-            "class_id": 1
-        }
-    },
-    {
-        "model": "pramlearnapp.classstudent",
-        "pk": 17,
-        "fields": {
-            "student": 24,
-            "class_id": 1
-        }
-    },
-    {
-        "model": "pramlearnapp.classstudent",
-        "pk": 18,
-        "fields": {
-            "student": 31,
-            "class_id": 5
-        }
-    },
-    {
-        "model": "pramlearnapp.classstudent",
-        "pk": 19,
-        "fields": {
-            "student": 37,
-            "class_id": 6
-        }
-    },
-    {
-        "model": "pramlearnapp.classstudent",
-        "pk": 20,
-        "fields": {
-            "student": 39,
-            "class_id": 5
-        }
-    },
-    {
-        "model": "pramlearnapp.classstudent",
-        "pk": 21,
-        "fields": {
-            "student": 44,
-            "class_id": 5
-        }
-    },
-    {
-        "model": "pramlearnapp.classstudent",
-        "pk": 22,
-        "fields": {
-            "student": 47,
-            "class_id": 2
-        }
-    },
-    {
-        "model": "pramlearnapp.classstudent",
-        "pk": 23,
-        "fields": {
-            "student": 26,
-            "class_id": 6
-        }
-    },
-    {
-        "model": "pramlearnapp.classstudent",
-        "pk": 24,
-        "fields": {
-            "student": 54,
-            "class_id": 4
-        }
-    },
-    {
-        "model": "pramlearnapp.classstudent",
-        "pk": 25,
-        "fields": {
-            "student": 19,
-            "class_id": 8
-        }
-    },
-    {
-        "model": "pramlearnapp.classstudent",
-        "pk": 26,
-        "fields": {
-            "student": 46,
-            "class_id": 2
-        }
-    },
-    {
-        "model": "pramlearnapp.classstudent",
-        "pk": 27,
-        "fields": {
-            "student": 15,
-            "class_id": 1
-        }
-    },
-    {
-        "model": "pramlearnapp.classstudent",
-        "pk": 28,
-        "fields": {
-            "student": 29,
-            "class_id": 2
-        }
-    },
-    {
-        "model": "pramlearnapp.classstudent",
-        "pk": 29,
         "fields": {
             "student": 48,
             "class_id": 8
@@ -1690,65 +1522,233 @@
     },
     {
         "model": "pramlearnapp.classstudent",
+        "pk": 9,
+        "fields": {
+            "student": 46,
+            "class_id": 5
+        }
+    },
+    {
+        "model": "pramlearnapp.classstudent",
+        "pk": 10,
+        "fields": {
+            "student": 42,
+            "class_id": 8
+        }
+    },
+    {
+        "model": "pramlearnapp.classstudent",
+        "pk": 11,
+        "fields": {
+            "student": 47,
+            "class_id": 7
+        }
+    },
+    {
+        "model": "pramlearnapp.classstudent",
+        "pk": 12,
+        "fields": {
+            "student": 39,
+            "class_id": 8
+        }
+    },
+    {
+        "model": "pramlearnapp.classstudent",
+        "pk": 13,
+        "fields": {
+            "student": 13,
+            "class_id": 2
+        }
+    },
+    {
+        "model": "pramlearnapp.classstudent",
+        "pk": 14,
+        "fields": {
+            "student": 49,
+            "class_id": 2
+        }
+    },
+    {
+        "model": "pramlearnapp.classstudent",
+        "pk": 15,
+        "fields": {
+            "student": 61,
+            "class_id": 7
+        }
+    },
+    {
+        "model": "pramlearnapp.classstudent",
+        "pk": 16,
+        "fields": {
+            "student": 23,
+            "class_id": 2
+        }
+    },
+    {
+        "model": "pramlearnapp.classstudent",
+        "pk": 17,
+        "fields": {
+            "student": 24,
+            "class_id": 2
+        }
+    },
+    {
+        "model": "pramlearnapp.classstudent",
+        "pk": 18,
+        "fields": {
+            "student": 30,
+            "class_id": 8
+        }
+    },
+    {
+        "model": "pramlearnapp.classstudent",
+        "pk": 19,
+        "fields": {
+            "student": 40,
+            "class_id": 4
+        }
+    },
+    {
+        "model": "pramlearnapp.classstudent",
+        "pk": 20,
+        "fields": {
+            "student": 27,
+            "class_id": 6
+        }
+    },
+    {
+        "model": "pramlearnapp.classstudent",
+        "pk": 21,
+        "fields": {
+            "student": 15,
+            "class_id": 4
+        }
+    },
+    {
+        "model": "pramlearnapp.classstudent",
+        "pk": 22,
+        "fields": {
+            "student": 58,
+            "class_id": 7
+        }
+    },
+    {
+        "model": "pramlearnapp.classstudent",
+        "pk": 23,
+        "fields": {
+            "student": 52,
+            "class_id": 8
+        }
+    },
+    {
+        "model": "pramlearnapp.classstudent",
+        "pk": 24,
+        "fields": {
+            "student": 29,
+            "class_id": 6
+        }
+    },
+    {
+        "model": "pramlearnapp.classstudent",
+        "pk": 25,
+        "fields": {
+            "student": 36,
+            "class_id": 6
+        }
+    },
+    {
+        "model": "pramlearnapp.classstudent",
+        "pk": 26,
+        "fields": {
+            "student": 34,
+            "class_id": 8
+        }
+    },
+    {
+        "model": "pramlearnapp.classstudent",
+        "pk": 27,
+        "fields": {
+            "student": 43,
+            "class_id": 6
+        }
+    },
+    {
+        "model": "pramlearnapp.classstudent",
+        "pk": 28,
+        "fields": {
+            "student": 60,
+            "class_id": 2
+        }
+    },
+    {
+        "model": "pramlearnapp.classstudent",
+        "pk": 29,
+        "fields": {
+            "student": 35,
+            "class_id": 2
+        }
+    },
+    {
+        "model": "pramlearnapp.classstudent",
         "pk": 30,
         "fields": {
-            "student": 62,
-            "class_id": 1
+            "student": 50,
+            "class_id": 6
         }
     },
     {
         "model": "pramlearnapp.classstudent",
         "pk": 31,
         "fields": {
-            "student": 40,
-            "class_id": 5
+            "student": 54,
+            "class_id": 3
         }
     },
     {
         "model": "pramlearnapp.classstudent",
         "pk": 32,
         "fields": {
-            "student": 13,
-            "class_id": 1
+            "student": 33,
+            "class_id": 8
         }
     },
     {
         "model": "pramlearnapp.classstudent",
         "pk": 33,
         "fields": {
-            "student": 58,
-            "class_id": 4
+            "student": 51,
+            "class_id": 5
         }
     },
     {
         "model": "pramlearnapp.classstudent",
         "pk": 34,
         "fields": {
-            "student": 16,
-            "class_id": 4
+            "student": 31,
+            "class_id": 1
         }
     },
     {
         "model": "pramlearnapp.classstudent",
         "pk": 35,
         "fields": {
-            "student": 61,
-            "class_id": 8
+            "student": 14,
+            "class_id": 5
         }
     },
     {
         "model": "pramlearnapp.classstudent",
         "pk": 36,
         "fields": {
-            "student": 32,
-            "class_id": 5
+            "student": 59,
+            "class_id": 4
         }
     },
     {
         "model": "pramlearnapp.classstudent",
         "pk": 37,
         "fields": {
-            "student": 55,
+            "student": 28,
             "class_id": 8
         }
     },
@@ -1756,63 +1756,63 @@
         "model": "pramlearnapp.classstudent",
         "pk": 38,
         "fields": {
-            "student": 22,
-            "class_id": 4
+            "student": 41,
+            "class_id": 3
         }
     },
     {
         "model": "pramlearnapp.classstudent",
         "pk": 39,
         "fields": {
-            "student": 25,
-            "class_id": 1
+            "student": 38,
+            "class_id": 6
         }
     },
     {
         "model": "pramlearnapp.classstudent",
         "pk": 40,
         "fields": {
-            "student": 57,
-            "class_id": 4
+            "student": 20,
+            "class_id": 2
         }
     },
     {
         "model": "pramlearnapp.classstudent",
         "pk": 41,
         "fields": {
-            "student": 45,
-            "class_id": 8
+            "student": 22,
+            "class_id": 3
         }
     },
     {
         "model": "pramlearnapp.classstudent",
         "pk": 42,
         "fields": {
-            "student": 49,
-            "class_id": 8
+            "student": 62,
+            "class_id": 1
         }
     },
     {
         "model": "pramlearnapp.classstudent",
         "pk": 43,
         "fields": {
-            "student": 33,
-            "class_id": 3
+            "student": 57,
+            "class_id": 2
         }
     },
     {
         "model": "pramlearnapp.classstudent",
         "pk": 44,
         "fields": {
-            "student": 42,
-            "class_id": 2
+            "student": 25,
+            "class_id": 8
         }
     },
     {
         "model": "pramlearnapp.classstudent",
         "pk": 45,
         "fields": {
-            "student": 21,
+            "student": 56,
             "class_id": 8
         }
     },
@@ -1820,15 +1820,15 @@
         "model": "pramlearnapp.classstudent",
         "pk": 46,
         "fields": {
-            "student": 23,
-            "class_id": 8
+            "student": 17,
+            "class_id": 6
         }
     },
     {
         "model": "pramlearnapp.classstudent",
         "pk": 47,
         "fields": {
-            "student": 50,
+            "student": 32,
             "class_id": 2
         }
     },
@@ -1836,15 +1836,15 @@
         "model": "pramlearnapp.classstudent",
         "pk": 48,
         "fields": {
-            "student": 17,
-            "class_id": 7
+            "student": 18,
+            "class_id": 6
         }
     },
     {
         "model": "pramlearnapp.classstudent",
         "pk": 49,
         "fields": {
-            "student": 36,
+            "student": 55,
             "class_id": 2
         }
     },
@@ -1852,7 +1852,7 @@
         "model": "pramlearnapp.classstudent",
         "pk": 50,
         "fields": {
-            "student": 43,
+            "student": 53,
             "class_id": 7
         }
     }
