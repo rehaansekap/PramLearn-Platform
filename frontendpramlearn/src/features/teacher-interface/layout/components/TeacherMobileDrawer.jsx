@@ -10,6 +10,7 @@ import {
   TeamOutlined,
   LogoutOutlined,
   BookOutlined,
+  CalendarOutlined,
 } from "@ant-design/icons";
 
 const { Text } = Typography;
@@ -34,6 +35,11 @@ const TeacherMobileDrawer = ({
       key: `/${userRolePath}/management`,
       icon: <SettingOutlined />,
       label: <Link to={`/${userRolePath}/management`}>Management</Link>,
+    },
+    {
+      key: `/${userRolePath}/sessions`,
+      icon: <CalendarOutlined />,
+      label: <Link to={`/${userRolePath}/sessions`}>Pertemuan</Link>,
     },
     {
       key: `/${userRolePath}/classes`,

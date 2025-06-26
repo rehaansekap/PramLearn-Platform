@@ -32,6 +32,8 @@ const GroupMembersView = ({ members, loading }) => {
   }
 
   const getMotivationColor = (level) => {
+    if (!level) return "#d9d9d9";
+
     switch (level?.toLowerCase()) {
       case "high":
         return "#52c41a";
@@ -45,6 +47,10 @@ const GroupMembersView = ({ members, loading }) => {
   };
 
   const getMotivationTag = (level) => {
+    if (!level) {
+      return <Tag color="default">Belum Dianalisis</Tag>;
+    }
+
     const colors = {
       high: "green",
       medium: "orange",
@@ -55,6 +61,7 @@ const GroupMembersView = ({ members, loading }) => {
       medium: "Sedang",
       low: "Rendah",
     };
+
     return (
       <Tag color={colors[level?.toLowerCase()] || "default"}>
         {labels[level?.toLowerCase()] || "Belum Dianalisis"}
@@ -92,8 +99,12 @@ const GroupMembersView = ({ members, loading }) => {
       members.reduce((sum, m) => sum + (m.attendance_rate || 0), 0) /
       members.length,
     motivationDistribution: members.reduce((acc, m) => {
-      const level = m.motivation_profile?.level?.toLowerCase() || "unknown";
-      acc[level] = (acc[level] || 0) + 1;
+      const level = m.motivation_profile?.level?.toLowerCase();
+      if (level) {
+        acc[level] = (acc[level] || 0) + 1;
+      } else {
+        acc["unknown"] = (acc["unknown"] || 0) + 1;
+      }
       return acc;
     }, {}),
   };
@@ -146,6 +157,10 @@ const GroupMembersView = ({ members, loading }) => {
               </Tag>
               <Tag color="red">
                 Rendah: {groupStats.motivationDistribution.low || 0}
+              </Tag>
+              <Tag color="default">
+                Belum Dianalisis:{" "}
+                {groupStats.motivationDistribution.unknown || 0}
               </Tag>
             </Space>
           </Card>

@@ -41,6 +41,9 @@ import TeacherClasses from "./features/teacher-interface/classes/TeacherClasses"
 import TeacherClassDetail from "./features/teacher-interface/classes/TeacherClassDetail";
 import TeacherSubjects from "./features/teacher-interface/subjects/TeacherSubjects";
 import TeacherSubjectDetail from "./features/teacher-interface/subjects/TeacherSubjectDetail";
+import TeacherSessions from "./features/teacher-interface/sessions/TeacherSessions";
+import TeacherSessionDetail from "./features/teacher-interface/sessions/TeacherSessionDetail";
+import TeacherSessionMaterialDetailPage from "./features/teacher-interface/sessions/TeacherSessionMaterialDetailPage";
 
 // Anti Design theme configuration
 const antdTheme = {
@@ -215,6 +218,15 @@ const AppRoutes = () => {
             <Route
               path="subjects/:subjectSlug"
               element={<TeacherSubjectDetail />}
+            />
+            <Route path="sessions" element={<TeacherSessions />} />
+            <Route
+              path="sessions/:subjectSlug"
+              element={<TeacherSessionDetail />}
+            />
+            <Route
+              path="sessions/:subjectSlug/:materialSlug"
+              element={<TeacherSessionMaterialDetailPage />}
             />
             <Route path="management" element={<ManagementPage />} />
             <Route

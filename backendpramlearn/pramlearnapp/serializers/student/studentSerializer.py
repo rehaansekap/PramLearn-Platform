@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from pramlearnapp.models import CustomUser, StudentMotivationProfile, Role
+from pramlearnapp.models import CustomUser, StudentMotivationProfile
 
 
 class StudentSerializer(serializers.ModelSerializer):
@@ -33,7 +33,13 @@ class StudentSerializer(serializers.ModelSerializer):
                 'satisfaction': profile.satisfaction
             }
         except StudentMotivationProfile.DoesNotExist:
-            return None
+            return {
+                'motivation_level': None,
+                'attention': None,
+                'relevance': None,
+                'confidence': None,
+                'satisfaction': None
+            }
 
 
 class StudentDetailSerializer(serializers.ModelSerializer):

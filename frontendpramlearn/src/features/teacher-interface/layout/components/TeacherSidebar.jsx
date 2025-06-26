@@ -11,6 +11,7 @@ import {
   MenuOutlined,
   CloseOutlined,
   BookOutlined,
+  CalendarOutlined,
 } from "@ant-design/icons";
 import { Button, Menu } from "antd";
 
@@ -36,6 +37,11 @@ const TeacherSidebar = ({
       key: `/${userRolePath}/management`,
       icon: <SettingOutlined />,
       label: <Link to={`/${userRolePath}/management`}>Management</Link>,
+    },
+    {
+      key: `/${userRolePath}/sessions`,
+      icon: <CalendarOutlined />,
+      label: <Link to={`/${userRolePath}/sessions`}>Pertemuan</Link>,
     },
     {
       key: `/${userRolePath}/classes`,

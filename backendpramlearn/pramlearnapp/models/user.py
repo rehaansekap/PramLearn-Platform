@@ -41,7 +41,12 @@ class StudentMotivationProfile(models.Model):
         ('Low', 'Low'),
         ('Medium', 'Medium'),
         ('High', 'High')
-    ], default='Medium')
+    ],
+        null=True,
+        blank=True,
+        default=None
+    )
 
     def __str__(self):
-        return f"{self.student.username} - {self.motivation_level}"
+        level = self.motivation_level or "Belum Dianalisis"
+        return f"{self.student.username} - {level}"

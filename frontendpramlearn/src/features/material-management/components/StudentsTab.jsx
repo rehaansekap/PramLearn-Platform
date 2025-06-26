@@ -116,6 +116,7 @@ const StudentsTab = ({ studentDetails, classId, loading, materialId }) => {
       motivationLevel = student.motivation_level.toLowerCase();
     }
 
+    // Return berdasarkan level atau null jika belum ada
     if (motivationLevel) {
       switch (motivationLevel) {
         case "high":
@@ -125,11 +126,12 @@ const StudentsTab = ({ studentDetails, classId, loading, materialId }) => {
         case "low":
           return { color: "red", text: "Rendah", icon: "📈" };
         default:
-          return { color: "gray", text: "Belum Dianalisis", icon: "❓" };
+          return { color: "default", text: "Belum Dianalisis", icon: "❓" };
       }
     }
 
-    return { color: "gray", text: "Belum Dianalisis", icon: "❓" };
+    // Jika tidak ada profil motivasi sama sekali
+    return { color: "default", text: "Belum Dianalisis", icon: "❓" };
   };
 
   const handleAttendanceChange = async (studentId, newStatus) => {

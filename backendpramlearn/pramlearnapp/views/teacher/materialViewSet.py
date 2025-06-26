@@ -7,6 +7,7 @@ from pramlearnapp.serializers import MaterialSerializer, MaterialDetailSerialize
 from rest_framework.response import Response
 from rest_framework import status
 from django.utils import timezone
+from rest_framework.exceptions import ValidationError
 
 
 class MaterialViewSet(viewsets.ModelViewSet):
@@ -16,7 +17,10 @@ class MaterialViewSet(viewsets.ModelViewSet):
     lookup_field = 'pk'
 
     def perform_create(self, serializer):
-        subject_id = self.kwargs.get('subject_id')
+        subject_id = self.kwargs.get(
+            'subject_id') or self.request.data.get('subject')
+        if not subject_id:
+            raise ValidationError("subject_id wajib diisi")
         subject = Subject.objects.get(pk=subject_id)
         serializer.save(subject=subject)
 

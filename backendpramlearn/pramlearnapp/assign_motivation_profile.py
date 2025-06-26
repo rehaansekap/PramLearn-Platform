@@ -23,9 +23,7 @@ def assign_motivation_profiles(csv_file):
     kmeans = KMeans(n_clusters=3, random_state=42)
     data['motivation_level'] = kmeans.fit_predict(features)
 
-    # Mapping cluster ke label
-    motivation_mapping = {0: 'Low', 1: 'Medium', 2: 'High'}
-    # Agar label konsisten, urutkan centroid dan mapping manual
+    # Mapping cluster ke label berdasarkan centroid
     centroids = kmeans.cluster_centers_.mean(axis=1)
     sorted_labels = pd.Series(centroids).sort_values().index.tolist()
     label_map = {sorted_labels[0]: 'Low', sorted_labels[1]
@@ -43,6 +41,7 @@ def assign_motivation_profiles(csv_file):
                 profile.relevance = row['relevance']
                 profile.confidence = row['confidence']
                 profile.satisfaction = row['satisfaction']
+                # Hasil clustering, bukan default
                 profile.motivation_level = row['motivation_level']
                 profile.save()
             except CustomUser.DoesNotExist:

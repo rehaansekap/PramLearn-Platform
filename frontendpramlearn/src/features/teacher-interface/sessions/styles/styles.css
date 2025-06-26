@@ -1,0 +1,36 @@
+.session-groups-table .ant-table-tbody > tr:hover > td {
+  background-color: #f0f7ff !important;
+}
+
+.session-group-formation-section {
+  background: linear-gradient(135deg, #f0f7ff 0%, #e6f4ff 100%);
+  border: 2px dashed #91caff;
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.session-group-formation-section:hover {
+  border-color: #1677ff;
+  box-shadow: 0 4px 12px rgba(22, 119, 255, 0.1);
+}
+
+.export-pdf-button {
+  transition: all 0.3s ease;
+}
+
+.export-pdf-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(17, 65, 139, 0.2);
+}
+
+.groups-statistics-card {
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.groups-statistics-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}

@@ -22,15 +22,19 @@ from pramlearnapp.views import (RoleViewSet, UserViewSet, RegisterView, LoginVie
                                 MaterialAccessView, StudentUpcomingDeadlinesView, StudentQuickActionsView, StudentMaterialProgressView, StudentMaterialBookmarkView, StudentMaterialAccessView,
                                 StudentMaterialActivityView, GroupQuizDetailView, SubmitGroupQuizView, GroupQuizResultsView, StudentGroupQuizListView, SaveGroupQuizAnswerView,
                                 AssignmentSubmissionDetailView, StudentAssignmentBySlugView, StudentAchievementView, StudentGradeView, AssignmentFeedbackByGradeView, QuizReviewView, GroupQuizReviewView,
-                                
+
                                 )
 from pramlearnapp.views.teacher.relatedUsersView import CurrentUserView
 from pramlearnapp.views.teacher.dashboard.teacherDashboardView import TeacherDashboardView
 from pramlearnapp.views.teacher.classes.teacherClassesListView import TeacherClassesListView
-from pramlearnapp.views.teacher.classes.teacherClassDetailView import TeacherClassDetailView 
+from pramlearnapp.views.teacher.classes.teacherClassDetailView import TeacherClassDetailView
 from pramlearnapp.views.teacher.subjects.teacherSubjectsView import TeacherSubjectsView
 from pramlearnapp.views.teacher.subjects.teacherSubjectDetailView import TeacherSubjectDetailView
-
+from pramlearnapp.views.teacher.sessions.teacherSessionsView import TeacherSessionsView
+from pramlearnapp.views.teacher.sessions.teacherSessionDetailView import TeacherSessionDetailView
+from pramlearnapp.views.teacher.sessions.teacherSessionMaterialDetail import TeacherSessionMaterialDetailView, TeacherSessionMaterialContentView
+from pramlearnapp.views.teacher.sessions.teacherSessionAutoGroupFormationView import TeacherSessionAutoGroupFormationView
+from pramlearnapp.views.teacher.sessions.teacherSessionsARCSUploadView import TeacherSessionsARCSUploadView, TeacherSessionsARCSSampleView
 
 router = DefaultRouter()
 router.register(r'student-activities', StudentActivityViewSet,
@@ -57,6 +61,12 @@ router.register(r'group-quizzes', GroupQuizViewSet, basename='groupquiz')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/teacher/sessions/upload-arcs/',
+         TeacherSessionsARCSUploadView.as_view(),
+         name='sessions-arcs-upload'),
+    path('api/teacher/sessions/arcs-sample/',
+         TeacherSessionsARCSSampleView.as_view(),
+         name='sessions-arcs-sample'),
     path('api/users/me/', CurrentUserView.as_view(), name='current-user'),
     path('api/', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
@@ -146,11 +156,29 @@ urlpatterns = [
          StudentMaterialActivityView.as_view()),
 
 
-     path('api/teacher/dashboard/', TeacherDashboardView.as_view(), name='teacher-dashboard'),
-     path('api/teacher/classes/', TeacherClassesListView.as_view(), name='teacher-classes-list'),
-     path('api/teacher/classes/<str:class_slug>/', TeacherClassDetailView.as_view(), name='teacher-class-detail'),
-     path('api/teacher/subjects/', TeacherSubjectsView.as_view(), name='teacher-subjects'),
-     path('api/teacher/subjects/<str:subject_slug>/', TeacherSubjectDetailView.as_view(), name='teacher-subject-detail'),
+    path('api/teacher/dashboard/', TeacherDashboardView.as_view(),
+         name='teacher-dashboard'),
+    path('api/teacher/classes/', TeacherClassesListView.as_view(),
+         name='teacher-classes-list'),
+    path('api/teacher/classes/<str:class_slug>/',
+         TeacherClassDetailView.as_view(), name='teacher-class-detail'),
+    path('api/teacher/subjects/', TeacherSubjectsView.as_view(),
+         name='teacher-subjects'),
+    path('api/teacher/subjects/<str:subject_slug>/',
+         TeacherSubjectDetailView.as_view(), name='teacher-subject-detail'),
+    path('api/teacher/sessions/', TeacherSessionsView.as_view(),
+         name='teacher-sessions'),
+    path('api/teacher/sessions/<slug:subject_slug>/',
+         TeacherSessionDetailView.as_view(), name='teacher-session-detail'),
+    path('api/teacher/sessions/material/<slug:material_slug>/',
+         TeacherSessionMaterialDetailView.as_view(),
+         name='session-material-detail'),
+    path('api/teacher/sessions/material/<slug:material_slug>/content/',
+         TeacherSessionMaterialContentView.as_view(),
+         name='session-material-content'),
+    path('api/teacher/sessions/material/<slug:material_slug>/auto-group/',
+         TeacherSessionAutoGroupFormationView.as_view(),
+         name='session-auto-group-formation'),
 
     #     path('api/student/quiz-attempt/<int:attempt_id>/review/',
     #          QuizAttemptReviewView.as_view(), name='quiz-attempt-review'),
@@ -185,7 +213,7 @@ urlpatterns = [
     path('api/files/upload/', FileUploadView.as_view(), name='file-upload'),
     path('api/files/<int:pk>/delete/',
          FileDeleteView.as_view(), name='file-delete'),
-    path('api/upload-arcs-csv/', UploadARCSCSVView.as_view(), name='upload_arcs_csv'),
+    #     path('api/upload-arcs-csv/', UploadARCSCSVView.as_view(), name='upload_arcs_csv'),
     path('student/motivation-profile/', StudentMotivationProfileView.as_view(),
          name='student_motivation_profile'),
     path('api/class-students/<int:class_id>/with-profile/',

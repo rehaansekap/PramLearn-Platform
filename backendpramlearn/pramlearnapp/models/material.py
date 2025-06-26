@@ -28,6 +28,8 @@ class Material(models.Model):
     subject = models.ForeignKey(
         Subject, related_name='materials', on_delete=models.CASCADE)
     slug = models.SlugField(unique=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.title
