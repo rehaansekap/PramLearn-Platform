@@ -35,6 +35,15 @@ from pramlearnapp.views.teacher.sessions.teacherSessionDetailView import Teacher
 from pramlearnapp.views.teacher.sessions.teacherSessionMaterialDetail import TeacherSessionMaterialDetailView, TeacherSessionMaterialContentView
 from pramlearnapp.views.teacher.sessions.teacherSessionAutoGroupFormationView import TeacherSessionAutoGroupFormationView
 from pramlearnapp.views.teacher.sessions.teacherSessionsARCSUploadView import TeacherSessionsARCSUploadView, TeacherSessionsARCSSampleView
+from pramlearnapp.views.teacher.sessions.teacherSessionMaterialQuizView import (
+    TeacherSessionMaterialQuizView, TeacherSessionQuizDetailView,
+    TeacherSessionQuizRankingView, TeacherSessionQuizAssignmentView
+)
+from pramlearnapp.views.teacher.sessions.teacherSessionAssignmentView import (
+    TeacherSessionAssignmentView, TeacherSessionAssignmentDetailView,
+    TeacherSessionAssignmentGradingView, TeacherSessionAssignmentAnalyticsView
+)
+
 
 router = DefaultRouter()
 router.register(r'student-activities', StudentActivityViewSet,
@@ -179,6 +188,30 @@ urlpatterns = [
     path('api/teacher/sessions/material/<slug:material_slug>/auto-group/',
          TeacherSessionAutoGroupFormationView.as_view(),
          name='session-auto-group-formation'),
+    path('api/teacher/sessions/material/<str:material_slug>/quizzes/',
+         TeacherSessionMaterialQuizView.as_view(), name='session-material-quizzes'),
+    path(
+        'api/teacher/sessions/material/<slug:material_slug>/quizzes/<int:quiz_id>/',
+        TeacherSessionMaterialQuizView.as_view(), name='teacher-session-material-quiz-update'
+    ),
+    path('api/teacher/sessions/material/<str:material_slug>/quizzes/<int:quiz_id>/',
+         TeacherSessionQuizDetailView.as_view(), name='session-quiz-detail'),
+    path('api/teacher/sessions/material/<str:material_slug>/quizzes/<int:quiz_id>/ranking/',
+         TeacherSessionQuizRankingView.as_view(), name='session-quiz-ranking'),
+    path('api/teacher/sessions/material/<str:material_slug>/quiz-assignment/',
+         TeacherSessionQuizAssignmentView.as_view(), name='session-quiz-assignment'),
+    path('api/teacher/sessions/material/<str:material_slug>/assignments/',
+         TeacherSessionAssignmentView.as_view(),
+         name='teacher-session-assignments'),
+    path('api/teacher/sessions/material/<str:material_slug>/assignments/<int:assignment_id>/',
+         TeacherSessionAssignmentDetailView.as_view(),
+         name='teacher-session-assignment-detail'),
+    path('api/teacher/sessions/material/<str:material_slug>/assignments/<int:assignment_id>/submissions/<int:submission_id>/grade/',
+         TeacherSessionAssignmentGradingView.as_view(),
+         name='teacher-session-assignment-grading'),
+    path('api/teacher/sessions/material/<str:material_slug>/assignments/analytics/',
+         TeacherSessionAssignmentAnalyticsView.as_view(),
+         name='teacher-session-assignment-analytics'),
 
     #     path('api/student/quiz-attempt/<int:attempt_id>/review/',
     #          QuizAttemptReviewView.as_view(), name='quiz-attempt-review'),

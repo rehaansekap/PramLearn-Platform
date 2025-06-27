@@ -17,11 +17,12 @@ class Quiz(models.Model):
     title = models.CharField(max_length=255)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
-    # Menentukan apakah kuis dikerjakan berkelompok atau mandiri
     is_group_quiz = models.BooleanField(default=False)
-    # atau nama field lain seperti deadline, due_date
     end_time = models.DateTimeField(null=True, blank=True)
     slug = models.SlugField(max_length=200, unique=True, blank=True)
+    duration = models.PositiveIntegerField(
+        default=0, help_text="Durasi quiz dalam menit")
+    is_active = models.BooleanField(default=True, help_text="Quiz aktif/non-aktif")
 
     def __str__(self):
         return self.title

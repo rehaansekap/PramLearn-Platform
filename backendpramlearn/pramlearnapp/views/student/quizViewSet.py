@@ -101,6 +101,16 @@ class GroupQuizDetailView(APIView):
                     status=status.HTTP_403_FORBIDDEN
                 )
 
+            # Define user_groups before using it
+            user_groups = GroupMember.objects.filter(
+                student=request.user
+            ).values_list('group', flat=True)
+
+            group_quizzes = GroupQuiz.objects.filter(
+                group__in=user_groups,
+                quiz__is_active=True
+            ).select_related('quiz', 'group').prefetch_related('submissions')
+
             # Get GroupQuiz
             group_quiz = GroupQuiz.objects.filter(
                 quiz=quiz,

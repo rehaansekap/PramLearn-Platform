@@ -8,7 +8,7 @@ class AssignmentQuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = AssignmentQuestion
         fields = ['id', 'assignment', 'text', 'choice_a',
-                  'choice_b', 'choice_c', 'choice_d', 'correct_choice']
+                  'choice_b', 'choice_c', 'choice_d', 'correct_choice', 'explanation']
 
 
 class AssignmentAnswerSerializer(serializers.ModelSerializer):
@@ -17,10 +17,15 @@ class AssignmentAnswerSerializer(serializers.ModelSerializer):
         fields = ['id', 'submission', 'question',
                   'selected_choice', 'is_correct']
 
+    def create(self, validated_data):
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        return super().update(instance, validated_data)
+
     def validate(self, data):
         submission = data['submission']
         question = data['question']
-        # Pastikan question memang milik assignment pada submission
         if question.assignment_id != submission.assignment_id:
             raise serializers.ValidationError(
                 "Soal tidak sesuai dengan assignment pada submission ini.")

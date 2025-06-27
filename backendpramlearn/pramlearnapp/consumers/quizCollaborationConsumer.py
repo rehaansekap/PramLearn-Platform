@@ -3,12 +3,18 @@ import logging
 import asyncio
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
+from channels.layers import get_channel_layer
 from django.contrib.auth.models import AnonymousUser
-from pramlearnapp.models import GroupQuiz, GroupMember, Quiz, Group, CustomUser, Question, GroupQuizSubmission
+from django.utils import timezone
+from pramlearnapp.models import (
+    GroupQuiz, GroupMember, Quiz, Group, CustomUser, Question,
+    GroupQuizSubmission, GroupQuizResult, Material
+)
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from urllib.parse import parse_qs
+from asgiref.sync import async_to_sync
 
 logger = logging.getLogger(__name__)
 
@@ -174,6 +180,7 @@ class QuizCollaborationConsumer(AsyncWebsocketConsumer):
                     logger.info("💓 Sent pong response")
 
             elif message_type == 'request_current_state':
+                await self.send_current_state()
                 # 🔧 PERBAIKAN: Handle current state request more carefully
                 logger.info("🔍 Processing request_current_state...")
 
@@ -230,6 +237,7 @@ class QuizCollaborationConsumer(AsyncWebsocketConsumer):
                         }))
 
             elif message_type == 'answer_selected':
+                await self.handle_answer_selection(data)
                 # Handle answer selection
                 question_id = data.get('question_id')
                 selected_choice = data.get('selected_choice')
@@ -250,6 +258,7 @@ class QuizCollaborationConsumer(AsyncWebsocketConsumer):
                         )
 
             elif message_type == 'question_changed':
+                await self.handle_question_change(data)
                 question_index = data.get('question_index')
 
                 # Broadcast question change to other members
@@ -311,11 +320,14 @@ class QuizCollaborationConsumer(AsyncWebsocketConsumer):
         selected_choice = data.get('selected_choice')
         user_id = self.scope["user"].id
 
+        logger.info(
+            f"🎯 Answer selection: Q{question_id} = {selected_choice} by user {user_id}")
+
         # Save answer to database
         success = await self.save_group_answer(question_id, selected_choice, user_id)
 
         if success:
-            # Broadcast answer update to group
+            # Broadcast to group members
             await self.channel_layer.group_send(
                 self.room_group_name,
                 {
@@ -326,25 +338,160 @@ class QuizCollaborationConsumer(AsyncWebsocketConsumer):
                     'username': self.scope["user"].username
                 }
             )
+
+            # 🔥 TAMBAHAN: BROADCAST RANKING UPDATE TO TEACHER
+            try:
+                quiz_id = self.quiz_id
+                material_id = await self.get_material_id_from_group()
+
+                if material_id:
+                    logger.info(
+                        f"📡 Broadcasting ranking update: quiz_id={quiz_id}, material_id={material_id}")
+                    await self.broadcast_ranking_update(quiz_id, material_id)
+                    logger.info(
+                        f"✅ Ranking broadcast completed after answer by {self.scope['user'].username}")
+                else:
+                    logger.error(
+                        f"❌ Could not get material_id for group {self.group_id}")
+
+            except Exception as e:
+                logger.error(f"❌ Failed to broadcast ranking update: {e}")
+                import traceback
+                traceback.print_exc()
         else:
-            # Send error message back to user
             await self.send(text_data=json.dumps({
                 'type': 'error',
-                'message': 'Gagal menyimpan jawaban'
+                'message': 'Failed to save answer'
             }))
 
-    async def handle_question_change(self, data):
-        """Handle when user changes question"""
-        # Broadcast question change to group
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                'type': 'question_changed',
-                'question_index': data.get('question_index'),
-                'user_id': self.scope["user"].id,
-                'username': self.scope["user"].username
-            }
-        )
+    @database_sync_to_async
+    def get_material_id_from_group(self):
+        """Get material_id from group"""
+        try:
+            group = Group.objects.get(id=self.group_id)
+            return group.material_id
+        except Group.DoesNotExist:
+            logger.error(f"Group {self.group_id} not found")
+            return None
+        except Exception as e:
+            logger.error(f"Error getting material_id: {e}")
+            return None
+
+    async def broadcast_ranking_update(self, quiz_id, material_id):
+        """Broadcast ranking update to QuizRankingConsumer"""
+        try:
+            channel_layer = get_channel_layer()
+            if not channel_layer:
+                logger.error("❌ Channel layer not available")
+                return
+
+            # Get fresh ranking data
+            rankings = await self.get_current_rankings(quiz_id, material_id)
+
+            # Broadcast to quiz ranking group
+            ranking_group_name = f'quiz_ranking_{quiz_id}'
+            logger.info(
+                f"📡 Sending ranking update to group: {ranking_group_name}")
+
+            await channel_layer.group_send(
+                ranking_group_name,
+                {
+                    'type': 'quiz_ranking_update',
+                    'rankings': rankings,
+                    'timestamp': str(timezone.now())
+                }
+            )
+            logger.info(
+                f"📡 Ranking broadcast sent for quiz {quiz_id} with {len(rankings)} groups")
+
+        except Exception as e:
+            logger.error(f"❌ Ranking broadcast error: {e}")
+            import traceback
+            traceback.print_exc()
+
+        except Exception as e:
+            logger.error(f"❌ Ranking broadcast error: {e}")
+            import traceback
+            traceback.print_exc()
+
+    @database_sync_to_async
+    def get_current_rankings(self, quiz_id, material_id):
+        """Get current quiz rankings - same logic as QuizRankingConsumer"""
+        try:
+            quiz = Quiz.objects.get(id=quiz_id)
+            groups = Group.objects.filter(material_id=material_id)
+            group_quizzes = GroupQuiz.objects.filter(
+                quiz=quiz,
+                group__in=groups
+            ).select_related('group')
+
+            ranking_data = []
+            for group_quiz in group_quizzes:
+                group = group_quiz.group
+                member_count = GroupMember.objects.filter(group=group).count()
+
+                # Get member names
+                members = GroupMember.objects.filter(
+                    group=group).select_related('student')
+                member_names = [
+                    f"{m.student.first_name} {m.student.last_name}".strip(
+                    ) or m.student.username
+                    for m in members
+                ]
+
+                # Calculate score real-time
+                total_questions = quiz.questions.count()
+                if total_questions > 0:
+                    correct_submissions = GroupQuizSubmission.objects.filter(
+                        group_quiz=group_quiz,
+                        is_correct=True
+                    ).count()
+                    score = (correct_submissions / total_questions) * 100
+                else:
+                    score = 0
+
+                # Calculate status
+                total_submissions = GroupQuizSubmission.objects.filter(
+                    group_quiz=group_quiz
+                ).count()
+
+                if total_submissions == 0:
+                    status_group = 'not_started'
+                elif total_submissions < total_questions:
+                    status_group = 'in_progress'
+                else:
+                    status_group = 'completed'
+
+                ranking_data.append({
+                    'group_id': group.id,
+                    'group_name': group.name,
+                    'group_code': group.code,
+                    'score': round(score, 2),
+                    'correct_answers': correct_submissions,
+                    'total_questions': total_questions,
+                    'member_count': member_count,
+                    'member_names': member_names,
+                    'status': status_group,
+                    'start_time': group_quiz.start_time.isoformat() if group_quiz.start_time else None,
+                    'end_time': group_quiz.end_time.isoformat() if group_quiz.end_time else None,
+                    'submitted_at': group_quiz.submitted_at.isoformat() if group_quiz.submitted_at else None,
+                })
+
+            # Sort by score
+            ranking_data.sort(key=lambda x: (-x['score'], x['group_name']))
+
+            # Add rank
+            for idx, item in enumerate(ranking_data):
+                item['rank'] = idx + 1
+
+            logger.info(f"✅ Generated {len(ranking_data)} ranking records")
+            return ranking_data
+
+        except Exception as e:
+            logger.error(f"❌ Error getting rankings: {e}")
+            import traceback
+            traceback.print_exc()
+            return []
 
     # WebSocket message handlers
     async def answer_updated(self, event):
@@ -389,6 +536,14 @@ class QuizCollaborationConsumer(AsyncWebsocketConsumer):
             'submitter_name': event['submitter_name'],
             'redirect_url': event['redirect_url'],
             'message': f"Quiz telah disubmit oleh {event['submitter_name']}. Mengarahkan ke halaman hasil..."
+        }))
+
+    async def quiz_deactivated(self, event):
+        """Handle quiz deactivation broadcast"""
+        await self.send(text_data=json.dumps({
+            'type': 'quiz_deactivated',
+            'quiz_id': event['quiz_id'],
+            'message': event['message']
         }))
 
     # Database operations
@@ -455,37 +610,35 @@ class QuizCollaborationConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def save_group_answer(self, question_id, selected_choice, user_id):
         try:
-            User = get_user_model()
-
-            # Get required instances
-            group_quiz = GroupQuiz.objects.get(
-                quiz_id=self.quiz_id,
-                group_id=self.group_id
-            )
+            # Get quiz and question
+            quiz = Quiz.objects.get(id=self.quiz_id)
             question = Question.objects.get(id=question_id)
-            user = User.objects.get(id=user_id)
+            group_quiz = GroupQuiz.objects.get(
+                quiz=quiz, group_id=self.group_id)
 
-            # Check if answer is correct
-            is_correct = question.correct_choice == selected_choice
+            logger.info(
+                f"💾 Saving answer: Q{question_id} = {selected_choice} for group_quiz {group_quiz.id}")
 
-            # Save or update GroupQuizSubmission
+            # Create or update submission (one answer per question per group)
             submission, created = GroupQuizSubmission.objects.update_or_create(
                 group_quiz=group_quiz,
                 question=question,
                 defaults={
-                    'student': user,
+                    'student_id': user_id,
                     'selected_choice': selected_choice,
-                    'is_correct': is_correct
+                    'is_correct': selected_choice == question.correct_choice
                 }
             )
 
             action = "Created" if created else "Updated"
-            logger.info(f"💾 {action} GroupQuizSubmission: {submission}")
-
+            logger.info(
+                f"✅ {action} submission: {submission} (correct: {submission.is_correct})")
             return True
 
         except Exception as e:
             logger.error(f"❌ Error saving group answer: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return False
 
     async def send_current_state(self):

@@ -143,6 +143,14 @@ const useGroupQuizCollaboration = (quizSlug) => {
             const data = JSON.parse(event.data);
             console.log("📨 WebSocket message received:", data);
 
+            if (data.type === "quiz_deactivated") {
+              message.warning(data.message);
+              setTimeout(() => {
+                navigate("/student/assessments");
+              }, 2000);
+              return;
+            }
+
             switch (data.type) {
               case "pong":
                 console.log("💓 Received pong from server");
