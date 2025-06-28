@@ -41,18 +41,17 @@ class ARCSQuestionnaire(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     slug = models.SlugField(max_length=200, unique=True, blank=True)
-
+    
     def save(self, *args, **kwargs):
         if not self.slug:
             base_slug = slugify(f"{self.title}-{self.questionnaire_type}")
-            unique_slug = f"{base_slug}-{uuid.uuid4().hex[:8]}"
-            self.slug = unique_slug
-
+            unique_id = uuid.uuid4().hex[:8]
+            self.slug = f"{base_slug}-{unique_id}"
             counter = 1
             while ARCSQuestionnaire.objects.filter(slug=self.slug).exists():
-                self.slug = f"{unique_slug}-{counter}"
+                self.slug = f"{base_slug}-{unique_id}-{counter}"
                 counter += 1
-
+                
         super().save(*args, **kwargs)
 
     @property

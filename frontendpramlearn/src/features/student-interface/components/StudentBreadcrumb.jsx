@@ -11,6 +11,7 @@ import {
   TeamOutlined,
   BarChartOutlined,
   BellOutlined,
+  FormOutlined,
 } from "@ant-design/icons";
 import api from "../../../api";
 
@@ -32,6 +33,9 @@ const StudentBreadcrumb = () => {
       // Handle material routes: /student/materials/:materialSlug
       if (pathSnippets[1] === "materials" && pathSnippets[2]) {
         const materialSlug = pathSnippets[2];
+        const arcsSlug = pathSnippets[3];
+        const isResultsPage = pathSnippets[4] === "results";
+
         try {
           const materialRes = await api.get(`materials/?slug=${materialSlug}`);
           const material = Array.isArray(materialRes.data)
@@ -40,7 +44,8 @@ const StudentBreadcrumb = () => {
 
           if (material && material.subject) {
             const subjectRes = await api.get(`subjects/${material.subject}/`);
-            setDynamicCrumbs([
+
+            const crumbs = [
               ...baseCrumbs,
               {
                 path: "/student/subjects",
@@ -52,11 +57,102 @@ const StudentBreadcrumb = () => {
                 breadcrumbName: subjectRes.data.name,
               },
               {
-                path: location.pathname,
+                path: `/student/materials/${materialSlug}`,
                 breadcrumbName: material.title,
                 icon: <FileTextOutlined />,
               },
-            ]);
+            ];
+
+            if (arcsSlug && isResultsPage) {
+              setDynamicCrumbs([
+                ...baseCrumbs,
+                {
+                  path: "/student/subjects",
+                  breadcrumbName: "Mata Pelajaran",
+                  icon: <BookOutlined />,
+                },
+                {
+                  path: `/student/subjects/${subjectRes.data.slug}`,
+                  breadcrumbName: subjectRes.data.name,
+                },
+                {
+                  path: `/student/materials/${materialSlug}`,
+                  breadcrumbName: material.title,
+                  icon: <FileTextOutlined />,
+                },
+                {
+                  path: location.pathname,
+                  breadcrumbName: "Hasil Kuesioner",
+                  icon: <TrophyOutlined style={{ color: "#11418b" }} />,
+                },
+              ]);
+              return;
+            }
+
+            // Handle ARCS routes
+            if (arcsSlug) {
+              // Fetch ARCS questionnaire data
+              try {
+                const arcsRes = await api.get(
+                  `/student/materials/${materialSlug}/arcs/`
+                );
+                const arcsQuestionnaire = arcsRes.data.find(
+                  (arcs) => arcs.slug === arcsSlug
+                );
+
+                if (arcsQuestionnaire) {
+                  crumbs.push({
+                    path: `/student/materials/${materialSlug}/${arcsSlug}`,
+                    breadcrumbName: arcsQuestionnaire.title,
+                    icon: <FormOutlined />,
+                  });
+
+                  if (isResultsPage) {
+                    crumbs.push({
+                      path: location.pathname,
+                      breadcrumbName: "Hasil Kuesioner",
+                      icon: <TrophyOutlined />,
+                    });
+                  }
+                } else {
+                  // Fallback jika ARCS tidak ditemukan
+                  crumbs.push({
+                    path: `/student/materials/${materialSlug}/${arcsSlug}`,
+                    breadcrumbName: "Kuesioner ARCS",
+                    icon: <FormOutlined />,
+                  });
+
+                  if (isResultsPage) {
+                    crumbs.push({
+                      path: location.pathname,
+                      breadcrumbName: "Hasil Kuesioner",
+                      icon: <TrophyOutlined />,
+                    });
+                  }
+                }
+              } catch (error) {
+                console.error(
+                  "Failed to fetch ARCS questionnaire data:",
+                  error
+                );
+                // Fallback untuk ARCS
+                crumbs.push({
+                  path: `/student/materials/${materialSlug}/${arcsSlug}`,
+                  breadcrumbName: "Kuesioner ARCS",
+                  icon: <FormOutlined />,
+                });
+
+                if (isResultsPage) {
+                  crumbs.push({
+                    path: location.pathname,
+                    breadcrumbName: "Hasil Kuesioner",
+                    icon: <TrophyOutlined />,
+                  });
+                }
+              }
+            }
+
+            setDynamicCrumbs(crumbs);
             return;
           }
         } catch (error) {
@@ -64,7 +160,7 @@ const StudentBreadcrumb = () => {
         }
 
         // Fallback jika gagal fetch
-        setDynamicCrumbs([
+        const fallbackCrumbs = [
           ...baseCrumbs,
           {
             path: "/student/subjects",
@@ -72,11 +168,29 @@ const StudentBreadcrumb = () => {
             icon: <BookOutlined />,
           },
           {
-            path: location.pathname,
+            path: `/student/materials/${materialSlug}`,
             breadcrumbName: "Materi",
             icon: <FileTextOutlined />,
           },
-        ]);
+        ];
+
+        if (arcsSlug) {
+          fallbackCrumbs.push({
+            path: `/student/materials/${materialSlug}/${arcsSlug}`,
+            breadcrumbName: "Kuesioner ARCS",
+            icon: <FormOutlined />,
+          });
+
+          if (isResultsPage) {
+            fallbackCrumbs.push({
+              path: location.pathname,
+              breadcrumbName: "Hasil Kuesioner",
+              icon: <TrophyOutlined />,
+            });
+          }
+        }
+
+        setDynamicCrumbs(fallbackCrumbs);
         return;
       }
 

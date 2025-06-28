@@ -152,6 +152,11 @@ const MaterialContentTabs = ({
             <Space>
               <FormOutlined />
               <span>ARCS</span>
+              {totalARCS > 0 && (
+                <Tag color={hasActiveARCS ? "processing" : "success"}>
+                  {completedARCS}/{totalARCS}
+                </Tag>
+              )}
             </Space>
           }
           key="arcs"

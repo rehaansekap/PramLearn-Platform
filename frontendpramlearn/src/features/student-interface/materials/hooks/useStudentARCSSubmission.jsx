@@ -37,18 +37,17 @@ const useStudentARCSSubmission = (materialSlug, arcsSlug) => {
   };
 
   // Submit ARCS answers
-  const submitARCS = async (answers) => {
-    if (!materialSlug || !arcsSlug || !token || !answers) {
+  const submitARCS = async (answersArray) => {
+    if (!materialSlug || !arcsSlug || !token || !answersArray) {
       return { success: false, error: "Data tidak lengkap" };
     }
-
     try {
       setSubmitting(true);
       setError(null);
 
       const response = await api.post(
         `/student/materials/${materialSlug}/arcs/${arcsSlug}/submit/`,
-        { answers }
+        { answers: answersArray }
       );
 
       console.log("ARCS submission response:", response.data);
