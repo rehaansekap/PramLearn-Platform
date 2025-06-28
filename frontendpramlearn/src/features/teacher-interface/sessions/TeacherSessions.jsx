@@ -1,46 +1,37 @@
 import React, { useState, useEffect } from "react";
-import { Card, Typography, Row, Col, Empty, Spin, Space, Alert } from "antd";
-import {
-  CalendarOutlined,
-  LoadingOutlined,
-  BookOutlined,
-} from "@ant-design/icons";
+import { Spin, Alert, Button, Space } from "antd";
+import { LoadingOutlined, ReloadOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import useTeacherSessions from "./hooks/useTeacherSessions";
-import SessionCard from "./components/SessionCard";
-import SessionFilters from "./components/SessionFilters";
 
-const { Title, Text } = Typography;
+// Import hooks
+import useTeacherSessions from "./hooks/useTeacherSessions";
+
+// Import components
+import SessionsHeader from "./components/sessions-list/SessionsHeader";
+import SessionsFilters from "./components/sessions-list/SessionsFilters";
+import SessionsStats from "./components/sessions-list/SessionsStats";
+import SessionsGrid from "./components/sessions-list/SessionsGrid";
+import SessionsEmptyState from "./components/sessions-list/SessionsEmptyState";
 
 const TeacherSessions = () => {
   const navigate = useNavigate();
   const { sessions, availableClasses, loading, error, refetch } =
     useTeacherSessions();
 
+  // Local state
   const [searchText, setSearchText] = useState("");
   const [classFilter, setClassFilter] = useState("");
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [refreshing, setRefreshing] = useState(false);
 
+  // Responsive handler
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const handleSearch = (search) => {
-    setSearchText(search);
-    refetch({ search, class: classFilter });
-  };
-
-  const handleClassFilter = (classId) => {
-    setClassFilter(classId);
-    refetch({ search: searchText, class: classId });
-  };
-
-  const handleSessionClick = (session) => {
-    navigate(`/teacher/sessions/${session.slug}`);
-  };
-
+  // Filter sessions
   const filteredSessions = sessions.filter((session) => {
     const matchSearch =
       searchText === "" ||
@@ -53,145 +44,151 @@ const TeacherSessions = () => {
     return matchSearch && matchClass;
   });
 
+  // Handlers
+  const handleSearch = (search) => {
+    setSearchText(search);
+  };
+
+  const handleClassFilter = (classId) => {
+    setClassFilter(classId);
+  };
+
+  const handleSessionClick = (session) => {
+    navigate(`/teacher/sessions/${session.slug}`);
+  };
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await refetch();
+    } catch (error) {
+      console.error("Error refreshing sessions:", error);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  const handleClearFilters = () => {
+    setSearchText("");
+    setClassFilter("");
+  };
+
+  const hasFilters = searchText !== "" || classFilter !== "";
   const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
+  // Error state
   if (error && !sessions.length) {
     return (
-      <Card style={{ margin: "24px", borderRadius: 12 }}>
+      <div
+        style={{
+          minHeight: "calc(100vh - 200px)",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          padding: "24px",
+        }}
+      >
         <Alert
-          message="Error"
-          description="Gagal memuat data pertemuan. Silakan coba lagi."
+          message="Gagal Memuat Data Sesi"
+          description="Terjadi kesalahan saat mengambil data sesi pembelajaran. Silakan coba lagi."
           type="error"
           showIcon
-          action={<button onClick={() => refetch()}>Coba Lagi</button>}
+          style={{
+            maxWidth: 500,
+            borderRadius: 12,
+            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+          }}
+          action={
+            <Space>
+              <Button
+                type="primary"
+                icon={<ReloadOutlined />}
+                onClick={handleRefresh}
+                loading={refreshing}
+                style={{ borderRadius: 8 }}
+              >
+                Coba Lagi
+              </Button>
+            </Space>
+          }
         />
-      </Card>
+      </div>
+    );
+  }
+
+  // Loading state
+  if (loading && !sessions.length) {
+    return (
+      <div
+        style={{
+          minHeight: "calc(100vh - 200px)",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          background: "#fafafa",
+        }}
+      >
+        <div style={{ textAlign: "center" }}>
+          <Spin indicator={antIcon} style={{ marginBottom: 16 }} />
+          <div style={{ color: "#666", fontSize: 16 }}>
+            Memuat data sesi pembelajaran...
+          </div>
+        </div>
+      </div>
     );
   }
 
   return (
-    <div style={{ padding: "24px", maxWidth: "1200px", margin: "0 auto" }}>
-      {/* Header */}
-      <Card
+    <div
+      style={{
+        minHeight: "calc(100vh - 64px)",
+        background: "#f8fafc",
+        padding: isMobile ? "16px" : "24px",
+      }}
+    >
+      <div
         style={{
-          marginBottom: 24,
-          borderRadius: 12,
-          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-          border: "none",
-          color: "white",
+          maxWidth: 1400,
+          margin: "0 auto",
         }}
-        bodyStyle={{ padding: "32px" }}
-      >
-        <Row align="middle">
-          <Col flex="auto">
-            <Space direction="vertical" size="small">
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <CalendarOutlined style={{ fontSize: 32, color: "white" }} />
-                <Title level={2} style={{ color: "white", margin: 0 }}>
-                  Pertemuan & Sesi Pembelajaran
-                </Title>
-              </div>
-              <Text style={{ color: "rgba(255, 255, 255, 0.8)", fontSize: 16 }}>
-                Kelola dan pantau pertemuan pembelajaran untuk setiap mata
-                pelajaran
-              </Text>
-            </Space>
-          </Col>
-          <Col>
-            <div
-              style={{
-                background: "rgba(255, 255, 255, 0.2)",
-                borderRadius: 12,
-                padding: "12px 20px",
-                textAlign: "center",
-              }}
-            >
-              <Title level={3} style={{ color: "white", margin: 0 }}>
-                {sessions.length}
-              </Title>
-              <Text style={{ color: "rgba(255, 255, 255, 0.8)" }}>
-                Mata Pelajaran
-              </Text>
-            </div>
-          </Col>
-        </Row>
-      </Card>
+      >\
+        <SessionsHeader
+          onRefresh={handleRefresh}
+          refreshing={refreshing}
+          sessionsCount={sessions.length}
+          isMobile={isMobile}
+        />
 
-      {/* Filters */}
-      <Card style={{ marginBottom: 24, borderRadius: 12 }}>
-        <SessionFilters
+        {/* Filters */}
+        {/* <SessionsFilters
           searchText={searchText}
           classFilter={classFilter}
           availableClasses={availableClasses}
           onSearchChange={handleSearch}
           onClassFilterChange={handleClassFilter}
           loading={loading}
-        />
-      </Card>
+          isMobile={isMobile}
+        /> */}
 
-      {/* Content */}
-      <Card style={{ borderRadius: 12 }} bodyStyle={{ padding: "24px" }}>
-        {loading && !sessions.length ? (
-          <div style={{ textAlign: "center", padding: "60px 0" }}>
-            <Spin indicator={antIcon} />
-            <p style={{ marginTop: 16, color: "#666" }}>
-              Memuat data pertemuan...
-            </p>
-          </div>
-        ) : filteredSessions.length > 0 ? (
-          <Row gutter={[0, 16]}>
-            {filteredSessions.map((session) => (
-              <Col key={session.id} span={24}>
-                <SessionCard
-                  session={session}
-                  onClick={() => handleSessionClick(session)}
-                />
-              </Col>
-            ))}
-          </Row>
+        {/* Statistics - Only show if there are sessions */}
+        {sessions.length > 0 && (
+          <SessionsStats sessions={sessions} isMobile={isMobile} />
+        )}
+
+        {/* Content */}
+        {filteredSessions.length > 0 ? (
+          <SessionsGrid
+            sessions={filteredSessions}
+            onSessionClick={handleSessionClick}
+            isMobile={isMobile}
+          />
         ) : (
-          <Empty
-            image={Empty.PRESENTED_IMAGE_SIMPLE}
-            description={
-              <div>
-                <BookOutlined
-                  style={{ fontSize: 48, color: "#d9d9d9", marginBottom: 16 }}
-                />
-                <Text style={{ fontSize: 16, color: "#666", display: "block" }}>
-                  {searchText || classFilter
-                    ? "Tidak ada pertemuan yang sesuai dengan filter"
-                    : "Belum ada mata pelajaran yang diampu"}
-                </Text>
-                <Text type="secondary" style={{ fontSize: 14 }}>
-                  {searchText || classFilter
-                    ? "Coba ubah kata kunci pencarian atau filter"
-                    : "Hubungi admin untuk menambahkan mata pelajaran"}
-                </Text>
-              </div>
-            }
+          <SessionsEmptyState
+            hasFilters={hasFilters}
+            onClearFilters={handleClearFilters}
           />
         )}
-      </Card>
-
-      {/* Loading overlay untuk refresh */}
-      {loading && sessions.length > 0 && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "rgba(255, 255, 255, 0.8)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            zIndex: 1000,
-          }}
-        >
-          <Spin indicator={antIcon} tip="Memperbarui data pertemuan..." />
-        </div>
-      )}
+      </div>
     </div>
   );
 };

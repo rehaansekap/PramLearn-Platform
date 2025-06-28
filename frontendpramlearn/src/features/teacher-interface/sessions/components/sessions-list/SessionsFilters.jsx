@@ -4,7 +4,7 @@ import { SearchOutlined, FilterOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
 
-const SessionFilters = ({
+const SessionsFilters = ({
   searchText,
   classFilter,
   availableClasses,
@@ -62,4 +62,4 @@ const SessionFilters = ({
   );
 };
 
-export default SessionFilters;
+export default SessionsFilters;
