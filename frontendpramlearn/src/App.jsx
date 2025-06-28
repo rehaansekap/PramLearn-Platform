@@ -34,6 +34,8 @@ import StudentAssignments from "./features/student-interface/assignments/Student
 import StudentGradeOverview from "./features/student-interface/grades/StudentGradeOverview";
 import GroupQuizInterface from "./features/student-interface/assessments/components/groupquiz/GroupQuizInterface";
 import GroupQuizResults from "./features/student-interface/assessments/components/group-quiz-results/GroupQuizResults";
+import StudentARCSSubmissionForm from "./features/student-interface/materials/components/arcs/StudentARCSSubmissionForm";
+import StudentARCSResultsPage from "./features/student-interface/materials/components/arcs/StudentARCSResultsPage";
 
 // Teacher Interface Components
 import TeacherDashboard from "./features/teacher-interface/dashboard/TeacherDashboard";
@@ -173,6 +175,14 @@ const AppRoutes = () => {
             <Route
               path="materials/:materialSlug"
               element={<StudentMaterialViewer />}
+            />
+            <Route
+              path="materials/:materialSlug/:arcsSlug"
+              element={<StudentARCSSubmissionForm />}
+            />
+            <Route
+              path="materials/:materialSlug/:arcsSlug/results"
+              element={<StudentARCSResultsPage />}
             />
             <Route path="assessments" element={<StudentQuizList />} />
             <Route path="quiz/:quizSlug" element={<QuizTakingInterface />} />

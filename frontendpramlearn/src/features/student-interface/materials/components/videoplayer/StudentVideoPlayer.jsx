@@ -7,7 +7,7 @@ import VideoEmptyState from "./VideoEmptyState";
 const { Text, Title } = Typography;
 
 const StudentVideoPlayer = ({
-  youtubeVideos,
+  youtubeVideos = [],
   progress,
   updateProgress,
   onActivity,

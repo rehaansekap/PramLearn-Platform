@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 
 import useStudentMaterialAccess from "./hooks/useStudentMaterialAccess";
 import useSubjectData from "./hooks/useSubjectData";
+import useStudentARCS from "./hooks/useStudentARCS"; // [NEW] Import ARCS hook
 import MaterialHeader from "./components/layout/MaterialHeader";
 import MaterialBreadcrumb from "./components/layout/MaterialBreadcrumb";
 import MaterialContentTabs from "./components/layout/MaterialContentTabs";
@@ -26,6 +27,10 @@ const StudentMaterialViewer = () => {
   } = useStudentMaterialAccess(materialSlug);
 
   const { subjectData } = useSubjectData(material?.subject);
+
+  // [NEW] ARCS hook untuk mendapatkan informasi kuesioner
+  const { questionnaires: arcsQuestionnaires } = useStudentARCS(materialSlug);
+
   const [activeTab, setActiveTab] = useState("1");
 
   if (loading) return <MaterialLoadingState />;
@@ -46,6 +51,7 @@ const StudentMaterialViewer = () => {
         material={material}
         progress={progress}
         subjectData={subjectData}
+        arcsQuestionnaires={arcsQuestionnaires} // [NEW] Pass ARCS data ke header
       />
 
       <MaterialContentTabs
@@ -58,6 +64,8 @@ const StudentMaterialViewer = () => {
         recordQuizCompletion={recordQuizCompletion}
         recordAssignmentSubmission={recordAssignmentSubmission}
         completedActivities={completedActivities}
+        arcsQuestionnaires={arcsQuestionnaires} // [NEW] Pass ARCS data ke tabs
+        materialSlug={materialSlug} // [NEW] Pass materialSlug untuk ARCS
       />
 
       <MaterialProgressTracker

@@ -259,6 +259,14 @@ const useStudentMaterialAccess = (materialSlug) => {
     async (activityType, activityData = {}) => {
       if (!materialId || !material) return;
 
+      if (
+        activityType === "arcs_completed" ||
+        activityType === "arcs_submitted"
+      ) {
+        console.log(`⚠️ Skipping ${activityType} - handled by ARCS backend`);
+        return;
+      }
+
       // ✅ CEK APAKAH SUDAH 100% COMPLETED DARI BACKEND
       const currentProgress = progressRef.current.completion_percentage || 0;
       if (

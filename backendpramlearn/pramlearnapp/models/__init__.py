@@ -3,15 +3,38 @@ from .classes import Class, ClassStudent
 from .subject import Subject, SubjectClass
 from .group import Group, GroupMember, GroupQuiz, GroupQuizSubmission, GroupQuizResult
 from .quiz import Quiz, Question, StudentQuizAttempt, StudentQuizAnswer
-from .assignment import Assignment, AssignmentSubmission, AssignmentQuestion, AssignmentAnswer, StudentAssignmentDraft
-from .material import Material, File, MaterialYoutubeVideo, StudentMaterialProgress, StudentMaterialBookmark, StudentMaterialActivity
+from .assignment import (
+    Assignment,
+    AssignmentSubmission,
+    AssignmentQuestion,
+    AssignmentAnswer,
+    StudentAssignmentDraft,
+)
+from .material import (
+    Material,
+    File,
+    MaterialYoutubeVideo,
+    StudentMaterialProgress,
+    StudentMaterialBookmark,
+    StudentMaterialActivity,
+)
 from .attedance import StudentAttendance
 from .studentActivity import StudentActivity
 from .schedule import Schedule
 from .announcement import Announcement
 from .grade import Grade, GradeStatistics, Achievement
+from .arcs_questionnaire import (
+    ARCSQuestionnaire,
+    ARCSQuestion,
+    ARCSResponse,
+    ARCSAnswer,
+)
 
 __all__ = [
+    "ARCSQuestionnaire",
+    "ARCSQuestion",
+    "ARCSResponse",
+    "ARCSAnswer",
     "Grade",
     "GradeStatistics",
     "Achievement",

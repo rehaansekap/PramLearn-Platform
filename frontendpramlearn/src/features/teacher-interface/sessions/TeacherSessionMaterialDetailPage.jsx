@@ -24,6 +24,8 @@ import {
   FileOutlined,
   LoadingOutlined,
   UserOutlined,
+  FormOutlined,
+  CheckCircleOutlined,
 } from "@ant-design/icons";
 import useSessionMaterialDetail from "./hooks/useSessionMaterialDetail";
 import SessionMaterialContentTab from "./components/SessionMaterialContentTab";
@@ -32,6 +34,7 @@ import SessionMaterialGroupsTab from "./components/SessionMaterialGroupsTab";
 import SessionMaterialQuizzesTab from "./components/SessionMaterialQuizzesTab";
 import SessionMaterialAssignmentsTab from "./components/SessionMaterialAssignmentsTab";
 import SessionMaterialAnalyticsTab from "./components/SessionMaterialAnalyticsTab";
+import SessionMaterialARCSTab from "./components/SessionMaterialARCSTab";
 
 const { Title, Text } = Typography;
 const { TabPane } = Tabs;
@@ -325,7 +328,19 @@ const SessionMaterialDetailPage = () => {
               />
             </div>
           </TabPane>
-
+          <TabPane
+            tab={
+              <span>
+                <FormOutlined />
+                {!isMobile && " Kuesioner ARCS"}
+              </span>
+            }
+            key="arcs"
+          >
+            <div style={{ padding: "24px" }}>
+              <SessionMaterialARCSTab materialSlug={materialSlug} />
+            </div>
+          </TabPane>
           <TabPane
             tab={
               <span>

@@ -2,7 +2,9 @@ import React from "react";
 import { Card, Tabs, Space, Tag } from "antd";
 import {
   FileTextOutlined,
+  QuestionCircleOutlined,
   PlayCircleOutlined,
+  EditOutlined,
   BookOutlined,
   FormOutlined,
 } from "@ant-design/icons";
@@ -11,6 +13,7 @@ import StudentPDFViewer from "../pdfviewer/StudentPDFViewer";
 import StudentVideoPlayer from "../videoplayer/StudentVideoPlayer";
 import MaterialQuizList from "../MaterialQuizList";
 import MaterialAssignmentList from "../MaterialAssignmentList";
+import StudentARCSTab from "../arcs/StudentARCSTab";
 import GoogleFormsTab from "./GoogleFormsTab";
 
 const { TabPane } = Tabs;
@@ -25,12 +28,17 @@ const MaterialContentTabs = ({
   recordQuizCompletion,
   recordAssignmentSubmission,
   completedActivities,
+  arcsQuestionnaires = [],
+  materialSlug,
 }) => {
   const hasPDFs = material.pdf_files?.length > 0;
   const hasVideos = material.youtube_videos?.some((v) => v.url);
   const hasGoogleForms =
     material.google_form_embed_arcs_awal ||
     material.google_form_embed_arcs_akhir;
+  const hasActiveARCS = arcsQuestionnaires.some((q) => !q.is_completed);
+  const completedARCS = arcsQuestionnaires.filter((q) => q.is_completed).length;
+  const totalARCS = arcsQuestionnaires.length;
 
   return (
     <Card
@@ -139,45 +147,17 @@ const MaterialContentTabs = ({
           </div>
         </TabPane>
 
-        {hasGoogleForms && (
-          <>
-            {material.google_form_embed_arcs_awal && (
-              <TabPane
-                tab={
-                  <Space>
-                    <FormOutlined />
-                    <span>ARCS Awal</span>
-                  </Space>
-                }
-                key="3"
-              >
-                <GoogleFormsTab
-                  embedUrl={material.google_form_embed_arcs_awal}
-                  title="ARCS Awal"
-                  description="Formulir penilaian ARCS sebelum pembelajaran"
-                />
-              </TabPane>
-            )}
-
-            {material.google_form_embed_arcs_akhir && (
-              <TabPane
-                tab={
-                  <Space>
-                    <FormOutlined />
-                    <span>ARCS Akhir</span>
-                  </Space>
-                }
-                key="4"
-              >
-                <GoogleFormsTab
-                  embedUrl={material.google_form_embed_arcs_akhir}
-                  title="ARCS Akhir"
-                  description="Formulir penilaian ARCS setelah pembelajaran"
-                />
-              </TabPane>
-            )}
-          </>
-        )}
+        <TabPane
+          tab={
+            <Space>
+              <FormOutlined />
+              <span>ARCS</span>
+            </Space>
+          }
+          key="arcs"
+        >
+          <StudentARCSTab materialSlug={materialSlug} />
+        </TabPane>
       </Tabs>
     </Card>
   );
