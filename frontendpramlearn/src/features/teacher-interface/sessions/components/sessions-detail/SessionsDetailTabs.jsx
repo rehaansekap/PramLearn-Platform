@@ -12,11 +12,15 @@ const SessionsDetailTabs = ({
   activeTab,
   onTabChange,
   sessionDetail,
+  materialsCount = 0,
   isMobile,
 }) => {
   if (!sessionDetail) return null;
 
   const { sessions_data = [], statistics = {} } = sessionDetail;
+
+  // Use materialsCount prop if provided, otherwise fallback to sessions_data
+  const materialCount = materialsCount || sessions_data.length;
 
   return (
     <div style={{ padding: isMobile ? "16px" : "20px 24px 0" }}>
@@ -49,7 +53,7 @@ const SessionsDetailTabs = ({
               <UnorderedListOutlined />
               <span>Materi</span>
               <Badge
-                count={sessions_data.length}
+                count={materialCount}
                 style={{
                   backgroundColor: "#667eea",
                   fontSize: 10,

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import { Alert, Spin, Row, Col, Space } from "antd";
 import { ReloadOutlined } from "@ant-design/icons";
 import api from "../../../../../api";
@@ -133,6 +134,9 @@ const GroupQuizResults = () => {
         minHeight: "calc(100vh - 64px)",
       }}
     >
+      <Helmet>
+        <title>Hasil Quiz Kelompok | PramLearn</title>
+      </Helmet>
       {/* Header dengan breadcrumb */}
       <GroupQuizHeader
         results={results}

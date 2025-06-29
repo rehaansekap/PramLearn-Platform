@@ -17,14 +17,13 @@ const useStudentARCSSubmission = (materialSlug, arcsSlug) => {
       setLoading(true);
       setError(null);
 
-      console.log("🔍 Fetching ARCS by slug:", { materialSlug, arcsSlug });
+      // console.log("🔍 Fetching ARCS by slug:", { materialSlug, arcsSlug });
 
-      // ✅ GUNAKAN SLUG ENDPOINT
       const response = await api.get(
         `/student/materials/${materialSlug}/arcs/${arcsSlug}/`
       );
 
-      console.log("📋 ARCS Response:", response.data);
+      // console.log("📋 ARCS Response:", response.data);
       setQuestionnaire(response.data);
     } catch (error) {
       console.error("❌ Error fetching ARCS questionnaire:", error);
@@ -50,7 +49,7 @@ const useStudentARCSSubmission = (materialSlug, arcsSlug) => {
         { answers: answersArray }
       );
 
-      console.log("ARCS submission response:", response.data);
+      // console.log("ARCS submission response:", response.data);
       return { success: true, data: response.data };
     } catch (error) {
       console.error("Error submitting ARCS:", error);

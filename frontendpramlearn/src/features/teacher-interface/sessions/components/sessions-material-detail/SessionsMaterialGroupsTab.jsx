@@ -136,6 +136,7 @@ const SessionsMaterialGroupsTab = ({
         </div>
       ),
       ellipsis: true,
+      width: isMobile ? 200 : 300,
     },
     {
       title: "Anggota",
@@ -159,7 +160,6 @@ const SessionsMaterialGroupsTab = ({
         </div>
       ),
       width: 200,
-      responsive: ["md"],
     },
     {
       title: "Quiz Assigned",
@@ -189,7 +189,6 @@ const SessionsMaterialGroupsTab = ({
         </Space>
       ),
       width: isMobile ? 80 : 120,
-      fixed: "right",
     },
   ];
 
@@ -207,57 +206,73 @@ const SessionsMaterialGroupsTab = ({
   return (
     <div>
       {/* Header */}
-      <div style={{ marginBottom: 24 }}>
-        <Row gutter={[16, 16]}>
-          <Col xs={24} lg={16}>
-            <Space direction="vertical" size="small">
-              <Title level={4} style={{ margin: 0, color: "#11418b" }}>
-                <TeamOutlined style={{ marginRight: 8 }} />
-                Manajemen Kelompok
-              </Title>
-              <Text type="secondary">
-                Kelola kelompok belajar dan pantau aktivitas mereka
-              </Text>
-            </Space>
-          </Col>
-          <Col xs={24} lg={8}>
-            <div style={{ textAlign: isMobile ? "center" : "right" }}>
-              <Space>
-                {/* Export PDF Button - only show if groups exist */}
-                {groups && groups.length > 0 && (
-                  <Tooltip title="Download laporan analisis kelompok">
-                    <Button
-                      icon={
-                        exportingPdf ? <LoadingOutlined /> : <FilePdfOutlined />
-                      }
-                      onClick={handleExportAnalysis}
-                      loading={exportingPdf}
-                      disabled={refreshing}
-                      style={{
-                        borderColor: "#11418b",
-                        color: "#11418b",
-                        borderRadius: 8,
-                      }}
-                    >
-                      {!isMobile && (exportingPdf ? "Export..." : "Export PDF")}
-                    </Button>
-                  </Tooltip>
-                )}
-
+      <div style={{ marginBottom: 24, textAlign: "center" }}>
+        <TeamOutlined
+          style={{
+            fontSize: isMobile ? 24 : 32,
+            color: "#11418b",
+            marginBottom: isMobile ? 8 : 12,
+          }}
+        />
+        <Title
+          level={isMobile ? 5 : 4}
+          style={{
+            marginBottom: 8,
+            fontSize: isMobile ? "16px" : "20px",
+            fontWeight: 700,
+            color: "#11418b",
+          }}
+        >
+          Manajemen Kelompok
+        </Title>
+        <Text
+          type="secondary"
+          style={{
+            fontSize: isMobile ? "12px" : "14px",
+            color: "#666",
+          }}
+        >
+          Kelola kelompok belajar dan pantau aktivitas mereka
+        </Text>
+        <div style={{ marginTop: 16, marginBottom: 0 }}>
+          <Space direction={isMobile ? "vertical" : "horizontal"}>
+            {groups && groups.length > 0 && (
+              <Tooltip title="Download laporan analisis kelompok">
                 <Button
-                  type="primary"
-                  icon={<ReloadOutlined />}
-                  onClick={handleRefreshGroups}
-                  loading={refreshing}
-                  disabled={exportingPdf}
-                  style={{ borderRadius: 8 }}
+                  icon={
+                    exportingPdf ? <LoadingOutlined /> : <FilePdfOutlined />
+                  }
+                  onClick={handleExportAnalysis}
+                  loading={exportingPdf}
+                  disabled={refreshing}
+                  style={{
+                    borderColor: "#11418b",
+                    color: "#11418b",
+                    borderRadius: 8,
+                  }}
+                  size={isMobile ? "small" : "middle"}
                 >
-                  {refreshing ? "Refreshing..." : "Refresh Data"}
+                  {isMobile
+                    ? "Export"
+                    : exportingPdf
+                    ? "Export..."
+                    : "Export PDF"}
                 </Button>
-              </Space>
-            </div>
-          </Col>
-        </Row>
+              </Tooltip>
+            )}
+            <Button
+              type="primary"
+              icon={<ReloadOutlined />}
+              onClick={handleRefreshGroups}
+              loading={refreshing}
+              disabled={exportingPdf}
+              style={{ borderRadius: 8 }}
+              size={isMobile ? "small" : "middle"}
+            >
+              {refreshing ? "Refreshing..." : "Refresh Data"}
+            </Button>
+          </Space>
+        </div>
       </div>
 
       {/* Statistics Cards */}

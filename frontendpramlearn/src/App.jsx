@@ -90,7 +90,7 @@ const getRolePath = (roleId) => {
 const RedirectIfAuthenticated = ({ children }) => {
   const { token, user, loading } = useContext(AuthContext);
 
-  if (loading) return null; // Loading state
+  if (loading) return null;
 
   if (token && user) {
     const rolePath = getRolePath(user.role);

@@ -62,8 +62,8 @@ const GroupFormationSection = ({
           display: "flex",
           justifyContent: "center",
           marginBottom: 16,
-          flexDirection: isMobile ? "column" : "row", // Responsif untuk mobile
-          gap: isMobile ? 12 : 24, // Jarak antar tombol
+          flexDirection: isMobile ? "column" : "row",
+          gap: isMobile ? 12 : 24,
         }}
       >
         <Button
@@ -77,7 +77,7 @@ const GroupFormationSection = ({
             fontWeight: 600,
             borderRadius: 8,
             padding: "0 24px",
-            minWidth: isMobile ? "100%" : 140, // Full width di mobile
+            minWidth: isMobile ? "100%" : 140,
             backgroundColor: "#52c41a",
             borderColor: "#52c41a",
           }}
@@ -96,7 +96,7 @@ const GroupFormationSection = ({
             fontWeight: 600,
             borderRadius: 8,
             padding: "0 24px",
-            minWidth: isMobile ? "100%" : 140, // Full width di mobile
+            minWidth: isMobile ? "100%" : 140,
           }}
         >
           Bentuk Kelompok Heterogen
@@ -119,10 +119,10 @@ const GroupFormationSection = ({
       {/* Info - Lebih compact */}
       <div
         style={{
-          marginTop: 16, // Kurangi dari 20 ke 16
-          padding: 12, // Kurangi dari 16 ke 12
+          marginTop: 16,
+          padding: 12,
           backgroundColor: "#f0f7ff",
-          borderRadius: 6, // Kurangi dari 8 ke 6
+          borderRadius: 6,
           border: "1px solid #d6e4ff",
         }}
       >

@@ -76,8 +76,16 @@ export const useTeacherLayout = () => {
       return `/${userRolePath}/management`;
     }
 
+    if (pathSegments[1] === "sessions") {
+      return `/${userRolePath}/sessions`;
+    }
+
     if (pathSegments[1] === "classes") {
       return `/${userRolePath}/classes`;
+    }
+
+    if (pathSegments[1] === "subjects") {
+      return `/${userRolePath}/subjects`;
     }
 
     if (pathSegments[1] === "analytics") {

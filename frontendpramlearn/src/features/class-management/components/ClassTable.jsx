@@ -165,7 +165,7 @@ const ClassTable = ({
             </Button>
             <Button
               icon={<DeleteOutlined />}
-              onClick={() => handleDeleteWithLoading(record.id, record)} // Kirim record untuk data class
+              onClick={() => handleDeleteWithLoading(record.id, record)}
               loading={actionLoading[`delete_${record.id}`]}
               danger
             >

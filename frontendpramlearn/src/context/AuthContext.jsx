@@ -14,7 +14,7 @@ const AuthContext = createContext();
 const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [user, setUser] = useState(null);
-  const activityTimeout = useRef(null); // Tambahkan baris ini
+  const activityTimeout = useRef(null);
   const [loading, setLoading] = useState(true);
 
   // Update activity dengan WebSocket notification
@@ -78,14 +78,14 @@ const AuthProvider = ({ children }) => {
   }, [token, user]);
 
   useEffect(() => {
-    setLoading(true); // <-- Tambahkan ini agar loading benar di setiap perubahan token
+    setLoading(true);
     if (token) {
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       api
         .get("users/me/")
         .then(async (res) => {
           setUser(res.data);
-          setLoading(false); // <-- Tambahkan ini setelah user berhasil di-set
+          setLoading(false);
           // Set online saat login
           await api.patch(`users/me/`, {
             is_online: true,
@@ -94,11 +94,11 @@ const AuthProvider = ({ children }) => {
         })
         .catch(() => {
           setUser(null);
-          setLoading(false); // <-- Tambahkan ini juga pada catch
+          setLoading(false); 
         });
     } else {
       setUser(null);
-      setLoading(false); // <-- Tambahkan ini juga jika tidak ada token
+      setLoading(false);
     }
   }, [token]);
 
@@ -107,7 +107,7 @@ const AuthProvider = ({ children }) => {
     if (token && user) {
       const interval = setInterval(() => {
         updateActivity();
-      }, 60000); // 1 menit
+      }, 60000); 
       return () => clearInterval(interval);
     }
   }, [token, user, updateActivity]);
@@ -235,7 +235,7 @@ const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ token, user, login, logout, updateActivity, loading }} // <--- tambahkan loading di sini!
+      value={{ token, user, login, logout, updateActivity, loading }} 
     >
       {children}
     </AuthContext.Provider>

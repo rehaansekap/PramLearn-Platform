@@ -462,7 +462,7 @@ const ClassManagement = () => {
             }
             visibleColumns={visibleColumns}
             handleShowInfo={handleShowInfo}
-            loading={false} // Table loading dihandle oleh parent
+            loading={false}
             modalLoading={modalLoading}
             infoLoading={infoLoading}
           />

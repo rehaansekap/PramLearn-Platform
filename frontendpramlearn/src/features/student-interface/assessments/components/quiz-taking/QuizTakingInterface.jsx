@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import { Layout, Spin, Alert } from "antd";
 import QuizSidebar from "./QuizSidebar";
 import QuizQuestionCard from "./QuizQuestionCard";
@@ -136,63 +137,68 @@ const QuizTakingInterface = () => {
   const currentQuestion = quiz.questions[currentQuestionIndex];
 
   return (
-    <Layout style={{ minHeight: "100vh", background: "#f0f2f5" }}>
-      {/* Sidebar Navigasi Soal */}
-      <Sider
-        collapsible
-        collapsed={siderCollapsed}
-        onCollapse={setSiderCollapsed}
-        width={280}
-        style={{
-          background: "#fff",
-          boxShadow: "2px 0 8px rgba(0,0,0,0.1)",
-        }}
-        breakpoint="lg"
-        collapsedWidth={0}
-      >
-        <QuizSidebar
-          questions={quiz.questions}
-          answers={answers}
-          flaggedQuestions={flaggedQuestions}
-          currentQuestionIndex={currentQuestionIndex}
-          onQuestionSelect={setCurrentQuestionIndex}
-          onToggleFlag={toggleQuestionFlag}
+    <>
+      <Helmet>
+        <title>Pengerjaan Quiz | PramLearn</title>
+      </Helmet>
+      <Layout style={{ minHeight: "100vh", background: "#f0f2f5" }}>
+        {/* Sidebar Navigasi Soal */}
+        <Sider
+          collapsible
           collapsed={siderCollapsed}
-        />
-      </Sider>
-
-      {/* Modal Submit */}
-      <QuizSubmitModal
-        visible={showSubmitModal}
-        onOk={async () => {
-          setShowSubmitModal(false);
-          await submitQuiz();
-          navigate(`/student/quiz/${quizSlug}/results`);
-        }}
-        onCancel={() => setShowSubmitModal(false)}
-        answeredCount={Object.keys(answers).length}
-        totalQuestions={quiz.questions.length}
-      />
-
-      {/* Main Content */}
-      <Layout>
-        <Content style={{ padding: 0 }}>
-          <QuizQuestionCard
-            quiz={quiz}
-            currentQuestion={currentQuestion}
-            currentQuestionIndex={currentQuestionIndex}
+          onCollapse={setSiderCollapsed}
+          width={280}
+          style={{
+            background: "#fff",
+            boxShadow: "2px 0 8px rgba(0,0,0,0.1)",
+          }}
+          breakpoint="lg"
+          collapsedWidth={0}
+        >
+          <QuizSidebar
+            questions={quiz.questions}
             answers={answers}
             flaggedQuestions={flaggedQuestions}
-            timeRemaining={timeRemaining}
-            onAnswerChange={setAnswer}
-            onFlagToggle={toggleQuestionFlag}
-            onPrev={() => handleQuestionNavigation("prev")}
-            onNext={() => handleQuestionNavigation("next")}
-            onSubmit={() => setShowSubmitModal(true)}
+            currentQuestionIndex={currentQuestionIndex}
+            onQuestionSelect={setCurrentQuestionIndex}
+            onToggleFlag={toggleQuestionFlag}
+            collapsed={siderCollapsed}
           />
-        </Content>
+        </Sider>
+
+        {/* Modal Submit */}
+        <QuizSubmitModal
+          visible={showSubmitModal}
+          onOk={async () => {
+            setShowSubmitModal(false);
+            await submitQuiz();
+            navigate(`/student/quiz/${quizSlug}/results`);
+          }}
+          onCancel={() => setShowSubmitModal(false)}
+          answeredCount={Object.keys(answers).length}
+          totalQuestions={quiz.questions.length}
+        />
+
+        {/* Main Content */}
+        <Layout>
+          <Content style={{ padding: 0 }}>
+            <QuizQuestionCard
+              quiz={quiz}
+              currentQuestion={currentQuestion}
+              currentQuestionIndex={currentQuestionIndex}
+              answers={answers}
+              flaggedQuestions={flaggedQuestions}
+              timeRemaining={timeRemaining}
+              onAnswerChange={setAnswer}
+              onFlagToggle={toggleQuestionFlag}
+              onPrev={() => handleQuestionNavigation("prev")}
+              onNext={() => handleQuestionNavigation("next")}
+              onSubmit={() => setShowSubmitModal(true)}
+            />
+          </Content>
+        </Layout>
       </Layout>
-    </Layout>
+    </>
   );
 };
 

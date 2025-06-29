@@ -35,7 +35,7 @@ export const OnlineStatusProvider = ({ children }) => {
           console.log("✅ WebSocket connected successfully!");
           setSocket(ws);
           setIsConnected(true);
-          setConnectionAttempts(0); // Reset attempts on successful connection
+          setConnectionAttempts(0);
           window.userStatusSocket = ws;
         };
 

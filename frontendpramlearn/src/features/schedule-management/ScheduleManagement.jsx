@@ -38,7 +38,6 @@ const ScheduleManagement = () => {
     fetchSchedules();
     fetchClasses();
     fetchSubjects();
-    // TODO: fetch classOptions dan subjectOptions dari API
   }, []);
 
   // Handler untuk tambah jadwal

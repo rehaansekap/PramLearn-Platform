@@ -4,6 +4,7 @@ import { Card, List, Space, Typography, Empty, Spin, Alert } from "antd";
 import { BookOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
+import { Helmet } from "react-helmet";
 
 import useStudentQuizzes from "./hooks/useStudentQuizzes";
 import useStudentGroupQuizzes from "./hooks/useStudentGroupQuizzes";
@@ -124,6 +125,9 @@ const StudentQuizList = () => {
         minHeight: "calc(100vh - 64px)",
       }}
     >
+      <Helmet>
+        <title>Daftar Kuis & Penilaian | PramLearn</title>
+      </Helmet>
       {/* Header */}
       <QuizListHeader totalQuizzes={allQuizzes.length} />
 

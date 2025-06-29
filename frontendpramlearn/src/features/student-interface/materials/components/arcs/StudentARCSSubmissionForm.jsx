@@ -3,6 +3,7 @@ import { Layout, message, Row, Col } from "antd";
 import { useParams, useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
+import { Helmet } from "react-helmet";
 
 import useStudentARCSSubmission from "../../hooks/useStudentARCSSubmission";
 import {
@@ -226,6 +227,9 @@ const StudentARCSSubmissionForm = () => {
         minHeight: "calc(100vh - 64px)",
       }}
     >
+      <Helmet>
+        <title>Pengisian ARCS | PramLearn</title>
+      </Helmet>
       <div style={{ maxWidth: 1400, margin: "0 auto" }}>
         {/* Header */}
         <ARCSSubmissionHeader

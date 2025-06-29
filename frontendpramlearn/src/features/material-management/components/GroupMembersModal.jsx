@@ -35,7 +35,7 @@ const GroupMembersModal = ({
   // tidak perlu melakukan mapping lagi
   const membersWithDetails = safeMembers.map((member) => ({
     ...member,
-    studentDetail: member, // member sudah adalah detail siswa
+    studentDetail: member,
   }));
 
   const columns = [

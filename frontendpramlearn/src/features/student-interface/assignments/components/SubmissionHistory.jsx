@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Helmet } from "react-helmet";
 import { Alert, Row, Col, Spin, Space } from "antd";
 import useSubmissionHistory from "../hooks/useSubmissionHistory";
 import SubmissionHistoryHeader from "./submission-history/SubmissionHistoryHeader";
@@ -81,6 +82,9 @@ const SubmissionHistory = ({ onBack, assignment, submissions }) => {
         minHeight: "calc(100vh - 64px)",
       }}
     >
+      <Helmet>
+        <title>Hasil Pengumpulan Tugas | PramLearn</title>
+      </Helmet>
       <SubmissionHistoryHeader
         assignment={assignmentState}
         latestSubmission={latestSubmission}

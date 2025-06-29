@@ -20,11 +20,13 @@ import {
   FireOutlined,
   CheckCircleOutlined,
 } from "@ant-design/icons";
+import { useOnlineStatus } from "../../../../../context/OnlineStatusContext";
 
 const { Title, Text } = Typography;
 
 const SessionsGroupMembersModal = ({ open, onClose, group, students }) => {
   const [loading, setLoading] = useState(false);
+  const { isUserOnline } = useOnlineStatus();
 
   useEffect(() => {
     if (open && group) {
@@ -206,8 +208,8 @@ const SessionsGroupMembersModal = ({ open, onClose, group, students }) => {
       title: "Status",
       key: "status",
       render: (_, record) => (
-        <Tag color={record.is_online ? "green" : "default"}>
-          {record.is_online ? "Online" : "Offline"}
+        <Tag color={isUserOnline(record) ? "green" : "default"}>
+          {isUserOnline(record) ? "Online" : "Offline"}
         </Tag>
       ),
       width: 100,

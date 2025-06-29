@@ -51,17 +51,16 @@ const useStudentAssignmentSubmission = () => {
           `/student/assignment/${assignmentId}/questions/`
         );
 
-        // PERBAIKAN: Extract questions dari response yang benar
         if (response.data && response.data.questions) {
           setAssignmentQuestions(
             Array.isArray(response.data.questions)
               ? response.data.questions
               : []
           );
-          console.log("✅ Questions set:", response.data.questions.length);
+          // console.log("✅ Questions set:", response.data.questions.length);
         } else if (Array.isArray(response.data)) {
           setAssignmentQuestions(response.data);
-          console.log("✅ Questions set (direct array):", response.data.length);
+          // console.log("✅ Questions set (direct array):", response.data.length);
         } else {
           console.log("⚠️ No questions found in response");
           setAssignmentQuestions([]);
@@ -213,11 +212,10 @@ const useStudentAssignmentSubmission = () => {
         // Refresh submission history
         await fetchSubmissionHistory(assignmentId);
 
-        // UBAH: Gunakan return value untuk menunjukkan success, biar parent component yang handle message
         return response.data;
       } catch (err) {
         console.error("Error submitting assignment:", err);
-        // UBAH: Return false instead of showing message here
+
         return false;
       } finally {
         setSubmitting(false);
@@ -232,7 +230,6 @@ const useStudentAssignmentSubmission = () => {
       const now = dayjs();
       const dueDate = dayjs(assignment.due_date);
 
-      // PERBAIKAN: Cek submission dari assignment object juga
       const hasSubmissionFromList =
         assignment.submission_id || assignment.submitted_at;
       const hasSubmissionFromState =

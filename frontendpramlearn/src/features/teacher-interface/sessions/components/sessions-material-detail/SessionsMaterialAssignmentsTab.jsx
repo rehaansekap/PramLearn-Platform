@@ -303,6 +303,7 @@ const SessionsMaterialAssignmentsTab = ({
         </div>
       ),
       ellipsis: true,
+      width: isMobile ? 200 : 300,
     },
     {
       title: "Deadline & Status",
@@ -332,7 +333,6 @@ const SessionsMaterialAssignmentsTab = ({
         </div>
       ),
       width: 160,
-      responsive: ["md"],
     },
     {
       title: "Submissions",
@@ -354,7 +354,6 @@ const SessionsMaterialAssignmentsTab = ({
       ),
       width: 180,
       align: "center",
-      responsive: ["lg"],
     },
     {
       title: "Rata-rata Nilai",
@@ -377,7 +376,6 @@ const SessionsMaterialAssignmentsTab = ({
       ),
       width: 120,
       align: "center",
-      responsive: ["lg"],
     },
     {
       title: "Actions",
@@ -434,7 +432,6 @@ const SessionsMaterialAssignmentsTab = ({
         );
       },
       width: isMobile ? 100 : 140,
-      fixed: "right",
     },
   ];
 
@@ -457,38 +454,55 @@ const SessionsMaterialAssignmentsTab = ({
     <div>
       {/* Header Section */}
       <Card style={{ marginBottom: 24 }} bodyStyle={{ padding: "20px" }}>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-start",
-            marginBottom: 16,
-          }}
-        >
-          <div>
-            <Title level={4} style={{ margin: 0, color: "#11418b" }}>
-              <FileTextOutlined style={{ marginRight: 8 }} />
-              Assignment Management
-            </Title>
-            <Text type="secondary">Kelola assignment untuk materi ini</Text>
+        <div style={{ marginBottom: 24, textAlign: "center" }}>
+          <FileTextOutlined
+            style={{
+              fontSize: isMobile ? 24 : 32,
+              color: "#11418b",
+              marginBottom: isMobile ? 8 : 12,
+            }}
+          />
+          <Title
+            level={isMobile ? 5 : 4}
+            style={{
+              marginBottom: 8,
+              fontSize: isMobile ? "16px" : "20px",
+              fontWeight: 700,
+              color: "#11418b",
+            }}
+          >
+            Manajemen Assignment
+          </Title>
+          <Text
+            type="secondary"
+            style={{
+              fontSize: isMobile ? "12px" : "14px",
+              color: "#666",
+            }}
+          >
+            Kelola assignment untuk materi ini
+          </Text>
+          <div style={{ marginTop: 16 }}>
+            <Space>
+              <Button
+                icon={<ReloadOutlined />}
+                onClick={fetchAssignments}
+                loading={loading}
+                size={isMobile ? "small" : "middle"}
+              >
+                Refresh
+              </Button>
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={handleAddAssignment}
+                style={{ backgroundColor: "#11418b" }}
+                size={isMobile ? "small" : "middle"}
+              >
+                {isMobile ? "Buat" : "Buat Assignment"}
+              </Button>
+            </Space>
           </div>
-          <Space>
-            <Button
-              icon={<ReloadOutlined />}
-              onClick={fetchAssignments}
-              loading={loading}
-            >
-              Refresh
-            </Button>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={handleAddAssignment}
-              style={{ backgroundColor: "#11418b" }}
-            >
-              Buat Assignment
-            </Button>
-          </Space>
         </div>
 
         {/* Statistics Row */}

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36">
+  <rect width="36" height="36" rx="8" fill="url(#gradient)" style="box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1)" />
+  <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" font-size="20" font-weight="800" fill="url(#text-gradient)" style="background-clip: text; text-fill-color: transparent; font-family: 'Roboto', sans-serif;">
+    P
+  </text>
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#f0f9ff" />
+    </linearGradient>
+    <linearGradient id="text-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e3a8a" />
+      <stop offset="100%" stop-color="#3b82f6" />
+    </linearGradient>
+  </defs>
+</svg>

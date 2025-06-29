@@ -12,8 +12,8 @@ const GroupsTab = ({
   loading,
   groupQuizAssignments,
   studentDetails,
-  materialId, // Add this prop
-  onGroupsChanged, // Add this prop
+  materialId,
+  onGroupsChanged,
 }) => {
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [membersModalVisible, setMembersModalVisible] = useState(false);
@@ -198,7 +198,7 @@ const GroupsTab = ({
             style: { textAlign: "center" },
           }}
           style={{ width: "100%" }}
-          scroll={{ x: isMobile ? 600 : undefined }} // Tambahkan scroll horizontal untuk mobile
+          scroll={{ x: isMobile ? 600 : undefined }}
           size="middle"
         />
       )}

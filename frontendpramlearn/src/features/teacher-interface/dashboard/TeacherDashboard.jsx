@@ -11,6 +11,7 @@ import TeacherTodayScheduleCard from "./components/TeacherTodayScheduleCard";
 import QuickActionsCard from "./components/QuickActionsCard";
 import ClassProgressCard from "./components/ClassProgressCard";
 import StudentEngagementCard from "./components/StudentEngagementCard";
+import { Helmet } from "react-helmet";
 
 const TeacherDashboard = () => {
   const { dashboard, loading, error, user, refreshing, refresh } =
@@ -63,6 +64,9 @@ const TeacherDashboard = () => {
         background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
       }}
     >
+      <Helmet>
+        <title>{`Dashboard | PramLearn`}</title>
+      </Helmet>
       <div
         style={{
           maxWidth: "1600px",

@@ -9,6 +9,7 @@ import {
   TeamOutlined,
   UserOutlined,
   BarChartOutlined,
+  CalendarOutlined,
 } from "@ant-design/icons";
 import { AuthContext } from "../../../context/AuthContext";
 import api from "../../../api";
@@ -129,6 +130,80 @@ const TeacherBreadcrumb = () => {
         return;
       }
 
+      // Handle sessions routes: /teacher/sessions
+      if (pathSnippets[1] === "sessions") {
+        if (pathSnippets.length === 2) {
+          setDynamicCrumbs([
+            ...baseCrumbs,
+            {
+              path: `/${userRolePath}/sessions`,
+              breadcrumbName: "Pertemuan",
+              icon: <CalendarOutlined />,
+            },
+          ]);
+        } else if (pathSnippets[2]) {
+          // Sessions detail page
+          const subjectSlug = pathSnippets[2];
+          try {
+            const response = await api.get(`teacher/sessions/${subjectSlug}/`);
+            const sessionData = response.data;
+            if (sessionData && sessionData.subject) {
+              setDynamicCrumbs([
+                ...baseCrumbs,
+                {
+                  path: `/${userRolePath}/sessions`,
+                  breadcrumbName: "Pertemuan",
+                  icon: <CalendarOutlined />,
+                },
+                {
+                  path: `/${userRolePath}/sessions/${subjectSlug}`,
+                  breadcrumbName: sessionData.subject.name,
+                  icon: <BookOutlined />,
+                },
+              ]);
+
+              // Handle material detail in sessions
+              if (pathSnippets[3]) {
+                const materialSlug = pathSnippets[3];
+                try {
+                  const materialRes = await api.get(
+                    `teacher/sessions/material/${materialSlug}/`
+                  );
+                  const material = materialRes.data;
+                  if (material) {
+                    setDynamicCrumbs([
+                      ...baseCrumbs,
+                      {
+                        path: `/${userRolePath}/sessions`,
+                        breadcrumbName: "Pertemuan",
+                        icon: <CalendarOutlined />,
+                      },
+                      {
+                        path: `/${userRolePath}/sessions/${subjectSlug}`,
+                        breadcrumbName: sessionData.subject.name,
+                        icon: <BookOutlined />,
+                      },
+                      {
+                        path: `/${userRolePath}/sessions/${subjectSlug}/${materialSlug}`,
+                        breadcrumbName: material.material.title,
+                        icon: <FileTextOutlined />,
+                      },
+                    ]);
+                    return;
+                  }
+                } catch (error) {
+                  console.error("Error fetching material in session:", error);
+                }
+              }
+              return;
+            }
+          } catch (error) {
+            console.error("Error fetching session:", error);
+          }
+        }
+        return;
+      }
+
       // Handle other static routes
       // Tambahkan di routeMap
       const routeMap = {
@@ -156,7 +231,7 @@ const TeacherBreadcrumb = () => {
         const classSlug = pathSnippets[2];
         try {
           const response = await api.get(`teacher/classes/${classSlug}/`);
-          const classData = response.data.class_info;
+          const classData = response.data.class;
           if (classData) {
             setDynamicCrumbs([
               ...baseCrumbs,
@@ -217,7 +292,7 @@ const TeacherBreadcrumb = () => {
               },
               {
                 path: location.pathname,
-                breadcrumbName: subjectRes.data.subject_info.name,
+                breadcrumbName: subjectRes.data.subject.name,
               },
             ]);
           } catch (error) {

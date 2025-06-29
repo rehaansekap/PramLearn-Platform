@@ -33,26 +33,26 @@ const TeacherSidebar = ({
       icon: <DashboardOutlined />,
       label: <Link to={`/${userRolePath}`}>Dashboard</Link>,
     },
-    {
-      key: `/${userRolePath}/management`,
-      icon: <SettingOutlined />,
-      label: <Link to={`/${userRolePath}/management`}>Management</Link>,
-    },
+    // {
+    //   key: `/${userRolePath}/management`,
+    //   icon: <SettingOutlined />,
+    //   label: <Link to={`/${userRolePath}/management`}>Management</Link>,
+    // },
     {
       key: `/${userRolePath}/sessions`,
       icon: <CalendarOutlined />,
       label: <Link to={`/${userRolePath}/sessions`}>Pertemuan</Link>,
     },
-    {
-      key: `/${userRolePath}/classes`,
-      icon: <TeamOutlined />,
-      label: <Link to={`/${userRolePath}/classes`}>Kelas Saya</Link>,
-    },
-    {
-      key: `/${userRolePath}/subjects`,
-      icon: <BookOutlined />,
-      label: <Link to={`/${userRolePath}/subjects`}>Mata Pelajaran</Link>,
-    },
+    // {
+    //   key: `/${userRolePath}/classes`,
+    //   icon: <TeamOutlined />,
+    //   label: <Link to={`/${userRolePath}/classes`}>Kelas Saya</Link>,
+    // },
+    // {
+    //   key: `/${userRolePath}/subjects`,
+    //   icon: <BookOutlined />,
+    //   label: <Link to={`/${userRolePath}/subjects`}>Mata Pelajaran</Link>,
+    // },
     // Uncomment when these features are implemented
     // {
     //   key: `/${userRolePath}/analytics`,

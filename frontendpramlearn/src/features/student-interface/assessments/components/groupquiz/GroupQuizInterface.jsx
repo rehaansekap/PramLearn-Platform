@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import { Layout, Alert, Spin, message } from "antd";
 import { AuthContext } from "../../../../../context/AuthContext";
 import { useOnlineStatus } from "../../../../../context/OnlineStatusContext";
@@ -168,6 +169,9 @@ const GroupQuizInterface = () => {
         minHeight: "calc(100vh - 64px)",
       }}
     >
+      <Helmet>
+        <title>Pengerjaan Quiz Kelompok | PramLearn</title>
+      </Helmet>
       <GroupQuizHeader
         quiz={quiz}
         currentQuestionIndex={currentQuestionIndex}

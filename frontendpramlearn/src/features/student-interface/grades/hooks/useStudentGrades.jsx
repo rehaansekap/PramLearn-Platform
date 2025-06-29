@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useContext } from "react";
 import { message } from "antd";
 import api from "../../../../api";
-import { AuthContext } from "../../../../context/AuthContext"; // ✅ PERBAIKI INI
+import { AuthContext } from "../../../../context/AuthContext";
 
 const useStudentGrades = () => {
   const { user, token } = useContext(AuthContext);
@@ -61,7 +61,6 @@ const useStudentGrades = () => {
         const response = await api.get(url);
 
         if (response.data) {
-          // ✅ PASTIKAN GRADES ADALAH ARRAY
           const gradesData = response.data.grades || [];
           setGrades(gradesData);
           setStatistics(response.data.statistics || {});

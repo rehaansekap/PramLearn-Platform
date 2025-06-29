@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Space, Alert, Button } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
+import { Helmet } from "react-helmet";
 
 import useStudentARCSResults from "../../hooks/useStudentARCSResults";
 import {
@@ -143,6 +144,9 @@ const StudentARCSResultsPage = () => {
         padding: isMobile ? "16px 8px" : "20px",
       }}
     >
+      <Helmet>
+        <title>Hasil ARCS | PramLearn</title>
+      </Helmet>
       <div
         style={{
           maxWidth: 1200,

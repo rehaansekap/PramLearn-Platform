@@ -61,19 +61,14 @@ const useAssignmentForm = (materialId, onSuccess, editingAssignment) => {
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       const { title, description, due_date, questions } = formData;
 
-      // PERBAIKAN: Format due_date ke ISO format
       let formattedDueDate = due_date;
       if (due_date) {
-        // Jika due_date adalah string dari DatePicker (DD/MM/YYYY HH:mm)
         if (typeof due_date === "string" && due_date.includes("/")) {
-          // Parse dari format DD/MM/YYYY HH:mm ke ISO
           const parsed = dayjs(due_date, "DD/MM/YYYY HH:mm");
           formattedDueDate = parsed.isValid() ? parsed.toISOString() : due_date;
         } else if (dayjs.isDayjs(due_date)) {
-          // Jika sudah dayjs object
           formattedDueDate = due_date.toISOString();
         } else if (typeof due_date === "string") {
-          // Coba parse sebagai ISO string atau convert ke ISO
           const parsed = dayjs(due_date);
           formattedDueDate = parsed.isValid() ? parsed.toISOString() : due_date;
         }

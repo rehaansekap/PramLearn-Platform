@@ -119,7 +119,7 @@ const MaterialProgressTracker = ({
         progressPercent={progressPercent}
         onClick={() => setDesktopCardOpen(!desktopCardOpen)}
         getProgressColor={getProgressColor}
-        isOpen={desktopCardOpen} // ← TAMBAH PROP INI
+        isOpen={desktopCardOpen}
       />
     </>
   );

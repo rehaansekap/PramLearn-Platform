@@ -89,13 +89,15 @@ const ARCSQuestionnaireList = ({
             showInfo={false}
             strokeColor="#52c41a"
           />
-          <Text type="secondary" style={{ fontSize: 10 }}>
-            {record.completion_rate}%
-          </Text>
+
+          {!isMobile && (
+            <Text type="secondary" style={{ fontSize: 10 }}>
+              {record.completion_rate}%
+            </Text>
+          )}
         </div>
       ),
       width: 100,
-      responsive: ["lg"],
     },
     {
       title: "Dibuat",
@@ -188,7 +190,6 @@ const ARCSQuestionnaireList = ({
         </Space>
       ),
       width: isMobile ? 150 : 200,
-      fixed: isMobile ? "right" : false,
     },
   ];
 
@@ -215,17 +216,23 @@ const ARCSQuestionnaireList = ({
 
   return (
     <Table
+      dataSource={questionnaires.map((q, idx) => ({
+        ...q,
+        key: q.id || idx,
+      }))}
       columns={columns}
-      dataSource={questionnaires.map((q) => ({ ...q, key: q.id }))}
       loading={loading}
       pagination={{
         pageSize: 10,
         showSizeChanger: false,
+        style: { textAlign: "center" },
         showTotal: (total, range) =>
           `${range[0]}-${range[1]} dari ${total} kuesioner`,
       }}
-      scroll={{ x: isMobile ? 800 : undefined }}
-      size={isMobile ? "small" : "middle"}
+      className="user-table-responsive"
+      style={{ width: "100%" }}
+      scroll={{ x: 600 }}
+      size="middle"
     />
   );
 };

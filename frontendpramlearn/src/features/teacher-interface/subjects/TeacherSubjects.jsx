@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import {
   Card,
   Row,
@@ -93,6 +94,9 @@ const TeacherSubjects = () => {
 
   return (
     <div style={{ padding: "24px" }}>
+      <Helmet>
+        <title>Mata Pelajaran | PramLearn</title>
+      </Helmet>
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
         <Title level={2} style={{ margin: 0, color: "#11418b" }}>

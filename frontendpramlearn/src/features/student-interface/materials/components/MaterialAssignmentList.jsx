@@ -30,12 +30,10 @@ const MaterialAssignmentList = ({
   );
   const { getTimeRemaining } = useAssignmentTimer();
 
-  // ✅ IMPROVED: Better tracking refs
   const recordedAssignments = useRef(new Set());
   const recordingInProgress = useRef(new Set());
   const initialLoadComplete = useRef(false);
 
-  // ✅ THROTTLED RECORD FUNCTION
   const throttledRecordAssignmentSubmission = useCallback(
     async (assignmentId) => {
       const assignmentKey = assignmentId.toString();
@@ -67,7 +65,6 @@ const MaterialAssignmentList = ({
     [recordAssignmentSubmission]
   );
 
-  // ✅ IMPROVED: Auto-record with throttling
   useEffect(() => {
     if (
       !enrichedAssignments ||
@@ -103,14 +100,12 @@ const MaterialAssignmentList = ({
     completedActivities,
   ]);
 
-  // ✅ INITIAL LOAD TRACKING
   useEffect(() => {
     if (enrichedAssignments && enrichedAssignments.length > 0) {
       initialLoadComplete.current = true;
     }
   }, [enrichedAssignments]);
 
-  // ✅ RESET SAAT MATERIAL BERUBAH
   // useEffect(() => {
   //   recordedAssignments.current.clear();
   //   recordingInProgress.current.clear();

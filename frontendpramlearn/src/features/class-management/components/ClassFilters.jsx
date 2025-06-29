@@ -11,7 +11,7 @@ const ClassFilters = ({
   handleRowsPerPageChange,
   handleAddClassClick,
   user,
-  loading = false, // Tambahkan prop loading
+  loading = false,
 }) => {
   const isMobile = window.innerWidth <= 768;
   // Jika teacher, 2 kolom; jika admin/operator, 3 kolom

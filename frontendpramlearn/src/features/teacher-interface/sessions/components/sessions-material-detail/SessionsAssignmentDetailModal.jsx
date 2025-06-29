@@ -258,10 +258,6 @@ const SessionsAssignmentDetailModal = ({
           type="link"
           size="small"
           icon={<EyeOutlined />}
-          onClick={() => {
-            // TODO: Implement view submission detail
-            console.log("View submission detail:", record);
-          }}
         >
           Detail
         </Button>

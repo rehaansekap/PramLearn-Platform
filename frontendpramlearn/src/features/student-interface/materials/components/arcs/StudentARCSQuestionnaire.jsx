@@ -27,7 +27,6 @@ const { TextArea } = Input;
 const StudentARCSQuestionnaire = ({ questionnaire, materialSlug, onBack }) => {
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
 
-  // ✅ GUNAKAN HOOK yang sudah ada, tapi ambil dari questionnaireDetail
   const {
     questionnaireDetail,
     currentQuestionIndex,
@@ -46,7 +45,6 @@ const StudentARCSQuestionnaire = ({ questionnaire, materialSlug, onBack }) => {
     setError,
   } = useStudentARCS(materialSlug);
 
-  // ✅ USE questionnaireDetail dari hook sebagai data source
   const activeQuestionnaire = questionnaireDetail || questionnaire;
   const currentQuestion =
     getCurrentQuestion() ||
@@ -196,7 +194,6 @@ const StudentARCSQuestionnaire = ({ questionnaire, materialSlug, onBack }) => {
     }
   };
 
-  // ✅ VALIDASI QUESTIONNAIRE
   if (
     !activeQuestionnaire ||
     !activeQuestionnaire.questions ||

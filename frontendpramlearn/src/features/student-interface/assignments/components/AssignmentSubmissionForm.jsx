@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; // Add this import
+import { Helmet } from "react-helmet";
 import { Layout, Alert, Spin, message } from "antd";
 import useAssignmentSubmission from "../hooks/useAssignmentSubmission";
 import AssignmentSubmissionHeader from "./assignment-submission/AssignmentSubmissionHeader";
@@ -156,6 +157,9 @@ const AssignmentSubmissionForm = ({
         minHeight: "calc(100vh - 64px)",
       }}
     >
+      <Helmet>
+        <title>Pengerjaan Tugas | PramLearn</title>
+      </Helmet>
       <AssignmentSubmissionHeader
         assignment={assignment}
         currentQuestionIndex={currentQuestionIndex}

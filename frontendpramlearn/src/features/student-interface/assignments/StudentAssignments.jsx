@@ -128,7 +128,6 @@ const StudentAssignments = () => {
       const status = getAssignmentStatus(assignment);
       if (status.status === "submitted" || status.status === "graded") {
         setCurrentView("history");
-        // ✅ TAMBAHKAN: Fetch submissions sebelum navigate
         fetchSubmissionHistory(assignment.id);
         navigate(
           `/student/assignments/${assignment.slug || assignment.id}/results`

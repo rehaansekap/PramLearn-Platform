@@ -1,4 +1,3 @@
-// frontendpramlearn/src/hooks/useAvailableStudents.jsx
 import { useState, useEffect, useContext } from "react";
 import api from "../../../api";
 import { AuthContext } from "../../../context/AuthContext";

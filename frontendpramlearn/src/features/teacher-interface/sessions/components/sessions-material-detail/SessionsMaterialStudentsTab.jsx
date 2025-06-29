@@ -197,10 +197,10 @@ const SessionsMaterialStudentsTab = ({
   );
 
   const calculateStudentStats = () => {
-    if (students.length === 0)
-      return { online: 0, excellent: 0, needsAttention: 0 };
+    // if (students.length === 0)
+    //   return { online: 0, excellent: 0, needsAttention: 0 };
 
-    const online = students.filter((s) => s.is_online).length;
+    // const online = students.filter((s) => s.is_online).length;
     const excellent = students.filter(
       (s) => (s.average_grade || 0) >= 85
     ).length;
@@ -208,8 +208,10 @@ const SessionsMaterialStudentsTab = ({
       (s) => (s.completion_percentage || 0) < 50
     ).length;
 
-    return { online, excellent, needsAttention };
+    return { excellent, needsAttention };
   };
+
+  const onlineCount = students.filter((s) => isUserOnline(s)).length;
 
   const studentStats = calculateStudentStats();
 
@@ -223,7 +225,7 @@ const SessionsMaterialStudentsTab = ({
     },
     {
       title: "Online",
-      value: `${studentStats.online} / ${students.length}`,
+      value: `${onlineCount} / ${students.length}`,
       icon: <CheckCircleOutlined style={{ color: "#52c41a" }} />,
       color: "#52c41a",
       bgColor: "#f6ffed",

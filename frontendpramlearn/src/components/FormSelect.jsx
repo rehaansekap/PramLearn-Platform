@@ -1,4 +1,3 @@
-// frontendpramlearn/src/components/FormSelect.jsx
 import React from "react";
 
 const FormSelect = ({ label, name, value, onChange, options, required }) => {

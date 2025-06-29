@@ -126,7 +126,7 @@ const AssignmentSubmissionDetailModal = ({
       open={open}
       onCancel={onClose}
       footer={null}
-      width={window.innerWidth <= 768 ? "95%" : 900} // Responsif untuk mobile
+      width={window.innerWidth <= 768 ? "95%" : 900}
       centered
       className="assignment-submission-detail-modal"
       destroyOnClose
@@ -188,17 +188,17 @@ const AssignmentSubmissionDetailModal = ({
               background: "#f8f9fa",
               border: "1px solid #e9ecef",
               borderRadius: "8px",
-              padding: window.innerWidth <= 768 ? "12px" : "16px", // Padding responsif
+              padding: window.innerWidth <= 768 ? "12px" : "16px",
               marginBottom: "20px",
             }}
           >
             <div
               style={{
                 display: "flex",
-                flexDirection: window.innerWidth <= 768 ? "column" : "row", // Responsif untuk mobile
+                flexDirection: window.innerWidth <= 768 ? "column" : "row",
                 justifyContent: "space-between",
                 alignItems: "center",
-                gap: window.innerWidth <= 768 ? 8 : 16, // Jarak antar elemen
+                gap: window.innerWidth <= 768 ? 8 : 16,
               }}
             >
               <div>
@@ -271,7 +271,7 @@ const AssignmentSubmissionDetailModal = ({
             style={{
               width: "100%",
             }}
-            scroll={{ x: window.innerWidth <= 768 ? 600 : undefined }} // Tambahkan scroll horizontal untuk mobile
+            scroll={{ x: window.innerWidth <= 768 ? 600 : undefined }}
             size="middle"
           />
         </>

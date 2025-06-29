@@ -29,7 +29,7 @@ const AppBreadcrumb = () => {
 
   useEffect(() => {
     const fetchDynamicData = async () => {
-      // Subject Detail Page - NEW PATH: /admin/management/subject/:subjectSlug
+      
       const subjectMatch = matchPath(
         { path: `/${userRolePath}/management/subject/:subjectSlug`, end: true },
         location.pathname
@@ -59,7 +59,6 @@ const AppBreadcrumb = () => {
         }
       }
 
-      // Material Detail Page - NEW PATH: /admin/management/material/:materialId
       const materialMatch = matchPath(
         {
           path: `/${userRolePath}/management/material/:materialSlug`,

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import {
   Card,
   Row,
@@ -228,6 +229,13 @@ const TeacherSubjectDetail = () => {
 
   return (
     <div style={{ padding: "24px" }}>
+      <Helmet>
+        <title>
+          {subject_info.name
+            ? `${subject_info.name} | PramLearn`
+            : "Detail Mata Pelajaran | PramLearn"}
+        </title>
+      </Helmet>
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
         <Button

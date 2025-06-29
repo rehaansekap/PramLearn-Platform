@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Helmet } from "react-helmet";
 import { Spin, Alert, Button, Space } from "antd";
 import { LoadingOutlined, ReloadOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
@@ -146,6 +147,9 @@ const TeacherSessions = () => {
         padding: isMobile ? "16px" : "24px",
       }}
     >
+      <Helmet>
+        <title>Sesi Pembelajaran | PramLearn</title>
+      </Helmet>
       <div
         style={{
           maxWidth: 1400,

@@ -416,26 +416,45 @@ const SessionsMaterialQuizzesTab = ({ materialSlug, quizzes, groups }) => {
     <div>
       {/* Header Section */}
       <div style={{ marginBottom: 24 }}>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: 16,
-          }}
-        >
-          <Title level={4} style={{ margin: 0 }}>
-            📝 Quiz Management
-          </Title>
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={handleAddQuiz}
-            size={isMobile ? "default" : "large"}
-            loading={actionLoading.creating}
+        <div style={{ marginBottom: 24, textAlign: "center" }}>
+          <QuestionCircleOutlined
+            style={{
+              fontSize: isMobile ? 24 : 32,
+              color: "#11418b",
+              marginBottom: isMobile ? 8 : 12,
+            }}
+          />
+          <Title
+            level={isMobile ? 5 : 4}
+            style={{
+              marginBottom: 8,
+              fontSize: isMobile ? "16px" : "20px",
+              fontWeight: 700,
+              color: "#11418b",
+            }}
           >
-            Buat Quiz
-          </Button>
+            Manajemen Quiz
+          </Title>
+          <Text
+            type="secondary"
+            style={{
+              fontSize: isMobile ? "12px" : "14px",
+              color: "#666",
+            }}
+          >
+            Kelola quiz kelompok dan pantau progres pengerjaan quiz siswa
+          </Text>
+          <div style={{ marginTop: 16 }}>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={handleAddQuiz}
+              size={isMobile ? "small" : "middle"}
+              loading={actionLoading.creating}
+            >
+              {isMobile ? "Buat" : "Buat Quiz"}
+            </Button>
+          </div>
         </div>
 
         {/* Statistics Cards */}

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Helmet } from "react-helmet";
 import { Alert, Spin } from "antd";
 import GradeHeader from "./components/overview/GradeHeader";
 import GradeStats from "./components/overview/GradeStats";
@@ -98,6 +99,9 @@ const StudentGradeOverview = () => {
         minHeight: "calc(100vh - 64px)",
       }}
     >
+      <Helmet>
+        <title>Rincian Nilai | PramLearn</title>
+      </Helmet>
       <GradeHeader statistics={statistics} totalGrades={totalGrades} />
 
       <GradeStats

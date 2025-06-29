@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Button, Badge } from "antd";
-import { TrophyOutlined, FireOutlined, CloseOutlined } from "@ant-design/icons"; // ← TAMBAH CloseOutlined
+import { TrophyOutlined, FireOutlined, CloseOutlined } from "@ant-design/icons";
 
 const ProgressFloatingButton = ({
   progressPercent,
   onClick,
   getProgressColor,
-  isOpen = false, // ← TAMBAH PROP INI
+  isOpen = false,
 }) => {
   const [pulse, setPulse] = useState(false);
 
@@ -84,14 +84,14 @@ const ProgressFloatingButton = ({
             type="primary"
             shape="circle"
             size="large"
-            icon={isOpen ? <CloseOutlined /> : <TrophyOutlined />} // ← UBAH ICON BERDASARKAN STATUS
+            icon={isOpen ? <CloseOutlined /> : <TrophyOutlined />}
             onClick={onClick}
             style={{
               width: 64,
               height: 64,
               fontSize: 24,
               background: isOpen
-                ? "linear-gradient(135deg, #ff4757 0%, #ff3742 100%)" // ← WARNA MERAH UNTUK CLOSE
+                ? "linear-gradient(135deg, #ff4757 0%, #ff3742 100%)"
                 : "linear-gradient(135deg, #001529 0%, #3a3f5c 60%, #43cea2 100%)",
               border: "none",
               boxShadow: isOpen
@@ -101,7 +101,7 @@ const ProgressFloatingButton = ({
               alignItems: "center",
               justifyContent: "center",
               transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-              transform: isOpen ? "rotate(90deg)" : "rotate(0deg)", // ← ROTASI SAAT CLOSE
+              transform: isOpen ? "rotate(90deg)" : "rotate(0deg)",
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = isOpen

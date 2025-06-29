@@ -1,5 +1,6 @@
 import React from "react";
 import { Result, Button, Card } from "antd";
+import { Helmet } from "react-helmet";
 import { HomeOutlined, ArrowLeftOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
@@ -46,6 +47,9 @@ const NotFound = () => {
         overflow: "hidden",
       }}
     >
+      <Helmet>
+        <title>Halaman Tidak Ditemukan | PramLearn</title>
+      </Helmet>
       {/* Background Decoration */}
       <div
         style={{

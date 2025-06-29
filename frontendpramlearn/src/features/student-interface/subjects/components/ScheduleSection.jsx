@@ -21,7 +21,6 @@ const ScheduleSection = ({ schedules }) => {
       Sabtu: 6,
     };
 
-    // PERBAIKAN: Gunakan field yang sesuai dengan API response
     const nextSchedule = schedules.find((schedule) => {
       const scheduleDay = dayMap[schedule.day_of_week || schedule.day];
       return scheduleDay >= today;

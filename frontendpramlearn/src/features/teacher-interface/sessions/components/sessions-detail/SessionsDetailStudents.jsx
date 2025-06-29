@@ -134,7 +134,7 @@ const SessionsDetailStudents = ({
     if (students.length === 0)
       return { online: 0, excellent: 0, needsAttention: 0 };
 
-    const online = students.filter((s) => s.is_online).length;
+    const online = students.filter((s) => isUserOnline(s)).length;
     const excellent = students.filter(
       (s) => (s.average_grade || 0) >= 85
     ).length;

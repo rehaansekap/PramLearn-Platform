@@ -106,7 +106,6 @@ class MaterialDetailSerializer(serializers.ModelSerializer):
         for quiz in quizzes:
             quiz_dict = QuizSerializer(quiz).data
 
-            # ✅ TAMBAHAN: Cek quiz completion status untuk user
             if user and user.is_authenticated:
                 try:
                     is_completed = False
@@ -145,7 +144,6 @@ class MaterialDetailSerializer(serializers.ModelSerializer):
                                 "score": attempt.score,
                             }
 
-                    # ✅ SET COMPLETION STATUS
                     quiz_dict["completed"] = is_completed
                     quiz_dict["is_completed"] = is_completed
 

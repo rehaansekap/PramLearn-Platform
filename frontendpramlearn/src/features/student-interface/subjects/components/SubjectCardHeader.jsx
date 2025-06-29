@@ -5,7 +5,6 @@ import { UserOutlined } from "@ant-design/icons";
 const { Text, Title } = Typography;
 
 const SubjectCardHeader = ({ subject }) => {
-  // PERBAIKAN: Hitung progress berdasarkan materials atau gunakan progress dari API
   const calculateProgress = () => {
     if (subject.progress !== undefined && subject.progress !== null) {
       return subject.progress;

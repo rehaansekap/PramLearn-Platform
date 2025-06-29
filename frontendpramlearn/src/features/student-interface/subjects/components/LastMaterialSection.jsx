@@ -5,7 +5,6 @@ import { FileTextOutlined, PlayCircleOutlined } from "@ant-design/icons";
 const { Text } = Typography;
 
 const LastMaterialSection = ({ subject, onQuickAccessMaterial }) => {
-  // PERBAIKAN: Ambil progress dari material yang sesuai
   const getLastMaterialProgress = () => {
     if (subject.last_material_progress !== undefined) {
       return subject.last_material_progress;

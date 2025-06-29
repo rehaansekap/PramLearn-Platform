@@ -5,7 +5,7 @@ const useGroupData = (materialId) => {
   const [groups, setGroups] = useState([]);
   const [groupMembers, setGroupMembers] = useState({});
   const [loading, setLoading] = useState(false);
-  const [membersLoading, setMembersLoading] = useState(false); // Tambahkan loading khusus untuk members
+  const [membersLoading, setMembersLoading] = useState(false); 
 
   const fetchGroups = async () => {
     if (!materialId) return;

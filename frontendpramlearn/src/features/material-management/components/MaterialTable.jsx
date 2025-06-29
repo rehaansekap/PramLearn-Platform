@@ -101,7 +101,6 @@ const MaterialTable = ({
     setActionLoading((prev) => ({ ...prev, [viewKey]: true }));
 
     try {
-      // GUNAKAN materialSlug bukan materialId
       navigate(`/${userRolePath}/management/material/${materialSlug}`);
     } catch (error) {
       console.error("Error viewing material detail:", error);

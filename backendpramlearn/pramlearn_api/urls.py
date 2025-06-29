@@ -432,14 +432,14 @@ urlpatterns = [
         name="session-material-quizzes",
     ),
     path(
-        "api/teacher/sessions/material/<slug:material_slug>/quizzes/<int:quiz_id>/",
-        TeacherSessionMaterialQuizView.as_view(),
-        name="teacher-session-material-quiz-update",
-    ),
-    path(
         "api/teacher/sessions/material/<str:material_slug>/quizzes/<int:quiz_id>/",
         TeacherSessionQuizDetailView.as_view(),
         name="session-quiz-detail",
+    ),
+    path(
+        "api/teacher/sessions/material/<slug:material_slug>/quizzes/<int:quiz_id>/",
+        TeacherSessionMaterialQuizView.as_view(),
+        name="teacher-session-material-quiz-update",
     ),
     path(
         "api/teacher/sessions/material/<str:material_slug>/quizzes/<int:quiz_id>/ranking/",

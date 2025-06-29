@@ -24,7 +24,6 @@ class ARCSQuestionnaire(models.Model):
     questionnaire_type = models.CharField(max_length=10, choices=QUESTIONNAIRE_TYPES)
     is_active = models.BooleanField(default=True)
 
-    # ✅ TAMBAHAN: Field masa berlaku
     start_date = models.DateTimeField(
         null=True, blank=True, help_text="Waktu mulai kuesioner dapat diisi"
     )
@@ -41,7 +40,7 @@ class ARCSQuestionnaire(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     slug = models.SlugField(max_length=200, unique=True, blank=True)
-    
+
     def save(self, *args, **kwargs):
         if not self.slug:
             base_slug = slugify(f"{self.title}-{self.questionnaire_type}")
@@ -51,7 +50,7 @@ class ARCSQuestionnaire(models.Model):
             while ARCSQuestionnaire.objects.filter(slug=self.slug).exists():
                 self.slug = f"{base_slug}-{unique_id}-{counter}"
                 counter += 1
-                
+
         super().save(*args, **kwargs)
 
     @property

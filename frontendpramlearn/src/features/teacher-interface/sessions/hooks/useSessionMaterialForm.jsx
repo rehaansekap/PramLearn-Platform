@@ -21,9 +21,7 @@ const useSessionMaterialForm = (materialId, subjectId, onSuccess) => {
   const fetchMaterialData = async () => {
     try {
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      const response = await api.get(
-        `materials/${materialId}/?slug=${materialId}`
-      );
+      const response = await api.get(`materials/${materialId}/`);
       const material = response.data;
 
       setFormData({

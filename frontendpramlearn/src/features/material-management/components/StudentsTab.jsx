@@ -380,8 +380,8 @@ const StudentsTab = ({ studentDetails, classId, loading, materialId }) => {
                 gap: 12,
                 flexWrap: "wrap",
                 justifyContent: "center",
-                flexDirection: isMobile ? "column" : "row", // Tambahkan ini
-                alignItems: "center", // Agar tombol tetap rata tengah di mobile
+                flexDirection: isMobile ? "column" : "row",
+                alignItems: "center",
               }}
             >
               <Button
@@ -390,8 +390,8 @@ const StudentsTab = ({ studentDetails, classId, loading, materialId }) => {
                 onClick={refetchAttendance}
                 loading={attendanceLoading}
                 style={{
-                  minWidth: isMobile ? 180 : 140, // Lebar tombol lebih besar di mobile
-                  width: isMobile ? "100%" : undefined, // Full width di mobile
+                  minWidth: isMobile ? 180 : 140,
+                  width: isMobile ? "100%" : undefined,
                 }}
               >
                 Refresh
@@ -429,7 +429,7 @@ const StudentsTab = ({ studentDetails, classId, loading, materialId }) => {
         }}
         className="user-table-responsive"
         style={{ width: "100%" }}
-        scroll={{ x: isMobile ? 600 : undefined }} // Tambahkan scroll horizontal untuk mobile
+        scroll={{ x: isMobile ? 600 : undefined }}
         size="middle"
       />
 

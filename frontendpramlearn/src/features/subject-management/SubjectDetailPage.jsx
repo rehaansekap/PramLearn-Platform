@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import {
   Card,
   Typography,
@@ -80,15 +81,15 @@ const SubjectDetailPage = () => {
   }, []);
 
   useEffect(() => {
-    console.log("Received subjectSlug:", subjectSlug);
+    // console.log("Received subjectSlug:", subjectSlug);
     const fetchSubjectId = async () => {
       setInitialLoading(true);
       try {
         if (token) {
           api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-          console.log(`Fetching subject with slug: ${subjectSlug}`);
+          // console.log(`Fetching subject with slug: ${subjectSlug}`);
           const response = await api.get(`subjects/?slug=${subjectSlug}`);
-          console.log("API Response:", response.data);
+          // console.log("API Response:", response.data);
           const filteredSubject = response.data.find(
             (subject) => subject.slug === subjectSlug
           );
@@ -379,69 +380,104 @@ const SubjectDetailPage = () => {
   }
 
   return (
-    <Card
-      style={{
-        maxWidth: 900,
-        margin: "0 auto",
-        background: "#fff",
-        boxShadow: "0 2px 8px #f0f1f2",
-        padding: 24,
-      }}
-    >
-      <Title
-        level={2}
+    <>
+      <Helmet>
+        <title>
+          {subjectDetail?.name || "Detail Mata Pelajaran"} | PramLearn
+        </title>
+      </Helmet>
+      <Card
         style={{
-          textAlign: "center",
-          marginBottom: 20,
-          fontWeight: "bold",
-          color: "#11418b",
+          maxWidth: 900,
+          margin: "0 auto",
+          background: "#fff",
+          boxShadow: "0 2px 8px #f0f1f2",
+          padding: 24,
         }}
       >
-        {subjectDetail?.name || "Subject Detail"}
-      </Title>
+        <Title
+          level={2}
+          style={{
+            textAlign: "center",
+            marginBottom: 20,
+            fontWeight: "bold",
+            color: "#11418b",
+          }}
+        >
+          {subjectDetail?.name || "Subject Detail"}
+        </Title>
 
-      {error && (
-        <Alert
-          message="Error"
-          description={error.message}
-          type="error"
-          showIcon
-          style={{ marginBottom: 16 }}
-        />
-      )}
-
-      {/* Loading untuk materials data - konsisten dengan ClassManagement */}
-      {subjectDetailLoading ? (
-        <div style={{ textAlign: "center", margin: "40px 0" }}>
-          <Spin indicator={antIcon} />
-          <p style={{ marginTop: 16, color: "#666" }}>
-            Loading materials data...
-          </p>
-        </div>
-      ) : (
-        <>
-          <MaterialFilters
-            searchText={searchText}
-            rowsPerPage={rowsPerPage}
-            handleSearchTextChange={(e) => setSearchText(e.target.value)}
-            handleRowsPerPageChange={setRowsPerPage}
-            handleAddMaterialClick={handleAddMaterialClick}
-            user={user}
-            loading={isPageLoading}
+        {error && (
+          <Alert
+            message="Error"
+            description={error.message}
+            type="error"
+            showIcon
+            style={{ marginBottom: 16 }}
           />
+        )}
 
-          <div
-            className="material-action-buttons"
-            style={{
-              display: "flex",
-              flexDirection: isMobile ? "column" : "row",
-              gap: 12,
-              marginBottom: 16,
-              alignItems: isMobile ? "stretch" : "center",
-              justifyContent: "space-between",
-            }}
-          >
-            {user?.role !== 2 && (
+        {/* Loading untuk materials data - konsisten dengan ClassManagement */}
+        {subjectDetailLoading ? (
+          <div style={{ textAlign: "center", margin: "40px 0" }}>
+            <Spin indicator={antIcon} />
+            <p style={{ marginTop: 16, color: "#666" }}>
+              Loading materials data...
+            </p>
+          </div>
+        ) : (
+          <>
+            <MaterialFilters
+              searchText={searchText}
+              rowsPerPage={rowsPerPage}
+              handleSearchTextChange={(e) => setSearchText(e.target.value)}
+              handleRowsPerPageChange={setRowsPerPage}
+              handleAddMaterialClick={handleAddMaterialClick}
+              user={user}
+              loading={isPageLoading}
+            />
+
+            <div
+              className="material-action-buttons"
+              style={{
+                display: "flex",
+                flexDirection: isMobile ? "column" : "row",
+                gap: 12,
+                marginBottom: 16,
+                alignItems: isMobile ? "stretch" : "center",
+                justifyContent: "space-between",
+              }}
+            >
+              {user?.role !== 2 && (
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: isMobile ? "column" : "row",
+                    gap: isMobile ? 8 : 12,
+                    width: isMobile ? "100%" : "auto",
+                  }}
+                >
+                  <Button
+                    type="primary"
+                    danger
+                    onClick={handleBulkDelete}
+                    disabled={selectedRowKeys.length === 0}
+                    loading={bulkDeleteLoading}
+                    style={{
+                      height: 40,
+                      fontWeight: 600,
+                      borderRadius: 8,
+                      padding: "0 24px",
+                      minWidth: 140,
+                    }}
+                  >
+                    {bulkDeleteLoading
+                      ? `Menghapus ${selectedRowKeys.length} materials...`
+                      : `Hapus ${selectedRowKeys.length || 0} materials`}
+                  </Button>
+                </div>
+              )}
+
               <div
                 style={{
                   display: "flex",
@@ -450,147 +486,119 @@ const SubjectDetailPage = () => {
                   width: isMobile ? "100%" : "auto",
                 }}
               >
-                <Button
-                  type="primary"
-                  danger
-                  onClick={handleBulkDelete}
-                  disabled={selectedRowKeys.length === 0}
-                  loading={bulkDeleteLoading}
-                  style={{
-                    height: 40,
-                    fontWeight: 600,
-                    borderRadius: 8,
-                    padding: "0 24px",
-                    minWidth: 140,
-                  }}
+                <Dropdown
+                  overlay={
+                    <Menu>
+                      {columnOptions.map((option) => (
+                        <Menu.Item key={option.value}>
+                          <Checkbox
+                            checked={visibleColumns.includes(option.value)}
+                            onChange={(e) => {
+                              const newColumns = e.target.checked
+                                ? [...visibleColumns, option.value]
+                                : visibleColumns.filter(
+                                    (col) => col !== option.value
+                                  );
+                              handleColumnVisibilityChange(newColumns);
+                            }}
+                          >
+                            {option.label}
+                          </Checkbox>
+                        </Menu.Item>
+                      ))}
+                    </Menu>
+                  }
+                  trigger={["click"]}
                 >
-                  {bulkDeleteLoading
-                    ? `Menghapus ${selectedRowKeys.length} materials...`
-                    : `Hapus ${selectedRowKeys.length || 0} materials`}
-                </Button>
-              </div>
-            )}
+                  <Button
+                    style={{
+                      height: 40,
+                      borderRadius: 8,
+                      padding: "0 16px",
+                    }}
+                  >
+                    Column Visibility
+                  </Button>
+                </Dropdown>
 
-            <div
-              style={{
-                display: "flex",
-                flexDirection: isMobile ? "column" : "row",
-                gap: isMobile ? 8 : 12,
-                width: isMobile ? "100%" : "auto",
-              }}
-            >
-              <Dropdown
-                overlay={
-                  <Menu>
-                    {columnOptions.map((option) => (
-                      <Menu.Item key={option.value}>
-                        <Checkbox
-                          checked={visibleColumns.includes(option.value)}
-                          onChange={(e) => {
-                            const newColumns = e.target.checked
-                              ? [...visibleColumns, option.value]
-                              : visibleColumns.filter(
-                                  (col) => col !== option.value
-                                );
-                            handleColumnVisibilityChange(newColumns);
-                          }}
-                        >
-                          {option.label}
-                        </Checkbox>
-                      </Menu.Item>
-                    ))}
-                  </Menu>
-                }
-                trigger={["click"]}
-              >
                 <Button
+                  className="export-btn"
+                  onClick={() => exportToFile("csv")}
+                  loading={exportLoading.export_csv}
                   style={{
                     height: 40,
                     borderRadius: 8,
                     padding: "0 16px",
                   }}
                 >
-                  Column Visibility
+                  {exportLoading.export_csv ? "Exporting..." : "Export CSV"}
                 </Button>
-              </Dropdown>
 
-              <Button
-                className="export-btn"
-                onClick={() => exportToFile("csv")}
-                loading={exportLoading.export_csv}
-                style={{
-                  height: 40,
-                  borderRadius: 8,
-                  padding: "0 16px",
-                }}
-              >
-                {exportLoading.export_csv ? "Exporting..." : "Export CSV"}
-              </Button>
-
-              <Button
-                className="export-btn"
-                onClick={() => exportToFile("xlsx")}
-                loading={exportLoading.export_xlsx}
-                style={{
-                  height: 40,
-                  borderRadius: 8,
-                  padding: "0 16px",
-                }}
-              >
-                {exportLoading.export_xlsx ? "Exporting..." : "Export Excel"}
-              </Button>
-            </div>
-          </div>
-
-          <MaterialTable
-            subjectDetail={subjectDetail}
-            deleteMaterial={deleteMaterial}
-            fetchSubjectDetail={fetchSubjectDetail}
-            onEditMaterial={handleEditMaterial}
-            rowSelection={
-              user?.role !== 2
-                ? {
-                    selectedRowKeys,
-                    onChange: setSelectedRowKeys,
-                  }
-                : null
-            }
-            visibleColumns={visibleColumns}
-            rowsPerPage={rowsPerPage}
-            loading={false} // Table loading dihandle oleh parent
-            modalLoading={materialLoading}
-            userRolePath={userRolePath}
-          />
-
-          {/* Modal dengan loading overlay yang konsisten */}
-          <Modal
-            open={isModalVisible}
-            onCancel={handleModalCancel}
-            footer={null}
-            centered
-            destroyOnClose
-            className="class-form-modal"
-          >
-            {materialLoading ? (
-              <div style={{ textAlign: "center", padding: "60px 0" }}>
-                <Spin indicator={antIcon} />
-                <p style={{ marginTop: 16, color: "#666" }}>
-                  Loading material data...
-                </p>
+                <Button
+                  className="export-btn"
+                  onClick={() => exportToFile("xlsx")}
+                  loading={exportLoading.export_xlsx}
+                  style={{
+                    height: 40,
+                    borderRadius: 8,
+                    padding: "0 16px",
+                  }}
+                >
+                  {exportLoading.export_xlsx ? "Exporting..." : "Export Excel"}
+                </Button>
               </div>
-            ) : (
-              <MaterialForm
-                materialId={selectedMaterialId}
-                subjectId={subjectId}
-                onSuccess={handleSuccess}
-                isSubmitting={isSubmitting}
-                setIsSubmitting={setIsSubmitting}
-              />
-            )}
-          </Modal>
-        </>
-      )}
-    </Card>
+            </div>
+
+            <MaterialTable
+              subjectDetail={subjectDetail}
+              deleteMaterial={deleteMaterial}
+              fetchSubjectDetail={fetchSubjectDetail}
+              onEditMaterial={handleEditMaterial}
+              rowSelection={
+                user?.role !== 2
+                  ? {
+                      selectedRowKeys,
+                      onChange: setSelectedRowKeys,
+                    }
+                  : null
+              }
+              visibleColumns={visibleColumns}
+              rowsPerPage={rowsPerPage}
+              loading={false} // Table loading dihandle oleh parent
+              modalLoading={materialLoading}
+              userRolePath={userRolePath}
+            />
+
+            {/* Modal dengan loading overlay yang konsisten */}
+            <Modal
+              open={isModalVisible}
+              onCancel={handleModalCancel}
+              footer={null}
+              centered
+              destroyOnClose
+              className="class-form-modal"
+            >
+              {materialLoading ? (
+                <div style={{ textAlign: "center", padding: "60px 0" }}>
+                  <Spin indicator={antIcon} />
+                  <p style={{ marginTop: 16, color: "#666" }}>
+                    Loading material data...
+                  </p>
+                </div>
+              ) : (
+                <MaterialForm
+                  materialId={selectedMaterialId}
+                  subjectId={subjectId}
+                  onSuccess={handleSuccess}
+                  isSubmitting={isSubmitting}
+                  setIsSubmitting={setIsSubmitting}
+                />
+              )}
+            </Modal>
+          </>
+        )}
+      </Card>
+    </>
   );
 };
 

@@ -8,6 +8,7 @@ import RecentActivitiesCard from "./components/RecentActivitiesCard";
 import GradeSummaryCard from "./components/GradeSummaryCard"; // NEW: Import GradeSummaryCard
 import UpcomingDeadlinesCard from "./components/UpcomingDeadlinesCard";
 import TodayScheduleCard from "./components/TodayScheduleCard";
+import { Helmet } from "react-helmet";
 
 const StudentDashboard = () => {
   const { dashboard, loading, error, user } = useStudentDashboard();
@@ -56,6 +57,9 @@ const StudentDashboard = () => {
         padding: "24px",
       }}
     >
+      <Helmet>
+        <title>Dashboard | PramLearn</title>
+      </Helmet>
       <div
         style={{
           maxWidth: "1400px",

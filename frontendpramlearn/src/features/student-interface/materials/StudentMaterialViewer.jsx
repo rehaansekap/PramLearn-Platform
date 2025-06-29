@@ -3,13 +3,14 @@ import { useParams } from "react-router-dom";
 
 import useStudentMaterialAccess from "./hooks/useStudentMaterialAccess";
 import useSubjectData from "./hooks/useSubjectData";
-import useStudentARCS from "./hooks/useStudentARCS"; // [NEW] Import ARCS hook
+import useStudentARCS from "./hooks/useStudentARCS";
 import MaterialHeader from "./components/layout/MaterialHeader";
 import MaterialBreadcrumb from "./components/layout/MaterialBreadcrumb";
 import MaterialContentTabs from "./components/layout/MaterialContentTabs";
 import MaterialLoadingState from "./components/layout/MaterialLoadingState";
 import MaterialErrorState from "./components/layout/MaterialErrorState";
 import MaterialProgressTracker from "./components/progress/MaterialProgressTracker";
+import { Helmet } from "react-helmet";
 
 const StudentMaterialViewer = () => {
   const { materialSlug } = useParams();
@@ -28,7 +29,6 @@ const StudentMaterialViewer = () => {
 
   const { subjectData } = useSubjectData(material?.subject);
 
-  // [NEW] ARCS hook untuk mendapatkan informasi kuesioner
   const { questionnaires: arcsQuestionnaires } = useStudentARCS(materialSlug);
 
   const [activeTab, setActiveTab] = useState("1");
@@ -45,13 +45,20 @@ const StudentMaterialViewer = () => {
         minHeight: "calc(100vh - 64px)",
       }}
     >
+      <Helmet>
+        <title>
+          {material.title
+            ? `${material.title} | PramLearn`
+            : "Detail Materi | PramLearn"}
+        </title>
+      </Helmet>
       {/* <MaterialBreadcrumb materialTitle={material.title} /> */}
 
       <MaterialHeader
         material={material}
         progress={progress}
         subjectData={subjectData}
-        arcsQuestionnaires={arcsQuestionnaires} // [NEW] Pass ARCS data ke header
+        arcsQuestionnaires={arcsQuestionnaires}
       />
 
       <MaterialContentTabs
@@ -64,8 +71,8 @@ const StudentMaterialViewer = () => {
         recordQuizCompletion={recordQuizCompletion}
         recordAssignmentSubmission={recordAssignmentSubmission}
         completedActivities={completedActivities}
-        arcsQuestionnaires={arcsQuestionnaires} // [NEW] Pass ARCS data ke tabs
-        materialSlug={materialSlug} // [NEW] Pass materialSlug untuk ARCS
+        arcsQuestionnaires={arcsQuestionnaires}
+        materialSlug={materialSlug}
       />
 
       <MaterialProgressTracker

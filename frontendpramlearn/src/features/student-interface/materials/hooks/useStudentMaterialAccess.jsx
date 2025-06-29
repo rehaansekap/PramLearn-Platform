@@ -134,7 +134,6 @@ const useStudentMaterialAccess = (materialSlug) => {
 
       const activityKeys = new Set(
         activities.map((activity) => {
-          // ✅ PERBAIKAN: Handle berbagai jenis activity
           if (activity.activity_type === "quiz_completed") {
             return `quiz_completed_${activity.content_index}`;
           } else if (activity.activity_type === "assignment_submitted") {
@@ -267,7 +266,6 @@ const useStudentMaterialAccess = (materialSlug) => {
         return;
       }
 
-      // ✅ CEK APAKAH SUDAH 100% COMPLETED DARI BACKEND
       const currentProgress = progressRef.current.completion_percentage || 0;
       if (
         currentProgress >= 100 &&
@@ -279,7 +277,6 @@ const useStudentMaterialAccess = (materialSlug) => {
         return;
       }
 
-      // ✅ IMPROVED KEY GENERATION
       let activityKey;
       if (activityType === "quiz_completed") {
         activityKey = `${activityType}_${activityData.quiz_id}`;
@@ -304,7 +301,6 @@ const useStudentMaterialAccess = (materialSlug) => {
       let progressIncrement = 0;
       const timeIncrement = activityData.timeIncrement || 10;
 
-      // ✅ HANYA HITUNG PROGRESS INCREMENT JIKA BELUM 100%
       if (currentProgress < 100) {
         switch (activityType) {
           case "pdf_opened":
@@ -355,7 +351,6 @@ const useStudentMaterialAccess = (materialSlug) => {
         }
       }
 
-      // ✅ SELALU COBA RECORD KE BACKEND (biar backend yang validasi)
       try {
         let backendData;
         if (activityType === "quiz_completed") {
@@ -385,7 +380,6 @@ const useStudentMaterialAccess = (materialSlug) => {
         // Hanya update progress jika backend sukses (status 201) dan ada increment
         if (response.status === 201 && progressIncrement > 0) {
           const newProgress = await updateProgress((prev) => {
-            // ✅ JANGAN MELEBIHI 100%
             const newPercentage = Math.min(
               100,
               (prev.completion_percentage || 0) + progressIncrement
@@ -432,7 +426,6 @@ const useStudentMaterialAccess = (materialSlug) => {
       const activityKey = `quiz_completed_${quizId}`;
       const globalKey = `${materialId}_${quizId}_${isGroupQuiz}`;
 
-      // ✅ GLOBAL & LOCAL DEDUPLICATION
       if (
         completedActivities.has(activityKey) ||
         globalRecordingQuizzes.has(globalKey)
@@ -443,7 +436,6 @@ const useStudentMaterialAccess = (materialSlug) => {
         return;
       }
 
-      // ✅ MARK AS RECORDING GLOBALLY
       globalRecordingQuizzes.add(globalKey);
 
       try {
@@ -455,7 +447,6 @@ const useStudentMaterialAccess = (materialSlug) => {
       } catch (error) {
         console.error(`❌ Failed to record quiz ${quizId}:`, error);
       } finally {
-        // ✅ REMOVE FROM GLOBAL TRACKING setelah 2 detik
         setTimeout(() => {
           globalRecordingQuizzes.delete(globalKey);
         }, 2000);
@@ -469,7 +460,6 @@ const useStudentMaterialAccess = (materialSlug) => {
       const activityKey = `assignment_submitted_${assignmentId}`;
       const globalKey = `${materialId}_${assignmentId}`;
 
-      // ✅ GLOBAL & LOCAL DEDUPLICATION
       if (
         completedActivities.has(activityKey) ||
         globalRecordingAssignments.has(globalKey)
@@ -480,7 +470,6 @@ const useStudentMaterialAccess = (materialSlug) => {
         return;
       }
 
-      // ✅ MARK AS RECORDING GLOBALLY
       globalRecordingAssignments.add(globalKey);
 
       try {
@@ -491,7 +480,6 @@ const useStudentMaterialAccess = (materialSlug) => {
       } catch (error) {
         console.error(`❌ Failed to record assignment ${assignmentId}:`, error);
       } finally {
-        // ✅ REMOVE FROM GLOBAL TRACKING setelah 2 detik
         setTimeout(() => {
           globalRecordingAssignments.delete(globalKey);
         }, 2000);

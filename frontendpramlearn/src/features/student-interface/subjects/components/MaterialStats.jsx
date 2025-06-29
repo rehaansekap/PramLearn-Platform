@@ -5,7 +5,6 @@ import { FileTextOutlined } from "@ant-design/icons";
 const { Text } = Typography;
 
 const MaterialStats = ({ subject }) => {
-  // PERBAIKAN: Hitung progress yang benar
   const calculateProgress = () => {
     if (subject.progress !== undefined && subject.progress !== null) {
       return subject.progress;

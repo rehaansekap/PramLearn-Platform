@@ -55,7 +55,6 @@ const ClassForm = ({ classId, onSuccess, isSubmitting, setIsSubmitting }) => {
     try {
       await handleSubmit();
       onSuccess();
-      // Hapus Swal.fire di sini karena sudah ada di parent component
     } catch (error) {
       const errorMessage =
         error.response?.data?.detail ||

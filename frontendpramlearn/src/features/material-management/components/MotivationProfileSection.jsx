@@ -15,7 +15,7 @@ const MotivationProfileSection = () => {
         border: "1px solid #f0f5ff",
         backgroundColor: "#fafcff",
       }}
-      bodyStyle={{ padding: "20px" }} // Kurangi padding dari 24px ke 20px
+      bodyStyle={{ padding: "20px" }}
     >
       {/* Header - lebih compact */}
       <div
@@ -24,7 +24,7 @@ const MotivationProfileSection = () => {
           flexDirection: "column",
           alignItems: "center",
           textAlign: "center",
-          marginBottom: 16, // Kurangi dari 20 ke 16
+          marginBottom: 16,
         }}
       >
         <CloudUploadOutlined

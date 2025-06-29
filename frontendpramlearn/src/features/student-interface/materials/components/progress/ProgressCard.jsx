@@ -6,7 +6,7 @@ import {
   UpOutlined,
   FireOutlined,
   ClockCircleOutlined,
-  CloseOutlined, // ← TAMBAH INI
+  CloseOutlined,
 } from "@ant-design/icons";
 import ProgressStats from "./ProgressStats";
 import ProgressChecklist from "./ProgressChecklist";
@@ -30,10 +30,10 @@ const ProgressCard = ({
       size="small"
       style={{
         position: "fixed",
-        bottom: 104, // ← UBAH DARI 24 KE 104 (64px button + 16px gap + 24px margin)
+        bottom: 104,
         right: 24,
         width: 380,
-        zIndex: 999, // ← UBAH DARI 1000 KE 999 AGAR DIBAWAH FLOATING BUTTON
+        zIndex: 999,
         boxShadow:
           "0 20px 40px rgba(17, 65, 139, 0.15), 0 8px 16px rgba(0, 0, 0, 0.1)",
         borderRadius: 20,
@@ -41,7 +41,6 @@ const ProgressCard = ({
         background: "rgba(255, 255, 255, 0.95)",
         backdropFilter: "blur(20px)",
         overflow: "hidden",
-        // ← TAMBAH ANIMATION
         animation: "slideUpFadeIn 0.3s ease-out",
       }}
       bodyStyle={{ padding: 0 }}

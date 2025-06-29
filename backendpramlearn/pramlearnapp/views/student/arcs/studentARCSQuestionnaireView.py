@@ -374,7 +374,6 @@ class StudentARCSBySlugView(APIView):
         try:
             material = get_object_or_404(Material, slug=material_slug)
 
-            # ✅ GET BY SLUG
             questionnaire = get_object_or_404(
                 ARCSQuestionnaire, slug=arcs_slug, material=material
             )

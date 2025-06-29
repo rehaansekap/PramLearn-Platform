@@ -1,4 +1,3 @@
-// frontendpramlearn/src/pages/ClassDetailPage.jsx
 import React, { useEffect, useState, useContext } from "react";
 import { useParams } from "react-router-dom";
 import ClassDetail from "./components/ClassDetail";

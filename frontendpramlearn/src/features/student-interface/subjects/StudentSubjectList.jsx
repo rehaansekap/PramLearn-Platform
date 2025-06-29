@@ -7,6 +7,7 @@ import SubjectCard from "./components/SubjectCard";
 import SubjectDetailStudent from "./SubjectDetailStudent";
 import SubjectListHeader from "./components/SubjectListHeader";
 import SubjectListFilters from "./components/SubjectListFilters";
+import { Helmet } from "react-helmet";
 
 const { Title } = Typography;
 
@@ -99,6 +100,9 @@ const StudentSubjectList = () => {
         padding: "24px 16px",
       }}
     >
+      <Helmet>
+        <title>{`Daftar Mata Pelajaran | PramLearn`}</title>
+      </Helmet>
       <SubjectListHeader />
 
       <SubjectListFilters

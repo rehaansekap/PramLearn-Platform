@@ -9,7 +9,10 @@ const useSessionMaterials = (subjectId) => {
   const [error, setError] = useState(null);
 
   const fetchMaterials = async () => {
-    if (!user || !token || user.role !== 2 || !subjectId) return;
+    if (!user || !token || user.role !== 2 || !subjectId) {
+      setLoading(false);
+      return;
+    }
 
     try {
       setLoading(true);

@@ -1,4 +1,3 @@
-// frontendpramlearn/src/components/FormTextArea.jsx
 import React from "react";
 
 const FormTextArea = ({ label, name, value, onChange, required }) => (

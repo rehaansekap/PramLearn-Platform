@@ -35,6 +35,21 @@ const SessionsMaterialDetailHeader = ({
   if (!materialDetail) return null;
 
   const { material, statistics } = materialDetail;
+  // Ambil dari materialDetail.statistics
+  const stats = materialDetail.statistics || {};
+  const contentStats = stats.content_stats || {};
+
+  const totalStudents =
+    stats.total_students ||
+    (materialDetail.students ? materialDetail.students.length : 0);
+  const progress = stats.average_progress || 0;
+  const attendance = stats.attendance_rate || 0;
+  const totalQuizzes =
+    contentStats.quizzes ||
+    (materialDetail.quizzes ? materialDetail.quizzes.length : 0);
+  const totalAssignments =
+    contentStats.assignments ||
+    (materialDetail.assignments ? materialDetail.assignments.length : 0);
 
   const getProgressColor = (progress) => {
     if (progress >= 80) return "#52c41a";
@@ -50,28 +65,6 @@ const SessionsMaterialDetailHeader = ({
 
   return (
     <div style={{ marginBottom: 24 }}>
-      {/* Breadcrumb */}
-      <Breadcrumb
-        style={{ marginBottom: 16 }}
-        items={[
-          {
-            title: <span style={{ color: "#666" }}>Sessions</span>,
-          },
-          {
-            title: (
-              <span style={{ color: "#666" }}>{material?.subject?.name}</span>
-            ),
-          },
-          {
-            title: (
-              <span style={{ color: "#11418b", fontWeight: 600 }}>
-                {material?.title}
-              </span>
-            ),
-          },
-        ]}
-      />
-
       {/* Navigation & Actions */}
       <div
         style={{
@@ -243,10 +236,10 @@ const SessionsMaterialDetailHeader = ({
                   <span style={{ fontSize: isMobile ? 12 : 14 }}>Progress</span>
                 </Space>
               }
-              value={statistics?.overall_progress || 0}
+              value={progress || 0}
               suffix="%"
               valueStyle={{
-                color: getProgressColor(statistics?.overall_progress || 0),
+                color: getProgressColor(progress || 0),
                 fontSize: isMobile ? 20 : 24,
                 fontWeight: 700,
               }}
@@ -272,10 +265,10 @@ const SessionsMaterialDetailHeader = ({
                   </span>
                 </Space>
               }
-              value={statistics?.overall_attendance || 0}
+              value={attendance || 0}
               suffix="%"
               valueStyle={{
-                color: getAttendanceColor(statistics?.overall_attendance || 0),
+                color: getAttendanceColor(attendance || 0),
                 fontSize: isMobile ? 20 : 24,
                 fontWeight: 700,
               }}
@@ -299,7 +292,7 @@ const SessionsMaterialDetailHeader = ({
                   <span style={{ fontSize: isMobile ? 12 : 14 }}>Quiz</span>
                 </Space>
               }
-              value={statistics?.total_quizzes || 0}
+              value={totalQuizzes || 0}
               valueStyle={{
                 color: "#faad14",
                 fontSize: isMobile ? 20 : 24,
@@ -327,7 +320,7 @@ const SessionsMaterialDetailHeader = ({
                   </span>
                 </Space>
               }
-              value={statistics?.total_assignments || 0}
+              value={totalAssignments || 0}
               valueStyle={{
                 color: "#722ed1",
                 fontSize: isMobile ? 20 : 24,

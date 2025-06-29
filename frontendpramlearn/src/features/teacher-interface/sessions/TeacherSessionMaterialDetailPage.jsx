@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import { Spin, Alert, message } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 
@@ -202,11 +203,18 @@ const TeacherSessionMaterialDetailPage = () => {
     <div
       className="sessions-list-container"
       style={{
-        background: "linear-gradient(135deg, #f8fafc 0%, #e6f3ff 100%)",
+        // background: "linear-gradient(135deg, #f8fafc 0%, #e6f3ff 100%)",
         minHeight: "calc(100vh - 64px)",
         padding: isMobile ? "16px" : "24px",
       }}
     >
+      <Helmet>
+        <title>
+          {materialDetail.name
+            ? `${materialDetail.name} | PramLearn`
+            : "Detail Materi | PramLearn"}
+        </title>
+      </Helmet>
       <div style={{ maxWidth: 1400, margin: "0 auto" }}>
         <SessionsMaterialDetailHeader
           materialDetail={materialDetail}

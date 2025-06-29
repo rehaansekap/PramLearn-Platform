@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Helmet } from "react-helmet";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/id";
@@ -59,6 +60,9 @@ const StudentAssignmentList = ({
         minHeight: "calc(100vh - 64px)",
       }}
     >
+      <Helmet>
+        <title>Daftar Tugas | PramLearn</title>
+      </Helmet>
       {/* Header */}
       <AssignmentListHeader totalAssignments={assignments.length} />
 

@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import { useParams } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import { Tabs, Divider, Spin } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import { AuthContext } from "../../context/AuthContext";
@@ -143,8 +144,7 @@ const MaterialDetailPage = () => {
     setSelectedAssignment(assignment);
   };
 
-  const handleViewRanking = (quiz) => {
-  };
+  const handleViewRanking = (quiz) => {};
 
   // Loading state untuk MaterialDetail
   const materialDetailLoading = !materialId || !materialDetail;
@@ -163,6 +163,9 @@ const MaterialDetailPage = () => {
 
   return (
     <div className="max-w-7xl mx-auto">
+      <Helmet>
+        <title>{materialDetail?.title ? `${materialDetail.title} | PramLearn` : "Detail Materi | PramLearn"}</title>
+      </Helmet>
       <h1 className="text-blue-900 font-bold text-left material-detailpage-title">
         {materialDetail.title}
       </h1>

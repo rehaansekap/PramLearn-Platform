@@ -6,14 +6,14 @@ const useStudentARCS = (materialSlug) => {
   const { token } = useContext(AuthContext);
   const [questionnaires, setQuestionnaires] = useState([]);
   const [selectedQuestionnaire, setSelectedQuestionnaire] = useState(null);
-  const [questionnaireDetail, setQuestionnaireDetail] = useState(null); // ✅ NEW STATE
+  const [questionnaireDetail, setQuestionnaireDetail] = useState(null); 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState({});
   const [loading, setLoading] = useState(false);
-  const [detailLoading, setDetailLoading] = useState(false); // ✅ NEW STATE
+  const [detailLoading, setDetailLoading] = useState(false); 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
-  const [isInQuestionnaireMode, setIsInQuestionnaireMode] = useState(false); // ✅ NEW STATE
+  const [isInQuestionnaireMode, setIsInQuestionnaireMode] = useState(false); 
 
   // Reset state saat questionnaire berubah
   const resetQuestionnaireState = () => {
@@ -32,13 +32,13 @@ const useStudentARCS = (materialSlug) => {
       setLoading(true);
       setError(null);
 
-      console.log(`Fetching ARCS questionnaires for material: ${materialSlug}`);
+      // console.log(`Fetching ARCS questionnaires for material: ${materialSlug}`);
 
       const response = await api.get(
         `/student/materials/${materialSlug}/arcs-questionnaires/`
       );
 
-      console.log("Questionnaires response:", response.data);
+      // console.log("Questionnaires response:", response.data);
       setQuestionnaires(response.data.questionnaires || []);
     } catch (error) {
       console.error("Error fetching ARCS questionnaires:", error);
@@ -56,19 +56,19 @@ const useStudentARCS = (materialSlug) => {
       setDetailLoading(true);
       setError(null);
 
-      console.log(
-        `Fetching questionnaire detail: ${questionnaireId} for material: ${materialSlug}`
-      );
+      // console.log(
+      //   `Fetching questionnaire detail: ${questionnaireId} for material: ${materialSlug}`
+      // );
 
       const response = await api.get(
         `/student/materials/${materialSlug}/arcs-questionnaires/${questionnaireId}/`
       );
 
-      console.log("Questionnaire detail response:", response.data);
+      // console.log("Questionnaire detail response:", response.data);
 
       setQuestionnaireDetail(response.data);
       setSelectedQuestionnaire(response.data);
-      setIsInQuestionnaireMode(true); // ✅ SET MODE KE QUESTIONNAIRE
+      setIsInQuestionnaireMode(true); 
       resetQuestionnaireState(); // Reset state
     } catch (error) {
       console.error("Error fetching questionnaire detail:", error);
@@ -134,22 +134,20 @@ const useStudentARCS = (materialSlug) => {
         throw new Error("Please answer all questions before submitting");
       }
 
-      console.log("Submitting ARCS questionnaire:", {
-        questionnaire_id: questionnaireDetail.id,
-        answers: answersArray
-      });
+      // console.log("Submitting ARCS questionnaire:", {
+      //   questionnaire_id: questionnaireDetail.id,
+      //   answers: answersArray
+      // });
 
       const response = await api.post(
         `/student/materials/${materialSlug}/arcs-questionnaires/${questionnaireDetail.id}/submit/`,
         { answers: answersArray }
       );
 
-      console.log("ARCS submission response:", response.data);
+      // console.log("ARCS submission response:", response.data);
 
-      // ✅ REFRESH questionnaires list untuk update completion status
       await fetchQuestionnaires();
 
-      // ✅ RESET state setelah berhasil submit
       setQuestionnaireDetail(null);
       setSelectedQuestionnaire(null);
       setIsInQuestionnaireMode(false);
@@ -193,7 +191,7 @@ const useStudentARCS = (materialSlug) => {
 
   // Select questionnaire dan langsung fetch detail
   const selectQuestionnaire = async (questionnaire) => {
-    console.log("Selecting questionnaire:", questionnaire);
+    // console.log("Selecting questionnaire:", questionnaire);
     setSelectedQuestionnaire(questionnaire);
     await fetchQuestionnaireDetail(questionnaire.id);
   };
@@ -213,12 +211,12 @@ const useStudentARCS = (materialSlug) => {
   return {
     questionnaires,
     selectedQuestionnaire,
-    questionnaireDetail, // ✅ NEW RETURN
-    isInQuestionnaireMode, // ✅ NEW RETURN
+    questionnaireDetail, 
+    isInQuestionnaireMode, 
     currentQuestionIndex,
     answers,
     loading,
-    detailLoading, // ✅ NEW RETURN
+    detailLoading,
     submitting,
     error,
     fetchQuestionnaires,

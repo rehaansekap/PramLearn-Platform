@@ -25,9 +25,8 @@ const useGroupQuizCollaboration = (quizSlug) => {
   const connectionAttemptRef = useRef(0);
   const maxConnectionAttempts = 3;
   const isConnectingRef = useRef(false);
-  const mountedRef = useRef(true); // 🔧 ADD: Track if component is mounted
+  const mountedRef = useRef(true);
 
-  // 🔧 IMPROVED: Better cleanup on unmount
   useEffect(() => {
     mountedRef.current = true;
     return () => {
@@ -74,7 +73,6 @@ const useGroupQuizCollaboration = (quizSlug) => {
     }
   }, [quizSlug]);
 
-  // 🔧 IMPROVED: WebSocket connection with better debouncing
   const connectWebSocket = useCallback(
     (quizId, groupId) => {
       if (!token || !mountedRef.current) {
@@ -120,7 +118,6 @@ const useGroupQuizCollaboration = (quizSlug) => {
           isConnectingRef.current = false;
           connectionAttemptRef.current = 0;
 
-          // 🔧 IMPROVED: Wait for connection to stabilize before requesting state
           setTimeout(() => {
             if (
               wsRef.current?.readyState === WebSocket.OPEN &&
@@ -133,7 +130,7 @@ const useGroupQuizCollaboration = (quizSlug) => {
                 })
               );
             }
-          }, 500); // 🔧 REDUCED: Wait only 500ms
+          }, 500);
         };
 
         wsRef.current.onmessage = (event) => {
@@ -254,7 +251,6 @@ const useGroupQuizCollaboration = (quizSlug) => {
           setWsConnected(false);
           isConnectingRef.current = false;
 
-          // 🔧 IMPROVED: Only reconnect on unexpected disconnections
           if (
             !isSubmitted &&
             ![1000, 1001, 4001, 4003].includes(event.code) &&
@@ -417,14 +413,12 @@ const useGroupQuizCollaboration = (quizSlug) => {
     }
   }, [timeRemaining, isSubmitted, submitQuiz]);
 
-  // 🔧 IMPROVED: Better data fetching and WebSocket initialization
   useEffect(() => {
     if (quizSlug && mountedRef.current) {
       fetchQuizData();
     }
   }, [quizSlug, fetchQuizData]);
 
-  // 🔧 IMPROVED: Separate effect for WebSocket connection after data is loaded
   useEffect(() => {
     if (quiz?.id && groupId && token && !loading && mountedRef.current) {
       console.log("🔗 Initializing WebSocket connection...", {
@@ -432,7 +426,6 @@ const useGroupQuizCollaboration = (quizSlug) => {
         groupId: groupId,
       });
 
-      // 🔧 ADD: Small delay to ensure component is fully mounted
       const timer = setTimeout(() => {
         if (mountedRef.current) {
           connectWebSocket(quiz.id, groupId);

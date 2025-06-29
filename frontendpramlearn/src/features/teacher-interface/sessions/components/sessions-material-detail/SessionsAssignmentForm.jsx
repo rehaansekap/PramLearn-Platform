@@ -39,7 +39,6 @@ const SessionsAssignmentForm = ({
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(false);
 
-  // Initialize form when editing - PERBAIKAN
   useEffect(() => {
     if (open && editingAssignment) {
       setInitialLoading(true);
@@ -53,9 +52,8 @@ const SessionsAssignmentForm = ({
             : null,
         });
 
-        // PERBAIKAN: Load questions from editingAssignment or assignmentDetail
         const questionsToLoad = editingAssignment.questions || [];
-        console.log("Loading questions for edit:", questionsToLoad); // Debug log
+        // console.log("Loading questions for edit:", questionsToLoad);
 
         setQuestions(
           questionsToLoad.map((q, index) => ({
@@ -66,7 +64,7 @@ const SessionsAssignmentForm = ({
             choice_c: q.choice_c || "",
             choice_d: q.choice_d || "",
             correct_choice: q.correct_choice || "A",
-            explanation: q.explanation || "", // PERBAIKAN: pastikan explanation ter-load
+            explanation: q.explanation || "",
           }))
         );
 
@@ -137,18 +135,18 @@ const SessionsAssignmentForm = ({
         ...values,
         due_date: values.due_date ? values.due_date.toISOString() : null,
         questions: questions.map((q) => ({
-          id: q.id, // PERBAIKAN: sertakan ID untuk update
+          id: q.id,
           text: q.text,
           choice_a: q.choice_a,
           choice_b: q.choice_b,
           choice_c: q.choice_c,
           choice_d: q.choice_d,
           correct_choice: q.correct_choice,
-          explanation: q.explanation || "", // PERBAIKAN: pastikan explanation dikirim
+          explanation: q.explanation || "",
         })),
       };
 
-      console.log("Submitting assignment data:", assignmentData); // Debug log
+      // console.log("Submitting assignment data:", assignmentData);
 
       await onSuccess(assignmentData);
       handleClose();

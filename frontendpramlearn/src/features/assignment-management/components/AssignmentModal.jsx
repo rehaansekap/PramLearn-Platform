@@ -26,7 +26,7 @@ const AssignmentModal = ({
   } = useAssignmentForm(materialId, onSuccess, editingAssignment);
 
   const [form] = Form.useForm();
-  const [initialLoading, setInitialLoading] = useState(false); // Loading untuk data awal
+  const [initialLoading, setInitialLoading] = useState(false); 
 
   useEffect(() => {
     if (open && editingAssignment) {

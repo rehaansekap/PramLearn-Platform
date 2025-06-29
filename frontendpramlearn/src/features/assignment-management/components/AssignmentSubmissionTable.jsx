@@ -15,11 +15,11 @@ const AssignmentSubmissionTable = ({
   questions,
   selectedAssignment,
   onReload,
-  loading = false, // Tambahkan prop loading
+  loading = false,
   isMobile,
 }) => {
   const [selectedSubmission, setSelectedSubmission] = useState(null);
-  const [detailLoading, setDetailLoading] = useState({}); // Loading untuk detail modal individual
+  const [detailLoading, setDetailLoading] = useState({});
 
   const filteredSubmissions = selectedAssignment
     ? submissions.filter((s) => s.assignment === selectedAssignment.id)
@@ -230,7 +230,7 @@ const AssignmentSubmissionTable = ({
           style={{
             width: "100%",
           }}
-          scroll={{ x: isMobile ? 600 : undefined }} // Tambahkan scroll horizontal untuk mobile
+          scroll={{ x: isMobile ? 600 : undefined }}
           size="middle"
         />
       )}

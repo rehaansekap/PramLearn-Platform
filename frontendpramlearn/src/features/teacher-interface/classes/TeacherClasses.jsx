@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import {
   Row,
   Col,
@@ -74,6 +75,9 @@ const TeacherClasses = () => {
 
   return (
     <div style={{ maxWidth: 1400, margin: "0 auto", padding: "0 16px" }}>
+      <Helmet>
+        <title>Kelas yang Diampu | PramLearn</title>
+      </Helmet>
       {/* Header */}
       <div style={{ marginBottom: 32 }}>
         <Title level={2} style={{ margin: 0, color: "#11418b" }}>

@@ -32,11 +32,9 @@ const ProgressChecklist = ({ material, isActivityCompleted }) => {
       completed: isActivityCompleted("video_played", idx),
     }));
 
-  // ✅ TAMBAHAN: Daftar Quiz
   const quizItems = (material.quizzes || []).map((quiz, idx) => {
     let isCompleted = false;
 
-    // ✅ PERBAIKAN: Gunakan isActivityCompleted untuk konsistensi
     const activityKey = `quiz_completed_${quiz.id}`;
     const completedByActivity = isActivityCompleted("quiz_completed", quiz.id);
 
@@ -61,7 +59,6 @@ const ProgressChecklist = ({ material, isActivityCompleted }) => {
     };
   });
 
-  // ✅ TAMBAHAN: Daftar Assignment
   const assignmentItems = (material.assignments || []).map(
     (assignment, idx) => {
       let isCompleted = false;
@@ -82,7 +79,6 @@ const ProgressChecklist = ({ material, isActivityCompleted }) => {
     }
   );
 
-  // ✅ GABUNGKAN SEMUA ITEMS
   const items = [...pdfItems, ...videoItems, ...quizItems, ...assignmentItems];
   const completedCount = items.filter((item) => item.completed).length;
   const completionRate =
@@ -96,7 +92,6 @@ const ProgressChecklist = ({ material, isActivityCompleted }) => {
     );
   }
 
-  // ✅ FUNGSI UNTUK MENDAPATKAN ICON BERDASARKAN TYPE
   const getTypeIcon = (type, isGroupQuiz = false) => {
     switch (type) {
       case "pdf":
@@ -172,7 +167,6 @@ const ProgressChecklist = ({ material, isActivityCompleted }) => {
     }
   };
 
-  // ✅ FUNGSI UNTUK MENDAPATKAN LABEL TYPE
   const getTypeLabel = (type, isGroupQuiz = false, grade = null) => {
     switch (type) {
       case "pdf":

@@ -10,7 +10,6 @@ import {
 const { Title, Text } = Typography;
 
 const SubjectDetailHeader = ({ subject }) => {
-  // PERBAIKAN: Hitung progress yang benar
   const calculateProgress = () => {
     if (subject.progress !== undefined && subject.progress !== null) {
       return subject.progress;
@@ -44,7 +43,6 @@ const SubjectDetailHeader = ({ subject }) => {
       Sabtu: 6,
     };
 
-    // PERBAIKAN: Gunakan field yang sesuai dengan API response
     const nextSchedule = subject.schedules.find((schedule) => {
       const scheduleDay = dayMap[schedule.day_of_week || schedule.day];
       return scheduleDay >= today;

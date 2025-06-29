@@ -27,15 +27,15 @@ const ARCSResponsesViewer = ({
   loading,
   isMobile,
 }) => {
-  const handleViewDetail = (response) => {
-    // TODO: Implement view detail modal
-    console.log("View detail:", response);
-  };
+  // const handleViewDetail = (response) => {
+  //   // TODO: Implement view detail modal
+  //   // console.log("View detail:", response);
+  // };
 
-  const handleExportResponses = () => {
-    // TODO: Implement export functionality
-    console.log("Export responses");
-  };
+  // const handleExportResponses = () => {
+  //   // TODO: Implement export functionality
+  //   console.log("Export responses");
+  // };
 
   const columns = [
     {

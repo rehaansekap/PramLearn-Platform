@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import { Spin, Alert, Button, Space } from "antd";
 import { ReloadOutlined, ArrowLeftOutlined } from "@ant-design/icons";
 import api from "../../../../../api";
@@ -113,6 +114,9 @@ const QuizResultsPage = () => {
 
   return (
     <div style={{ maxWidth: 900, margin: "0 auto", padding: 16 }}>
+      <Helmet>
+        <title>Hasil Quiz | PramLearn</title>
+      </Helmet>
       {/* Header dengan breadcrumb */}
       <QuizResultsHeader
         quizDetails={quizDetails}

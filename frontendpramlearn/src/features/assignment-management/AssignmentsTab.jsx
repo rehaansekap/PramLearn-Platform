@@ -36,7 +36,7 @@ const AssignmentsTab = ({
   onDeleteAssignment,
   onSelectAssignment,
   loading,
-  submissionsLoading = false, // Tambahkan prop loading untuk submissions
+  submissionsLoading = false,
 }) => {
   const [actionLoading, setActionLoading] = useState({});
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -353,7 +353,7 @@ const AssignmentsTab = ({
           }}
           style={{ width: "100%" }}
           className="user-table-responsive"
-          scroll={{ x: isMobile ? 600 : undefined }} // Tambahkan scroll horizontal untuk mobile
+          scroll={{ x: isMobile ? 600 : undefined }}
           size="middle"
         />
       )}

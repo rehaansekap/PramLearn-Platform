@@ -36,7 +36,7 @@ class StudentGradeView(APIView):
 
     def get(self, request):
         try:
-            # ✅ PERBAIKAN: Pengecekan role yang lebih robust
+            
             user = request.user
             is_student = False
 
@@ -136,7 +136,7 @@ class StudentGradeAnalyticsView(APIView):
 
     def get(self, request):
         try:
-            # ✅ PERBAIKAN: Pengecekan role yang sama
+            
             user = request.user
             is_student = False
 
@@ -175,7 +175,7 @@ class StudentAchievementView(APIView):
 
     def get(self, request):
         try:
-            # ✅ PERBAIKAN: Pengecekan role yang sama
+            
             user = request.user
             is_student = False
 

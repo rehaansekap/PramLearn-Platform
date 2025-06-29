@@ -15,6 +15,7 @@ import {
   LoginOutlined,
   BookOutlined,
 } from "@ant-design/icons";
+import { Helmet } from "react-helmet";
 
 const { Title, Text } = Typography;
 
@@ -38,6 +39,9 @@ const LoginForm = ({ onFinish, loading = false, error = null }) => {
         overflow: "hidden",
       }}
     >
+      <Helmet>
+        <title>Login | PramLearn</title>
+      </Helmet>
       {/* Background Decoration */}
       <div
         style={{
