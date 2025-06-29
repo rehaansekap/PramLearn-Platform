@@ -31,6 +31,14 @@ const QuizTakingInterface = () => {
     autoSave,
   } = useStudentQuizAttempt(quizSlug);
 
+  useEffect(() => {
+    if (!loading && quiz && quiz.is_active === false) {
+      message.warning("Quiz ini tidak aktif.");
+      navigate("/student/assessments", { replace: true });
+    }
+    // Jika ada expired flag, tambahkan pengecekan di sini juga
+  }, [quiz, loading, navigate]);
+
   // Auto-save jawaban setiap 5 detik
   useEffect(() => {
     if (!attempt?.id) return;

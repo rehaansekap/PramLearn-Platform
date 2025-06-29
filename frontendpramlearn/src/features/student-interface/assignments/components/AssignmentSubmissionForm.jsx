@@ -50,6 +50,20 @@ const AssignmentSubmissionForm = ({
     initialFiles
   );
 
+  useEffect(() => {
+    if (
+      assignment &&
+      (assignment.is_active === false ||
+        assignment.status === "expired" ||
+        assignment.status === "overdue")
+    ) {
+      message.warning(
+        "Assignment ini sudah tidak aktif atau sudah kadaluarsa."
+      );
+      navigate("/student/assignments", { replace: true });
+    }
+  }, [assignment, navigate]);
+
   // Mobile detection
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);

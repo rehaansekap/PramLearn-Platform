@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, List, Space, Typography, Empty, Spin, Alert } from "antd";
+import {
+  Card,
+  List,
+  Space,
+  Typography,
+  Empty,
+  Spin,
+  Alert,
+  message,
+} from "antd";
 import { BookOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
@@ -56,6 +65,12 @@ const StudentQuizList = () => {
 
   // Quiz navigation
   const handleStartQuiz = (quiz) => {
+    if (quiz.is_active === false) {
+      message.warning(
+        "Quiz ini belum aktif atau sudah dinonaktifkan oleh guru."
+      );
+      return;
+    }
     if (quiz.is_group_quiz && quiz.is_completed) {
       navigate(`/student/group-quiz/${quiz.slug}/results`);
     } else if (quiz.quiz_type === "group" || quiz.is_group_quiz) {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
-import { Spin, Alert, Button } from "antd";
+import { Spin, Alert, Button, message } from "antd";
 import StudentAssignmentList from "./components/StudentAssignmentList";
 import AssignmentSubmissionForm from "./components/AssignmentSubmissionForm";
 import SubmissionHistory from "./components/SubmissionHistory";
@@ -124,8 +124,19 @@ const StudentAssignments = () => {
   // Handler ketika memilih assignment dari list
   const handleSelectAssignment = useCallback(
     (assignment) => {
-      setSelectedAssignment(assignment);
       const status = getAssignmentStatus(assignment);
+      // CEK: Assignment harus aktif dan tidak expired
+      if (
+        assignment.is_active === false ||
+        status.status === "overdue" ||
+        status.status === "expired"
+      ) {
+        message.warning(
+          "Assignment ini sudah tidak aktif atau sudah kadaluarsa."
+        );
+        return;
+      }
+      setSelectedAssignment(assignment);
       if (status.status === "submitted" || status.status === "graded") {
         setCurrentView("history");
         fetchSubmissionHistory(assignment.id);
@@ -144,6 +155,25 @@ const StudentAssignments = () => {
       fetchSubmissionHistory,
     ]
   );
+
+  useEffect(() => {
+    // Hanya aktif jika sedang di halaman submit dan ada assignment terpilih
+    if (currentView !== "submit" || !selectedAssignment) return;
+
+    const interval = setInterval(() => {
+      const status = getAssignmentStatus(selectedAssignment);
+      if (
+        selectedAssignment.is_active === false ||
+        status.status === "overdue" ||
+        status.status === "expired"
+      ) {
+        message.warning("Assignment sudah tidak aktif atau waktu sudah habis.");
+        handleBackToList();
+      }
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, [currentView, selectedAssignment, getAssignmentStatus, handleBackToList]);
 
   // Render error jika assignment tidak ditemukan
   if (currentView === "notfound") {
@@ -219,14 +249,13 @@ const StudentAssignments = () => {
         submitting={submitting}
         draftSaving={draftSaving}
         isDraftDirty={isDraftDirty}
-        onAnswerChange={updateAnswer} // Make sure this is updateAnswer, not undefined
+        onAnswerChange={updateAnswer}
         onFileChange={addUploadedFile}
         onFileRemove={removeUploadedFile}
         onSaveDraft={saveDraft}
         onSubmit={submitAssignment}
         onBack={handleBackToList}
         getTimeRemaining={getTimeRemaining}
-        updateAnswer={updateAnswer} // Remove this duplicate prop
         currentSubmission={currentSubmission}
       />
     );

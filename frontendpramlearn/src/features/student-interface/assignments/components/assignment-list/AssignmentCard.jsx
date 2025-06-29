@@ -398,7 +398,10 @@ const AssignmentCard = ({ assignment, status, timeRemaining, isMobile }) => {
           icon={getStatusIcon(status)}
           onClick={handleCardClick}
           disabled={
-            status.status === "overdue" && !assignment.allow_late_submission
+            assignment.is_active === false ||
+            (status.status === "overdue" &&
+              !assignment.allow_late_submission) ||
+            status.status === "expired"
           }
           size="large"
           style={{
@@ -417,8 +420,36 @@ const AssignmentCard = ({ assignment, status, timeRemaining, isMobile }) => {
                 ? "0 4px 12px rgba(255, 173, 20, 0.4)"
                 : "0 4px 12px rgba(0, 21, 41, 0.2)",
             transition: "all 0.3s ease",
+            opacity:
+              assignment.is_active === false ||
+              (status.status === "overdue" &&
+                !assignment.allow_late_submission) ||
+              status.status === "expired"
+                ? 0.6
+                : 1,
+            cursor:
+              assignment.is_active === false ||
+              (status.status === "overdue" &&
+                !assignment.allow_late_submission) ||
+              status.status === "expired"
+                ? "not-allowed"
+                : "pointer",
+            color:
+              assignment.is_active === false ||
+              (status.status === "overdue" &&
+                !assignment.allow_late_submission) ||
+              status.status === "expired"
+                ? "#999"
+                : "#fff",
           }}
           onMouseEnter={(e) => {
+            if (
+              assignment.is_active === false ||
+              (status.status === "overdue" &&
+                !assignment.allow_late_submission) ||
+              status.status === "expired"
+            )
+              return;
             e.currentTarget.style.transform = "translateY(-2px)";
             e.currentTarget.style.boxShadow =
               status.status === "graded"
@@ -426,6 +457,13 @@ const AssignmentCard = ({ assignment, status, timeRemaining, isMobile }) => {
                 : "0 6px 16px rgba(0, 21, 41, 0.3)";
           }}
           onMouseLeave={(e) => {
+            if (
+              assignment.is_active === false ||
+              (status.status === "overdue" &&
+                !assignment.allow_late_submission) ||
+              status.status === "expired"
+            )
+              return;
             e.currentTarget.style.transform = "translateY(0)";
             e.currentTarget.style.boxShadow =
               status.status === "graded"

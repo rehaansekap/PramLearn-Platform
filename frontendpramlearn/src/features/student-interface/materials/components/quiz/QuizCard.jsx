@@ -19,6 +19,7 @@ const QuizCard = ({ quiz, timeRemaining, timeColor }) => {
   const status = getQuizStatus(quiz);
   const buttonAction = getButtonAction(quiz, status, navigate);
   const isExpired = timeRemaining === "EXPIRED";
+  const isInactive = quiz.is_active === false;
   const isMobile = window.innerWidth <= 768;
 
   return (
@@ -471,7 +472,7 @@ const QuizCard = ({ quiz, timeRemaining, timeColor }) => {
           type={buttonAction.type}
           icon={buttonAction.icon}
           onClick={buttonAction.onClick}
-          disabled={isExpired}
+          disabled={isExpired || isInactive}
           size="large"
           style={{
             width: "100%",
@@ -479,39 +480,49 @@ const QuizCard = ({ quiz, timeRemaining, timeColor }) => {
             borderRadius: 10,
             fontWeight: 600,
             fontSize: 13,
-            background: isExpired
-              ? "#f5f5f5"
-              : buttonAction.style?.background ||
-                (buttonAction.type === "primary"
-                  ? "linear-gradient(135deg, #001529 0%, #3a3f5c 60%, #43cea2 100%)"
-                  : undefined),
-            border: isExpired
-              ? "1px solid #d9d9d9"
-              : buttonAction.style?.borderColor || "none",
-            color: isExpired ? "#999" : buttonAction.style?.color || undefined,
-            boxShadow: isExpired
-              ? "none"
-              : buttonAction.style?.boxShadow ||
-                "0 4px 12px rgba(0, 21, 41, 0.2)",
+            background:
+              isExpired || isInactive
+                ? "#f5f5f5"
+                : buttonAction.style?.background ||
+                  (buttonAction.type === "primary"
+                    ? "linear-gradient(135deg, #001529 0%, #3a3f5c 60%, #43cea2 100%)"
+                    : undefined),
+            border:
+              isExpired || isInactive
+                ? "1px solid #d9d9d9"
+                : buttonAction.style?.borderColor || "none",
+            color:
+              isExpired || isInactive
+                ? "#999"
+                : buttonAction.style?.color || undefined,
+            boxShadow:
+              isExpired || isInactive
+                ? "none"
+                : buttonAction.style?.boxShadow ||
+                  "0 4px 12px rgba(0, 21, 41, 0.2)",
             textShadow: buttonAction.style?.textShadow || undefined,
             transition: "all 0.3s ease",
           }}
           onMouseEnter={(e) => {
-            if (buttonAction.style?.background && !isExpired) {
+            if (buttonAction.style?.background && !isExpired && !isInactive) {
               e.currentTarget.style.transform = "translateY(-2px)";
               e.currentTarget.style.boxShadow =
                 "0 6px 16px rgba(255, 173, 20, 0.5)";
             }
           }}
           onMouseLeave={(e) => {
-            if (buttonAction.style?.background && !isExpired) {
+            if (buttonAction.style?.background && !isExpired && !isInactive) {
               e.currentTarget.style.transform = "translateY(0)";
               e.currentTarget.style.boxShadow =
                 "0 4px 12px rgba(255, 173, 20, 0.4)";
             }
           }}
         >
-          {isExpired ? "Waktu Habis" : buttonAction.text}
+          {isInactive
+            ? "Tidak Aktif"
+            : isExpired
+            ? "Waktu Habis"
+            : buttonAction.text}
         </Button>
       </div>
     </Card>

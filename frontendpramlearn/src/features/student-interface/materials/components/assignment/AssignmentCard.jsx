@@ -21,6 +21,8 @@ const AssignmentCard = ({ assignment, timeRemaining }) => {
   const navigate = useNavigate();
   const status = getAssignmentStatus(assignment);
   const isMobile = window.innerWidth <= 768;
+  const isExpired = timeRemaining?.expired;
+  const isInactive = assignment.is_active === false;
 
   const handleClick = () => {
     const assignmentSlug = assignment.slug || assignment.id;
@@ -32,7 +34,10 @@ const AssignmentCard = ({ assignment, timeRemaining }) => {
   };
 
   const isDisabled =
-    status.status === "overdue" && !assignment.allow_late_submission;
+    isInactive ||
+    (status.status === "overdue" && !assignment.allow_late_submission) ||
+    status.status === "expired" ||
+    isExpired;
 
   const buttonText = getButtonText(status, timeRemaining, assignment);
   const buttonStyle = getButtonStyle(status, timeRemaining);
@@ -445,7 +450,11 @@ const AssignmentCard = ({ assignment, timeRemaining }) => {
             }
           }}
         >
-          {buttonText}
+          {isInactive
+            ? "Tidak Aktif"
+            : isExpired || status.status === "expired"
+            ? "Waktu Habis"
+            : buttonText}
         </Button>
 
         {/* Submission timestamp */}

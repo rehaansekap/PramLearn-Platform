@@ -4,6 +4,7 @@ import { TrophyOutlined, PlayCircleOutlined } from "@ant-design/icons";
 
 const QuizActionButton = ({ quiz, status, timeRemaining, onStartQuiz }) => {
   const isExpired = timeRemaining === "EXPIRED";
+  const isInactive = quiz.is_active === false;
 
   const getButtonConfig = () => {
     if (status.status === "completed") {
@@ -36,12 +37,15 @@ const QuizActionButton = ({ quiz, status, timeRemaining, onStartQuiz }) => {
 
   const buttonConfig = getButtonConfig();
 
+  const isButtonDisabled =
+    (isExpired && status.status !== "completed") || isInactive;
+
   return (
     <Button
       type={buttonConfig.type}
       icon={buttonConfig.icon}
       onClick={() => onStartQuiz(quiz)}
-      disabled={isExpired && status.status !== "completed"}
+      disabled={isButtonDisabled}
       size="large"
       style={{
         width: "100%",
@@ -49,38 +53,31 @@ const QuizActionButton = ({ quiz, status, timeRemaining, onStartQuiz }) => {
         borderRadius: 10,
         fontWeight: 600,
         fontSize: 13,
-        background:
-          isExpired && status.status !== "completed"
-            ? "#f5f5f5"
-            : buttonConfig.style.background,
-        border:
-          isExpired && status.status !== "completed"
-            ? "1px solid #d9d9d9"
-            : "none",
-        color:
-          isExpired && status.status !== "completed"
-            ? "#999"
-            : buttonConfig.style.color,
-        boxShadow:
-          isExpired && status.status !== "completed"
-            ? "none"
-            : buttonConfig.style.boxShadow || "0 4px 12px rgba(0, 21, 41, 0.2)",
+        background: isButtonDisabled
+          ? "#f5f5f5"
+          : buttonConfig.style.background,
+        border: isButtonDisabled ? "1px solid #d9d9d9" : "none",
+        color: isButtonDisabled ? "#999" : buttonConfig.style.color,
+        boxShadow: isButtonDisabled
+          ? "none"
+          : buttonConfig.style.boxShadow || "0 4px 12px rgba(0, 21, 41, 0.2)",
         textShadow: buttonConfig.style.textShadow,
         transition: "all 0.3s ease",
       }}
       onMouseEnter={(e) => {
-        if (!isExpired && buttonConfig.style.background) {
+        if (!isButtonDisabled && buttonConfig.style.background) {
           e.currentTarget.style.transform = "translateY(-2px)";
         }
       }}
       onMouseLeave={(e) => {
-        if (!isExpired && buttonConfig.style.background) {
+        if (!isButtonDisabled && buttonConfig.style.background) {
           e.currentTarget.style.transform = "translateY(0)";
         }
       }}
     >
-      {/* isexpired && not submited maka tampilkan "Waktu Habis" */}
-      {isExpired && status.status !== "completed"
+      {isInactive
+        ? "Tidak Aktif"
+        : isExpired && status.status !== "completed"
         ? "Waktu Habis"
         : buttonConfig.text}
     </Button>

@@ -83,21 +83,22 @@ const useSessionQuizManagement = (materialSlug) => {
     }
   };
 
-    // Update quiz status
+  // Update quiz status
   const updateQuizStatus = async (quizId, isActive) => {
     try {
       setActionLoading((prev) => ({ ...prev, [`status_${quizId}`]: true }));
-  
+
       const response = await api.patch(
-        `teacher/sessions/material/${materialSlug}/quizzes/${quizId}/`,
+        `teacher/sessions/material/${materialSlug}/quizzes/${quizId}/update`,
         { is_active: isActive }
       );
-  
+
       message.success(response.data.message);
       await fetchQuizData();
       return response.data;
     } catch (error) {
-      const errorMessage = error.response?.data?.error || "Gagal mengubah status quiz";
+      const errorMessage =
+        error.response?.data?.error || "Gagal mengubah status quiz";
       message.error(errorMessage);
       throw error;
     } finally {

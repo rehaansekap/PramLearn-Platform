@@ -60,6 +60,8 @@ class StudentGroupQuizListView(APIView):
                     "title": quiz.title,
                     "content": quiz.content,
                     "slug": quiz.slug,
+                    "duration": quiz.duration,
+                    "is_active": quiz.is_active,
                     "is_group_quiz": True,
                     "end_time": group_quiz.end_time,
                     "group_name": group_quiz.group.name,
