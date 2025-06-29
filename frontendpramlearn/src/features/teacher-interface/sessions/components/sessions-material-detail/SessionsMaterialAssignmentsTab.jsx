@@ -34,15 +34,15 @@ import {
   MoreOutlined,
   BarChartOutlined,
 } from "@ant-design/icons";
-import useSessionAssignmentManagement from "../hooks/useSessionAssignmentManagement";
-import SessionAssignmentForm from "./SessionAssignmentForm";
-import SessionAssignmentDetailModal from "./SessionAssignmentDetailModal";
+import useSessionAssignmentManagement from "../../hooks/useSessionAssignmentManagement";
+import SessionsAssignmentForm from "./SessionsAssignmentForm";
+import SessionsAssignmentDetailModal from "./SessionsAssignmentDetailModal";
 import Swal from "sweetalert2";
 import dayjs from "dayjs";
 
 const { Title, Text } = Typography;
 
-const SessionMaterialAssignmentsTab = ({
+const SessionsMaterialAssignmentsTab = ({
   materialSlug,
   assignments: propAssignments = [],
   students: propStudents = [],
@@ -569,7 +569,7 @@ const SessionMaterialAssignmentsTab = ({
       </Card>
 
       {/* Modals */}
-      <SessionAssignmentForm
+      <SessionsAssignmentForm
         open={isAssignmentModalVisible}
         onClose={() => {
           setIsAssignmentModalVisible(false);
@@ -580,7 +580,7 @@ const SessionMaterialAssignmentsTab = ({
         onSuccess={handleAssignmentFormSuccess}
       />
 
-      <SessionAssignmentDetailModal
+      <SessionsAssignmentDetailModal
         open={isDetailModalVisible}
         onClose={() => {
           setIsDetailModalVisible(false);
@@ -600,4 +600,4 @@ const SessionMaterialAssignmentsTab = ({
   );
 };
 
-export default SessionMaterialAssignmentsTab;
+export default SessionsMaterialAssignmentsTab;

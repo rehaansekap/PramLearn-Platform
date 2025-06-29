@@ -16,12 +16,12 @@ import {
   EyeOutlined,
   LoadingOutlined,
 } from "@ant-design/icons";
-import useSessionMaterialContent from "../hooks/useSessionMaterialContent";
+import useSessionMaterialContent from "../../hooks/useSessionMaterialContent";
 
 const { Title, Text, Paragraph } = Typography;
 const { Panel } = Collapse;
 
-const SessionMaterialContentTab = ({ materialSlug, materialDetail }) => {
+const SessionsMaterialContentTab = ({ materialSlug, materialDetail }) => {
   const { content, loading, error } = useSessionMaterialContent(materialSlug);
 
   const openPdfFile = (fileUrl) => {
@@ -403,4 +403,4 @@ const SessionMaterialContentTab = ({ materialSlug, materialDetail }) => {
   );
 };
 
-export default SessionMaterialContentTab;
+export default SessionsMaterialContentTab;

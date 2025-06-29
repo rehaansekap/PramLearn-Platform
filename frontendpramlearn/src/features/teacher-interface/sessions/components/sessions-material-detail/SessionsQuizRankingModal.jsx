@@ -29,12 +29,12 @@ import {
   CheckCircleOutlined,
   SyncOutlined,
 } from "@ant-design/icons";
-import useSessionQuizRanking from "../hooks/useSessionQuizRanking";
+import useSessionQuizRanking from "../../hooks/useSessionQuizRanking";
 import moment from "moment";
 
 const { Title, Text } = Typography;
 
-const SessionQuizRankingModal = ({ open, onClose, quiz, materialSlug }) => {
+const SessionsQuizRankingModal = ({ open, onClose, quiz, materialSlug }) => {
   const {
     rankings,
     loading,
@@ -446,4 +446,4 @@ const SessionQuizRankingModal = ({ open, onClose, quiz, materialSlug }) => {
   );
 };
 
-export default SessionQuizRankingModal;
+export default SessionsQuizRankingModal;

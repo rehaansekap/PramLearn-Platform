@@ -16,7 +16,18 @@ const useTeacherSessionDetail = (subjectSlug) => {
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
       const response = await api.get(`teacher/sessions/${subjectSlug}/`);
-      setSessionDetail(response.data);
+      const data = response.data;
+      setSessionDetail({
+        ...data,
+        sessions_data: data.sessions || [],
+        students: data.students_performance || [],
+        statistics: {
+          ...data.statistics,
+          students_count:
+            data.statistics?.total_students ||
+            (data.students_performance ? data.students_performance.length : 0),
+        },
+      });
       setError(null);
     } catch (err) {
       setError(err);

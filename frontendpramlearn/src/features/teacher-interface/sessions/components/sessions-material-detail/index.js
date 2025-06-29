@@ -1,0 +1,9 @@
+export { default as SessionsMaterialDetailHeader } from './SessionsMaterialDetailHeader';
+export { default as SessionsMaterialDetailTabs } from './SessionsMaterialDetailTabs';
+export { default as SessionsMaterialContentTab } from './SessionsMaterialContentTab';
+export { default as SessionsMaterialStudentsTab } from './SessionsMaterialStudentsTab';
+export { default as SessionsMaterialGroupsTab } from './SessionsMaterialGroupsTab';
+export { default as SessionsMaterialQuizzesTab } from './SessionsMaterialQuizzesTab';
+export { default as SessionsMaterialAssignmentsTab } from './SessionsMaterialAssignmentsTab';
+export { default as SessionsMaterialARCSTab } from './SessionsMaterialARCSTab';
+export { default as SessionsMaterialAnalyticsTab } from './SessionsMaterialAnalyticsTab';

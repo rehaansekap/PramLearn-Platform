@@ -3,7 +3,7 @@ import { message } from "antd";
 import api from "../../../../api";
 import { AuthContext } from "../../../../context/AuthContext";
 import Swal from "sweetalert2";
-import "../styles/styles.css";
+// import "../styles/styles.css";
 
 const useSessionGroupFormation = (materialSlug, onGroupsChanged) => {
   const { token } = useContext(AuthContext);

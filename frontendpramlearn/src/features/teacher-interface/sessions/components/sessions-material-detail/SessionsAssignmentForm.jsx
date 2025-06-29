@@ -27,7 +27,7 @@ import dayjs from "dayjs";
 const { TextArea } = Input;
 const { Option } = Select;
 
-const SessionAssignmentForm = ({
+const SessionsAssignmentForm = ({
   open,
   onClose,
   materialSlug,
@@ -426,4 +426,4 @@ const SessionAssignmentForm = ({
   );
 };
 
-export default SessionAssignmentForm;
+export default SessionsAssignmentForm;

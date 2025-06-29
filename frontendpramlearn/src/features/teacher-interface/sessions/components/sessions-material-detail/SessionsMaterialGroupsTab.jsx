@@ -26,13 +26,13 @@ import {
   FilePdfOutlined,
   DownloadOutlined,
 } from "@ant-design/icons";
-import SessionGroupMembersModal from "./SessionGroupMembersModal";
-import SessionGroupFormationSection from "./SessionGroupFormationSection";
-import useSessionGroupFormation from "../hooks/useSessionGroupFormation";
+import SessionsGroupMembersModal from "./SessionsGroupMembersModal";
+import SessionsGroupFormationSection from "./SessionsGroupFormationSection";
+import useSessionGroupFormation from "../../hooks/useSessionGroupFormation";
 
 const { Title, Text } = Typography;
 
-const SessionMaterialGroupsTab = ({
+const SessionsMaterialGroupsTab = ({
   materialSlug,
   groups,
   students,
@@ -362,14 +362,14 @@ const SessionMaterialGroupsTab = ({
       </Card>
 
       {/* Group Formation Section */}
-      <SessionGroupFormationSection
+      <SessionsGroupFormationSection
         materialSlug={materialSlug}
         students={students}
         onGroupsChanged={handleGroupsUpdate}
       />
 
       {/* Group Members Modal */}
-      <SessionGroupMembersModal
+      <SessionsGroupMembersModal
         open={membersModalVisible}
         onClose={handleCloseMembersModal}
         group={selectedGroup}
@@ -379,4 +379,4 @@ const SessionMaterialGroupsTab = ({
   );
 };
 
-export default SessionMaterialGroupsTab;
+export default SessionsMaterialGroupsTab;

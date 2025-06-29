@@ -23,7 +23,7 @@ import {
 
 const { Title, Text } = Typography;
 
-const SessionGroupMembersModal = ({ open, onClose, group, students }) => {
+const SessionsGroupMembersModal = ({ open, onClose, group, students }) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -320,4 +320,4 @@ const SessionGroupMembersModal = ({ open, onClose, group, students }) => {
   );
 };
 
-export default SessionGroupMembersModal;
+export default SessionsGroupMembersModal;

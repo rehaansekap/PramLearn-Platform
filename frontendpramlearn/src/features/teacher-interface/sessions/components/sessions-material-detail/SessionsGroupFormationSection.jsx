@@ -7,11 +7,11 @@ import {
   FilePdfOutlined,
   DownloadOutlined,
 } from "@ant-design/icons";
-import useSessionGroupFormation from "../hooks/useSessionGroupFormation";
+import useSessionGroupFormation from "../../hooks/useSessionGroupFormation";
 
 const { Title, Text } = Typography;
 
-const SessionGroupFormationSection = ({
+const SessionsGroupFormationSection = ({
   materialSlug,
   students,
   onGroupsChanged,
@@ -214,4 +214,4 @@ const SessionGroupFormationSection = ({
   );
 };
 
-export default SessionGroupFormationSection;
+export default SessionsGroupFormationSection;

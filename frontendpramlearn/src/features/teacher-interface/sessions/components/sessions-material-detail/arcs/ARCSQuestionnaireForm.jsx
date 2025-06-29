@@ -24,7 +24,7 @@ import {
   ClockCircleOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
-import useARCSQuestionForm from "../../hooks/useARCSQuestionForm";
+import useARCSQuestionForm from "../../../hooks/useARCSQuestionForm";
 import ARCSQuestionFormItem from "./ARCSQuestionFormItem";
 
 const { Title, Text } = Typography;

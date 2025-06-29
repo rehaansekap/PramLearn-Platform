@@ -142,7 +142,7 @@ const TeacherSessions = () => {
     <div
       style={{
         minHeight: "calc(100vh - 64px)",
-        background: "#f8fafc",
+        // background: "#f8fafc",
         padding: isMobile ? "16px" : "24px",
       }}
     >
@@ -151,14 +151,14 @@ const TeacherSessions = () => {
           maxWidth: 1400,
           margin: "0 auto",
         }}
-      >\
+      >
+        \
         <SessionsHeader
           onRefresh={handleRefresh}
           refreshing={refreshing}
           sessionsCount={sessions.length}
           isMobile={isMobile}
         />
-
         {/* Filters */}
         {/* <SessionsFilters
           searchText={searchText}
@@ -169,12 +169,10 @@ const TeacherSessions = () => {
           loading={loading}
           isMobile={isMobile}
         /> */}
-
         {/* Statistics - Only show if there are sessions */}
         {sessions.length > 0 && (
           <SessionsStats sessions={sessions} isMobile={isMobile} />
         )}
-
         {/* Content */}
         {filteredSessions.length > 0 ? (
           <SessionsGrid

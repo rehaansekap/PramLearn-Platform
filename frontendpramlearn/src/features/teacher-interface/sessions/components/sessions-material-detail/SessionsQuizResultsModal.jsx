@@ -33,7 +33,7 @@ import moment from "moment";
 const { Title, Text, Paragraph } = Typography;
 const { Panel } = Collapse;
 
-const SessionQuizResultsModal = ({
+const SessionsQuizResultsModal = ({
   open,
   onClose,
   quiz,
@@ -593,4 +593,4 @@ const SessionQuizResultsModal = ({
   );
 };
 
-export default SessionQuizResultsModal;
+export default SessionsQuizResultsModal;

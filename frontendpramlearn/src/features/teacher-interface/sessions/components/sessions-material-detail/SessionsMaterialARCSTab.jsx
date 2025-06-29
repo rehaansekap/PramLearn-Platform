@@ -20,7 +20,7 @@ import {
   UserOutlined,
   CheckCircleOutlined,
 } from "@ant-design/icons";
-import useSessionARCSManagement from "../hooks/useSessionARCSManagement";
+import useSessionARCSManagement from "../../hooks/useSessionARCSManagement";
 import ARCSQuestionnaireList from "./arcs/ARCSQuestionnaireList";
 import ARCSQuestionnaireForm from "./arcs/ARCSQuestionnaireForm";
 import ARCSQuestionManager from "./arcs/ARCSQuestionManager";
@@ -30,7 +30,7 @@ import ARCSAnalyticsDashboard from "./arcs/ARCSAnalyticsDashboard";
 const { Title, Text } = Typography;
 const { TabPane } = Tabs;
 
-const SessionMaterialARCSTab = ({ materialSlug }) => {
+const SessionsMaterialARCSTab = ({ materialSlug }) => {
   const [activeTab, setActiveTab] = useState("questionnaires");
   const [modalVisible, setModalVisible] = useState(false);
   const [editingQuestionnaire, setEditingQuestionnaire] = useState(null);
@@ -366,4 +366,4 @@ const SessionMaterialARCSTab = ({ materialSlug }) => {
   );
 };
 
-export default SessionMaterialARCSTab;
+export default SessionsMaterialARCSTab;

@@ -37,7 +37,7 @@ const { Title, Text } = Typography;
 const { TabPane } = Tabs;
 const { TextArea } = Input;
 
-const SessionAssignmentDetailModal = ({
+const SessionsAssignmentDetailModal = ({
   open,
   onClose,
   assignment,
@@ -521,4 +521,4 @@ const SessionAssignmentDetailModal = ({
   );
 };
 
-export default SessionAssignmentDetailModal;
+export default SessionsAssignmentDetailModal;

@@ -6,6 +6,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import { AuthContext } from "./context/AuthContext";
+import { OnlineStatusProvider } from "./context/OnlineStatusContext";
 import { ConfigProvider } from "antd";
 import Login from "./features/authentication/Login";
 import PrivateRoute from "./features/navigation/components/PrivateRoute";
@@ -297,7 +298,9 @@ function App() {
   return (
     <ConfigProvider theme={antdTheme}>
       <Router>
-        <AppRoutes />
+        <OnlineStatusProvider>
+          <AppRoutes />
+        </OnlineStatusProvider>
       </Router>
     </ConfigProvider>
   );

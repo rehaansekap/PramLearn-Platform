@@ -34,15 +34,15 @@ import {
   QuestionCircleOutlined,
   StopOutlined,
 } from "@ant-design/icons";
-import useSessionQuizManagement from "../hooks/useSessionQuizManagement";
-import SessionQuizModal from "./SessionQuizModal";
-import SessionQuizRankingModal from "./SessionQuizRankingModal";
-import SessionQuizResultsModal from "./SessionQuizResultsModal";
+import useSessionQuizManagement from "../../hooks/useSessionQuizManagement";
+import SessionsQuizModal from "./SessionsQuizModal";
+import SessionsQuizRankingModal from "./SessionsQuizRankingModal";
+import SessionsQuizResultsModal from "./SessionsQuizResultsModal";
 import moment from "moment";
 
 const { Title, Text } = Typography;
 
-const SessionMaterialQuizzesTab = ({ materialSlug, quizzes, groups }) => {
+const SessionsMaterialQuizzesTab = ({ materialSlug, quizzes, groups }) => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [isQuizModalVisible, setIsQuizModalVisible] = useState(false);
   const [isRankingModalVisible, setIsRankingModalVisible] = useState(false);
@@ -541,7 +541,7 @@ const SessionMaterialQuizzesTab = ({ materialSlug, quizzes, groups }) => {
       </Card>
 
       {/* Modals */}
-      <SessionQuizModal
+      <SessionsQuizModal
         open={isQuizModalVisible}
         onClose={() => setIsQuizModalVisible(false)}
         onSubmit={handleQuizSubmit}
@@ -553,14 +553,14 @@ const SessionMaterialQuizzesTab = ({ materialSlug, quizzes, groups }) => {
         materialSlug={materialSlug}
       />
 
-      <SessionQuizRankingModal
+      <SessionsQuizRankingModal
         open={isRankingModalVisible}
         onClose={() => setIsRankingModalVisible(false)}
         quiz={selectedQuiz}
         materialSlug={materialSlug}
       />
 
-      <SessionQuizResultsModal
+      <SessionsQuizResultsModal
         open={isResultsModalVisible}
         onClose={() => setIsResultsModalVisible(false)}
         quiz={selectedQuiz}
@@ -571,4 +571,4 @@ const SessionMaterialQuizzesTab = ({ materialSlug, quizzes, groups }) => {
   );
 };
 
-export default SessionMaterialQuizzesTab;
+export default SessionsMaterialQuizzesTab;

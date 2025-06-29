@@ -28,6 +28,7 @@ import {
   LoadingOutlined,
 } from "@ant-design/icons";
 import SessionsARCSProfileSection from "./SessionsARCSProfileSection";
+import api from "../../../../api";
 
 const { Title, Text } = Typography;
 

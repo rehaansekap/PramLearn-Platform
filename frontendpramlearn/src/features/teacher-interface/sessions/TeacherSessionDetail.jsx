@@ -1,20 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Card, Typography, Tabs, Alert, Spin, Button, Space } from "antd";
-import {
-  ArrowLeftOutlined,
-  CalendarOutlined,
-  LoadingOutlined,
-  UnorderedListOutlined,
-  BarChartOutlined,
-  TeamOutlined,
-} from "@ant-design/icons";
-import useTeacherSessionDetail from "./hooks/useTeacherSessionDetail";
-import SessionDetailCard from "./components/SessionDetailCard";
-import SessionMaterialManagement from "./components/SessionMaterialManagement"; // Import component baru
+import { Spin, Alert, message } from "antd";
+import { LoadingOutlined } from "@ant-design/icons";
 
-const { Title } = Typography;
-const { TabPane } = Tabs;
+// Import hooks
+import useTeacherSessionDetail from "./hooks/useTeacherSessionDetail";
+
+// Import refactored components
+import SessionsDetailHeader from "./components/sessions-detail/SessionsDetailHeader";
+import SessionsDetailTabs from "./components/sessions-detail/SessionsDetailTabs";
+import SessionsDetailMaterialsGrid from "./components/sessions-detail/SessionsDetailMaterialsGrid";
+import SessionsDetailAnalytics from "./components/sessions-detail/SessionsDetailAnalytics";
+import SessionsDetailStudents from "./components/sessions-detail/SessionsDetailStudents";
 
 const TeacherSessionDetail = () => {
   const { subjectSlug } = useParams();
@@ -24,6 +21,8 @@ const TeacherSessionDetail = () => {
 
   const [activeTab, setActiveTab] = useState("materials");
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [actionLoading, setActionLoading] = useState({});
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
@@ -36,16 +35,27 @@ const TeacherSessionDetail = () => {
   };
 
   const handleViewMaterial = async (material) => {
-    const viewKey = `view_${material.id}`;
-    setActionLoading((prev) => ({ ...prev, [viewKey]: true }));
-
     try {
-      // Navigate to sessions material detail page instead of regular material detail
-      navigate(`/teacher/sessions/material/${material.slug}`);
-    } catch (error) {
-      console.error("Error viewing material:", error);
+      setActionLoading((prev) => ({ ...prev, [`view_${material.id}`]: true }));
+      // Add your view material logic here
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
+      navigate(`/teacher/sessions/${subjectSlug}/${material.slug}`);
+    } catch (err) {
+      message.error("Gagal membuka materi");
     } finally {
-      setActionLoading((prev) => ({ ...prev, [viewKey]: false }));
+      setActionLoading((prev) => ({ ...prev, [`view_${material.id}`]: false }));
+    }
+  };
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await refetch();
+      message.success("Data berhasil diperbarui");
+    } catch (err) {
+      message.error("Gagal memperbarui data");
+    } finally {
+      setRefreshing(false);
     }
   };
 
@@ -53,158 +63,153 @@ const TeacherSessionDetail = () => {
 
   if (error) {
     return (
-      <Card style={{ margin: "24px", borderRadius: 12 }}>
+      <div
+        style={{
+          minHeight: "calc(100vh - 64px)",
+          background: "linear-gradient(135deg, #f8fafc 0%, #e6f3ff 100%)",
+          padding: "24px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
         <Alert
           message="Error"
-          description="Gagal memuat detail pertemuan. Silakan coba lagi."
+          description="Gagal memuat data session. Silakan coba lagi."
           type="error"
           showIcon
-          action={
-            <Space>
-              <Button onClick={() => refetch()}>Coba Lagi</Button>
-              <Button onClick={handleBack}>Kembali</Button>
-            </Space>
-          }
+          style={{
+            borderRadius: 16,
+            maxWidth: 500,
+            width: "100%",
+          }}
         />
-      </Card>
+      </div>
     );
   }
 
   if (loading && !sessionDetail) {
     return (
-      <div style={{ textAlign: "center", padding: "60px 0" }}>
-        <Spin indicator={antIcon} />
-        <p style={{ marginTop: 16, color: "#666" }}>
-          Memuat detail pertemuan...
-        </p>
+      <div
+        style={{
+          minHeight: "calc(100vh - 64px)",
+          background: "linear-gradient(135deg, #f8fafc 0%, #e6f3ff 100%)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Spin
+          indicator={antIcon}
+          size="large"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 16,
+          }}
+        />
       </div>
     );
   }
 
-  return (
-    <div style={{ padding: "24px", maxWidth: "1400px", margin: "0 auto" }}>
-      {/* Back Button */}
-      <div style={{ marginBottom: 16 }}>
-        <Button
-          icon={<ArrowLeftOutlined />}
-          onClick={handleBack}
-          style={{ borderRadius: 8 }}
-        >
-          Kembali ke Daftar Pertemuan
-        </Button>
-      </div>
-
-      {/* Session Detail Header */}
-      <SessionDetailCard sessionDetail={sessionDetail} loading={loading} />
-
-      {/* Content Tabs */}
-      <Card style={{ borderRadius: 12 }} bodyStyle={{ padding: 0 }}>
-        <Tabs
-          activeKey={activeTab}
-          onChange={setActiveTab}
-          type="card"
-          size="large"
-          style={{ marginBottom: 0 }}
-          tabBarStyle={{
-            margin: 0,
-            paddingLeft: 24,
-            paddingRight: 24,
-            paddingTop: 16,
-            background: "#fafafa",
-            borderRadius: "12px 12px 0 0",
+  if (!sessionDetail) {
+    return (
+      <div
+        style={{
+          minHeight: "calc(100vh - 64px)",
+          background: "linear-gradient(135deg, #f8fafc 0%, #e6f3ff 100%)",
+          padding: "24px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Alert
+          message="Data Tidak Ditemukan"
+          description="Session yang Anda cari tidak ditemukan."
+          type="warning"
+          showIcon
+          style={{
+            borderRadius: 16,
+            maxWidth: 500,
+            width: "100%",
           }}
-        >
-          <TabPane
-            tab={
-              <span>
-                <UnorderedListOutlined />
-                {!isMobile && " Manajemen Materi"}
-              </span>
-            }
-            key="materials"
-          >
-            <div style={{ padding: "24px" }}>
-              {sessionDetail && (
-                <SessionMaterialManagement
-                  subjectId={sessionDetail.subject.id}
-                  subjectName={sessionDetail.subject.name}
-                  className={sessionDetail.subject.class_name}
-                />
-              )}
-            </div>
-          </TabPane>
+        />
+      </div>
+    );
+  }
 
-          <TabPane
-            tab={
-              <span>
-                <BarChartOutlined />
-                {!isMobile && " Analisis Performa"}
-              </span>
-            }
-            key="analytics"
-          >
-            <div style={{ padding: "24px" }}>
-              {/* Performance Analytics Component */}
-              <div style={{ textAlign: "center", padding: "60px 0" }}>
-                <BarChartOutlined
-                  style={{ fontSize: 48, color: "#d9d9d9", marginBottom: 16 }}
-                />
-                <Title level={4} style={{ color: "#999" }}>
-                  Analisis Performa
-                </Title>
-                <p style={{ color: "#666" }}>
-                  Fitur analisis performa akan segera hadir
-                </p>
-              </div>
-            </div>
-          </TabPane>
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case "materials":
+        return (
+          <SessionsDetailMaterialsGrid
+            materials={sessionDetail.sessions_data || []}
+            onViewMaterial={handleViewMaterial}
+            actionLoading={actionLoading}
+            isMobile={isMobile}
+          />
+        );
+      case "analytics":
+        return (
+          <SessionsDetailAnalytics
+            sessionDetail={sessionDetail}
+            isMobile={isMobile}
+          />
+        );
+      case "students":
+        return (
+          <SessionsDetailStudents
+            sessionDetail={sessionDetail}
+            isMobile={isMobile}
+            onRefresh={handleRefresh}
+            refreshing={refreshing}
+          />
+        );
+      default:
+        return null;
+    }
+  };
 
-          <TabPane
-            tab={
-              <span>
-                <TeamOutlined />
-                {!isMobile && " Performa Siswa"}
-              </span>
-            }
-            key="students"
-          >
-            <div style={{ padding: "24px" }}>
-              {/* Student Performance Component */}
-              <div style={{ textAlign: "center", padding: "60px 0" }}>
-                <TeamOutlined
-                  style={{ fontSize: 48, color: "#d9d9d9", marginBottom: 16 }}
-                />
-                <Title level={4} style={{ color: "#999" }}>
-                  Performa Siswa
-                </Title>
-                <p style={{ color: "#666" }}>
-                  Detail performa siswa akan segera hadir
-                </p>
-              </div>
-            </div>
-          </TabPane>
-        </Tabs>
-      </Card>
+  return (
+    <div
+      className="sessions-list-container"
+      style={{
+        // background: "linear-gradient(135deg, #f8fafc 0%, #e6f3ff 100%)",
+        minHeight: "calc(100vh - 64px)",
+        padding: isMobile ? "16px" : "24px",
+      }}
+    >
+      <div style={{ maxWidth: 1400, margin: "0 auto" }}>
+        <SessionsDetailHeader
+          sessionDetail={sessionDetail}
+          onBack={handleBack}
+          onRefresh={handleRefresh}
+          refreshing={refreshing}
+          isMobile={isMobile}
+        />
 
-      {/* Loading overlay untuk refresh */}
-      {loading && sessionDetail && (
         <div
           style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "rgba(255, 255, 255, 0.8)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            zIndex: 1000,
+            background: "white",
+            borderRadius: 16,
+            boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
+            overflow: "hidden",
           }}
         >
-          <Spin indicator={antIcon} tip="Memperbarui data..." />
+          <SessionsDetailTabs
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            sessionDetail={sessionDetail}
+            isMobile={isMobile}
+          />
+
+          <div style={{ padding: isMobile ? "16px" : "24px" }}>
+            {renderTabContent()}
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };

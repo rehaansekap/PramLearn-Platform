@@ -32,7 +32,7 @@ const { Title, Text } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
 
-const SessionQuizModal = ({
+const SessionsQuizModal = ({
   open,
   onClose,
   onSubmit,
@@ -632,4 +632,4 @@ const SessionQuizModal = ({
   );
 };
 
-export default SessionQuizModal;
+export default SessionsQuizModal;

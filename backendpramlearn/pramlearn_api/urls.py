@@ -106,6 +106,7 @@ from pramlearnapp.views.teacher.sessions.teacherSessionDetailView import (
 from pramlearnapp.views.teacher.sessions.teacherSessionMaterialDetail import (
     TeacherSessionMaterialDetailView,
     TeacherSessionMaterialContentView,
+    TeacherSessionMaterialAttendanceView,
 )
 from pramlearnapp.views.teacher.sessions.teacherSessionAutoGroupFormationView import (
     TeacherSessionAutoGroupFormationView,
@@ -409,6 +410,11 @@ urlpatterns = [
         "api/teacher/sessions/material/<slug:material_slug>/",
         TeacherSessionMaterialDetailView.as_view(),
         name="session-material-detail",
+    ),
+    path(
+        "api/teacher/sessions/material/<slug:material_slug>/attendance/<int:student_id>/",
+        TeacherSessionMaterialAttendanceView.as_view(),
+        name="teacher-session-material-attendance",
     ),
     path(
         "api/teacher/sessions/material/<slug:material_slug>/content/",
