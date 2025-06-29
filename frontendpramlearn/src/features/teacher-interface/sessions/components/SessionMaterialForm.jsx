@@ -62,8 +62,8 @@ const SessionMaterialForm = ({
       setFormData({
         title: "",
         pdf_files: [],
-        google_form_embed_arcs_awal: "",
-        google_form_embed_arcs_akhir: "",
+        // google_form_embed_arcs_awal: "",
+        // google_form_embed_arcs_akhir: "",
         youtube_videos: [{ url: "" }],
       });
     }
@@ -403,7 +403,7 @@ const SessionMaterialForm = ({
           </Card>
 
           {/* Google Forms */}
-          <Card
+          {/* <Card
             title="Google Form ARCS"
             style={{ marginBottom: 24, borderRadius: 8 }}
           >
@@ -447,7 +447,7 @@ const SessionMaterialForm = ({
                 </Form.Item>
               </Col>
             </Row>
-          </Card>
+          </Card> */}
 
           {/* Submit Button */}
           <Form.Item style={{ textAlign: "center", marginTop: 32 }}>

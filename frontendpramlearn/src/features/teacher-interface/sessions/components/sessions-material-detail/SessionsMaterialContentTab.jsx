@@ -289,7 +289,7 @@ const SessionsMaterialContentTab = ({ materialSlug, materialDetail }) => {
         </Panel>
 
         {/* Google Forms */}
-        <Panel
+        {/* <Panel
           header={
             <Space>
               <FormOutlined style={{ color: "#52c41a" }} />
@@ -300,7 +300,6 @@ const SessionsMaterialContentTab = ({ materialSlug, materialDetail }) => {
         >
           <AccordionContent>
             <Space direction="vertical" style={{ width: "100%" }} size="large">
-              {/* ARCS Awal */}
               <Card
                 size="small"
                 title={
@@ -348,7 +347,6 @@ const SessionsMaterialContentTab = ({ materialSlug, materialDetail }) => {
                 )}
               </Card>
 
-              {/* ARCS Akhir */}
               <Card
                 size="small"
                 title={
@@ -397,7 +395,7 @@ const SessionsMaterialContentTab = ({ materialSlug, materialDetail }) => {
               </Card>
             </Space>
           </AccordionContent>
-        </Panel>
+        </Panel> */}
       </Collapse>
     </div>
   );

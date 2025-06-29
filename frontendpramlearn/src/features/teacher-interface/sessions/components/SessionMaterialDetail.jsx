@@ -184,7 +184,7 @@ const SessionMaterialDetail = ({ material }) => {
         </Panel>
 
         {/* Google Forms */}
-        <Panel
+        {/* <Panel
           header={
             <Space>
               <LinkOutlined style={{ color: "#52c41a" }} />
@@ -194,7 +194,6 @@ const SessionMaterialDetail = ({ material }) => {
           key="forms"
         >
           <Space direction="vertical" style={{ width: "100%" }} size="large">
-            {/* ARCS Awal */}
             <Card
               size="small"
               title={
@@ -239,7 +238,6 @@ const SessionMaterialDetail = ({ material }) => {
               )}
             </Card>
 
-            {/* ARCS Akhir */}
             <Card
               size="small"
               title={
@@ -284,7 +282,7 @@ const SessionMaterialDetail = ({ material }) => {
               )}
             </Card>
           </Space>
-        </Panel>
+        </Panel> */}
       </Collapse>
     </div>
   );

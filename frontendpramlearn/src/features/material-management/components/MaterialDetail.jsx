@@ -126,13 +126,13 @@ const MaterialDetail = ({ materialId }) => {
           }
           key="arcs"
         >
-          <AccordionContent>
+          {/* <AccordionContent>
             <GoogleFormsPanel
               arcsAwal={materialDetail.google_form_embed_arcs_awal}
               arcsAkhir={materialDetail.google_form_embed_arcs_akhir}
               getGoogleFormEmbedUrl={getGoogleFormEmbedUrl}
             />
-          </AccordionContent>
+          </AccordionContent> */}
         </Panel>
       </Collapse>
     </div>

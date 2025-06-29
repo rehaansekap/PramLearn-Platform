@@ -7,8 +7,8 @@ const useMaterialForm = (materialId, subjectId, onSuccess) => {
   const [formData, setFormData] = useState({
     title: "",
     pdf_files: [],
-    google_form_embed_arcs_awal: "",
-    google_form_embed_arcs_akhir: "",
+    // google_form_embed_arcs_awal: "",
+    // google_form_embed_arcs_akhir: "",
     youtube_videos: [{ url: "" }],
   });
   const [message, setMessage] = useState("");
@@ -24,10 +24,10 @@ const useMaterialForm = (materialId, subjectId, onSuccess) => {
           setFormData({
             title: response.data.title || "",
             pdf_files: response.data.pdf_files || [],
-            google_form_embed_arcs_awal:
-              response.data.google_form_embed_arcs_awal || "",
-            google_form_embed_arcs_akhir:
-              response.data.google_form_embed_arcs_akhir || "",
+            // google_form_embed_arcs_awal:
+            //   response.data.google_form_embed_arcs_awal || "",
+            // google_form_embed_arcs_akhir:
+            //   response.data.google_form_embed_arcs_akhir || "",
             youtube_videos:
               response.data.youtube_videos &&
               response.data.youtube_videos.length > 0
@@ -104,8 +104,8 @@ const useMaterialForm = (materialId, subjectId, onSuccess) => {
     const payload = {
       title: formData.title,
       pdf_files_ids: (formData.pdf_files || []).map((file) => file.id),
-      google_form_embed_arcs_awal: formData.google_form_embed_arcs_awal,
-      google_form_embed_arcs_akhir: formData.google_form_embed_arcs_akhir,
+      // google_form_embed_arcs_awal: formData.google_form_embed_arcs_awal,
+      // google_form_embed_arcs_akhir: formData.google_form_embed_arcs_akhir,
       youtube_videos: (formData.youtube_videos || []).filter(
         (v) => v.url.trim() !== ""
       ),
@@ -129,8 +129,8 @@ const useMaterialForm = (materialId, subjectId, onSuccess) => {
           setFormData({
             title: "",
             pdf_files: [],
-            google_form_embed_arcs_awal: "",
-            google_form_embed_arcs_akhir: "",
+            // google_form_embed_arcs_awal: "",
+            // google_form_embed_arcs_akhir: "",
             youtube_videos: [{ url: "" }],
           });
         }

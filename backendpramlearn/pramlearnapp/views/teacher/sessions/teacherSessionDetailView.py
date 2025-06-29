@@ -118,8 +118,8 @@ class TeacherSessionDetailView(APIView):
                     'created_at': material.id,  # Using ID as proxy for creation order
                     'has_content': bool(
                         material.pdf_files.exists() or
-                        material.youtube_videos.exists() or
-                        material.google_form_embed
+                        material.youtube_videos.exists()
+                        # or material.google_form_embed
                     )
                 })
 

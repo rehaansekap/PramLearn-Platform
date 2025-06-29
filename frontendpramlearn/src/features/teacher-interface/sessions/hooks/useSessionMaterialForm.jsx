@@ -7,8 +7,8 @@ const useSessionMaterialForm = (materialId, subjectId, onSuccess) => {
   const [formData, setFormData] = useState({
     title: "",
     pdf_files: [],
-    google_form_embed_arcs_awal: "",
-    google_form_embed_arcs_akhir: "",
+    // google_form_embed_arcs_awal: "",
+    // google_form_embed_arcs_akhir: "",
     youtube_videos: [{ url: "" }],
   });
 
@@ -29,9 +29,9 @@ const useSessionMaterialForm = (materialId, subjectId, onSuccess) => {
       setFormData({
         title: material.title || "",
         pdf_files: material.pdf_files || [],
-        google_form_embed_arcs_awal: material.google_form_embed_arcs_awal || "",
-        google_form_embed_arcs_akhir:
-          material.google_form_embed_arcs_akhir || "",
+        // google_form_embed_arcs_awal: material.google_form_embed_arcs_awal || "",
+        // google_form_embed_arcs_akhir:
+        //   material.google_form_embed_arcs_akhir || "",
         youtube_videos:
           material.youtube_videos?.length > 0
             ? material.youtube_videos
@@ -94,8 +94,8 @@ const useSessionMaterialForm = (materialId, subjectId, onSuccess) => {
         youtube_videos: formData.youtube_videos.filter((video) =>
           video.url.trim()
         ),
-        google_form_embed_arcs_awal: formData.google_form_embed_arcs_awal,
-        google_form_embed_arcs_akhir: formData.google_form_embed_arcs_akhir,
+        // google_form_embed_arcs_awal: formData.google_form_embed_arcs_awal,
+        // google_form_embed_arcs_akhir: formData.google_form_embed_arcs_akhir,
       };
 
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
@@ -111,8 +111,8 @@ const useSessionMaterialForm = (materialId, subjectId, onSuccess) => {
         setFormData({
           title: "",
           pdf_files: [],
-          google_form_embed_arcs_awal: "",
-          google_form_embed_arcs_akhir: "",
+          // google_form_embed_arcs_awal: "",
+          // google_form_embed_arcs_akhir: "",
           youtube_videos: [{ url: "" }],
         });
       }

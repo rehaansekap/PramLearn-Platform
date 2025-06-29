@@ -33,9 +33,9 @@ const MaterialContentTabs = ({
 }) => {
   const hasPDFs = material.pdf_files?.length > 0;
   const hasVideos = material.youtube_videos?.some((v) => v.url);
-  const hasGoogleForms =
-    material.google_form_embed_arcs_awal ||
-    material.google_form_embed_arcs_akhir;
+  // const hasGoogleForms =
+  //   material.google_form_embed_arcs_awal ||
+  //   material.google_form_embed_arcs_akhir;
   const hasActiveARCS = arcsQuestionnaires.some((q) => !q.is_completed);
   const completedARCS = arcsQuestionnaires.filter((q) => q.is_completed).length;
   const totalARCS = arcsQuestionnaires.length;

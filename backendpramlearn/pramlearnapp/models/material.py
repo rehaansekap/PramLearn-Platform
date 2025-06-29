@@ -22,9 +22,9 @@ class File(models.Model):
 class Material(models.Model):
     title = models.CharField(max_length=255)
     pdf_files = models.ManyToManyField(File, blank=True)
-    google_form_embed_arcs_awal = models.URLField(blank=True, null=True)
-    google_form_embed_arcs_akhir = models.URLField(blank=True, null=True)
-    google_form_embed = models.TextField(blank=True, null=True)
+    # google_form_embed_arcs_awal = models.URLField(blank=True, null=True)
+    # google_form_embed_arcs_akhir = models.URLField(blank=True, null=True)
+    # google_form_embed = models.TextField(blank=True, null=True)
     subject = models.ForeignKey(
         Subject, related_name='materials', on_delete=models.CASCADE)
     slug = models.SlugField(unique=True, blank=True)

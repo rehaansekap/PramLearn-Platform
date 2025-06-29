@@ -61,8 +61,8 @@ const MaterialForm = ({
       setFormData({
         title: "",
         pdf_files: [],
-        google_form_embed_arcs_awal: "",
-        google_form_embed_arcs_akhir: "",
+        // google_form_embed_arcs_awal: "",
+        // google_form_embed_arcs_akhir: "",
         youtube_videos: [{ url: "" }],
       });
     }
@@ -438,7 +438,7 @@ const MaterialForm = ({
           )}
         </Form.Item>
 
-        <Form.Item
+        {/* <Form.Item
           label={
             <span style={{ fontWeight: "bold" }}>
               Embed Google Form ARCS Awal
@@ -486,7 +486,7 @@ const MaterialForm = ({
               borderRadius: 8,
             }}
           />
-        </Form.Item>
+        </Form.Item> */}
 
         <Form.Item
           label={

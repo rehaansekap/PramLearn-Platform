@@ -14,11 +14,11 @@ export const hasContentType = (material, type) => {
       return material.pdf_files?.length > 0;
     case "video":
       return material.youtube_videos?.some((v) => v.url);
-    case "forms":
-      return (
-        material.google_form_embed_arcs_awal ||
-        material.google_form_embed_arcs_akhir
-      );
+    // case "forms":
+    //   return (
+    //     material.google_form_embed_arcs_awal ||
+    //     material.google_form_embed_arcs_akhir
+    //   );
     default:
       return false;
   }

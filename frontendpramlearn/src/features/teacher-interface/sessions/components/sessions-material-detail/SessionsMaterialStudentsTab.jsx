@@ -53,7 +53,7 @@ const SessionsMaterialStudentsTab = ({
   const [searchText, setSearchText] = useState("");
   const [sortedInfo, setSortedInfo] = useState({});
   const [updating, setUpdating] = useState({});
-    const { isUserOnline } = useOnlineStatus();
+  const { isUserOnline } = useOnlineStatus();
 
   if (!materialDetail) {
     return (
@@ -261,10 +261,10 @@ const SessionsMaterialStudentsTab = ({
             <Avatar
               icon={<UserOutlined />}
               style={{
-                background: record.is_online ? "#52c41a" : "#d9d9d9",
+                background: isUserOnline(record) ? "#52c41a" : "#d9d9d9",
               }}
             />
-            {record.is_online && (
+            {isUserOnline(record) && (
               <div
                 style={{
                   position: "absolute",

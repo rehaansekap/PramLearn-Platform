@@ -138,8 +138,8 @@ class TeacherSessionMaterialDetailView(APIView):
                         }
                         for video in material.youtube_videos.all()
                     ],
-                    "google_form_embed_arcs_awal": material.google_form_embed_arcs_awal,
-                    "google_form_embed_arcs_akhir": material.google_form_embed_arcs_akhir,
+                    # "google_form_embed_arcs_awal": material.google_form_embed_arcs_awal,
+                    # "google_form_embed_arcs_akhir": material.google_form_embed_arcs_akhir,
                 },
                 "students": students_data,
                 "groups": groups_data,
@@ -189,8 +189,8 @@ class TeacherSessionMaterialDetailView(APIView):
         return {
             "pdf_files": pdf_files,
             "youtube_videos": youtube_videos,
-            "google_form_embed_arcs_awal": material.google_form_embed_arcs_awal,
-            "google_form_embed_arcs_akhir": material.google_form_embed_arcs_akhir,
+            # "google_form_embed_arcs_awal": material.google_form_embed_arcs_awal,
+            # "google_form_embed_arcs_akhir": material.google_form_embed_arcs_akhir,
         }
 
     def get_students_data(self, class_obj, material):
@@ -405,10 +405,10 @@ class TeacherSessionMaterialContentView(APIView):
                 },
                 "pdf_files": self.get_pdf_files(material),
                 "youtube_videos": self.get_youtube_videos(material),
-                "google_forms": {
-                    "arcs_awal": material.google_form_embed_arcs_awal,
-                    "arcs_akhir": material.google_form_embed_arcs_akhir,
-                },
+                # "google_forms": {
+                #     "arcs_awal": material.google_form_embed_arcs_awal,
+                #     "arcs_akhir": material.google_form_embed_arcs_akhir,
+                # },
             }
 
             return Response(content_data, status=status.HTTP_200_OK)
