@@ -482,6 +482,40 @@ class TeacherSessionQuizDetailView(APIView):
                     group=group_quiz.group
                 ).select_related("student")
 
+                submissions = GroupQuizSubmission.objects.filter(group_quiz=group_quiz)
+                answers = []
+                for submission in submissions:
+                    answers.append(
+                        {
+                            "question_id": submission.question.id,
+                            "question_text": submission.question.text,
+                            "correct_choice": submission.question.correct_choice,
+                            "selected_choice": submission.selected_choice,
+                            "is_correct": submission.is_correct,
+                            "answered_by": (
+                                {
+                                    "id": submission.student.id,
+                                    "username": submission.student.username,
+                                    "first_name": submission.student.first_name,
+                                    "last_name": submission.student.last_name,
+                                }
+                                if submission.student
+                                else None
+                            ),
+                        }
+                    )
+                # Analisis performa sederhana
+                total = len(answers)
+                benar = sum(1 for a in answers if a["is_correct"])
+                performance = {
+                    "score": (
+                        group_quiz.result.score if hasattr(group_quiz, "result") else 0
+                    ),
+                    "accuracy": (benar / total * 100) if total else 0,
+                    "correct": benar,
+                    "total": total,
+                }
+
                 result_data = {
                     "group_id": group_quiz.group.id,
                     "group_name": group_quiz.group.name,
@@ -499,6 +533,8 @@ class TeacherSessionQuizDetailView(APIView):
                         }
                         for m in group_members
                     ],
+                    "answers": answers,
+                    "performance": performance,
                 }
 
                 # Get result if exists

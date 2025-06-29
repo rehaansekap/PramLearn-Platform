@@ -141,7 +141,11 @@ const SessionsQuizResultsModal = ({
       render: (answeredBy) => (
         <Space>
           <Avatar size="small" icon={<UserOutlined />} />
-          <Text>{answeredBy.name || answeredBy.username}</Text>
+          <Text>
+            {answeredBy.first_name && answeredBy.last_name
+              ? `${answeredBy.first_name} ${answeredBy.last_name}`
+              : answeredBy.username || "-"}
+          </Text>
         </Space>
       ),
       width: 150,
@@ -247,7 +251,12 @@ const SessionsQuizResultsModal = ({
                           quizDetail.results.length > 0
                             ? (
                                 quizDetail.results.reduce(
-                                  (sum, r) => sum + r.performance.score,
+                                  (sum, r) =>
+                                    sum +
+                                    (r.performance &&
+                                    typeof r.performance.score === "number"
+                                      ? r.performance.score
+                                      : 0),
                                   0
                                 ) / quizDetail.results.length
                               ).toFixed(1)
@@ -268,65 +277,61 @@ const SessionsQuizResultsModal = ({
               <Collapse
                 size="small"
                 ghost
-                expandIcon={({ isActive }) => (
-                  <div
-                    style={{
-                      transform: `rotate(${isActive ? 90 : 0}deg)`,
-                      fontSize: 16,
-                      color: "#1890ff",
-                    }}
-                  >
-                    ▶
-                  </div>
-                )}
+                // expandIcon={({ isActive }) => (
+                //   <div
+                //     style={{
+                //       transform: `rotate(${isActive ? 90 : 0}deg)`,
+                //       fontSize: 16,
+                //       color: "#1890ff",
+                //     }}
+                //   >
+                //     ▶
+                //   </div>
+                // )}
               >
                 {quizDetail.results.map((result, index) => (
                   <Panel
-                    key={result.group.id}
+                    key={result.group_id}
                     header={
                       <div
                         style={{
                           display: "flex",
                           justifyContent: "space-between",
                           alignItems: "center",
+                          paddingRight: 24,
                         }}
                       >
                         <Space>
                           <Text strong style={{ fontSize: 16 }}>
-                            {result.group.name}
+                            {result.group_name || "Nama grup tidak tersedia"}
                           </Text>
-                          <Text type="secondary">({result.group.code})</Text>
+                          <Text type="secondary">
+                            ({result.group_code || "Kode grup tidak tersedia"})
+                          </Text>
                           <Tag color="blue">
-                            {result.group.members.length} anggota
+                            {(result.members && result.members.length) || 0}{" "}
+                            anggota
                           </Tag>
+                          {/* Status badge */}
+                          {result.is_completed ? (
+                            <Tag color="green">Sudah Selesai</Tag>
+                          ) : (
+                            <Tag color="orange">Belum Selesai</Tag>
+                          )}
                         </Space>
                         <Space>
                           <Progress
-                            percent={result.performance.score}
+                            percent={result.score || 0}
                             size="small"
                             style={{ width: 100 }}
                             strokeColor={
-                              result.performance.score >= 80
+                              result.score >= 80
                                 ? "#52c41a"
-                                : result.performance.score >= 60
+                                : result.score >= 60
                                 ? "#faad14"
                                 : "#ff4d4f"
                             }
                           />
-                          <Text
-                            strong
-                            style={{
-                              color:
-                                result.performance.score >= 80
-                                  ? "#52c41a"
-                                  : result.performance.score >= 60
-                                  ? "#faad14"
-                                  : "#ff4d4f",
-                              fontSize: 16,
-                            }}
-                          >
-                            {result.performance.score.toFixed(1)}%
-                          </Text>
                         </Space>
                       </div>
                     }
@@ -338,38 +343,55 @@ const SessionsQuizResultsModal = ({
                           <Space direction="vertical" style={{ width: "100%" }}>
                             <div>
                               <Text strong>Anggota:</Text>
-                              <div style={{ marginTop: 8 }}>
-                                {result.group.members.map((member) => (
-                                  <Tag
-                                    key={member.id}
-                                    style={{ margin: "2px 4px 2px 0" }}
-                                  >
-                                    <Space>
-                                      <UserOutlined />
-                                      {member.name}
-                                    </Space>
-                                  </Tag>
-                                ))}
+                              <div style={{ marginBottom: 12 }}>
+                                <Text strong>Anggota:</Text>
+                                {result.members && result.members.length > 0 ? (
+                                  <ul style={{ margin: 0, paddingLeft: 20 }}>
+                                    {result.members.map((m) => (
+                                      <li key={m.id}>
+                                        {m.first_name} {m.last_name}{" "}
+                                        <span style={{ color: "#888" }}>
+                                          ({m.username})
+                                        </span>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                ) : (
+                                  <Text type="secondary">
+                                    Tidak ada anggota
+                                  </Text>
+                                )}
                               </div>
+                              {/* Info waktu submit */}
+                              {result.is_completed && result.submitted_at && (
+                                <div style={{ marginBottom: 8 }}>
+                                  <Text type="success">
+                                    <ClockCircleOutlined /> Submit:{" "}
+                                    {moment(result.submitted_at).format(
+                                      "DD/MM/YYYY HH:mm"
+                                    )}
+                                  </Text>
+                                </div>
+                              )}
                             </div>
                             <div>
                               <Text strong>Waktu:</Text>
                               <div style={{ marginTop: 4 }}>
                                 <div>
                                   <ClockCircleOutlined /> Mulai:{" "}
-                                  {moment(result.quiz_info.start_time).format(
+                                  {moment(result.start_time).format(
                                     "DD/MM/YYYY HH:mm"
                                   )}
                                 </div>
-                                {result.quiz_info.submitted_at && (
+                                {result.submitted_at && (
                                   <div>
                                     <CheckCircleOutlined
                                       style={{ color: "#52c41a" }}
                                     />{" "}
                                     Submit:{" "}
-                                    {moment(
-                                      result.quiz_info.submitted_at
-                                    ).format("DD/MM/YYYY HH:mm")}
+                                    {moment(result.submitted_at).format(
+                                      "DD/MM/YYYY HH:mm"
+                                    )}
                                   </div>
                                 )}
                               </div>
@@ -385,13 +407,13 @@ const SessionsQuizResultsModal = ({
                             <Col xs={12}>
                               <Statistic
                                 title="Skor"
-                                value={result.performance.score}
+                                value={result.score || 0}
                                 suffix="%"
                                 valueStyle={{
                                   color:
-                                    result.performance.score >= 80
+                                    result.score >= 80
                                       ? "#52c41a"
-                                      : result.performance.score >= 60
+                                      : result.score >= 60
                                       ? "#faad14"
                                       : "#ff4d4f",
                                 }}
@@ -400,7 +422,15 @@ const SessionsQuizResultsModal = ({
                             <Col xs={12}>
                               <Statistic
                                 title="Akurasi"
-                                value={result.performance.accuracy}
+                                value={
+                                  result.total_questions > 0
+                                    ? (
+                                        (result.correct_answers /
+                                          result.total_questions) *
+                                        100
+                                      ).toFixed(1)
+                                    : 0
+                                }
                                 suffix="%"
                                 valueStyle={{ color: "#1890ff" }}
                               />
@@ -408,8 +438,8 @@ const SessionsQuizResultsModal = ({
                             <Col xs={12}>
                               <Statistic
                                 title="Benar"
-                                value={result.performance.correct_answers}
-                                suffix={`/${result.performance.total_questions}`}
+                                value={result.correct_answers || 0}
+                                suffix={`/${result.total_questions || 0}`}
                                 valueStyle={{ color: "#52c41a" }}
                               />
                             </Col>
@@ -417,12 +447,10 @@ const SessionsQuizResultsModal = ({
                               <Statistic
                                 title="Status"
                                 value={
-                                  result.quiz_info.is_completed
-                                    ? "Selesai"
-                                    : "Belum"
+                                  result.is_completed ? "Selesai" : "Belum"
                                 }
                                 valueStyle={{
-                                  color: result.quiz_info.is_completed
+                                  color: result.is_completed
                                     ? "#52c41a"
                                     : "#faad14",
                                 }}
@@ -436,29 +464,43 @@ const SessionsQuizResultsModal = ({
                       <Col xs={24} md={8}>
                         <Card size="small" title="Analisis Cepat">
                           <div>
-                            {result.performance.score >= 80 && (
-                              <Tag color="success" style={{ marginBottom: 8 }}>
-                                ✅ Excellent Performance
-                              </Tag>
+                            {result.performance ? (
+                              <>
+                                {result.performance_score >= 80 && (
+                                  <Tag
+                                    color="success"
+                                    style={{ marginBottom: 8 }}
+                                  >
+                                    ✅ Excellent Performance
+                                  </Tag>
+                                )}
+                                {result.performance_score >= 60 &&
+                                  result.performance_score < 80 && (
+                                    <Tag
+                                      color="warning"
+                                      style={{ marginBottom: 8 }}
+                                    >
+                                      ⚠️ Good Performance
+                                    </Tag>
+                                  )}
+                                {result.performance_score < 60 && (
+                                  <Tag
+                                    color="error"
+                                    style={{ marginBottom: 8 }}
+                                  >
+                                    ❌ Need Improvement
+                                  </Tag>
+                                )}
+                                <Text type="secondary" style={{ fontSize: 12 }}>
+                                  Tingkat akurasi:{" "}
+                                  {result.performance_accuracy || 0}%
+                                </Text>
+                              </>
+                            ) : (
+                              <Text type="secondary" style={{ fontSize: 12 }}>
+                                Data kinerja belum tersedia
+                              </Text>
                             )}
-                            {result.performance.score >= 60 &&
-                              result.performance.score < 80 && (
-                                <Tag
-                                  color="warning"
-                                  style={{ marginBottom: 8 }}
-                                >
-                                  ⚠️ Good Performance
-                                </Tag>
-                              )}
-                            {result.performance.score < 60 && (
-                              <Tag color="error" style={{ marginBottom: 8 }}>
-                                ❌ Need Improvement
-                              </Tag>
-                            )}
-                            <br />
-                            <Text type="secondary" style={{ fontSize: 12 }}>
-                              Tingkat akurasi: {result.performance.accuracy}%
-                            </Text>
                           </div>
                         </Card>
                       </Col>
@@ -500,10 +542,13 @@ const SessionsQuizResultsModal = ({
                   const totalAnswers = quizDetail.results.length;
                   const correctAnswers = quizDetail.results.reduce(
                     (count, result) => {
-                      const answer = result.answers.find(
-                        (a) => a.question_id === question.id
-                      );
-                      return count + (answer?.is_correct ? 1 : 0);
+                      if (Array.isArray(result.answers)) {
+                        const answer = result.answers.find(
+                          (a) => a.question_id === question.id
+                        );
+                        return count + (answer?.is_correct ? 1 : 0);
+                      }
+                      return count;
                     },
                     0
                   );
@@ -534,7 +579,7 @@ const SessionsQuizResultsModal = ({
                         </div>
 
                         <Progress
-                          percent={correctPercentage}
+                          percent={Number(correctPercentage.toFixed(1))}
                           size="small"
                           strokeColor={
                             correctPercentage >= 80
@@ -553,7 +598,8 @@ const SessionsQuizResultsModal = ({
                           }}
                         >
                           <Text style={{ fontSize: 12 }}>
-                            {correctAnswers}/{totalAnswers} benar
+                            {correctAnswers}/{totalAnswers} benar (
+                            {correctPercentage.toFixed(1)}%)
                           </Text>
                           <Text style={{ fontSize: 12 }}>
                             {correctPercentage >= 80

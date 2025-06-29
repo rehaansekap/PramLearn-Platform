@@ -66,7 +66,7 @@ const useSessionQuizManagement = (materialSlug) => {
       setActionLoading((prev) => ({ ...prev, [`updating_${quizId}`]: true }));
 
       const response = await api.put(
-        `teacher/sessions/material/${materialSlug}/quizzes/${quizId}/`,
+        `teacher/sessions/material/${materialSlug}/quizzes/${quizId}/update`,
         quizData
       );
 
