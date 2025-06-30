@@ -74,22 +74,6 @@ az webapp create \
   --runtime "NODE|20-lts"
 
 
-az webapp config set --resource-group $RESOURCE_GROUP --name $APP_NAME_BACKEND --web-sockets-enabled true
-az webapp config set --resource-group $RESOURCE_GROUP --name $APP_NAME_FRONTEND --web-sockets-enabled true
-az webapp config hostname add \
-  --resource-group $RESOURCE_GROUP \
-  --webapp-name $APP_NAME_FRONTEND \
-  --hostname pramlearn.tech
-az webapp config hostname add \
-  --resource-group $RESOURCE_GROUP \
-  --webapp-name $APP_NAME_BACKEND \
-  --hostname api.pramlearn.tech
-az webapp update --resource-group $RESOURCE_GROUP --name $APP_NAME_FRONTEND --https-only true
-az webapp update --resource-group $RESOURCE_GROUP --name $APP_NAME_BACKEND --https-only true
-az webapp config set --resource-group $RESOURCE_GROUP --name $APP_NAME_FRONTEND --startup-file "pm2 serve /home/site/wwwroot --no-daemon --spa"
-az webapp config set --resource-group $RESOURCE_GROUP --name $APP_NAME_BACKEND --startup-file "gunicorn pramlearn_api.asgi:application --worker-class uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000"
-
-
 # Get connection strings
 echo "🔗 Getting connection strings..."
 DB_CONNECTION_STRING=$(az postgres flexible-server show-connection-string \
@@ -129,6 +113,25 @@ az webapp config appsettings set \
     REACT_APP_API_URL="https://$APP_NAME_BACKEND.azurewebsites.net" \
     WEBSITE_NODE_DEFAULT_VERSION="20.x"
 
+
+az webapp config set --resource-group $RESOURCE_GROUP --name $APP_NAME_BACKEND --always-on true
+az webapp config set --resource-group $RESOURCE_GROUP --name $APP_NAME_FRONTEND --always-on true
+az webapp config set --resource-group $RESOURCE_GROUP --name $APP_NAME_BACKEND --web-sockets-enabled true
+az webapp config set --resource-group $RESOURCE_GROUP --name $APP_NAME_FRONTEND --web-sockets-enabled true
+az webapp config hostname add \
+  --resource-group $RESOURCE_GROUP \
+  --webapp-name $APP_NAME_FRONTEND \
+  --hostname pramlearn.tech
+az webapp config hostname add \
+  --resource-group $RESOURCE_GROUP \
+  --webapp-name $APP_NAME_BACKEND \
+  --hostname api.pramlearn.tech
+az webapp update --resource-group $RESOURCE_GROUP --name $APP_NAME_FRONTEND --https-only true
+az webapp update --resource-group $RESOURCE_GROUP --name $APP_NAME_BACKEND --https-only true
+az webapp config set --resource-group $RESOURCE_GROUP --name $APP_NAME_FRONTEND --startup-file "pm2 serve /home/site/wwwroot --no-daemon --spa"
+az webapp config set --resource-group $RESOURCE_GROUP --name $APP_NAME_BACKEND --startup-file "gunicorn pramlearn_api.asgi:application --worker-class uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000"
+
+
 echo "✅ Azure resources created successfully!"
 echo "📋 Resource details:"
 echo "   Resource Group: $RESOURCE_GROUP"
@@ -136,3 +139,12 @@ echo "   Backend URL: https://$APP_NAME_BACKEND.azurewebsites.net"
 echo "   Frontend URL: https://$APP_NAME_FRONTEND.azurewebsites.net"
 echo "   Database: $DB_SERVER_NAME.postgres.database.azure.com"
 echo "   Redis: $REDIS_NAME.redis.cache.windows.net"
+echo ""
+echo "🔑 Backend Environment Variables:"
+echo "   DATABASE_URL=postgresql://$DB_ADMIN_USER:$DB_ADMIN_PASSWORD@$DB_SERVER_NAME.postgres.database.azure.com:5432/pramlearn_db?sslmode=require"
+echo "   SECRET_KEY=J35syL0l1789"
+echo "   DEBUG=False"
+echo "   DJANGO_SETTINGS_MODULE=pramlearn_api.settings"
+echo "   REDIS_URL=$REDIS_CONNECTION_STRING"
+echo "   SCM_DO_BUILD_DURING_DEPLOYMENT=true"
+echo "   ENABLE_ORYX_BUILD=true"

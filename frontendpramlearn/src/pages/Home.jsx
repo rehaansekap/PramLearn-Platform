@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { Helmet } from "react-helmet";
 import { AuthContext } from "../context/AuthContext";
 import StudentDashboard from "../features/student-interface/dashboard/StudentDashboard";
-import TeacherDashboard from "../features/teacher-interface/dashboard/TeacherDashboard"; // Import Teacher Dashboard
+import TeacherDashboard from "../features/teacher-interface/dashboard/TeacherDashboard";
 
 const Home = () => {
   const { user } = useContext(AuthContext);
@@ -11,10 +11,18 @@ const Home = () => {
   if (user?.role === 3) {
     return <StudentDashboard />;
   } else if (user?.role === 2) {
-    return <TeacherDashboard />; // Render Teacher Dashboard
-  } else if (user?.role === 1) {
-    // Admin bisa menggunakan Teacher Dashboard atau buat Admin Dashboard tersendiri
     return <TeacherDashboard />;
+  } else if (user?.role === 1) {
+    // Admin: tampilkan halaman Home saja, bukan TeacherDashboard
+    return (
+      <div style={{ padding: "24px", textAlign: "center" }}>
+        <Helmet>
+          <title>Dashboard Admin | PramLearn</title>
+        </Helmet>
+        <h2>Selamat datang, Admin!</h2>
+        <p>Gunakan menu di samping untuk mengelola aplikasi.</p>
+      </div>
+    );
   }
 
   // Fallback
