@@ -4,8 +4,9 @@ on:
   push:
     branches:
       - production
-    # paths:
-    #   - "frontendpramlearn/**"
+    paths:
+      - "frontendpramlearn/**"
+      - ".github/workflows/azure-frontend.yml"
 
 jobs:
   build-and-deploy:
@@ -13,10 +14,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: "npm"
@@ -27,6 +28,11 @@ jobs:
           cd frontendpramlearn
           npm ci
 
+      - name: Copy production environment
+        run: |
+          cd frontendpramlearn
+          cp .env.production .env
+
       - name: Build application
         run: |
           cd frontendpramlearn
@@ -35,7 +41,6 @@ jobs:
       - name: Create deployment package
         run: |
           cd frontendpramlearn
-          # Create package.json for App Service
           echo '{
             "name": "pramlearn-frontend",
             "version": "1.0.0",
@@ -47,7 +52,6 @@ jobs:
             }
           }' > dist/package.json
 
-          # Zip deployment files
           cd dist
           zip -r ../deployment.zip .
 

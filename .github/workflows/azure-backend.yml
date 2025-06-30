@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - production
+    paths:
+      - "backendpramlearn/**"
+      - ".github/workflows/azure-backend.yml"
 
 jobs:
   build-and-deploy:
@@ -11,7 +14,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -28,16 +31,6 @@ jobs:
         run: |
           cd backendpramlearn
           cp .env.production .env
-
-      - name: Run migrations
-        run: |
-          cd backendpramlearn
-          python manage.py migrate --noinput
-
-      - name: Collect static files
-        run: |
-          cd backendpramlearn
-          python manage.py collectstatic --noinput
 
       - name: Azure Login
         uses: azure/login@v1
