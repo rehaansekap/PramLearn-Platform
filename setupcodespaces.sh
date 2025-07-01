@@ -17,8 +17,8 @@ sudo -u postgres psql -c "ALTER USER pramadmin WITH SUPERUSER;"
 sudo -u postgres psql -c "ALTER USER postgres PASSWORD '123123123';"
 
 
-python3 -m venv venv
-source venv/bin/activate
+python3 -m venv .venv
+source .venv/bin/activate
 cd backendpramlearn
 
 # Create virtual environment

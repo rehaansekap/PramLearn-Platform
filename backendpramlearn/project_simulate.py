@@ -169,7 +169,6 @@ def generate_subjects():
                 "name": "Administrasi Sistem Jaringan",
                 "slug": "administrasi-sistem-jaringan",
                 "subject_class": 1,
-                # add teacher name
             },
         }
     ]
@@ -258,208 +257,994 @@ def generate_youtube_videos():
 
 
 def generate_quiz():
-    """Generate 1 quiz"""
-    return [
+    """Generate 5 group quizzes with deadline 2 Agustus 2025"""
+    quizzes = [
         {
             "model": "pramlearnapp.quiz",
             "pk": 1,
             "fields": {
-                "title": "Quiz 1",
-                "content": "Quiz tentang pengenalan jaringan komputer",
+                "title": "Quiz 1: Pengenalan Jaringan Komputer",
+                "slug": "quiz-1-pengenalan-jaringan-komputer",
+                "content": "Quiz kelompok tentang pengenalan dasar jaringan komputer",
                 "material": 1,
                 "is_active": True,
+                "is_group_quiz": True,
                 "duration": 30,
-                "created_at": "2024-01-15T09:00:00Z",
+                "end_time": "2025-08-02T23:59:59Z",
+                "created_at": "2025-07-01T08:00:00Z",
             },
-        }
+        },
+        {
+            "model": "pramlearnapp.quiz",
+            "pk": 2,
+            "fields": {
+                "title": "Quiz 2: Topologi Jaringan",
+                "slug": "quiz-2-topologi-jaringan",
+                "content": "Quiz kelompok tentang berbagai jenis topologi jaringan komputer",
+                "material": 1,
+                "is_active": True,
+                "is_group_quiz": True,
+                "duration": 35,
+                "end_time": "2025-08-02T23:59:59Z",
+                "created_at": "2025-07-01T08:00:00Z",
+            },
+        },
+        {
+            "model": "pramlearnapp.quiz",
+            "pk": 3,
+            "fields": {
+                "title": "Quiz 3: Protokol Jaringan",
+                "slug": "quiz-3-protokol-jaringan",
+                "content": "Quiz kelompok tentang protokol-protokol dalam jaringan komputer",
+                "material": 1,
+                "is_active": True,
+                "is_group_quiz": True,
+                "duration": 40,
+                "end_time": "2025-08-02T23:59:59Z",
+                "created_at": "2025-07-01T08:00:00Z",
+            },
+        },
+        {
+            "model": "pramlearnapp.quiz",
+            "pk": 4,
+            "fields": {
+                "title": "Quiz 4: Perangkat Jaringan",
+                "slug": "quiz-4-perangkat-jaringan",
+                "content": "Quiz kelompok tentang perangkat-perangkat jaringan komputer",
+                "material": 1,
+                "is_active": True,
+                "is_group_quiz": True,
+                "duration": 25,
+                "end_time": "2025-08-02T23:59:59Z",
+                "created_at": "2025-07-01T08:00:00Z",
+            },
+        },
+        {
+            "model": "pramlearnapp.quiz",
+            "pk": 5,
+            "fields": {
+                "title": "Quiz 5: Keamanan Jaringan",
+                "slug": "quiz-5-keamanan-jaringan",
+                "content": "Quiz kelompok tentang keamanan dalam jaringan komputer",
+                "material": 1,
+                "is_active": True,
+                "is_group_quiz": True,
+                "duration": 45,
+                "end_time": "2025-08-02T23:59:59Z",
+                "created_at": "2025-07-01T08:00:00Z",
+            },
+        },
     ]
+    return quizzes
 
 
 def generate_quiz_questions():
-    """Generate quiz questions"""
-    questions = [
-        {
-            "model": "pramlearnapp.question",
-            "pk": 1,
-            "fields": {
-                "quiz": 1,
-                "text": "Apa yang dimaksud dengan jaringan komputer?",
-                "choice_a": "Kumpulan komputer yang terhubung untuk berbagi data",
-                "choice_b": "Program untuk mengakses internet",
-                "choice_c": "Perangkat keras komputer",
-                "choice_d": "Sistem operasi komputer",
-                "correct_choice": "A",
-            },
-        },
-        {
-            "model": "pramlearnapp.question",
-            "pk": 2,
-            "fields": {
-                "quiz": 1,
-                "text": "Protokol yang digunakan untuk transfer file adalah?",
-                "choice_a": "HTTP",
-                "choice_b": "FTP",
-                "choice_c": "SMTP",
-                "choice_d": "DNS",
-                "correct_choice": "B",
-            },
-        },
-        {
-            "model": "pramlearnapp.question",
-            "pk": 3,
-            "fields": {
-                "quiz": 1,
-                "text": "Topologi jaringan yang membentuk lingkaran adalah?",
-                "choice_a": "Star",
-                "choice_b": "Bus",
-                "choice_c": "Ring",
-                "choice_d": "Mesh",
-                "correct_choice": "C",
-            },
-        },
-        {
-            "model": "pramlearnapp.question",
-            "pk": 4,
-            "fields": {
-                "quiz": 1,
-                "text": "Perangkat yang berfungsi menghubungkan jaringan adalah?",
-                "choice_a": "Hub",
-                "choice_b": "Switch",
-                "choice_c": "Router",
-                "choice_d": "Semua benar",
-                "correct_choice": "D",
-            },
-        },
-        {
-            "model": "pramlearnapp.question",
-            "pk": 5,
-            "fields": {
-                "quiz": 1,
-                "text": "IP Address 192.168.1.1 termasuk kelas?",
-                "choice_a": "Kelas A",
-                "choice_b": "Kelas B",
-                "choice_c": "Kelas C",
-                "choice_d": "Kelas D",
-                "correct_choice": "C",
-            },
-        },
+    """Generate quiz questions for all 5 quizzes"""
+    questions = []
+    question_id = 1
+
+    # Quiz 1: Pengenalan Jaringan Komputer (8 questions)
+    quiz1_questions = [
+        (
+            "Apa yang dimaksud dengan jaringan komputer?",
+            "Kumpulan komputer yang terhubung untuk berbagi data",
+            "Program untuk mengakses internet",
+            "Perangkat keras komputer",
+            "Sistem operasi komputer",
+            "A",
+        ),
+        (
+            "Apa keuntungan utama dari jaringan komputer?",
+            "Menghemat listrik",
+            "Berbagi sumber daya dan data",
+            "Membuat komputer lebih cepat",
+            "Mengurangi virus",
+            "B",
+        ),
+        (
+            "Jaringan yang mencakup area geografis luas disebut?",
+            "LAN",
+            "MAN",
+            "WAN",
+            "PAN",
+            "C",
+        ),
+        (
+            "Komponen dasar jaringan komputer meliputi?",
+            "Hardware, software, protokol",
+            "Monitor, keyboard, mouse",
+            "CPU, RAM, storage",
+            "Input, process, output",
+            "A",
+        ),
+        (
+            "Media transmisi kabel yang paling umum adalah?",
+            "Fiber optic",
+            "UTP",
+            "Coaxial",
+            "Wireless",
+            "B",
+        ),
+        (
+            "Kecepatan transfer data diukur dalam satuan?",
+            "Hertz",
+            "Watt",
+            "bps",
+            "dB",
+            "C",
+        ),
+        (
+            "Jaringan peer-to-peer memiliki karakteristik?",
+            "Ada server pusat",
+            "Tidak ada server pusat",
+            "Hanya untuk internet",
+            "Khusus untuk game",
+            "B",
+        ),
+        (
+            "Model jaringan client-server memiliki keunggulan?",
+            "Tidak butuh admin",
+            "Keamanan terpusat",
+            "Biaya murah",
+            "Setup mudah",
+            "B",
+        ),
     ]
+
+    for i, (text, choice_a, choice_b, choice_c, choice_d, correct) in enumerate(
+        quiz1_questions
+    ):
+        questions.append(
+            {
+                "model": "pramlearnapp.question",
+                "pk": question_id,
+                "fields": {
+                    "quiz": 1,
+                    "text": text,
+                    "choice_a": choice_a,
+                    "choice_b": choice_b,
+                    "choice_c": choice_c,
+                    "choice_d": choice_d,
+                    "correct_choice": correct,
+                },
+            }
+        )
+        question_id += 1
+
+    # Quiz 2: Topologi Jaringan (7 questions)
+    quiz2_questions = [
+        (
+            "Topologi jaringan yang membentuk lingkaran adalah?",
+            "Star",
+            "Bus",
+            "Ring",
+            "Mesh",
+            "C",
+        ),
+        (
+            "Topologi star memiliki karakteristik?",
+            "Semua node terhubung langsung",
+            "Ada node pusat",
+            "Bentuk lingkaran",
+            "Tidak ada kabel",
+            "B",
+        ),
+        (
+            "Kelemahan topologi bus adalah?",
+            "Biaya mahal",
+            "Sulit troubleshooting",
+            "Butuh banyak kabel",
+            "Kecepatan lambat",
+            "B",
+        ),
+        (
+            "Topologi yang paling fault-tolerant adalah?",
+            "Bus",
+            "Star",
+            "Ring",
+            "Mesh",
+            "D",
+        ),
+        (
+            "Hybrid topology merupakan kombinasi dari?",
+            "Dua atau lebih topologi",
+            "Hardware dan software",
+            "Kabel dan wireless",
+            "Server dan client",
+            "A",
+        ),
+        (
+            "Topologi tree memiliki struktur?",
+            "Lingkaran",
+            "Bintang",
+            "Hierarkis",
+            "Acak",
+            "C",
+        ),
+        (
+            "Topologi yang cocok untuk jaringan kecil adalah?",
+            "Mesh",
+            "Tree",
+            "Star",
+            "Ring",
+            "C",
+        ),
+    ]
+
+    for i, (text, choice_a, choice_b, choice_c, choice_d, correct) in enumerate(
+        quiz2_questions
+    ):
+        questions.append(
+            {
+                "model": "pramlearnapp.question",
+                "pk": question_id,
+                "fields": {
+                    "quiz": 2,
+                    "text": text,
+                    "choice_a": choice_a,
+                    "choice_b": choice_b,
+                    "choice_c": choice_c,
+                    "choice_d": choice_d,
+                    "correct_choice": correct,
+                },
+            }
+        )
+        question_id += 1
+
+    # Quiz 3: Protokol Jaringan (10 questions)
+    quiz3_questions = [
+        (
+            "Protokol yang digunakan untuk transfer file adalah?",
+            "HTTP",
+            "FTP",
+            "SMTP",
+            "DNS",
+            "B",
+        ),
+        (
+            "TCP/IP bekerja pada layer berapa di model OSI?",
+            "Layer 1-2",
+            "Layer 3-4",
+            "Layer 5-6",
+            "Layer 7",
+            "B",
+        ),
+        ("Protokol untuk mengirim email adalah?", "HTTP", "FTP", "SMTP", "POP3", "C"),
+        (
+            "DHCP berfungsi untuk?",
+            "Transfer file",
+            "Assign IP address",
+            "Web browsing",
+            "Email",
+            "B",
+        ),
+        ("Protokol keamanan untuk web adalah?", "HTTP", "HTTPS", "FTP", "SMTP", "B"),
+        (
+            "DNS berfungsi untuk?",
+            "Transfer file",
+            "Resolve nama domain",
+            "Kirim email",
+            "Browse web",
+            "B",
+        ),
+        ("Port default untuk HTTP adalah?", "21", "25", "80", "443", "C"),
+        (
+            "ICMP digunakan untuk?",
+            "Transfer data",
+            "Error reporting",
+            "Email",
+            "File sharing",
+            "B",
+        ),
+        (
+            "Protokol untuk sinkronisasi waktu adalah?",
+            "NTP",
+            "SNMP",
+            "TFTP",
+            "LDAP",
+            "A",
+        ),
+        (
+            "UDP memiliki karakteristik?",
+            "Connection-oriented",
+            "Connectionless",
+            "Reliable",
+            "Secure",
+            "B",
+        ),
+    ]
+
+    for i, (text, choice_a, choice_b, choice_c, choice_d, correct) in enumerate(
+        quiz3_questions
+    ):
+        questions.append(
+            {
+                "model": "pramlearnapp.question",
+                "pk": question_id,
+                "fields": {
+                    "quiz": 3,
+                    "text": text,
+                    "choice_a": choice_a,
+                    "choice_b": choice_b,
+                    "choice_c": choice_c,
+                    "choice_d": choice_d,
+                    "correct_choice": correct,
+                },
+            }
+        )
+        question_id += 1
+
+    # Quiz 4: Perangkat Jaringan (6 questions)
+    quiz4_questions = [
+        (
+            "Perangkat yang bekerja di Physical Layer adalah?",
+            "Router",
+            "Switch",
+            "Hub",
+            "Gateway",
+            "C",
+        ),
+        (
+            "Switch bekerja berdasarkan?",
+            "IP Address",
+            "MAC Address",
+            "Port Number",
+            "Domain Name",
+            "B",
+        ),
+        (
+            "Router berfungsi untuk?",
+            "Menghubungkan segmen jaringan",
+            "Memperkuat sinyal",
+            "Menyimpan data",
+            "Mengamankan jaringan",
+            "A",
+        ),
+        (
+            "Bridge beroperasi di layer?",
+            "Physical",
+            "Data Link",
+            "Network",
+            "Transport",
+            "B",
+        ),
+        (
+            "Repeater berfungsi untuk?",
+            "Routing",
+            "Switching",
+            "Memperkuat sinyal",
+            "Filtering",
+            "C",
+        ),
+        (
+            "Access Point digunakan untuk?",
+            "Jaringan kabel",
+            "Jaringan wireless",
+            "Internet",
+            "Email",
+            "B",
+        ),
+    ]
+
+    for i, (text, choice_a, choice_b, choice_c, choice_d, correct) in enumerate(
+        quiz4_questions
+    ):
+        questions.append(
+            {
+                "model": "pramlearnapp.question",
+                "pk": question_id,
+                "fields": {
+                    "quiz": 4,
+                    "text": text,
+                    "choice_a": choice_a,
+                    "choice_b": choice_b,
+                    "choice_c": choice_c,
+                    "choice_d": choice_d,
+                    "correct_choice": correct,
+                },
+            }
+        )
+        question_id += 1
+
+    # Quiz 5: Keamanan Jaringan (9 questions)
+    quiz5_questions = [
+        (
+            "Fungsi utama dari firewall adalah?",
+            "Mempercepat koneksi",
+            "Melindungi dari ancaman",
+            "Menyimpan data",
+            "Routing paket",
+            "B",
+        ),
+        (
+            "Enkripsi digunakan untuk?",
+            "Mempercepat data",
+            "Mengamankan data",
+            "Mengkompresi data",
+            "Menyimpan data",
+            "B",
+        ),
+        (
+            "VPN kepanjangan dari?",
+            "Virtual Private Network",
+            "Very Personal Network",
+            "Virtual Public Network",
+            "Visual Private Network",
+            "A",
+        ),
+        (
+            "Antivirus berfungsi untuk?",
+            "Mempercepat sistem",
+            "Melindungi dari malware",
+            "Menghemat memory",
+            "Backup data",
+            "B",
+        ),
+        (
+            "Intrusion Detection System (IDS) bertugas?",
+            "Mencegah serangan",
+            "Mendeteksi serangan",
+            "Memperbaiki kerusakan",
+            "Backup data",
+            "B",
+        ),
+        (
+            "Password yang kuat memiliki karakteristik?",
+            "Hanya huruf",
+            "Hanya angka",
+            "Kombinasi huruf, angka, simbol",
+            "Nama sendiri",
+            "C",
+        ),
+        (
+            "Social engineering adalah?",
+            "Teknik programming",
+            "Manipulasi psikologis",
+            "Desain network",
+            "Instalasi software",
+            "B",
+        ),
+        (
+            "Backup data sebaiknya dilakukan?",
+            "Sebulan sekali",
+            "Setahun sekali",
+            "Secara berkala",
+            "Tidak perlu",
+            "C",
+        ),
+        (
+            "Two-factor authentication menambah keamanan dengan?",
+            "Password ganda",
+            "Dua jenis verifikasi",
+            "Dua komputer",
+            "Dua jaringan",
+            "B",
+        ),
+    ]
+
+    for i, (text, choice_a, choice_b, choice_c, choice_d, correct) in enumerate(
+        quiz5_questions
+    ):
+        questions.append(
+            {
+                "model": "pramlearnapp.question",
+                "pk": question_id,
+                "fields": {
+                    "quiz": 5,
+                    "text": text,
+                    "choice_a": choice_a,
+                    "choice_b": choice_b,
+                    "choice_c": choice_c,
+                    "choice_d": choice_d,
+                    "correct_choice": correct,
+                },
+            }
+        )
+        question_id += 1
+
     return questions
 
 
 def generate_assignment():
-    """Generate 1 assignment"""
-    return [
+    """Generate 5 assignments with deadline 2 Agustus 2025"""
+    assignments = [
         {
             "model": "pramlearnapp.assignment",
             "pk": 1,
             "fields": {
-                "title": "Test 1",
+                "title": "Assignment 1: Analisis Konsep Jaringan Komputer",
+                "slug": "assignment-1-analisis-konsep-jaringan-komputer",
+                "description": "Tugas untuk menganalisis konsep dasar jaringan komputer dan implementasinya",
                 "material": 1,
-                "created_at": "2024-01-15T10:00:00Z",
-                "updated_at": "2024-01-15T10:00:00Z",
-                "due_date": "2024-01-22T23:59:59Z",
+                "created_at": "2025-07-01T08:00:00Z",
+                "updated_at": "2025-07-01T08:00:00Z",
+                "due_date": "2025-08-02T23:59:59Z",
             },
-        }
+        },
+        {
+            "model": "pramlearnapp.assignment",
+            "pk": 2,
+            "fields": {
+                "title": "Assignment 2: Desain Topologi Jaringan",
+                "slug": "assignment-2-desain-topologi-jaringan",
+                "description": "Tugas merancang topologi jaringan untuk kebutuhan organisasi",
+                "material": 1,
+                "created_at": "2025-07-01T08:00:00Z",
+                "updated_at": "2025-07-01T08:00:00Z",
+                "due_date": "2025-08-02T23:59:59Z",
+            },
+        },
+        {
+            "model": "pramlearnapp.assignment",
+            "pk": 3,
+            "fields": {
+                "title": "Assignment 3: Konfigurasi Protokol Jaringan",
+                "slug": "assignment-3-konfigurasi-protokol-jaringan",
+                "description": "Tugas praktik konfigurasi protokol jaringan",
+                "material": 1,
+                "created_at": "2025-07-01T08:00:00Z",
+                "updated_at": "2025-07-01T08:00:00Z",
+                "due_date": "2025-08-02T23:59:59Z",
+            },
+        },
+        {
+            "model": "pramlearnapp.assignment",
+            "pk": 4,
+            "fields": {
+                "title": "Assignment 4: Evaluasi Perangkat Jaringan",
+                "slug": "assignment-4-evaluasi-perangkat-jaringan",
+                "description": "Tugas evaluasi dan pemilihan perangkat jaringan yang tepat",
+                "material": 1,
+                "created_at": "2025-07-01T08:00:00Z",
+                "updated_at": "2025-07-01T08:00:00Z",
+                "due_date": "2025-08-02T23:59:59Z",
+            },
+        },
+        {
+            "model": "pramlearnapp.assignment",
+            "pk": 5,
+            "fields": {
+                "title": "Assignment 5: Implementasi Keamanan Jaringan",
+                "slug": "assignment-5-implementasi-keamanan-jaringan",
+                "description": "Tugas implementasi strategi keamanan jaringan komputer",
+                "material": 1,
+                "created_at": "2025-07-01T08:00:00Z",
+                "updated_at": "2025-07-01T08:00:00Z",
+                "due_date": "2025-08-02T23:59:59Z",
+            },
+        },
     ]
+    return assignments
 
 
 def generate_assignment_questions():
-    """Generate assignment questions"""
-    questions = [
-        {
-            "model": "pramlearnapp.assignmentquestion",
-            "pk": 1,
-            "fields": {
-                "assignment": 1,
-                "text": "Jelaskan perbedaan antara LAN, MAN, dan WAN beserta contohnya!",
-                # "question_type": "essay",
-                "choice_a": None,
-                "choice_b": None,
-                "choice_c": None,
-                "choice_d": None,
-                "correct_choice": None,
-            },
-        },
-        {
-            "model": "pramlearnapp.assignmentquestion",
-            "pk": 2,
-            "fields": {
-                "assignment": 1,
-                "text": "Buatlah diagram topologi jaringan star dengan 8 komputer klien!",
-                # "question_type": "essay",
-                "choice_a": None,
-                "choice_b": None,
-                "choice_c": None,
-                "choice_d": None,
-                "correct_choice": None,
-            },
-        },
-        {
-            "model": "pramlearnapp.assignmentquestion",
-            "pk": 3,
-            "fields": {
-                "assignment": 1,
-                "text": "Model referensi OSI memiliki berapa layer?",
-                # "question_type": "multiple_choice",
-                "choice_a": "5 layer",
-                "choice_b": "6 layer",
-                "choice_c": "7 layer",
-                "choice_d": "8 layer",
-                "correct_choice": "C",
-            },
-        },
+    """Generate assignment questions for all 5 assignments"""
+    questions = []
+    question_id = 1
+
+    # Assignment 1: Analisis Konsep Jaringan Komputer (4 questions)
+    assignment1_questions = [
+        (
+            "Jelaskan perbedaan antara LAN, MAN, dan WAN beserta contoh implementasinya masing-masing!",
+            "Pertanyaan essay tentang klasifikasi jaringan berdasarkan geografis",
+            None,
+            None,
+            None,
+            None,
+            None,
+        ),
+        (
+            "Apa keuntungan dan kerugian dari model jaringan peer-to-peer dibandingkan dengan client-server?",
+            "Analisis perbandingan model jaringan",
+            None,
+            None,
+            None,
+            None,
+            None,
+        ),
+        (
+            "Manakah yang termasuk komponen hardware dalam jaringan komputer?",
+            "Pertanyaan pilihan ganda tentang komponen jaringan",
+            "NIC, Kabel, Switch",
+            "Software, Driver, OS",
+            "Protocol, TCP/IP, HTTP",
+            "Database, File, Folder",
+            "A",
+        ),
+        (
+            "Sebutkan dan jelaskan 3 faktor yang mempengaruhi performa jaringan komputer!",
+            "Pertanyaan essay tentang faktor performa jaringan",
+            None,
+            None,
+            None,
+            None,
+            None,
+        ),
     ]
+
+    for i, (
+        text,
+        explanation,
+        choice_a,
+        choice_b,
+        choice_c,
+        choice_d,
+        correct,
+    ) in enumerate(assignment1_questions):
+        questions.append(
+            {
+                "model": "pramlearnapp.assignmentquestion",
+                "pk": question_id,
+                "fields": {
+                    "assignment": 1,
+                    "text": text,
+                    "explanation": explanation,
+                    "choice_a": choice_a,
+                    "choice_b": choice_b,
+                    "choice_c": choice_c,
+                    "choice_d": choice_d,
+                    "correct_choice": correct,
+                },
+            }
+        )
+        question_id += 1
+
+    # Assignment 2: Desain Topologi Jaringan (5 questions)
+    assignment2_questions = [
+        (
+            "Buatlah diagram topologi jaringan star untuk kantor dengan 20 komputer dan jelaskan keunggulannya!",
+            "Tugas menggambar dan analisis topologi star",
+            None,
+            None,
+            None,
+            None,
+            None,
+        ),
+        (
+            "Topologi mana yang paling cocok untuk jaringan dengan kebutuhan high availability?",
+            "Pertanyaan pilihan ganda tentang topologi untuk high availability",
+            "Bus",
+            "Ring",
+            "Star",
+            "Mesh",
+            "D",
+        ),
+        (
+            "Analisis biaya implementasi topologi bus vs star untuk 15 komputer!",
+            "Pertanyaan analisis biaya implementasi",
+            None,
+            None,
+            None,
+            None,
+            None,
+        ),
+        (
+            "Apa yang terjadi jika central hub pada topologi star mengalami kerusakan?",
+            "Pertanyaan pilihan ganda tentang single point of failure",
+            "Hanya 1 komputer mati",
+            "Setengah jaringan mati",
+            "Seluruh jaringan mati",
+            "Tidak ada pengaruh",
+            "C",
+        ),
+        (
+            "Rancang topologi hybrid yang menggabungkan star dan ring untuk gedung 3 lantai!",
+            "Tugas desain topologi hybrid",
+            None,
+            None,
+            None,
+            None,
+            None,
+        ),
+    ]
+
+    for i, (
+        text,
+        explanation,
+        choice_a,
+        choice_b,
+        choice_c,
+        choice_d,
+        correct,
+    ) in enumerate(assignment2_questions):
+        questions.append(
+            {
+                "model": "pramlearnapp.assignmentquestion",
+                "pk": question_id,
+                "fields": {
+                    "assignment": 2,
+                    "text": text,
+                    "explanation": explanation,
+                    "choice_a": choice_a,
+                    "choice_b": choice_b,
+                    "choice_c": choice_c,
+                    "choice_d": choice_d,
+                    "correct_choice": correct,
+                },
+            }
+        )
+        question_id += 1
+
+    # Assignment 3: Konfigurasi Protokol Jaringan (6 questions)
+    assignment3_questions = [
+        (
+            "Jelaskan langkah-langkah konfigurasi TCP/IP pada Windows!",
+            "Tugas praktik konfigurasi TCP/IP",
+            None,
+            None,
+            None,
+            None,
+            None,
+        ),
+        (
+            "Port berapa yang digunakan untuk protokol HTTPS?",
+            "Pertanyaan tentang port protokol",
+            "80",
+            "443",
+            "21",
+            "25",
+            "B",
+        ),
+        (
+            "Apa fungsi dari subnet mask dalam konfigurasi IP?",
+            "Pertanyaan essay tentang subnet mask",
+            None,
+            None,
+            None,
+            None,
+            None,
+        ),
+        (
+            "Protokol mana yang digunakan untuk transfer file secara aman?",
+            "Pertanyaan tentang protokol file transfer aman",
+            "FTP",
+            "TFTP",
+            "SFTP",
+            "HTTP",
+            "C",
+        ),
+        (
+            "Konfigurasikan DHCP server untuk range IP 192.168.1.100-200!",
+            "Tugas konfigurasi DHCP",
+            None,
+            None,
+            None,
+            None,
+            None,
+        ),
+        (
+            "Apa perbedaan TCP dan UDP dalam hal reliability?",
+            "Pertanyaan essay perbandingan TCP vs UDP",
+            None,
+            None,
+            None,
+            None,
+            None,
+        ),
+    ]
+
+    for i, (
+        text,
+        explanation,
+        choice_a,
+        choice_b,
+        choice_c,
+        choice_d,
+        correct,
+    ) in enumerate(assignment3_questions):
+        questions.append(
+            {
+                "model": "pramlearnapp.assignmentquestion",
+                "pk": question_id,
+                "fields": {
+                    "assignment": 3,
+                    "text": text,
+                    "explanation": explanation,
+                    "choice_a": choice_a,
+                    "choice_b": choice_b,
+                    "choice_c": choice_c,
+                    "choice_d": choice_d,
+                    "correct_choice": correct,
+                },
+            }
+        )
+        question_id += 1
+
+    # Assignment 4: Evaluasi Perangkat Jaringan (4 questions)
+    assignment4_questions = [
+        (
+            "Bandingkan fungsi dan kegunaan Hub, Switch, dan Router!",
+            "Pertanyaan essay perbandingan perangkat jaringan",
+            None,
+            None,
+            None,
+            None,
+            None,
+        ),
+        (
+            "Perangkat apa yang bekerja di Layer 2 OSI Model?",
+            "Pertanyaan tentang layer perangkat jaringan",
+            "Hub",
+            "Switch",
+            "Router",
+            "Gateway",
+            "B",
+        ),
+        (
+            "Evaluasi kebutuhan perangkat jaringan untuk kantor 50 orang dengan 3 departemen!",
+            "Tugas evaluasi kebutuhan perangkat",
+            None,
+            None,
+            None,
+            None,
+            None,
+        ),
+        (
+            "Sebutkan 4 kriteria pemilihan switch untuk jaringan enterprise!",
+            "Pertanyaan essay kriteria pemilihan switch",
+            None,
+            None,
+            None,
+            None,
+            None,
+        ),
+    ]
+
+    for i, (
+        text,
+        explanation,
+        choice_a,
+        choice_b,
+        choice_c,
+        choice_d,
+        correct,
+    ) in enumerate(assignment4_questions):
+        questions.append(
+            {
+                "model": "pramlearnapp.assignmentquestion",
+                "pk": question_id,
+                "fields": {
+                    "assignment": 4,
+                    "text": text,
+                    "explanation": explanation,
+                    "choice_a": choice_a,
+                    "choice_b": choice_b,
+                    "choice_c": choice_c,
+                    "choice_d": choice_d,
+                    "correct_choice": correct,
+                },
+            }
+        )
+        question_id += 1
+
+    # Assignment 5: Implementasi Keamanan Jaringan (5 questions)
+    assignment5_questions = [
+        (
+            "Rancang strategi keamanan berlapis (defense in depth) untuk jaringan perusahaan!",
+            "Tugas perancangan strategi keamanan berlapis",
+            None,
+            None,
+            None,
+            None,
+            None,
+        ),
+        (
+            "Apa yang dimaksud dengan social engineering dalam konteks keamanan jaringan?",
+            "Pertanyaan pilihan ganda tentang social engineering",
+            "Teknik hacking",
+            "Manipulasi psikologis",
+            "Desain jaringan",
+            "Instalasi perangkat",
+            "B",
+        ),
+        (
+            "Jelaskan perbedaan antara firewall hardware dan software beserta kelebihan masing-masing!",
+            "Pertanyaan essay perbandingan jenis firewall",
+            None,
+            None,
+            None,
+            None,
+            None,
+        ),
+        (
+            "Metode enkripsi mana yang paling aman untuk data sensitif?",
+            "Pertanyaan tentang metode enkripsi",
+            "DES",
+            "3DES",
+            "AES",
+            "RC4",
+            "C",
+        ),
+        (
+            "Buatlah kebijakan password yang aman untuk organisasi dengan 100 karyawan!",
+            "Tugas pembuatan kebijakan password",
+            None,
+            None,
+            None,
+            None,
+            None,
+        ),
+    ]
+
+    for i, (
+        text,
+        explanation,
+        choice_a,
+        choice_b,
+        choice_c,
+        choice_d,
+        correct,
+    ) in enumerate(assignment5_questions):
+        questions.append(
+            {
+                "model": "pramlearnapp.assignmentquestion",
+                "pk": question_id,
+                "fields": {
+                    "assignment": 5,
+                    "text": text,
+                    "explanation": explanation,
+                    "choice_a": choice_a,
+                    "choice_b": choice_b,
+                    "choice_c": choice_c,
+                    "choice_d": choice_d,
+                    "correct_choice": correct,
+                },
+            }
+        )
+        question_id += 1
+
     return questions
 
 
 def generate_arcs_questionnaires():
-    """Generate 2 ARCS questionnaires: Sebelum dan Sesudah"""
+    """Generate hanya 1 ARCS questionnaire: Pre-assessment (post belum dibuat)"""
     return [
         {
             "model": "pramlearnapp.arcsquestionnaire",
             "pk": 1,
             "fields": {
                 "title": "Kuesioner ARCS Sebelum Pembelajaran",
-                "slug": "arcs-sebelum-pembelajaran",
-                "description": "Kuesioner untuk mengukur motivasi belajar siswa sebelum pembelajaran dimulai",
+                "slug": "arcs-sebelum-pembelajaran-jaringan",
+                "description": "Kuesioner untuk mengukur motivasi belajar siswa sebelum mempelajari materi Jaringan Komputer",
                 "material": 1,
                 "questionnaire_type": "pre",
                 "is_active": True,
                 "duration_minutes": 15,
-                "start_date": "2024-01-15T07:00:00Z",
-                "end_date": "2024-01-15T23:59:59Z",
-                "created_at": "2024-01-15T06:00:00Z",
-                "updated_at": "2024-01-15T06:00:00Z",
-                "created_by": 2,  # <-- Tambahkan ini (ID teacher)
+                "start_date": "2025-07-01T07:00:00Z",
+                "end_date": "2025-08-02T23:59:59Z",
+                "created_at": "2025-07-01T06:00:00Z",
+                "updated_at": "2025-07-01T06:00:00Z",
+                "created_by": 2,  # Teacher ID
             },
-        },
-        {
-            "model": "pramlearnapp.arcsquestionnaire",
-            "pk": 2,
-            "fields": {
-                "title": "Kuesioner ARCS Sesudah Pembelajaran",
-                "slug": "arcs-sesudah-pembelajaran",
-                "description": "Kuesioner untuk mengukur motivasi belajar siswa setelah pembelajaran selesai",
-                "material": 1,
-                "questionnaire_type": "post",
-                "is_active": True,
-                "duration_minutes": 15,
-                "start_date": "2024-01-22T07:00:00Z",
-                "end_date": "2024-01-22T23:59:59Z",
-                "created_at": "2024-01-15T06:00:00Z",
-                "updated_at": "2024-01-15T06:00:00Z",
-                "created_by": 2,  # <-- Tambahkan ini (ID teacher)
-            },
-        },
+        }
     ]
 
 
 def generate_arcs_questions():
-    """Generate ARCS questions for both questionnaires"""
+    """Generate ARCS questions hanya untuk pre-assessment"""
     questions = []
 
-    # Questions for questionnaire 1 (Sebelum)
+    # Questions data for ARCS dimensions
     arcs_questions_data = [
         # Attention dimension
         (
@@ -480,7 +1265,11 @@ def generate_arcs_questions():
         ),
         ("Pembelajaran jaringan komputer sesuai dengan minat saya", "relevance", 8),
         ("Materi ini akan membantu saya dalam karir di bidang IT", "relevance", 9),
-        ("Saya membutuhkan pengetahuan jaringan komputer", "relevance", 10),
+        (
+            "Saya membutuhkan pengetahuan jaringan komputer untuk pekerjaan",
+            "relevance",
+            10,
+        ),
         # Confidence dimension
         (
             "Saya yakin dapat memahami materi jaringan komputer dengan baik",
@@ -511,36 +1300,34 @@ def generate_arcs_questions():
         ),
     ]
 
-    # Generate questions for both questionnaires
-    for qid in [1, 2]:
-        for idx, (text, dimension, order) in enumerate(arcs_questions_data, 1):
-            pk = (qid - 1) * 20 + idx
-            questions.append(
-                {
-                    "model": "pramlearnapp.arcsquestion",
-                    "pk": pk,
-                    "fields": {
-                        "questionnaire": qid,
-                        "text": text,
-                        "dimension": dimension,
-                        "question_type": "likert_5",
-                        "order": order,
-                        "is_required": True,
-                        "scale_min": 1,
-                        "scale_max": 5,
-                        "scale_label_min": "Sangat Tidak Setuju",
-                        "scale_label_max": "Sangat Setuju",
-                        "created_at": "2024-01-15T06:00:00Z",
-                        "updated_at": "2024-01-15T06:00:00Z",
-                        # HAPUS "scale_labels"
-                    },
-                }
-            )
+    # Generate questions for pre-assessment only
+    for pk, (text, dimension, order) in enumerate(arcs_questions_data, 1):
+        questions.append(
+            {
+                "model": "pramlearnapp.arcsquestion",
+                "pk": pk,
+                "fields": {
+                    "questionnaire": 1,  # Only pre-assessment
+                    "text": text,
+                    "dimension": dimension,
+                    "question_type": "likert_5",
+                    "order": order,
+                    "is_required": True,
+                    "scale_min": 1,
+                    "scale_max": 5,
+                    "scale_label_min": "Sangat Tidak Setuju",
+                    "scale_label_max": "Sangat Setuju",
+                    "created_at": "2025-07-01T06:00:00Z",
+                    "updated_at": "2025-07-01T06:00:00Z",
+                },
+            }
+        )
+
     return questions
 
 
 def generate_arcs_responses():
-    """Generate ARCS responses for all students"""
+    """Generate ARCS responses untuk pre-assessment untuk semua 34 siswa"""
     responses = []
 
     # Generate responses for questionnaire 1 (pre-learning) for all 34 students
@@ -552,8 +1339,8 @@ def generate_arcs_responses():
                 "fields": {
                     "questionnaire": 1,
                     "student": student_id,
-                    "submitted_at": "2024-01-15T08:30:00Z",
-                    "completed_at": "2024-01-15T08:45:00Z",
+                    "submitted_at": "2025-07-01T08:30:00Z",
+                    "completed_at": "2025-07-01T08:45:00Z",
                     "is_completed": True,
                 },
             }
@@ -563,7 +1350,7 @@ def generate_arcs_responses():
 
 
 def generate_arcs_answers():
-    """Generate ARCS answers for all student responses"""
+    """Generate ARCS answers untuk semua student responses"""
     answers = []
     answer_id = 1
 
@@ -571,8 +1358,16 @@ def generate_arcs_answers():
     for student_response_id in range(1, 35):  # Response IDs 1-34
         # Generate answers for all 20 questions (1-20 for questionnaire 1)
         for question_id in range(1, 21):
-            # Generate realistic likert responses (mostly 3-5)
-            likert_value = random.choices([2, 3, 4, 5], weights=[10, 30, 40, 20])[0]
+            # Generate realistic likert responses (mostly 3-5 with some variation)
+            # Higher scores for attention and relevance, mixed for confidence and satisfaction
+            if question_id <= 5:  # Attention questions
+                likert_value = random.choices([3, 4, 5], weights=[20, 40, 40])[0]
+            elif question_id <= 10:  # Relevance questions
+                likert_value = random.choices([3, 4, 5], weights=[30, 35, 35])[0]
+            elif question_id <= 15:  # Confidence questions
+                likert_value = random.choices([2, 3, 4, 5], weights=[10, 30, 40, 20])[0]
+            else:  # Satisfaction questions
+                likert_value = random.choices([2, 3, 4, 5], weights=[15, 25, 35, 25])[0]
 
             answers.append(
                 {
@@ -584,7 +1379,7 @@ def generate_arcs_answers():
                         "likert_value": likert_value,
                         "choice_value": None,
                         "text_value": None,
-                        "answered_at": "2024-01-15T08:35:00Z",
+                        "answered_at": "2025-07-01T08:35:00Z",
                     },
                 }
             )
@@ -594,17 +1389,18 @@ def generate_arcs_answers():
 
 
 def generate_student_motivation_profiles():
-    """Generate motivation profiles based on ARCS responses"""
+    """Generate motivation profiles berdasarkan ARCS responses"""
     profiles = []
 
+    # Generate profiles for all 34 students
     for student_id in range(3, 37):  # Students ID 3-36
-        # Generate realistic ARCS scores
-        attention = round(random.uniform(2.5, 4.5), 2)
-        relevance = round(random.uniform(2.8, 4.8), 2)
-        confidence = round(random.uniform(2.2, 4.2), 2)
-        satisfaction = round(random.uniform(2.6, 4.6), 2)
+        # Calculate realistic ARCS scores
+        attention = round(random.uniform(3.2, 4.8), 2)
+        relevance = round(random.uniform(3.0, 4.5), 2)
+        confidence = round(random.uniform(2.8, 4.2), 2)
+        satisfaction = round(random.uniform(2.9, 4.3), 2)
 
-        # Determine motivation level based on averages
+        # Calculate overall motivation level
         avg_score = (attention + relevance + confidence + satisfaction) / 4
         if avg_score >= 4.0:
             motivation_level = "High"
@@ -616,7 +1412,7 @@ def generate_student_motivation_profiles():
         profiles.append(
             {
                 "model": "pramlearnapp.studentmotivationprofile",
-                "pk": student_id - 2,
+                "pk": student_id - 2,  # Profile ID 1-34
                 "fields": {
                     "student": student_id,
                     "attention": attention,
@@ -632,32 +1428,118 @@ def generate_student_motivation_profiles():
 
 
 def generate_student_attendance():
-    """Generate attendance data with various status"""
-    attendance = []
-    statuses = ["present", "excused", "late", "absent"]
-    weights = [70, 15, 10, 5]  # Realistic distribution
+    """Generate attendance data dengan various status"""
+    attendances = []
 
-    for i, student_id in enumerate(range(3, 37), 1):  # Students ID 3-36
-        status = random.choices(statuses, weights=weights)[0]
-        attendance.append(
+    # Generate attendance for all 34 students for the material
+    for student_id in range(3, 37):  # Students ID 3-36
+        # Most students present, some late, few absent
+        status_weights = [80, 10, 5, 5]  # present, late, absent, excused
+        status = random.choices(
+            ["present", "late", "absent", "excused"], weights=status_weights
+        )[0]
+
+        attendances.append(
             {
                 "model": "pramlearnapp.studentattendance",
-                "pk": i,
+                "pk": student_id - 2,  # Attendance ID 1-34
                 "fields": {
                     "student": student_id,
-                    "material": 1,  # ID materi
+                    "material": 1,
                     "status": status,
-                    "updated_by": 2,  # ID teacher
-                    "updated_at": "2024-01-15T08:00:00Z",  # <-- Tambahkan ini!
+                    "updated_at": "2025-07-01T08:00:00Z",
+                    "updated_by": 2,  # Teacher ID
                 },
             }
         )
-    return attendance
+
+    return attendances
+
+
+def generate_student_activities():
+    """Generate student activities untuk learning analytics"""
+    activities = []
+    activity_id = 1
+
+    activity_types = [
+        ("material", "Membuka Materi Pembelajaran"),
+        ("quiz", "Melihat Quiz"),
+        ("assignment", "Melihat Tugas"),
+    ]
+
+    # Generate activities for all students
+    for student_id in range(3, 37):  # Students ID 3-36
+        # Generate 2-5 activities per student (belum mengerjakan, hanya melihat)
+        num_activities = random.randint(2, 5)
+
+        for i in range(num_activities):
+            activity_type, title_template = random.choice(activity_types)
+
+            # Create activity with realistic timestamps
+            base_time = datetime(2025, 7, 1, 8, 0, 0)
+            activity_time = base_time + timedelta(
+                hours=random.randint(0, 24), minutes=random.randint(0, 59)
+            )
+
+            activities.append(
+                {
+                    "model": "pramlearnapp.studentactivity",
+                    "pk": activity_id,
+                    "fields": {
+                        "student": student_id,
+                        "activity_type": activity_type,
+                        "title": f"{title_template} - Jaringan Komputer",
+                        "timestamp": activity_time.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                        "related_object_id": 1,  # Related to material/quiz/assignment ID 1
+                    },
+                }
+            )
+            activity_id += 1
+
+    return activities
+
+
+def generate_announcements():
+    """Generate sample announcements"""
+    return [
+        {
+            "model": "pramlearnapp.announcement",
+            "pk": 1,
+            "fields": {
+                "title": "Selamat Datang di Pembelajaran Jaringan Komputer",
+                "content": "Selamat datang di pembelajaran Administrasi Sistem Jaringan. Materi pembelajaran, quiz, dan tugas sudah tersedia di sistem. Deadline pengumpulan semua tugas adalah 2 Agustus 2025. Silakan pelajari materi terlebih dahulu sebelum mengerjakan quiz dan tugas.",
+                "author": 2,  # Teacher ID
+                "priority": "high",
+                "target_audience": "class",
+                "target_class": 1,
+                "is_active": True,
+                "deadline": "2025-08-02T23:59:59Z",
+                "created_at": "2025-07-01T10:00:00Z",
+                "updated_at": "2025-07-01T10:00:00Z",
+            },
+        },
+        {
+            "model": "pramlearnapp.announcement",
+            "pk": 2,
+            "fields": {
+                "title": "Informasi Quiz dan Tugas Tersedia",
+                "content": "Quiz dan tugas untuk materi Jaringan Komputer sudah tersedia. Terdapat 5 quiz kelompok dan 5 tugas individual. Pastikan untuk membentuk kelompok terlebih dahulu sebelum mengerjakan quiz kelompok. Semua deadline di tanggal 2 Agustus 2025.",
+                "author": 2,  # Teacher ID
+                "priority": "medium",
+                "target_audience": "class",
+                "target_class": 1,
+                "is_active": True,
+                "deadline": "2025-08-02T23:59:59Z",
+                "created_at": "2025-07-01T11:00:00Z",
+                "updated_at": "2025-07-01T11:00:00Z",
+            },
+        },
+    ]
 
 
 def main():
     """Main function to generate comprehensive initial data"""
-    print("Generating comprehensive PramLearn initial data...")
+    print("Generating PramLearn initial data (Updated Version)...")
     print("=" * 50)
 
     data = []
@@ -675,23 +1557,31 @@ def main():
     data.extend(generate_files())
     data.extend(generate_youtube_videos())
 
-    print("🧩 Generating quiz and questions...")
+    print("🧩 Generating 5 group quizzes (BELUM DIKERJAKAN)...")
     data.extend(generate_quiz())
     data.extend(generate_quiz_questions())
 
-    print("📋 Generating assignment and questions...")
+    print("📋 Generating 5 assignments (BELUM DIKERJAKAN)...")
     data.extend(generate_assignment())
     data.extend(generate_assignment_questions())
 
-    print("📊 Generating ARCS questionnaires...")
+    print("📊 Generating ARCS pre-assessment (post belum dibuat)...")
     data.extend(generate_arcs_questionnaires())
     data.extend(generate_arcs_questions())
     data.extend(generate_arcs_responses())
     data.extend(generate_arcs_answers())
+
+    print("🎯 Generating student profiles...")
     data.extend(generate_student_motivation_profiles())
 
     print("📅 Generating attendance data...")
     data.extend(generate_student_attendance())
+
+    print("📈 Generating student activities...")
+    data.extend(generate_student_activities())
+
+    print("📢 Generating announcements...")
+    data.extend(generate_announcements())
 
     # Ensure fixtures directory exists
     os.makedirs("pramlearnapp/fixtures", exist_ok=True)
@@ -712,18 +1602,33 @@ def main():
     print("  • 1 Subject (Administrasi Sistem Jaringan)")
     print("  • 1 Material (Pengenalan Jaringan Komputer)")
     print("  • 1 PDF file + 2 YouTube videos")
-    print("  • 1 Quiz (5 questions)")
-    print("  • 1 Assignment (3 questions)")
-    print("  • 2 ARCS Questionnaires (Pre & Post)")
-    print("  • 40 ARCS Questions (20 each)")
-    print("  • 34 ARCS Responses (all students completed pre-learning)")
-    print("  • 680 ARCS Answers (34 students × 20 questions)")
+    print("  • 5 Group quizzes (BELUM DIKERJAKAN)")
+    print("    - Quiz 1: Pengenalan Jaringan (8 soal)")
+    print("    - Quiz 2: Topologi Jaringan (7 soal)")
+    print("    - Quiz 3: Protokol Jaringan (10 soal)")
+    print("    - Quiz 4: Perangkat Jaringan (6 soal)")
+    print("    - Quiz 5: Keamanan Jaringan (9 soal)")
+    print("  • 5 Assignments (BELUM DIKERJAKAN)")
+    print("    - Assignment 1: Analisis Konsep (4 soal)")
+    print("    - Assignment 2: Desain Topologi (5 soal)")
+    print("    - Assignment 3: Konfigurasi Protokol (6 soal)")
+    print("    - Assignment 4: Evaluasi Perangkat (4 soal)")
+    print("    - Assignment 5: Keamanan Jaringan (5 soal)")
+    print("  • 1 ARCS pre-assessment (20 pertanyaan)")
+    print("  • 34 Student ARCS responses with answers")
     print("  • 34 Student motivation profiles")
-    print("  • 34 Attendance records")
-    print("\n🎯 All students have completed ARCS pre-learning questionnaire")
-    print("📝 No students have completed quiz or assignment yet")
-    print("📁 File saved to: pramlearnapp/fixtures/initial_data.json")
-    print("\n🚀 Ready for loading with: python manage.py loaddata initial_data")
+    print("  • 34 Student attendance records")
+    print("  • Student learning activities")
+    print("  • 2 Class announcements")
+    print("\n⚠️  CATATAN:")
+    print("  • Quiz belum dikerjakan siswa/kelompok")
+    print("  • Assignment belum dikerjakan siswa")
+    print("  • Group belum dibentuk")
+    print("  • ARCS post-assessment belum dibuat")
+    print("  • Semua deadline: 2 Agustus 2025")
+    print(
+        "\n🎉 Ready to load with: python manage.py loaddata pramlearnapp/fixtures/initial_data.json"
+    )
 
 
 if __name__ == "__main__":

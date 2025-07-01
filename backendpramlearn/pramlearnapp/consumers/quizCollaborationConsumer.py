@@ -484,6 +484,17 @@ class QuizCollaborationConsumer(AsyncWebsocketConsumer):
                 else:
                     status_group = "completed"
 
+                # Calculate time spent in seconds
+                time_spent = 0
+                if group_quiz.start_time and group_quiz.submitted_at:
+                    time_diff = group_quiz.submitted_at - group_quiz.start_time
+                    time_spent = int(time_diff.total_seconds())
+
+                # Determine completed_at
+                completed_at = None
+                if status_group == "completed":
+                    completed_at = group_quiz.submitted_at or group_quiz.end_time
+
                 ranking_data.append(
                     {
                         "group_id": group.id,
@@ -495,6 +506,7 @@ class QuizCollaborationConsumer(AsyncWebsocketConsumer):
                         "member_count": member_count,
                         "member_names": member_names,
                         "status": status_group,
+                        "time_spent": time_spent,
                         "start_time": (
                             group_quiz.start_time.isoformat()
                             if group_quiz.start_time
@@ -509,6 +521,9 @@ class QuizCollaborationConsumer(AsyncWebsocketConsumer):
                             group_quiz.submitted_at.isoformat()
                             if group_quiz.submitted_at
                             else None
+                        ),
+                        "completed_at": (
+                            completed_at.isoformat() if completed_at else None
                         ),
                     }
                 )
@@ -708,6 +723,125 @@ class QuizCollaborationConsumer(AsyncWebsocketConsumer):
 
             traceback.print_exc()
             return False
+
+    @database_sync_to_async
+    def get_quiz_rankings(self):
+        """Get quiz rankings from database"""
+        try:
+            quiz = Quiz.objects.get(id=self.quiz_id)
+
+            # Get material if provided
+            if self.material_id:
+                groups = Group.objects.filter(material_id=self.material_id)
+            else:
+                groups = Group.objects.all()
+
+            group_quizzes = GroupQuiz.objects.filter(
+                quiz=quiz, group__in=groups
+            ).select_related("group")
+
+            ranking_data = []
+            total_questions = quiz.questions.count()
+
+            for group_quiz in group_quizzes:
+                group = group_quiz.group
+
+                # Get member information
+                members = GroupMember.objects.filter(group=group).select_related(
+                    "student"
+                )
+                member_count = members.count()
+                member_names = [
+                    f"{m.student.first_name} {m.student.last_name}".strip()
+                    or m.student.username
+                    for m in members
+                ]
+
+                # Calculate score
+                if total_questions > 0:
+                    correct_submissions = GroupQuizSubmission.objects.filter(
+                        group_quiz=group_quiz, is_correct=True
+                    ).count()
+                    score = (correct_submissions / total_questions) * 100
+                else:
+                    score = 0
+
+                # Determine status
+                total_submissions = GroupQuizSubmission.objects.filter(
+                    group_quiz=group_quiz
+                ).count()
+
+                if total_submissions == 0:
+                    status_group = "not_started"
+                elif total_submissions < total_questions:
+                    status_group = "in_progress"
+                else:
+                    status_group = "completed"
+
+                # Calculate time spent
+                time_spent = 0
+                if group_quiz.start_time and group_quiz.submitted_at:
+                    time_diff = group_quiz.submitted_at - group_quiz.start_time
+                    time_spent = int(time_diff.total_seconds())
+
+                # Determine completed_at
+                completed_at = None
+                if status_group == "completed":
+                    completed_at = group_quiz.submitted_at or group_quiz.end_time
+
+                ranking_data.append(
+                    {
+                        "group_id": group.id,
+                        "group_name": group.name,
+                        "group_code": group.code,
+                        "score": round(score, 2),
+                        "correct_answers": correct_submissions,
+                        "total_questions": total_questions,
+                        "member_count": member_count,
+                        "member_names": member_names,
+                        "status": status_group,
+                        "time_spent": time_spent,  # Add time spent in seconds
+                        "start_time": (
+                            group_quiz.start_time.isoformat()
+                            if group_quiz.start_time
+                            else None
+                        ),
+                        "end_time": (
+                            group_quiz.end_time.isoformat()
+                            if group_quiz.end_time
+                            else None
+                        ),
+                        "submitted_at": (
+                            group_quiz.submitted_at.isoformat()
+                            if group_quiz.submitted_at
+                            else None
+                        ),
+                        "completed_at": (
+                            completed_at.isoformat() if completed_at else None
+                        ),  # Add completed_at
+                    }
+                )
+
+            # Sort by score (descending), then by submission time (ascending)
+            ranking_data.sort(
+                key=lambda x: (-x["score"], x["submitted_at"] or "9999-12-31")
+            )
+
+            # Add rank
+            for idx, item in enumerate(ranking_data):
+                item["rank"] = idx + 1
+
+            print(
+                f"✅ Generated ranking data for {len(ranking_data)} groups with time data"
+            )
+            return ranking_data
+
+        except Exception as e:
+            print(f"❌ Error getting quiz rankings: {e}")
+            import traceback
+
+            traceback.print_exc()
+            return []
 
     async def send_current_state(self):
         """Send current quiz state to the user"""

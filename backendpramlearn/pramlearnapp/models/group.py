@@ -36,8 +36,8 @@ class GroupQuiz(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
     start_time = models.DateTimeField(auto_now_add=True)
     end_time = models.DateTimeField(null=True, blank=True)
-    is_completed = models.BooleanField(default=False)  # Track completion status
-    submitted_at = models.DateTimeField(null=True, blank=True)  # ADD THIS FIELD
+    is_completed = models.BooleanField(default=False)
+    submitted_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         unique_together = ("quiz", "group")
@@ -70,8 +70,11 @@ class GroupQuiz(models.Model):
             result.completed_at = timezone.now()
             result.save()
 
+        # Update submission time if not already set
+        if not self.submitted_at:
+            self.submitted_at = timezone.now()
+        
         self.is_completed = True
-        self.submitted_at = timezone.now()
         self.save()
 
         return result

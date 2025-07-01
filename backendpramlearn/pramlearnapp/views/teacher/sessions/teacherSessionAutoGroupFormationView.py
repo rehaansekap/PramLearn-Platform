@@ -21,6 +21,12 @@ from collections import Counter
 from pramlearnapp.services.group_formation_pdf_service import GroupFormationPDFService
 from django.http import HttpResponse
 from datetime import datetime
+from django.conf import settings
+import tempfile
+import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 # DEAP imports
 try:
@@ -39,6 +45,11 @@ class TeacherSessionAutoGroupFormationView(APIView):
     permission_classes = [IsAuthenticated, IsTeacherUser]
 
     def get(self, request, material_slug):
+        logger.info(f"PDF export requested for material: {material_slug}")
+        logger.info(
+            f"Using Azure Storage: {bool(os.getenv('AZURE_STORAGE_CONNECTION_STRING'))}"
+        )
+
         """Export group formation analysis as PDF"""
         teacher = request.user
         export_format = request.GET.get("export", None)
@@ -149,12 +160,21 @@ class TeacherSessionAutoGroupFormationView(APIView):
             pdf_content = pdf_service.generate_group_formation_report(
                 material_data, groups_data, quality_analysis, formation_params
             )
+            logger.info(f"PDF generated successfully, size: {len(pdf_content)} bytes")
 
             # Create response
             response = HttpResponse(pdf_content, content_type="application/pdf")
             filename = f"analisis_kelompok_{material.slug}_{datetime.now().strftime('%Y%m%d_%H%M')}.pdf"
-            response["Content-Disposition"] = f'attachment; filename="{filename}"'
 
+            # Use proper Content-Disposition header format
+            response["Content-Disposition"] = f'attachment; filename="{filename}"'
+            response["Content-Length"] = len(pdf_content)
+            response["Cache-Control"] = "no-cache, no-store, must-revalidate"
+            response["Pragma"] = "no-cache"
+            response["Expires"] = "0"
+
+            # Important: Don't try to save to media folder in production
+            # Return the PDF directly from memory
             return response
 
         except Material.DoesNotExist:
@@ -167,6 +187,7 @@ class TeacherSessionAutoGroupFormationView(APIView):
                 status=status.HTTP_403_FORBIDDEN,
             )
         except Exception as e:
+            logger.error(f"PDF export error: {str(e)}", exc_info=True)
             return Response(
                 {"error": f"Terjadi kesalahan saat membuat PDF: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,

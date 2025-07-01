@@ -60,6 +60,11 @@ class GroupQuizDetailView(APIView):
                     status=status.HTTP_404_NOT_FOUND,
                 )
 
+            # Set start_time if this is the first access
+            if not group_quiz.start_time:
+                group_quiz.start_time = timezone.now()
+                group_quiz.save()
+
             is_quiz_submitted = self.is_quiz_submitted(group_quiz)
 
             # If submitted, return completed status with results
@@ -473,6 +478,49 @@ class GroupQuizResultsView(APIView):
                 }
                 answers_detail.append(answer_data)
 
+            # Calculate time taken in minutes
+            time_taken_minutes = 0
+            if group_quiz.start_time and group_quiz.submitted_at:
+                time_diff = group_quiz.submitted_at - group_quiz.start_time
+                time_taken_minutes = int(time_diff.total_seconds() / 60)
+
+            # Calculate ranking and total participants
+            # Get all group quizzes for this quiz
+            all_group_quizzes = (
+                GroupQuiz.objects.filter(quiz=quiz, is_completed=True)
+                .select_related("group")
+                .prefetch_related("result")
+            )
+
+            # Create ranking list with scores
+            ranking_data = []
+            for gq in all_group_quizzes:
+                try:
+                    gq_result = GroupQuizResult.objects.get(group_quiz=gq)
+                    ranking_data.append(
+                        {
+                            "group_quiz": gq,
+                            "score": gq_result.score,
+                            "submitted_at": gq.submitted_at,
+                        }
+                    )
+                except GroupQuizResult.DoesNotExist:
+                    continue
+
+            # Sort by score (descending), then by submission time (ascending)
+            ranking_data.sort(
+                key=lambda x: (-x["score"], x["submitted_at"] or timezone.now())
+            )
+
+            # Find current group's rank
+            current_group_rank = None
+            total_participants = len(ranking_data)
+
+            for index, item in enumerate(ranking_data):
+                if item["group_quiz"].group.id == user_group.group.id:
+                    current_group_rank = index + 1
+                    break
+
             # Construct the final response
             results_data = {
                 "quiz_title": quiz.title,
@@ -482,9 +530,9 @@ class GroupQuizResultsView(APIView):
                 "total_questions": quiz.questions.count(),
                 "correct_answers": submissions.filter(is_correct=True).count(),
                 "submitted_at": result.completed_at,
-                "time_taken": getattr(result, "time_taken", 0),
-                "rank": getattr(result, "rank", None),
-                "total_participants": getattr(result, "total_participants", None),
+                "time_taken": time_taken_minutes,  # Fixed: Calculate actual time
+                "rank": current_group_rank,  # Fixed: Calculate actual rank
+                "total_participants": total_participants,  # Fixed: Count total participants
                 "answers": answers_detail,
                 "group_members": members_data,  # CRITICAL: This must be included
                 "material_slug": quiz.material.slug if quiz.material else None,
@@ -511,27 +559,9 @@ class GroupQuizResultsView(APIView):
                 f"📤 Group members type: {type(results_data.get('group_members'))}"
             )
             logger.info(f"📤 Group members count: {len(members_data)}")
-            logger.info(f"📤 Group members data: {results_data['group_members']}")
-
-            # Test serialization
-            import json
-
-            try:
-                json_str = json.dumps(results_data, default=str)
-                logger.info(
-                    f"📤 JSON serialization successful, length: {len(json_str)}"
-                )
-
-                # Parse back to check
-                parsed_data = json.loads(json_str)
-                logger.info(
-                    f"📤 Parsed back successfully, group_members in parsed: {'group_members' in parsed_data}"
-                )
-                logger.info(
-                    f"📤 Parsed group_members count: {len(parsed_data.get('group_members', []))}"
-                )
-            except Exception as json_error:
-                logger.error(f"❌ JSON serialization error: {json_error}")
+            logger.info(f"📤 Time taken: {time_taken_minutes} minutes")
+            logger.info(f"📤 Rank: {current_group_rank}")
+            logger.info(f"📤 Total participants: {total_participants}")
 
             return Response(results_data, status=status.HTTP_200_OK)
 
