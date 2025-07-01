@@ -24,22 +24,6 @@ ALLOWED_HOSTS = [
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-
-MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-
-# Azure Blob Storage for media files
-if os.getenv("AZURE_STORAGE_CONNECTION_STRING"):
-    DEFAULT_FILE_STORAGE = "storages.backends.azure_storage.AzureStorage"
-    AZURE_ACCOUNT_NAME = os.getenv("AZURE_ACCOUNT_NAME")
-    AZURE_ACCOUNT_KEY = os.getenv("AZURE_ACCOUNT_KEY")
-    AZURE_CONTAINER = os.getenv("AZURE_CONTAINER", "media")
-    AZURE_CONNECTION_STRING = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
-    AZURE_CUSTOM_DOMAIN = f"{AZURE_ACCOUNT_NAME}.blob.core.windows.net"
-    MEDIA_URL = f"https://{AZURE_CUSTOM_DOMAIN}/{AZURE_CONTAINER}/"
-
 # Application definition
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -53,7 +37,26 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "channels",
+    "storages",
 ]
+
+# Azure Blob Storage for media files
+if os.getenv("AZURE_STORAGE_CONNECTION_STRING"):
+    INSTALLED_APPS.append("storages")
+    DEFAULT_FILE_STORAGE = "storages.backends.azure_storage.AzureStorage"
+    AZURE_ACCOUNT_NAME = os.getenv("AZURE_ACCOUNT_NAME")
+    AZURE_ACCOUNT_KEY = os.getenv("AZURE_ACCOUNT_KEY")
+    AZURE_CONTAINER = os.getenv("AZURE_CONTAINER", "media")
+    AZURE_CONNECTION_STRING = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+    AZURE_CUSTOM_DOMAIN = f"{AZURE_ACCOUNT_NAME}.blob.core.windows.net"
+    MEDIA_URL = f"https://{AZURE_CUSTOM_DOMAIN}/{AZURE_CONTAINER}/"
+    AZURE_OBJECT_PARAMETERS = {
+        "content_disposition": "attachment",
+    }
+else:
+    # Fallback ke local storage
+    MEDIA_URL = "/media/"
+    MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # Channel layers: Redis jika REDIS_URL ada, fallback ke InMemory
 if os.getenv("REDIS_URL"):
