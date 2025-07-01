@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Button, Typography, Space, Radio, Tooltip } from "antd";
+import { Card, Button, Typography, Space, Radio, Tooltip, Grid } from "antd";
 import {
   ArrowLeftOutlined,
   ArrowRightOutlined,
@@ -9,6 +9,7 @@ import {
 } from "@ant-design/icons";
 
 const { Text } = Typography;
+const { useBreakpoint } = Grid;
 
 const GroupQuizQuestionCard = ({
   quiz,
@@ -22,6 +23,8 @@ const GroupQuizQuestionCard = ({
   onNext,
   onSubmit,
 }) => {
+  const screens = useBreakpoint();
+  const isMobile = !screens.md;
   // Helper untuk status soal
   const getQuestionStatus = (questionIndex) => {
     const question = quiz.questions[questionIndex];
@@ -239,7 +242,7 @@ const GroupQuizQuestionCard = ({
                 <div
                   key={option}
                   style={{
-                    paddingLeft: 50,
+                    paddingLeft: isMobile ? 12 : 50,
                     border: `3px solid ${isSelected ? "#001529" : "#e5e7eb"}`,
                     borderRadius: 16,
                     background: isSelected
@@ -264,12 +267,12 @@ const GroupQuizQuestionCard = ({
                   >
                     <div
                       style={{
-                        padding: "20px 24px",
-                        marginLeft: 8,
+                        padding: isMobile ? "16px 20px" : "20px 24px",
+                        marginLeft: isMobile ? 0 : 8,
                         display: "flex",
-                        alignItems: "flex-start",
-                        gap: 16,
-                        minHeight: 70,
+                        alignItems: isMobile ? "center" : "flex-start",
+                        gap: isMobile ? 12 : 16,
+                        minHeight: isMobile ? 60 : 70,
                       }}
                     >
                       <div
@@ -279,13 +282,13 @@ const GroupQuizQuestionCard = ({
                             : "#6b7280",
                           color: "white",
                           borderRadius: 12,
-                          width: 44,
-                          height: 44,
+                          width: isMobile ? 36 : 44,
+                          height: isMobile ? 36 : 44,
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
                           fontWeight: 700,
-                          fontSize: 18,
+                          fontSize: isMobile ? 16 : 18,
                           flexShrink: 0,
                           transition: "all 0.3s ease",
                           boxShadow: isSelected
@@ -295,13 +298,13 @@ const GroupQuizQuestionCard = ({
                       >
                         {option}
                       </div>
-                      <div style={{ flex: 1, paddingTop: 2 }}>
+                      <div style={{ flex: 1, paddingTop: isMobile ? 0 : 2 }}>
                         <Text
                           style={{
-                            fontSize: 14,
-                            lineHeight: 1.6,
+                            fontSize: isMobile ? 13 : 14,
+                            lineHeight: 1.5,
                             textAlign: "left",
-                            padding: "8px 0",
+                            padding: isMobile ? "4px 0" : "8px 0",
                             color: isSelected ? "#1f2937" : "#374151",
                             fontWeight: isSelected ? 600 : 400,
                             wordBreak: "break-word",
@@ -315,12 +318,12 @@ const GroupQuizQuestionCard = ({
                         <div
                           style={{
                             position: "absolute",
-                            top: 16,
-                            right: 16,
+                            top: isMobile ? 12 : 16,
+                            right: isMobile ? 12 : 16,
                             background: "#52c41a",
                             borderRadius: "50%",
-                            width: 28,
-                            height: 28,
+                            width: isMobile ? 24 : 28,
+                            height: isMobile ? 24 : 28,
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
@@ -328,7 +331,10 @@ const GroupQuizQuestionCard = ({
                           }}
                         >
                           <CheckCircleOutlined
-                            style={{ color: "white", fontSize: 16 }}
+                            style={{
+                              color: "white",
+                              fontSize: isMobile ? 14 : 16,
+                            }}
                           />
                         </div>
                       )}
@@ -344,13 +350,13 @@ const GroupQuizQuestionCard = ({
         <div
           style={{
             display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
+            flexDirection: isMobile ? "column" : "row",
+            justifyContent: isMobile ? "center" : "space-between",
             alignItems: "center",
             marginTop: 40,
             paddingTop: 28,
             borderTop: "2px solid #f3f4f6",
-            gap: 16,
+            gap: isMobile ? 12 : 16,
           }}
         >
           <Button
@@ -366,11 +372,13 @@ const GroupQuizQuestionCard = ({
               fontSize: 15,
               border: "2px solid #e5e7eb",
               color: "#6b7280",
-              width: "auto",
+              width: isMobile ? "100%" : "auto",
+              order: isMobile ? 1 : 0,
             }}
           >
             Sebelumnya
           </Button>
+
           <div
             style={{
               textAlign: "center",
@@ -378,6 +386,8 @@ const GroupQuizQuestionCard = ({
               padding: "12px 20px",
               borderRadius: 12,
               border: "1px solid #e2e8f0",
+              width: isMobile ? "100%" : "auto",
+              order: isMobile ? 2 : 0,
             }}
           >
             <Text
@@ -402,6 +412,7 @@ const GroupQuizQuestionCard = ({
               {answeredCount} dari {quiz.questions.length} soal terjawab
             </Text>
           </div>
+
           {currentQuestionIndex === quiz.questions.length - 1 ? (
             <Button
               type="primary"
@@ -409,8 +420,7 @@ const GroupQuizQuestionCard = ({
               onClick={onSubmit}
               size="large"
               style={{
-                background:
-                  "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)",
+                background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)",
                 borderColor: "transparent",
                 borderRadius: 12,
                 fontWeight: 700,
@@ -418,7 +428,8 @@ const GroupQuizQuestionCard = ({
                 padding: "0 28px",
                 fontSize: 15,
                 boxShadow: "0 4px 16px rgba(34, 197, 94, 0.3)",
-                width: "auto",
+                width: isMobile ? "100%" : "auto",
+                order: isMobile ? 3 : 0,
               }}
             >
               Submit Kuis
@@ -439,7 +450,8 @@ const GroupQuizQuestionCard = ({
                 padding: "0 28px",
                 fontSize: 15,
                 boxShadow: "0 4px 16px rgba(0, 21, 41, 0.3)",
-                width: "auto",
+                width: isMobile ? "100%" : "auto",
+                order: isMobile ? 3 : 0,
               }}
             >
               Selanjutnya

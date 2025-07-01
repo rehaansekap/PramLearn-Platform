@@ -1,58 +1,28 @@
 import React, { useState, useEffect } from "react";
-import {
-  Table,
-  Card,
-  Typography,
-  Space,
-  Button,
-  Tag,
-  Modal,
-  Spin,
-  Empty,
-  Row,
-  Col,
-  Statistic,
-  message,
-  Progress,
-  Tooltip,
-  Dropdown,
-  Menu,
-} from "antd";
-import {
-  FileTextOutlined,
-  PlusOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  EyeOutlined,
-  ReloadOutlined,
-  LoadingOutlined,
-  CalendarOutlined,
-  UserOutlined,
-  CheckCircleOutlined,
-  ClockCircleOutlined,
-  ExclamationCircleOutlined,
-  MoreOutlined,
-  BarChartOutlined,
-} from "@ant-design/icons";
-import useSessionAssignmentManagement from "../../hooks/useSessionAssignmentManagement";
-import SessionsAssignmentForm from "./SessionsAssignmentForm";
-import SessionsAssignmentDetailModal from "./SessionsAssignmentDetailModal";
-import Swal from "sweetalert2";
-import dayjs from "dayjs";
+import { message, Spin, Alert, Button } from "antd";
+import { ReloadOutlined, LoadingOutlined } from "@ant-design/icons";
 
-const { Title, Text } = Typography;
+import useSessionAssignmentManagement from "../../hooks/useSessionAssignmentManagement";
+
+// Import new components
+import AssignmentsHeader from "./assignments/AssignmentsHeader";
+import AssignmentsStatsCards from "./assignments/AssignmentsStatsCards";
+import AssignmentControlPanel from "./assignments/AssignmentControlPanel";
+import AssignmentsTable from "./assignments/AssignmentsTable";
+import AssignmentFormModal from "./assignments/AssignmentFormModal";
+import AssignmentDetailModal from "./assignments/AssignmentDetailModal";
 
 const SessionsMaterialAssignmentsTab = ({
   materialSlug,
-  assignments: propAssignments = [],
-  students: propStudents = [],
+  materialDetail,
+  isMobile = false,
 }) => {
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [isAssignmentModalVisible, setIsAssignmentModalVisible] =
     useState(false);
   const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
   const [editingAssignment, setEditingAssignment] = useState(null);
   const [actionLoading, setActionLoading] = useState({});
+  const [refreshing, setRefreshing] = useState(false);
 
   const {
     assignments,
@@ -77,513 +47,205 @@ const SessionsMaterialAssignmentsTab = ({
   } = useSessionAssignmentManagement(materialSlug);
 
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    const handleResize = () => {
+      // Update mobile state if needed
+    };
+
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Handle create assignment
   const handleAddAssignment = () => {
     setEditingAssignment(null);
     setIsAssignmentModalVisible(true);
   };
 
+  // Handle edit assignment
   const handleEditAssignment = async (assignment) => {
-    const editKey = `edit_${assignment.id}`;
-    setActionLoading((prev) => ({ ...prev, [editKey]: true }));
-
     try {
-      const assignmentWithQuestions = await fetchAssignmentForEdit(
-        assignment.id
-      );
+      setActionLoading((prev) => ({
+        ...prev,
+        [`edit_${assignment.id}`]: true,
+      }));
 
-      if (assignmentWithQuestions) {
-        setEditingAssignment(assignmentWithQuestions);
-      } else {
-        setEditingAssignment(assignment);
-      }
-
+      const editData = await fetchAssignmentForEdit(assignment.id);
+      setEditingAssignment(editData);
       setIsAssignmentModalVisible(true);
     } catch (error) {
-      message.error("Gagal memuat data assignment");
+      console.error("Error fetching assignment for edit:", error);
+      message.error("Gagal memuat data assignment untuk diedit");
     } finally {
-      setActionLoading((prev) => ({ ...prev, [editKey]: false }));
+      setActionLoading((prev) => ({
+        ...prev,
+        [`edit_${assignment.id}`]: false,
+      }));
     }
   };
 
+  // Handle delete assignment
   const handleDeleteAssignment = async (assignment) => {
-    const deleteKey = `delete_${assignment.id}`;
-
-    const result = await Swal.fire({
-      title: "Hapus Assignment?",
-      html: `
-        <div style="text-align: left; margin: 16px 0;">
-          <strong>${assignment.title}</strong>
-          <br><br>
-          <div style="color: #ff4d4f;">
-            ⚠️ Semua data submission akan ikut terhapus!
-          </div>
-        </div>
-      `,
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Ya, Hapus!",
-      cancelButtonText: "Batal",
-      reverseButtons: true,
-    });
-
-    if (result.isConfirmed) {
-      setActionLoading((prev) => ({ ...prev, [deleteKey]: true }));
-
-      try {
-        const success = await deleteAssignment(assignment.id);
-        if (success) {
-          Swal.fire({
-            title: "Berhasil!",
-            text: "Assignment berhasil dihapus",
-            icon: "success",
-            timer: 2000,
-            showConfirmButton: false,
-          });
-        }
-      } catch (error) {
-        console.error("Error deleting assignment:", error);
-      } finally {
-        setActionLoading((prev) => ({ ...prev, [deleteKey]: false }));
-      }
+    try {
+      setActionLoading((prev) => ({
+        ...prev,
+        [`delete_${assignment.id}`]: true,
+      }));
+      await deleteAssignment(assignment.id);
+    } catch (error) {
+      console.error("Error deleting assignment:", error);
+    } finally {
+      setActionLoading((prev) => ({
+        ...prev,
+        [`delete_${assignment.id}`]: false,
+      }));
     }
   };
 
+  // Handle view assignment detail
   const handleViewDetail = async (assignment) => {
-    const viewKey = `view_${assignment.id}`;
-    setActionLoading((prev) => ({ ...prev, [viewKey]: true }));
-
     try {
+      setActionLoading((prev) => ({
+        ...prev,
+        [`view_${assignment.id}`]: true,
+      }));
+
       setSelectedAssignment(assignment);
-      await fetchAssignmentDetail(assignment.id);
       setIsDetailModalVisible(true);
+
+      // Fetch detailed data
+      await fetchAssignmentDetail(assignment.id);
     } catch (error) {
+      console.error("Error fetching assignment detail:", error);
       message.error("Gagal memuat detail assignment");
     } finally {
-      setActionLoading((prev) => ({ ...prev, [viewKey]: false }));
+      setActionLoading((prev) => ({
+        ...prev,
+        [`view_${assignment.id}`]: false,
+      }));
     }
   };
 
-  const handleAssignmentFormSuccess = async (assignmentData) => {
-    if (editingAssignment) {
-      await updateAssignment(editingAssignment.id, assignmentData);
-    } else {
-      await createAssignment(assignmentData);
-    }
-  };
-
-  const getAssignmentStatistics = () => {
-    const totalAssignments = assignments.length;
-    const totalSubmissions = assignments.reduce(
-      (sum, a) => sum + a.total_submissions,
-      0
-    );
-    const pendingGrading = assignments.reduce(
-      (sum, a) => sum + a.pending_submissions,
-      0
-    );
-    const averageGrade =
-      totalAssignments > 0
-        ? assignments.reduce((sum, a) => sum + a.average_grade, 0) /
-          totalAssignments
-        : 0;
-
-    return {
-      totalAssignments,
-      totalSubmissions,
-      pendingGrading,
-      averageGrade: Math.round(averageGrade * 10) / 10,
-    };
-  };
-
-  const stats = getAssignmentStatistics();
-
-  const getStatusTag = (assignment) => {
-    const now = dayjs();
-    const dueDate = assignment.due_date ? dayjs(assignment.due_date) : null;
-
-    if (!dueDate) {
-      return <Tag color="blue">Tanpa Deadline</Tag>;
-    }
-
-    const isOverdue = now.isAfter(dueDate);
-    const isUpcoming = dueDate.diff(now, "hours") <= 24 && !isOverdue;
-
-    if (isOverdue) {
-      return (
-        <Tag color="red" icon={<ExclamationCircleOutlined />}>
-          Overdue
-        </Tag>
-      );
-    } else if (isUpcoming) {
-      return (
-        <Tag color="orange" icon={<ClockCircleOutlined />}>
-          Segera Berakhir
-        </Tag>
-      );
-    } else {
-      return (
-        <Tag color="green" icon={<CheckCircleOutlined />}>
-          Aktif
-        </Tag>
+  // Handle assignment form submission
+  const handleAssignmentSubmit = async (assignmentData) => {
+    try {
+      if (editingAssignment) {
+        await updateAssignment(editingAssignment.id, assignmentData);
+        message.success("Assignment berhasil diperbarui");
+      } else {
+        await createAssignment(assignmentData);
+        message.success("Assignment berhasil dibuat");
+      }
+      setIsAssignmentModalVisible(false);
+      setEditingAssignment(null);
+    } catch (error) {
+      console.error("Error submitting assignment:", error);
+      message.error(
+        editingAssignment
+          ? "Gagal memperbarui assignment"
+          : "Gagal membuat assignment"
       );
     }
   };
 
-  const getSubmissionProgress = (assignment) => {
-    const totalStudents = students.length;
-    const submissionRate =
-      totalStudents > 0
-        ? Math.round((assignment.total_submissions / totalStudents) * 100)
-        : 0;
+  // Handle grade submission
+  const handleGradeSubmission = async (
+    assignmentId,
+    submissionId,
+    grade,
+    feedback
+  ) => {
+    try {
+      await gradeSubmission(assignmentId, submissionId, grade, feedback);
+      message.success("Nilai berhasil disimpan");
+      return true;
+    } catch (error) {
+      console.error("Error grading submission:", error);
+      message.error("Gagal menyimpan nilai");
+      return false;
+    }
+  };
 
+  // Handle refresh
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await fetchAssignments();
+      message.success("Data assignments berhasil diperbarui");
+    } catch (error) {
+      console.error("Error refreshing assignments:", error);
+      message.error("Gagal memperbarui data assignments");
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  // Error state
+  if (loading && assignments.length === 0) {
     return (
-      <div>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            marginBottom: 4,
-          }}
-        >
-          <Text style={{ fontSize: 12 }}>Progress Submission</Text>
-          <Text style={{ fontSize: 12 }}>{submissionRate}%</Text>
-        </div>
-        <Progress
-          percent={submissionRate}
-          size="small"
-          strokeColor={
-            submissionRate >= 80
-              ? "#52c41a"
-              : submissionRate >= 50
-              ? "#faad14"
-              : "#ff4d4f"
-          }
-          showInfo={false}
-        />
-      </div>
-    );
-  };
-
-  const columns = [
-    {
-      title: "No",
-      key: "no",
-      render: (_, __, index) => index + 1,
-      width: 60,
-      align: "center",
-    },
-    {
-      title: "Assignment",
-      dataIndex: "title",
-      key: "title",
-      render: (title, record) => (
-        <div>
-          <Text strong style={{ display: "block", fontSize: 14 }}>
-            {title}
-          </Text>
-          <Text type="secondary" style={{ fontSize: 12 }}>
-            {record.description
-              ? record.description.length > 80
-                ? `${record.description.substring(0, 80)}...`
-                : record.description
-              : "Tidak ada deskripsi"}
-          </Text>
-          <div style={{ marginTop: 4 }}>
-            <Tag color="blue" size="small">
-              {record.question_count} Soal
-            </Tag>
-          </div>
-        </div>
-      ),
-      ellipsis: true,
-      width: isMobile ? 200 : 300,
-    },
-    {
-      title: "Deadline & Status",
-      key: "deadline",
-      render: (_, record) => (
-        <div>
-          {record.due_date ? (
-            <>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 4,
-                  marginBottom: 4,
-                }}
-              >
-                <CalendarOutlined style={{ color: "#1890ff", fontSize: 12 }} />
-                <Text style={{ fontSize: 12 }}>
-                  {dayjs(record.due_date).format("DD MMM YYYY HH:mm")}
-                </Text>
-              </div>
-              {getStatusTag(record)}
-            </>
-          ) : (
-            <Tag color="blue">Tanpa Deadline</Tag>
-          )}
-        </div>
-      ),
-      width: 160,
-    },
-    {
-      title: "Submissions",
-      key: "submissions",
-      render: (_, record) => (
-        <div>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginBottom: 4,
-            }}
-          >
-            <Tag color="green">{record.total_submissions} Submit</Tag>
-            <Tag color="orange">{record.pending_submissions} Pending</Tag>
-          </div>
-          {getSubmissionProgress(record)}
-        </div>
-      ),
-      width: 180,
-      align: "center",
-    },
-    {
-      title: "Rata-rata Nilai",
-      key: "average_grade",
-      render: (_, record) => (
+      <div
+        style={{
+          background: "linear-gradient(135deg, #f8fafc 0%, #e6f3ff 100%)",
+          minHeight: "400px",
+          borderRadius: 16,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "40px 20px",
+        }}
+      >
         <div style={{ textAlign: "center" }}>
-          {record.graded_submissions > 0 ? (
-            <div>
-              <div style={{ fontSize: 16, fontWeight: 600 }}>
-                {record.average_grade}
-              </div>
-              <Text type="secondary" style={{ fontSize: 11 }}>
-                {record.graded_submissions} dinilai
-              </Text>
-            </div>
-          ) : (
-            <Text type="secondary">Belum ada nilai</Text>
-          )}
+          <Spin
+            indicator={<LoadingOutlined style={{ fontSize: 32 }} spin />}
+            size="large"
+          />
+          <div style={{ marginTop: 16, color: "#666", fontSize: 16 }}>
+            Memuat data assignments...
+          </div>
         </div>
-      ),
-      width: 120,
-      align: "center",
-    },
-    {
-      title: "Actions",
-      key: "actions",
-      render: (_, record) => {
-        const menuItems = [
-          {
-            key: "edit",
-            label: "Edit Assignment",
-            icon: <EditOutlined />,
-            onClick: () => handleEditAssignment(record),
-          },
-          {
-            key: "analytics",
-            label: "Lihat Analytics",
-            icon: <BarChartOutlined />,
-            onClick: () => message.info("Fitur analytics akan segera hadir"),
-          },
-          {
-            key: "delete",
-            label: "Hapus Assignment",
-            icon: <DeleteOutlined />,
-            danger: true,
-            onClick: () => handleDeleteAssignment(record),
-          },
-        ];
-
-        return (
-          <Space size="small">
-            <Button
-              icon={<EyeOutlined />}
-              size="small"
-              onClick={() => handleViewDetail(record)}
-              loading={actionLoading[`view_${record.id}`]}
-              style={{ backgroundColor: "#1890ff", color: "#fff" }}
-            >
-              {!isMobile && "Detail"}
-            </Button>
-            <Dropdown
-              menu={{ items: menuItems }}
-              trigger={["click"]}
-              placement="bottomRight"
-            >
-              <Button
-                icon={<MoreOutlined />}
-                size="small"
-                loading={
-                  actionLoading[`edit_${record.id}`] ||
-                  actionLoading[`delete_${record.id}`]
-                }
-              />
-            </Dropdown>
-          </Space>
-        );
-      },
-      width: isMobile ? 100 : 140,
-    },
-  ];
-
-  const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
-
-  if (loading) {
-    return (
-      <Card>
-        <div style={{ textAlign: "center", padding: "60px 0" }}>
-          <Spin indicator={antIcon} />
-          <p style={{ marginTop: 16, color: "#666" }}>
-            Memuat data assignment...
-          </p>
-        </div>
-      </Card>
+      </div>
     );
   }
 
   return (
-    <div>
-      {/* Header Section */}
-      <Card style={{ marginBottom: 24 }} bodyStyle={{ padding: "20px" }}>
-        <div style={{ marginBottom: 24, textAlign: "center" }}>
-          <FileTextOutlined
-            style={{
-              fontSize: isMobile ? 24 : 32,
-              color: "#11418b",
-              marginBottom: isMobile ? 8 : 12,
-            }}
-          />
-          <Title
-            level={isMobile ? 5 : 4}
-            style={{
-              marginBottom: 8,
-              fontSize: isMobile ? "16px" : "20px",
-              fontWeight: 700,
-              color: "#11418b",
-            }}
-          >
-            Manajemen Assignment
-          </Title>
-          <Text
-            type="secondary"
-            style={{
-              fontSize: isMobile ? "12px" : "14px",
-              color: "#666",
-            }}
-          >
-            Kelola assignment untuk materi ini
-          </Text>
-          <div style={{ marginTop: 16 }}>
-            <Space>
-              <Button
-                icon={<ReloadOutlined />}
-                onClick={fetchAssignments}
-                loading={loading}
-                size={isMobile ? "small" : "middle"}
-              >
-                Refresh
-              </Button>
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={handleAddAssignment}
-                style={{ backgroundColor: "#11418b" }}
-                size={isMobile ? "small" : "middle"}
-              >
-                {isMobile ? "Buat" : "Buat Assignment"}
-              </Button>
-            </Space>
-          </div>
-        </div>
+    <div
+      style={{
+        // background: "linear-gradient(135deg, #f8fafc 0%, #e6f3ff 100%)",
+        minHeight: "100vh",
+        padding: isMobile ? 16 : 24,
+        borderRadius: 16,
+      }}
+    >
+      {/* Header */}
+      <AssignmentsHeader
+        isMobile={isMobile}
+        assignmentsCount={assignments.length}
+      />
 
-        {/* Statistics Row */}
-        <Row gutter={16}>
-          <Col xs={12} sm={6}>
-            <Statistic
-              title="Total Assignment"
-              value={stats.totalAssignments}
-              prefix={<FileTextOutlined />}
-              valueStyle={{ color: "#11418b" }}
-            />
-          </Col>
-          <Col xs={12} sm={6}>
-            <Statistic
-              title="Total Submission"
-              value={stats.totalSubmissions}
-              prefix={<UserOutlined />}
-              valueStyle={{ color: "#52c41a" }}
-            />
-          </Col>
-          <Col xs={12} sm={6}>
-            <Statistic
-              title="Pending Grading"
-              value={stats.pendingGrading}
-              prefix={<ClockCircleOutlined />}
-              valueStyle={{ color: "#faad14" }}
-            />
-          </Col>
-          <Col xs={12} sm={6}>
-            <Statistic
-              title="Rata-rata Nilai"
-              value={stats.averageGrade}
-              precision={1}
-              valueStyle={{ color: "#1890ff" }}
-            />
-          </Col>
-        </Row>
-      </Card>
+      {/* Statistics Cards */}
+      <AssignmentsStatsCards assignments={assignments} isMobile={isMobile} />
+
+      {/* Control Panel */}
+      <AssignmentControlPanel
+        onCreateAssignment={handleAddAssignment}
+        onRefresh={handleRefresh}
+        refreshing={refreshing}
+        hasAssignments={assignments.length > 0}
+        isMobile={isMobile}
+      />
 
       {/* Assignments Table */}
-      <Card>
-        {assignments.length > 0 ? (
-          <Table
-            dataSource={assignments.map((assignment, idx) => ({
-              ...assignment,
-              key: assignment.id,
-              no: idx + 1,
-            }))}
-            columns={columns}
-            pagination={{
-              pageSize: 10,
-              showSizeChanger: false,
-              style: { textAlign: "center" },
-              showTotal: (total, range) =>
-                `${range[0]}-${range[1]} dari ${total} assignment`,
-            }}
-            className="session-assignments-table"
-            style={{ width: "100%" }}
-            scroll={{ x: isMobile ? 1000 : undefined }}
-            size="middle"
-          />
-        ) : (
-          <Empty
-            description="Belum ada assignment dibuat"
-            image={Empty.PRESENTED_IMAGE_SIMPLE}
-            style={{ padding: "40px 0" }}
-          >
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={handleAddAssignment}
-              style={{ backgroundColor: "#11418b" }}
-            >
-              Buat Assignment Pertama
-            </Button>
-          </Empty>
-        )}
-      </Card>
+      <AssignmentsTable
+        assignments={assignments}
+        students={materialDetail?.students || []}
+        onViewDetail={handleViewDetail}
+        onEditAssignment={handleEditAssignment}
+        onDeleteAssignment={handleDeleteAssignment}
+        actionLoading={actionLoading}
+        isMobile={isMobile}
+      />
 
       {/* Modals */}
-      <SessionsAssignmentForm
+      <AssignmentFormModal
         open={isAssignmentModalVisible}
         onClose={() => {
           setIsAssignmentModalVisible(false);
@@ -591,10 +253,10 @@ const SessionsMaterialAssignmentsTab = ({
         }}
         materialSlug={materialSlug}
         editingAssignment={editingAssignment}
-        onSuccess={handleAssignmentFormSuccess}
+        onSuccess={handleAssignmentSubmit}
       />
 
-      <SessionsAssignmentDetailModal
+      <AssignmentDetailModal
         open={isDetailModalVisible}
         onClose={() => {
           setIsDetailModalVisible(false);
@@ -608,7 +270,8 @@ const SessionsMaterialAssignmentsTab = ({
         loading={detailLoading}
         submissionsLoading={submissionsLoading}
         gradingLoading={gradingLoading}
-        onGradeSubmission={gradeSubmission}
+        onGradeSubmission={handleGradeSubmission}
+        isMobile={isMobile}
       />
     </div>
   );

@@ -74,7 +74,7 @@ const GroupQuizScoreCard = ({ results }) => {
                 border: "none",
               }}
             >
-              Peringkat: {getGradeText(results.score)}
+              Grade: {getGradeText(results.score)}
             </Tag>
           </div>
         }

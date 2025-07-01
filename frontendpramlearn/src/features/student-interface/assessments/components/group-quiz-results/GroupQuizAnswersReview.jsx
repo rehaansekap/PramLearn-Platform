@@ -178,17 +178,25 @@ const GroupQuizAnswersReview = ({ results }) => {
                 <Text strong style={{ color: "#666", fontSize: 14 }}>
                   Jawaban Kelompok Anda:{" "}
                 </Text>
-                <Tag
-                  color={answer.is_correct ? "success" : "error"}
-                  style={{
-                    fontSize: 13,
-                    padding: "4px 12px",
-                    fontWeight: 600,
-                    borderRadius: 6,
-                  }}
-                >
-                  {answer.selected_answer}. {answer.selected_answer_text}
-                </Tag>
+                <div style={{ marginTop: 8 }}>
+                  <Tag
+                    color={answer.is_correct ? "success" : "error"}
+                    style={{
+                      fontSize: 13,
+                      padding: "4px 12px",
+                      fontWeight: 600,
+                      borderRadius: 6,
+                      whiteSpace: "normal",
+                      wordBreak: "break-word",
+                      overflowWrap: "break-word",
+                      display: "inline-block",
+                      maxWidth: "100%",
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    {answer.selected_answer}. {answer.selected_answer_text}
+                  </Tag>
+                </div>
               </div>
 
               {/* Correct Answer (if wrong) */}
@@ -204,17 +212,25 @@ const GroupQuizAnswersReview = ({ results }) => {
                   <Text strong style={{ color: "#666", fontSize: 14 }}>
                     Jawaban Yang Benar:{" "}
                   </Text>
-                  <Tag
-                    color="success"
-                    style={{
-                      fontSize: 13,
-                      padding: "4px 12px",
-                      fontWeight: 600,
-                      borderRadius: 6,
-                    }}
-                  >
-                    {answer.correct_answer}. {answer.correct_answer_text}
-                  </Tag>
+                  <div style={{ marginTop: 8 }}>
+                    <Tag
+                      color="success"
+                      style={{
+                        fontSize: 13,
+                        padding: "4px 12px",
+                        fontWeight: 600,
+                        borderRadius: 6,
+                        whiteSpace: "normal",
+                        wordBreak: "break-word",
+                        overflowWrap: "break-word",
+                        display: "inline-block",
+                        maxWidth: "100%",
+                        lineHeight: 1.4,
+                      }}
+                    >
+                      {answer.correct_answer}. {answer.correct_answer_text}
+                    </Tag>
+                  </div>
                 </div>
               )}
 
@@ -231,7 +247,15 @@ const GroupQuizAnswersReview = ({ results }) => {
                   <Text strong style={{ color: "#1890ff", fontSize: 14 }}>
                     💡 Penjelasan:{" "}
                   </Text>
-                  <Text style={{ color: "#666", fontSize: 14 }}>
+                  <Text
+                    style={{
+                      color: "#666",
+                      fontSize: 14,
+                      display: "block",
+                      marginTop: 4,
+                      lineHeight: 1.5,
+                    }}
+                  >
                     {answer.explanation}
                   </Text>
                 </div>

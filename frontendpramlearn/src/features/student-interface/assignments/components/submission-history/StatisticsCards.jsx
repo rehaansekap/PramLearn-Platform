@@ -34,17 +34,17 @@ const StatisticsCards = ({
   };
 
   const statisticsData = [
-    {
-      title: "Waktu Pengerjaan",
-      value:
-        submissionDetails?.work_duration ||
-        getWorkDuration(
-          latestSubmission?.start_time,
-          latestSubmission?.submission_date
-        ),
-      prefix: <ClockCircleOutlined style={{ color: "#1890ff" }} />,
-      color: "#1890ff",
-    },
+    // {
+    //   title: "Waktu Pengerjaan",
+    //   value:
+    //     submissionDetails?.work_duration ||
+    //     getWorkDuration(
+    //       latestSubmission?.start_time,
+    //       latestSubmission?.submission_date
+    //     ),
+    //   prefix: <ClockCircleOutlined style={{ color: "#1890ff" }} />,
+    //   color: "#1890ff",
+    // },
     {
       title: "Peringkat",
       value: submissionDetails?.rank || "-",
@@ -82,8 +82,17 @@ const StatisticsCards = ({
   return (
     <Row gutter={[16, 16]}>
       {statisticsData.map((stat, index) => (
-        <Col xs={12} sm={12} key={index}>
-          <Card style={{ borderRadius: 12, textAlign: "center" }}>
+        <Col xs={24} sm={8} md={8} lg={8} key={index}>
+          <Card
+            style={{
+              borderRadius: 12,
+              textAlign: "center",
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+            }}
+          >
             <Statistic
               title={stat.title}
               value={stat.value}

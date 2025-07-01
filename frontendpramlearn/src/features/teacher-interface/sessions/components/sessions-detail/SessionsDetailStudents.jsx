@@ -25,6 +25,7 @@ import {
   TeamOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
+import { useOnlineStatus } from "../../../../../context/OnlineStatusContext";
 
 const { Text } = Typography;
 const { Search } = Input;
@@ -37,6 +38,7 @@ const SessionsDetailStudents = ({
 }) => {
   const [searchText, setSearchText] = useState("");
   const [sortedInfo, setSortedInfo] = useState({});
+  const { isUserOnline } = useOnlineStatus();
 
   if (!sessionDetail) {
     return (

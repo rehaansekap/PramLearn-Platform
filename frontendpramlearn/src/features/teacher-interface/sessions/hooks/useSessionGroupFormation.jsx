@@ -30,15 +30,28 @@ const useSessionGroupFormation = (materialSlug, onGroupsChanged) => {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
+          // Remove Content-Type header for PDF requests
         },
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
+        const errorText = await response.text();
+        let errorData = {};
+        try {
+          errorData = JSON.parse(errorText);
+        } catch (e) {
+          // If not JSON, use the text as error message
+          errorData = { error: errorText };
+        }
         throw new Error(
           errorData.error || `HTTP error! status: ${response.status}`
         );
+      }
+
+      // Check if response is actually a PDF
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/pdf")) {
+        throw new Error("Response is not a PDF file");
       }
 
       // Get filename from Content-Disposition header or create default
@@ -49,15 +62,20 @@ const useSessionGroupFormation = (materialSlug, onGroupsChanged) => {
 
       if (contentDisposition) {
         const filenameMatch = contentDisposition.match(
-          /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/
+          /filename[^;=\n]*=["']?([^"';]+)["']?/
         );
         if (filenameMatch && filenameMatch[1]) {
-          filename = filenameMatch[1].replace(/['"]/g, "");
+          filename = filenameMatch[1];
         }
       }
 
       // Convert response to blob
       const blob = await response.blob();
+
+      // Verify blob size
+      if (blob.size === 0) {
+        throw new Error("PDF file is empty");
+      }
 
       // Create download link
       const url = window.URL.createObjectURL(blob);
@@ -71,8 +89,10 @@ const useSessionGroupFormation = (materialSlug, onGroupsChanged) => {
       a.click();
 
       // Cleanup
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
+      setTimeout(() => {
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      }, 100);
 
       // Show success message
       message.success("📄 Laporan analisis kelompok berhasil didownload!");
@@ -89,6 +109,10 @@ const useSessionGroupFormation = (materialSlug, onGroupsChanged) => {
           "Anda tidak memiliki akses untuk mengexport analisis ini.";
       } else if (error.message.includes("500")) {
         errorMessage += "Terjadi kesalahan server. Silakan coba lagi.";
+      } else if (error.message.includes("empty")) {
+        errorMessage += "File PDF kosong. Silakan coba lagi.";
+      } else if (error.message.includes("not a PDF")) {
+        errorMessage += "Response bukan file PDF. Silakan coba lagi.";
       } else {
         errorMessage += error.message;
       }
@@ -315,7 +339,9 @@ const useSessionGroupFormation = (materialSlug, onGroupsChanged) => {
         });
       }
 
-      if (onGroupsChanged) onGroupsChanged();
+      if (onGroupsChanged) {
+        await onGroupsChanged();
+      }
     } catch (error) {
       console.error("Error creating groups:", error);
 
@@ -388,7 +414,11 @@ const useSessionGroupFormation = (materialSlug, onGroupsChanged) => {
 
       setGroupMessage(response.data.message);
       message.success("Kelompok berhasil dibuat ulang!");
-      if (onGroupsChanged) onGroupsChanged();
+
+      // IMPORTANT: Call the callback to refresh groups data
+      if (onGroupsChanged) {
+        await onGroupsChanged();
+      }
     } catch (err) {
       const errorMessage =
         err.response?.data?.error || "Gagal membentuk kelompok.";

@@ -1,40 +1,32 @@
 import React, { useState, useEffect, useMemo } from "react";
-import {
-  Card,
-  Tabs,
-  Button,
-  Space,
-  Typography,
-  Empty,
-  Tag,
-  Statistic,
-  Row,
-  Col,
-  Alert,
-} from "antd";
-import {
-  PlusOutlined,
-  QuestionCircleOutlined,
-  BarChartOutlined,
-  FileTextOutlined,
-  UserOutlined,
-  CheckCircleOutlined,
-} from "@ant-design/icons";
+import { Card, Tabs, Alert, message, Button } from "antd";
+import { ReloadOutlined } from "@ant-design/icons";
+
 import useSessionARCSManagement from "../../hooks/useSessionARCSManagement";
-import ARCSQuestionnaireList from "./arcs/ARCSQuestionnaireList";
+
+// Import enhanced components
+import ARCSHeader from "./arcs/ARCSHeader";
+import ARCSStatsCards from "./arcs/ARCSStatsCards";
+import ARCSQuestionnaireGrid from "./arcs/ARCSQuestionnaireGrid";
 import ARCSQuestionnaireForm from "./arcs/ARCSQuestionnaireForm";
 import ARCSQuestionManager from "./arcs/ARCSQuestionManager";
 import ARCSResponsesViewer from "./arcs/ARCSResponsesViewer";
 import ARCSAnalyticsDashboard from "./arcs/ARCSAnalyticsDashboard";
 
-const { Title, Text } = Typography;
+// Import empty states
+import {
+  QuestionsEmptyState,
+  ResponsesEmptyState,
+  AnalyticsEmptyState,
+  SelectedQuestionnaireInfo,
+} from "./arcs/ARCSEmptyStates";
+
 const { TabPane } = Tabs;
 
-const SessionsMaterialARCSTab = ({ materialSlug }) => {
+const SessionsMaterialARCSTab = ({ materialSlug, isMobile = false }) => {
   const [activeTab, setActiveTab] = useState("questionnaires");
   const [modalVisible, setModalVisible] = useState(false);
   const [editingQuestionnaire, setEditingQuestionnaire] = useState(null);
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   const {
     questionnaires,
@@ -52,306 +44,450 @@ const SessionsMaterialARCSTab = ({ materialSlug }) => {
     deleteQuestionnaire,
     fetchQuestions,
     createQuestion,
+    updateQuestion,
+    deleteQuestion,
     fetchResponses,
     fetchAnalytics,
+    fetchQuestionnaires: refetch,
   } = useSessionARCSManagement(materialSlug);
 
-  // Stabilize resize handler dengan useEffect yang benar
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
+      // Update mobile state if needed
     };
-
-    // Set initial value
-    setIsMobile(window.innerWidth <= 768);
-
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []); // Empty dependency array
+  }, []);
 
-  // Stabilize handlers with useMemo/useCallback
-  const handleCreateQuestionnaire = useMemo(
-    () => () => {
-      setEditingQuestionnaire(null);
-      setModalVisible(true);
-    },
-    []
-  );
+  // Handle create questionnaire
+  const handleCreateQuestionnaire = () => {
+    setEditingQuestionnaire(null);
+    setModalVisible(true);
+  };
 
-  const handleEditQuestionnaire = useMemo(
-    () => (questionnaire) => {
-      setEditingQuestionnaire(questionnaire);
-      setModalVisible(true);
-    },
-    []
-  );
+  // Handle edit questionnaire
+  const handleEditQuestionnaire = (questionnaire) => {
+    setEditingQuestionnaire(questionnaire);
+    setModalVisible(true);
+  };
 
-  const handleQuestionnaireSubmit = useMemo(
-    () => async (data) => {
-      try {
-        if (editingQuestionnaire) {
-          await updateQuestionnaire(editingQuestionnaire.id, data);
-        } else {
-          await createQuestionnaire(data);
-        }
-        setModalVisible(false);
-        setEditingQuestionnaire(null);
-      } catch (error) {
-        console.error("Error submitting questionnaire:", error);
+  // Handle questionnaire submission
+  const handleQuestionnaireSubmit = async (data) => {
+    try {
+      if (editingQuestionnaire) {
+        await updateQuestionnaire(editingQuestionnaire.id, data);
+      } else {
+        await createQuestionnaire(data);
       }
-    },
-    [editingQuestionnaire, updateQuestionnaire, createQuestionnaire]
-  );
+      setModalVisible(false);
+      setEditingQuestionnaire(null);
+    } catch (error) {
+      console.error("Error submitting questionnaire:", error);
+    }
+  };
 
-  const handleQuestionnaireSelect = useMemo(
-    () => (questionnaire) => {
-      setSelectedQuestionnaire(questionnaire);
-      setActiveTab("questions");
-      fetchQuestions(questionnaire.id);
-    },
-    [setSelectedQuestionnaire, fetchQuestions]
-  );
+  // Handle select questionnaire
+  const handleQuestionnaireSelect = (questionnaire) => {
+    setSelectedQuestionnaire(questionnaire);
+    setActiveTab("questions");
+    fetchQuestions(questionnaire.id);
+  };
 
-  const handleViewResponses = useMemo(
-    () => (questionnaire) => {
-      setSelectedQuestionnaire(questionnaire);
-      setActiveTab("responses");
-      fetchResponses(questionnaire.id);
-    },
-    [setSelectedQuestionnaire, fetchResponses]
-  );
+  // Handle view responses
+  const handleViewResponses = (questionnaire) => {
+    setSelectedQuestionnaire(questionnaire);
+    setActiveTab("responses");
+    fetchResponses(questionnaire.id);
+  };
 
-  const handleViewAnalytics = useMemo(
-    () => (questionnaire) => {
-      setSelectedQuestionnaire(questionnaire);
-      setActiveTab("analytics");
-      fetchAnalytics(questionnaire.id);
-    },
-    [setSelectedQuestionnaire, fetchAnalytics]
-  );
+  // Handle view analytics
+  const handleViewAnalytics = (questionnaire) => {
+    setSelectedQuestionnaire(questionnaire);
+    setActiveTab("analytics");
+    fetchAnalytics(questionnaire.id);
+  };
 
-  // Calculate summary statistics dengan useMemo untuk mencegah recalculation
+  // Handle toggle status
+  const handleToggleStatus = async (questionnaireId, isActive) => {
+    try {
+      await updateQuestionnaire(questionnaireId, { is_active: isActive });
+    } catch (error) {
+      console.error("Error toggling questionnaire status:", error);
+    }
+  };
+
+  // Handle refresh
+  const handleRefresh = async () => {
+    try {
+      await refetch();
+      if (selectedQuestionnaire) {
+        // Refresh related data if questionnaire is selected
+        if (activeTab === "questions") {
+          await fetchQuestions(selectedQuestionnaire.id);
+        } else if (activeTab === "responses") {
+          await fetchResponses(selectedQuestionnaire.id);
+        } else if (activeTab === "analytics") {
+          await fetchAnalytics(selectedQuestionnaire.id);
+        }
+      }
+      message.success("Data berhasil diperbarui");
+    } catch (error) {
+      console.error("Error refreshing data:", error);
+      message.error("Gagal memperbarui data");
+    }
+  };
+
+  // Handle back to questionnaires
+  const handleBackToQuestionnaires = () => {
+    setActiveTab("questionnaires");
+  };
+
+  // Calculate summary statistics
   const summaryStats = useMemo(() => {
     const totalQuestionnaires = questionnaires.length;
     const activeQuestionnaires = questionnaires.filter(
       (q) => q.is_active
     ).length;
-    const totalResponses = questionnaires.reduce(
-      (sum, q) => sum + (q.responses_count || 0),
-      0
-    );
-    const avgCompletionRate =
-      questionnaires.length > 0
-        ? questionnaires.reduce((sum, q) => sum + (q.completion_rate || 0), 0) /
-          questionnaires.length
-        : 0;
+
+    // Calculate total responses and completed responses from questionnaires data
+    let totalResponses = 0;
+    let completedResponses = 0;
+
+    questionnaires.forEach((q) => {
+      totalResponses += q.responses_count || 0;
+      // Since completion_rate is percentage, calculate completed responses
+      const questionnaireCompletedResponses = Math.round(
+        ((q.completion_rate || 0) / 100) * (q.responses_count || 0)
+      );
+      completedResponses += questionnaireCompletedResponses;
+    });
+
+    // For ARCS dimension averages, we need to fetch actual response data
+    // These will be updated when we have actual response data from the selected questionnaire
+    let avgAttention = 0;
+    let avgRelevance = 0;
+    let avgConfidence = 0;
+    let avgSatisfaction = 0;
+
+    // If we have responses data (from selected questionnaire), calculate dimension averages
+    if (responses.length > 0) {
+      const dimensionSums = {
+        attention: 0,
+        relevance: 0,
+        confidence: 0,
+        satisfaction: 0,
+      };
+      const dimensionCounts = {
+        attention: 0,
+        relevance: 0,
+        confidence: 0,
+        satisfaction: 0,
+      };
+
+      responses.forEach((response) => {
+        if (response.answers && response.is_completed) {
+          response.answers.forEach((answer) => {
+            const dimension = answer.question?.dimension || answer.dimension;
+            if (
+              dimension &&
+              dimensionSums.hasOwnProperty(dimension) &&
+              answer.likert_value
+            ) {
+              dimensionSums[dimension] += answer.likert_value;
+              dimensionCounts[dimension]++;
+            }
+          });
+        }
+      });
+
+      avgAttention =
+        dimensionCounts.attention > 0
+          ? dimensionSums.attention / dimensionCounts.attention
+          : 0;
+      avgRelevance =
+        dimensionCounts.relevance > 0
+          ? dimensionSums.relevance / dimensionCounts.relevance
+          : 0;
+      avgConfidence =
+        dimensionCounts.confidence > 0
+          ? dimensionSums.confidence / dimensionCounts.confidence
+          : 0;
+      avgSatisfaction =
+        dimensionCounts.satisfaction > 0
+          ? dimensionSums.satisfaction / dimensionCounts.satisfaction
+          : 0;
+    }
 
     return {
       totalQuestionnaires,
       activeQuestionnaires,
       totalResponses,
-      avgCompletionRate,
+      completedResponses,
+      avgAttention,
+      avgRelevance,
+      avgConfidence,
+      avgSatisfaction,
     };
-  }, [questionnaires]);
+  }, [questionnaires, responses]);
+
+  if (loading && questionnaires.length === 0) {
+    return (
+      <div
+        style={{
+          background: "linear-gradient(135deg, #f8fafc 0%, #e6f3ff 100%)",
+          minHeight: "400px",
+          borderRadius: 16,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "40px 20px",
+        }}
+      >
+        <div style={{ textAlign: "center" }}>
+          <div
+            style={{
+              background: "rgba(102, 126, 234, 0.1)",
+              width: 80,
+              height: 80,
+              borderRadius: "50%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              margin: "0 auto",
+              marginBottom: 16,
+            }}
+          >
+            <ReloadOutlined style={{ fontSize: 32, color: "#667eea" }} spin />
+          </div>
+          <p style={{ color: "#666", fontSize: 16 }}>Memuat data ARCS...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ padding: isMobile ? "16px" : "24px" }}>
+    <div
+      style={{
+        background: "linear-gradient(135deg, #f8fafc 0%, #e6f3ff 100%)",
+        minHeight: "100vh",
+        padding: isMobile ? 16 : 24,
+        borderRadius: 16,
+      }}
+    >
       {/* Header */}
-      <div style={{ marginBottom: 24, textAlign: "center" }}>
-        <QuestionCircleOutlined
-          style={{
-            fontSize: isMobile ? 24 : 32,
-            color: "#11418b",
-            marginBottom: isMobile ? 8 : 12,
-          }}
-        />
-        <Title
-          level={isMobile ? 5 : 4}
-          style={{
-            marginBottom: 8,
-            fontSize: isMobile ? "16px" : "20px",
-            fontWeight: 700,
-            color: "#11418b",
-          }}
-        >
-          Manajemen Kuesioner ARCS
-        </Title>
-        <Text
-          type="secondary"
-          style={{
-            fontSize: isMobile ? "12px" : "14px",
-            color: "#666",
-          }}
-        >
-          Kelola kuesioner untuk mengukur motivasi siswa berdasarkan model ARCS
-        </Text>
-      </div>
-
-      {/* Summary Statistics */}
-      <Card size="small" style={{ marginBottom: 24 }}>
-        <Row gutter={16}>
-          <Col xs={12} sm={6}>
-            <Statistic
-              title="Total Kuesioner"
-              value={summaryStats.totalQuestionnaires}
-              prefix={<FileTextOutlined />}
-              valueStyle={{ color: "#11418b", fontSize: isMobile ? 14 : 16 }}
-            />
-          </Col>
-          <Col xs={12} sm={6}>
-            <Statistic
-              title="Aktif"
-              value={summaryStats.activeQuestionnaires}
-              prefix={<CheckCircleOutlined />}
-              valueStyle={{ color: "#52c41a", fontSize: isMobile ? 14 : 16 }}
-            />
-          </Col>
-          <Col xs={12} sm={6}>
-            <Statistic
-              title="Total Respons"
-              value={summaryStats.totalResponses}
-              prefix={<UserOutlined />}
-              valueStyle={{ color: "#1890ff", fontSize: isMobile ? 14 : 16 }}
-            />
-          </Col>
-          <Col xs={12} sm={6}>
-            <Statistic
-              title="Tingkat Selesai"
-              value={summaryStats.avgCompletionRate}
-              precision={1}
-              suffix="%"
-              prefix={<BarChartOutlined />}
-              valueStyle={{ color: "#faad14", fontSize: isMobile ? 14 : 16 }}
-            />
-          </Col>
-        </Row>
-      </Card>
-
-      {/* Rest of the component remains the same... */}
-      {/* Info Alert */}
-      <Alert
-        message="Tentang Kuesioner ARCS"
-        description="Kuesioner ARCS mengukur 4 dimensi motivasi: Attention (Perhatian), Relevance (Relevansi), Confidence (Percaya Diri), dan Satisfaction (Kepuasan). Hasil kuesioner akan otomatis mengisi profil motivasi siswa."
-        type="info"
-        showIcon
-        style={{ marginBottom: 24 }}
+      <ARCSHeader
+        isMobile={isMobile}
+        questionnaireCount={questionnaires.length}
+        onCreateQuestionnaire={handleCreateQuestionnaire}
+        onRefresh={handleRefresh}
+        loading={loading}
       />
 
-      {/* Main Content Tabs */}
-      <Card>
+      {/* Statistics Cards */}
+      <ARCSStatsCards summaryStats={summaryStats} isMobile={isMobile} />
+
+      {/* Main Content */}
+      <Card
+        style={{
+          borderRadius: 16,
+          border: "none",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+        }}
+        bodyStyle={{ padding: 0 }}
+      >
         <Tabs
           activeKey={activeTab}
           onChange={setActiveTab}
-          tabBarExtraContent={
-            activeTab === "questionnaires" ? (
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={handleCreateQuestionnaire}
-                size={isMobile ? "small" : "middle"}
-              >
-                {isMobile ? "Buat" : "Buat Kuesioner"}
-              </Button>
-            ) : selectedQuestionnaire ? (
-              <Space>
-                <Tag color="blue">{selectedQuestionnaire.title}</Tag>
-                <Button
-                  size="small"
-                  onClick={() => {
-                    setActiveTab("questionnaires");
-                    setSelectedQuestionnaire(null);
-                  }}
-                >
-                  Kembali
-                </Button>
-              </Space>
-            ) : null
-          }
+          type="card"
+          size={isMobile ? "small" : "large"}
+          style={{
+            "& .ant-tabs-tab": {
+              borderRadius: "12px 12px 0 0",
+              fontWeight: 600,
+            },
+          }}
         >
+          {/* Questionnaires Tab */}
           <TabPane
             tab={
-              <span>
-                <FileTextOutlined />
-                {!isMobile && " Kuesioner"}
+              <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                📋 Daftar Kuesioner
+                {questionnaires.length > 0 && (
+                  <span
+                    style={{
+                      background: "#667eea",
+                      color: "white",
+                      borderRadius: "50%",
+                      width: 20,
+                      height: 20,
+                      fontSize: 11,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {questionnaires.length}
+                  </span>
+                )}
               </span>
             }
             key="questionnaires"
           >
-            <ARCSQuestionnaireList
-              questionnaires={questionnaires}
-              loading={loading}
-              onEdit={handleEditQuestionnaire}
-              onDelete={deleteQuestionnaire}
-              onSelect={handleQuestionnaireSelect}
-              onViewResponses={handleViewResponses}
-              onViewAnalytics={handleViewAnalytics}
-              isMobile={isMobile}
-            />
+            <div style={{ padding: isMobile ? 16 : 24 }}>
+              <ARCSQuestionnaireGrid
+                questionnaires={questionnaires}
+                loading={loading}
+                onEdit={handleEditQuestionnaire}
+                onDelete={deleteQuestionnaire}
+                onSelect={handleQuestionnaireSelect}
+                onViewResponses={handleViewResponses}
+                onViewAnalytics={handleViewAnalytics}
+                onToggleStatus={handleToggleStatus}
+                isMobile={isMobile}
+              />
+            </div>
           </TabPane>
 
-          {selectedQuestionnaire && (
-            <>
-              <TabPane
-                tab={
-                  <span>
-                    <QuestionCircleOutlined />
-                    {!isMobile && " Pertanyaan"}
+          {/* Questions Tab */}
+          <TabPane
+            tab={
+              <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                ❓ Kelola Pertanyaan
+                {selectedQuestionnaire && (
+                  <span
+                    style={{
+                      background: "#52c41a",
+                      color: "white",
+                      borderRadius: "50%",
+                      width: 20,
+                      height: 20,
+                      fontSize: 11,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {questions.length}
                   </span>
-                }
-                key="questions"
-              >
-                <ARCSQuestionManager
-                  questionnaire={selectedQuestionnaire}
-                  questions={questions}
-                  loading={questionsLoading}
-                  onCreateQuestion={(data) =>
-                    createQuestion(selectedQuestionnaire.id, data)
-                  }
-                  onUpdateQuestion={fetchQuestions}
-                  materialSlug={materialSlug}
+                )}
+              </span>
+            }
+            key="questions"
+          >
+            <div style={{ padding: isMobile ? 16 : 24 }}>
+              {selectedQuestionnaire ? (
+                <>
+                  <SelectedQuestionnaireInfo
+                    questionnaire={selectedQuestionnaire}
+                    isMobile={isMobile}
+                  />
+                  <ARCSQuestionManager
+                    questionnaire={selectedQuestionnaire}
+                    questions={questions}
+                    loading={questionsLoading}
+                    onCreateQuestion={createQuestion}
+                    onUpdateQuestion={updateQuestion}
+                    onDeleteQuestion={deleteQuestion}
+                    materialSlug={materialSlug}
+                    isMobile={isMobile}
+                  />
+                </>
+              ) : (
+                <QuestionsEmptyState
+                  onSelectQuestionnaire={handleBackToQuestionnaires}
                   isMobile={isMobile}
                 />
-              </TabPane>
+              )}
+            </div>
+          </TabPane>
 
-              <TabPane
-                tab={
-                  <span>
-                    <UserOutlined />
-                    {!isMobile && " Respons"}
+          {/* Responses Tab */}
+          <TabPane
+            tab={
+              <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                📊 Data Respons
+                {selectedQuestionnaire && responses.length > 0 && (
+                  <span
+                    style={{
+                      background: "#52c41a",
+                      color: "white",
+                      borderRadius: "50%",
+                      width: 20,
+                      height: 20,
+                      fontSize: 11,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {responses.length}
                   </span>
-                }
-                key="responses"
-              >
-                <ARCSResponsesViewer
-                  questionnaire={selectedQuestionnaire}
-                  responses={responses}
-                  loading={responsesLoading}
+                )}
+              </span>
+            }
+            key="responses"
+          >
+            <div style={{ padding: isMobile ? 16 : 24 }}>
+              {selectedQuestionnaire ? (
+                <>
+                  <SelectedQuestionnaireInfo
+                    questionnaire={selectedQuestionnaire}
+                    isMobile={isMobile}
+                  />
+                  <ARCSResponsesViewer
+                    questionnaire={selectedQuestionnaire}
+                    responses={responses}
+                    loading={responsesLoading}
+                    isMobile={isMobile}
+                  />
+                </>
+              ) : (
+                <ResponsesEmptyState
+                  onSelectQuestionnaire={handleBackToQuestionnaires}
                   isMobile={isMobile}
                 />
-              </TabPane>
+              )}
+            </div>
+          </TabPane>
 
-              <TabPane
-                tab={
-                  <span>
-                    <BarChartOutlined />
-                    {!isMobile && " Analitik"}
-                  </span>
-                }
-                key="analytics"
-              >
-                <ARCSAnalyticsDashboard
-                  questionnaire={selectedQuestionnaire}
-                  analytics={analytics}
-                  loading={analyticsLoading}
+          {/* Analytics Tab */}
+          <TabPane
+            tab={
+              <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                📈 Dashboard Analitik
+              </span>
+            }
+            key="analytics"
+          >
+            <div style={{ padding: isMobile ? 16 : 24 }}>
+              {selectedQuestionnaire ? (
+                <>
+                  <SelectedQuestionnaireInfo
+                    questionnaire={selectedQuestionnaire}
+                    isMobile={isMobile}
+                  />
+                  <ARCSAnalyticsDashboard
+                    questionnaire={selectedQuestionnaire}
+                    analytics={analytics}
+                    loading={analyticsLoading}
+                    isMobile={isMobile}
+                  />
+                </>
+              ) : (
+                <AnalyticsEmptyState
+                  onSelectQuestionnaire={handleBackToQuestionnaires}
                   isMobile={isMobile}
                 />
-              </TabPane>
-            </>
-          )}
+              )}
+            </div>
+          </TabPane>
         </Tabs>
       </Card>
 
-      {/* Questionnaire Form Modal */}
+      {/* Form Modal */}
       <ARCSQuestionnaireForm
         visible={modalVisible}
         onCancel={() => {

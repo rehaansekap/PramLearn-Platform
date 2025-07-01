@@ -21,22 +21,22 @@ const GroupQuizStatistics = ({ results }) => {
   };
 
   const statisticsData = [
-    {
-      title: "Waktu Pengerjaan",
-      value: results.time_taken || 0,
-      suffix: "menit",
-      icon: <ClockCircleOutlined style={{ color: "#1890ff" }} />,
-      color: "#1890ff",
-    },
-    {
-      title: "Peringkat",
-      value: results.rank || "-",
-      suffix: results.total_participants
-        ? `/ ${results.total_participants}`
-        : "",
-      icon: <CrownOutlined style={{ color: "#faad14" }} />,
-      color: "#faad14",
-    },
+    // {
+    //   title: "Waktu Pengerjaan",
+    //   value: results.time_taken || 0,
+    //   suffix: "menit",
+    //   icon: <ClockCircleOutlined style={{ color: "#1890ff" }} />,
+    //   color: "#1890ff",
+    // },
+    // {
+    //   title: "Peringkat",
+    //   value: results.rank || "-",
+    //   suffix: results.total_participants
+    //     ? `/ ${results.total_participants}`
+    //     : "",
+    //   icon: <CrownOutlined style={{ color: "#faad14" }} />,
+    //   color: "#faad14",
+    // },
     {
       title: "Jawaban Benar",
       value: results.correct_answers,

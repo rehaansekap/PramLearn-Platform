@@ -549,6 +549,13 @@ const ARCSCard = ({ questionnaire, materialSlug, status, timeRemaining }) => {
                 padding: "4px 12px",
                 fontWeight: 600,
                 borderRadius: 12,
+                whiteSpace: "normal",
+                wordBreak: "break-word",
+                overflowWrap: "break-word",
+                display: "inline-block",
+                maxWidth: "100%",
+                lineHeight: 1.4,
+                textAlign: "center",
               }}
             >
               💡 {questionnaire.status_message}

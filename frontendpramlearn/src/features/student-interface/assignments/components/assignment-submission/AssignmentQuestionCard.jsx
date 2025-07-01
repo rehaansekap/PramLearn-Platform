@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Button, Typography, Space, Radio, Input, Tag } from "antd";
+import { Card, Button, Typography, Space, Radio, Input, Tag, Grid } from "antd";
 import {
   ArrowLeftOutlined,
   ArrowRightOutlined,
@@ -11,6 +11,7 @@ import {
 
 const { Text, Title } = Typography;
 const { TextArea } = Input;
+const { useBreakpoint } = Grid;
 
 const AssignmentQuestionCard = ({
   currentQuestion,
@@ -25,6 +26,8 @@ const AssignmentQuestionCard = ({
   onNext,
   onSubmit,
 }) => {
+  const screens = useBreakpoint();
+  const isMobile = !screens.md;
   const currentAnswer = answers[currentQuestion?.id];
   const isMultipleChoice = multipleChoiceQuestions.some(
     (q) => q.id === currentQuestion?.id
@@ -184,7 +187,7 @@ const AssignmentQuestionCard = ({
                     <div
                       key={option}
                       style={{
-                        paddingLeft: 50,
+                        paddingLeft: isMobile ? 12 : 50,
                         border: `3px solid ${
                           isSelected ? "#001529" : "#e5e7eb"
                         }`,
@@ -211,12 +214,12 @@ const AssignmentQuestionCard = ({
                       >
                         <div
                           style={{
-                            padding: "20px 24px",
-                            marginLeft: 8,
+                            padding: isMobile ? "16px 20px" : "20px 24px",
+                            marginLeft: isMobile ? 0 : 8,
                             display: "flex",
-                            alignItems: "flex-start",
-                            gap: 16,
-                            minHeight: 70,
+                            alignItems: isMobile ? "center" : "flex-start",
+                            gap: isMobile ? 12 : 16,
+                            minHeight: isMobile ? 60 : 70,
                           }}
                         >
                           <div
@@ -226,13 +229,13 @@ const AssignmentQuestionCard = ({
                                 : "#6b7280",
                               color: "white",
                               borderRadius: 12,
-                              width: 44,
-                              height: 44,
+                              width: isMobile ? 36 : 44,
+                              height: isMobile ? 36 : 44,
                               display: "flex",
                               alignItems: "center",
                               justifyContent: "center",
                               fontWeight: 700,
-                              fontSize: 18,
+                              fontSize: isMobile ? 16 : 18,
                               flexShrink: 0,
                               transition: "all 0.3s ease",
                               boxShadow: isSelected
@@ -242,13 +245,15 @@ const AssignmentQuestionCard = ({
                           >
                             {option}
                           </div>
-                          <div style={{ flex: 1, paddingTop: 2 }}>
+                          <div
+                            style={{ flex: 1, paddingTop: isMobile ? 0 : 2 }}
+                          >
                             <Text
                               style={{
-                                fontSize: 14,
-                                lineHeight: 1.6,
+                                fontSize: isMobile ? 13 : 14,
+                                lineHeight: 1.5,
                                 textAlign: "left",
-                                padding: "8px 0",
+                                padding: isMobile ? "4px 0" : "8px 0",
                                 color: isSelected ? "#1f2937" : "#374151",
                                 fontWeight: isSelected ? 600 : 400,
                                 wordBreak: "break-word",
@@ -266,12 +271,12 @@ const AssignmentQuestionCard = ({
                             <div
                               style={{
                                 position: "absolute",
-                                top: 16,
-                                right: 16,
+                                top: isMobile ? 12 : 16,
+                                right: isMobile ? 12 : 16,
                                 background: "#52c41a",
                                 borderRadius: "50%",
-                                width: 28,
-                                height: 28,
+                                width: isMobile ? 24 : 28,
+                                height: isMobile ? 24 : 28,
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",
@@ -279,7 +284,10 @@ const AssignmentQuestionCard = ({
                               }}
                             >
                               <CheckCircleOutlined
-                                style={{ color: "white", fontSize: 16 }}
+                                style={{
+                                  color: "white",
+                                  fontSize: isMobile ? 14 : 16,
+                                }}
                               />
                             </div>
                           )}
@@ -329,13 +337,13 @@ const AssignmentQuestionCard = ({
         <div
           style={{
             display: "flex",
-            justifyContent: "space-between",
+            flexDirection: isMobile ? "column" : "row",
+            justifyContent: isMobile ? "center" : "space-between",
             alignItems: "center",
             marginTop: 40,
             paddingTop: 28,
             borderTop: "2px solid #f3f4f6",
-            gap: 16,
-            flexWrap: "wrap",
+            gap: isMobile ? 12 : 16,
           }}
         >
           <Button
@@ -351,7 +359,9 @@ const AssignmentQuestionCard = ({
               fontSize: 15,
               border: "2px solid #e5e7eb",
               color: "#6b7280",
-              minWidth: 120,
+              width: isMobile ? "100%" : "auto",
+              minWidth: isMobile ? "auto" : 120,
+              order: isMobile ? 1 : 0,
             }}
           >
             Sebelumnya
@@ -364,8 +374,10 @@ const AssignmentQuestionCard = ({
               padding: "12px 20px",
               borderRadius: 12,
               border: "1px solid #e2e8f0",
-              flex: 1,
-              maxWidth: 250,
+              width: isMobile ? "100%" : "auto",
+              flex: isMobile ? 0 : 1,
+              maxWidth: isMobile ? "100%" : 250,
+              order: isMobile ? 2 : 0,
             }}
           >
             <Text
@@ -411,7 +423,9 @@ const AssignmentQuestionCard = ({
                 boxShadow: isOverdue
                   ? "none"
                   : "0 4px 16px rgba(82, 196, 26, 0.3)",
-                minWidth: 140,
+                width: isMobile ? "100%" : "auto",
+                minWidth: isMobile ? "auto" : 140,
+                order: isMobile ? 3 : 0,
               }}
             >
               {isOverdue ? "Waktu Habis" : "Submit Tugas"}
@@ -432,7 +446,9 @@ const AssignmentQuestionCard = ({
                 padding: "0 28px",
                 fontSize: 15,
                 boxShadow: "0 4px 16px rgba(0, 21, 41, 0.3)",
-                minWidth: 120,
+                width: isMobile ? "100%" : "auto",
+                minWidth: isMobile ? "auto" : 120,
+                order: isMobile ? 3 : 0,
               }}
             >
               Selanjutnya

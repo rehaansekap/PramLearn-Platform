@@ -52,6 +52,15 @@ const TeacherSessionMaterialDetailPage = () => {
     }
   };
 
+  const handleGroupsUpdate = async () => {
+    try {
+      await refetch();
+    } catch (error) {
+      console.error("Error updating groups:", error);
+      message.error("Gagal memperbarui data kelompok");
+    }
+  };
+
   const handleDataUpdate = async () => {
     await refetch();
   };
@@ -161,6 +170,8 @@ const TeacherSessionMaterialDetailPage = () => {
             students={materialDetail.students || []}
             materialDetail={materialDetail}
             isMobile={isMobile}
+            onGroupsChanged={handleGroupsUpdate}
+            refreshing={refreshing}
           />
         );
       case "quizzes":
@@ -187,13 +198,13 @@ const TeacherSessionMaterialDetailPage = () => {
             isMobile={isMobile}
           />
         );
-      case "analytics":
-        return (
-          <SessionsMaterialAnalyticsTab
-            materialDetail={materialDetail}
-            isMobile={isMobile}
-          />
-        );
+      // case "analytics":
+      //   return (
+      //     <SessionsMaterialAnalyticsTab
+      //       materialDetail={materialDetail}
+      //       isMobile={isMobile}
+      //     />
+      //   );
       default:
         return null;
     }

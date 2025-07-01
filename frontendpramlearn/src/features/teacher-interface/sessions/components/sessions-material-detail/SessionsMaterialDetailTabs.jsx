@@ -191,7 +191,7 @@ const SessionsMaterialDetailTabs = ({
           key="arcs"
         />
 
-        <TabPane
+        {/* <TabPane
           tab={
             <span
               style={{
@@ -207,7 +207,7 @@ const SessionsMaterialDetailTabs = ({
             </span>
           }
           key="analytics"
-        />
+        /> */}
       </Tabs>
     </div>
   );

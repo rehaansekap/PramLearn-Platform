@@ -14,6 +14,9 @@ import {
   Switch,
   Popconfirm,
   Alert,
+  Progress,
+  Row,
+  Col,
 } from "antd";
 import {
   PlusOutlined,
@@ -21,6 +24,7 @@ import {
   DeleteOutlined,
   DragOutlined,
   QuestionCircleOutlined,
+  BulbOutlined,
 } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
@@ -42,10 +46,10 @@ const ARCSQuestionManager = ({
   const [submitting, setSubmitting] = useState(false);
 
   const dimensionColors = {
-    attention: "blue",
-    relevance: "green",
-    confidence: "orange",
-    satisfaction: "purple",
+    attention: "#1890ff",
+    relevance: "#52c41a",
+    confidence: "#faad14",
+    satisfaction: "#722ed1",
   };
 
   const dimensionLabels = {
@@ -55,12 +59,27 @@ const ARCSQuestionManager = ({
     satisfaction: "Satisfaction",
   };
 
+  const dimensionDescriptions = {
+    attention: "🎯 Kemampuan menarik dan mempertahankan perhatian siswa",
+    relevance: "🔗 Kesesuaian materi dengan kebutuhan dan tujuan siswa",
+    confidence: "💪 Tingkat keyakinan siswa dalam menguasai materi",
+    satisfaction: "😊 Kepuasan siswa terhadap proses pembelajaran",
+  };
+
   const typeLabels = {
     likert_5: "Likert 1-5",
     likert_7: "Likert 1-7",
     multiple_choice: "Pilihan Ganda",
     text: "Input Teks",
   };
+
+  // Calculate dimension distribution
+  const dimensionStats = Object.keys(dimensionLabels).reduce((acc, dim) => {
+    acc[dim] = questions.filter((q) => q.dimension === dim).length;
+    return acc;
+  }, {});
+
+  const totalQuestions = questions.length;
 
   const handleAdd = () => {
     setEditingQuestion(null);
@@ -98,35 +117,67 @@ const ARCSQuestionManager = ({
     if (questionType !== "multiple_choice") return null;
 
     return (
-      <>
-        <Form.Item
-          label="Pilihan A"
-          name="choice_a"
-          rules={[{ required: true, message: "Pilihan A harus diisi" }]}
+      <div style={{ marginTop: 16 }}>
+        <Text
+          strong
+          style={{ display: "block", marginBottom: 12, color: "#667eea" }}
         >
-          <Input placeholder="Masukkan pilihan A" />
-        </Form.Item>
+          📝 Pilihan Jawaban:
+        </Text>
 
-        <Form.Item
-          label="Pilihan B"
-          name="choice_b"
-          rules={[{ required: true, message: "Pilihan B harus diisi" }]}
-        >
-          <Input placeholder="Masukkan pilihan B" />
-        </Form.Item>
+        <Row gutter={[12, 12]}>
+          {["choice_a", "choice_b", "choice_c", "choice_d", "choice_e"].map(
+            (choice, index) => {
+              const letter = String.fromCharCode(65 + index);
+              const isRequired = index < 2;
 
-        <Form.Item label="Pilihan C" name="choice_c">
-          <Input placeholder="Masukkan pilihan C (opsional)" />
-        </Form.Item>
-
-        <Form.Item label="Pilihan D" name="choice_d">
-          <Input placeholder="Masukkan pilihan D (opsional)" />
-        </Form.Item>
-
-        <Form.Item label="Pilihan E" name="choice_e">
-          <Input placeholder="Masukkan pilihan E (opsional)" />
-        </Form.Item>
-      </>
+              return (
+                <Col span={24} key={choice}>
+                  <Form.Item
+                    name={choice}
+                    rules={
+                      isRequired
+                        ? [
+                            {
+                              required: true,
+                              message: `Pilihan ${letter} harus diisi`,
+                            },
+                          ]
+                        : []
+                    }
+                    style={{ marginBottom: 8 }}
+                  >
+                    <Input
+                      placeholder={`Pilihan ${letter} ${
+                        isRequired ? "(Wajib)" : "(Opsional)"
+                      }`}
+                      addonBefore={
+                        <div
+                          style={{
+                            background: isRequired ? "#1890ff" : "#d9d9d9",
+                            color: "white",
+                            width: 24,
+                            height: 24,
+                            borderRadius: "50%",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: 12,
+                            fontWeight: 600,
+                          }}
+                        >
+                          {letter}
+                        </div>
+                      }
+                      style={{ borderRadius: 8 }}
+                    />
+                  </Form.Item>
+                </Col>
+              );
+            }
+          )}
+        </Row>
+      </div>
     );
   };
 
@@ -137,61 +188,78 @@ const ARCSQuestionManager = ({
       key: "order",
       width: 50,
       align: "center",
-      sorter: (a, b) => a.order - b.order,
+      render: (order, record, index) => (
+        <div
+          style={{
+            width: 28,
+            height: 28,
+            borderRadius: "50%",
+            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            color: "white",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 12,
+            fontWeight: 600,
+          }}
+        >
+          {index + 1}
+        </div>
+      ),
     },
     {
       title: "Pertanyaan",
       dataIndex: "text",
       key: "text",
-      ellipsis: true,
-      render: (text) => (
-        <Text style={{ fontSize: isMobile ? 12 : 14 }}>
-          {text.length > 80 ? `${text.substring(0, 80)}...` : text}
-        </Text>
+      render: (text, record) => (
+        <div>
+          <Text
+            style={{
+              fontSize: isMobile ? 12 : 14,
+              lineHeight: 1.4,
+              display: "block",
+              marginBottom: 8,
+            }}
+          >
+            {text.length > 100 ? `${text.substring(0, 100)}...` : text}
+          </Text>
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+            <Tag
+              color={dimensionColors[record.dimension]}
+              size="small"
+              style={{
+                borderRadius: 12,
+                fontWeight: 600,
+                fontSize: 10,
+              }}
+            >
+              {dimensionLabels[record.dimension]}
+            </Tag>
+            <Tag
+              color="blue"
+              size="small"
+              style={{
+                borderRadius: 12,
+                fontSize: 10,
+              }}
+            >
+              {typeLabels[record.question_type]}
+            </Tag>
+            {record.is_required && (
+              <Tag
+                color="red"
+                size="small"
+                style={{
+                  borderRadius: 12,
+                  fontSize: 10,
+                }}
+              >
+                Wajib
+              </Tag>
+            )}
+          </div>
+        </div>
       ),
-    },
-    {
-      title: "Dimensi",
-      dataIndex: "dimension",
-      key: "dimension",
-      width: 120,
-      render: (dimension) => (
-        <Tag color={dimensionColors[dimension]} size="small">
-          {dimensionLabels[dimension]}
-        </Tag>
-      ),
-      filters: [
-        { text: "Attention", value: "attention" },
-        { text: "Relevance", value: "relevance" },
-        { text: "Confidence", value: "confidence" },
-        { text: "Satisfaction", value: "satisfaction" },
-      ],
-      onFilter: (value, record) => record.dimension === value,
-    },
-    {
-      title: "Tipe",
-      dataIndex: "question_type",
-      key: "question_type",
-      width: 100,
-      render: (type) => (
-        <Tag color="blue" size="small">
-          {typeLabels[type]}
-        </Tag>
-      ),
-      responsive: ["md"],
-    },
-    {
-      title: "Wajib",
-      dataIndex: "is_required",
-      key: "is_required",
-      width: 80,
-      align: "center",
-      render: (required) => (
-        <Tag color={required ? "green" : "default"} size="small">
-          {required ? "Ya" : "Tidak"}
-        </Tag>
-      ),
-      responsive: ["lg"],
     },
     {
       title: "Aksi",
@@ -204,14 +272,13 @@ const ARCSQuestionManager = ({
             icon={<EditOutlined />}
             onClick={() => handleEdit(record)}
             title="Edit"
+            style={{ borderRadius: 6 }}
           />
           <Popconfirm
             title="Hapus pertanyaan ini?"
-            description="Tindakan ini tidak dapat dibatalkan."
-            onConfirm={() => {
-              /* Handle delete */
-            }}
-            okText="Ya, Hapus"
+            description="Tindakan ini tidak dapat dibatalkan"
+            onConfirm={() => console.log("Delete question:", record.id)}
+            okText="Ya"
             cancelText="Batal"
           >
             <Button
@@ -219,6 +286,7 @@ const ARCSQuestionManager = ({
               icon={<DeleteOutlined />}
               danger
               title="Hapus"
+              style={{ borderRadius: 6 }}
             />
           </Popconfirm>
         </Space>
@@ -226,185 +294,421 @@ const ARCSQuestionManager = ({
     },
   ];
 
-  if (questions.length === 0 && !loading) {
+  if (!questionnaire) {
     return (
-      <Card>
-        <Empty
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-          description={
-            <div>
-              <Text>Belum ada pertanyaan untuk kuesioner ini.</Text>
-              <br />
-              <Text type="secondary">
-                Tambahkan pertanyaan untuk mengukur dimensi ARCS.
-              </Text>
-            </div>
-          }
-        >
-          <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
-            Tambah Pertanyaan Pertama
-          </Button>
-        </Empty>
-      </Card>
+      <Alert
+        message="Pilih Kuesioner"
+        description="Silakan pilih kuesioner terlebih dahulu untuk mengelola pertanyaan"
+        type="info"
+        showIcon
+        style={{ borderRadius: 12 }}
+      />
     );
   }
 
   return (
     <div>
       {/* Header */}
-      <div
+      <Card
         style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 16,
+          marginBottom: 24,
+          borderRadius: 16,
+          background: "linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)",
+          border: "1px solid #bae6fd",
         }}
+        bodyStyle={{ padding: isMobile ? "16px" : "20px" }}
       >
-        <div>
-          <Title level={5} style={{ margin: 0, color: "#11418b" }}>
-            Pertanyaan Kuesioner
-          </Title>
-          <Text type="secondary" style={{ fontSize: 12 }}>
-            Kelola pertanyaan untuk mengukur motivasi siswa
-          </Text>
-        </div>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={handleAdd}
-          size={isMobile ? "small" : "middle"}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 16,
+            marginBottom: 16,
+          }}
         >
-          {isMobile ? "Tambah" : "Tambah Pertanyaan"}
-        </Button>
-      </div>
-
-      {/* Summary Stats */}
-      <Alert
-        message={`Total: ${questions.length} pertanyaan`}
-        description={
-          <div>
-            {Object.entries(dimensionLabels).map(([key, label]) => {
-              const count = questions.filter((q) => q.dimension === key).length;
-              return (
-                <Tag
-                  key={key}
-                  color={dimensionColors[key]}
-                  style={{ margin: "2px" }}
-                >
-                  {label}: {count}
-                </Tag>
-              );
-            })}
+          <div
+            style={{
+              background: "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
+              borderRadius: "50%",
+              width: isMobile ? 48 : 56,
+              height: isMobile ? 48 : 56,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: "0 4px 12px rgba(14, 165, 233, 0.3)",
+            }}
+          >
+            <QuestionCircleOutlined
+              style={{
+                color: "white",
+                fontSize: isMobile ? 20 : 24,
+              }}
+            />
           </div>
-        }
-        type="info"
-        showIcon
-        style={{ marginBottom: 16 }}
-      />
+          <div>
+            <Title
+              level={isMobile ? 5 : 4}
+              style={{ margin: 0, color: "#0c4a6e" }}
+            >
+              🎯 Kelola Pertanyaan ARCS
+            </Title>
+            <Text style={{ color: "#0369a1", fontSize: isMobile ? 12 : 14 }}>
+              {questionnaire.title}
+            </Text>
+          </div>
+        </div>
+
+        {/* Dimension Distribution */}
+        <div
+          style={{
+            background: "rgba(255, 255, 255, 0.8)",
+            borderRadius: 12,
+            padding: "16px",
+            marginBottom: 16,
+          }}
+        >
+          <Text
+            strong
+            style={{ display: "block", marginBottom: 12, color: "#0c4a6e" }}
+          >
+            📊 Distribusi Dimensi ARCS:
+          </Text>
+          <Row gutter={[8, 8]}>
+            {Object.entries(dimensionStats).map(([dimension, count]) => (
+              <Col xs={12} sm={6} key={dimension}>
+                <div
+                  style={{
+                    textAlign: "center",
+                    padding: "8px",
+                    background: "white",
+                    borderRadius: 8,
+                    border: `2px solid ${dimensionColors[dimension]}20`,
+                  }}
+                >
+                  <div
+                    style={{
+                      color: dimensionColors[dimension],
+                      fontWeight: 600,
+                      fontSize: isMobile ? 16 : 18,
+                    }}
+                  >
+                    {count}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: isMobile ? 10 : 11,
+                      color: "#666",
+                      fontWeight: 500,
+                    }}
+                  >
+                    {dimensionLabels[dimension]}
+                  </div>
+                </div>
+              </Col>
+            ))}
+          </Row>
+        </div>
+
+        {/* Action Button */}
+        <div style={{ textAlign: "center" }}>
+          <Button
+            type="primary"
+            onClick={handleAdd}
+            size="large"
+            style={{
+              borderRadius: 8,
+              background: "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
+              border: "none",
+              boxShadow: "0 4px 12px rgba(14, 165, 233, 0.3)",
+              fontWeight: 600,
+              height: 44,
+              // minWidth: 160,
+              width: "100%",
+            }}
+          >
+            ➕ Tambah Pertanyaan
+          </Button>
+        </div>
+      </Card>
 
       {/* Questions Table */}
-      <Table
-        columns={columns}
-        dataSource={questions.map((q) => ({ ...q, key: q.id }))}
-        loading={loading}
-        pagination={{
-          pageSize: 10,
-          showSizeChanger: false,
-          showTotal: (total, range) =>
-            `${range[0]}-${range[1]} dari ${total} pertanyaan`,
-        }}
-        scroll={{ x: isMobile ? 800 : undefined }}
-        size={isMobile ? "small" : "middle"}
-      />
+      {questions.length > 0 ? (
+        <Card
+          style={{
+            borderRadius: 16,
+            border: "none",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+          }}
+          bodyStyle={{ padding: 0 }}
+        >
+          <Table
+            columns={columns}
+            dataSource={questions.map((q, index) => ({
+              ...q,
+              key: q.id || index,
+            }))}
+            loading={loading}
+            pagination={false}
+            scroll={{ x: isMobile ? 500 : undefined }}
+            size={isMobile ? "small" : "middle"}
+          />
+        </Card>
+      ) : (
+        <Card
+          style={{
+            borderRadius: 16,
+            border: "2px dashed #d9d9d9",
+            textAlign: "center",
+            padding: "40px 20px",
+          }}
+        >
+          <Empty
+            description={
+              <div>
+                <div
+                  style={{
+                    fontSize: 16,
+                    fontWeight: 600,
+                    color: "#667eea",
+                    marginBottom: 8,
+                  }}
+                >
+                  Belum ada pertanyaan
+                </div>
+                <div style={{ fontSize: 14, color: "#666" }}>
+                  Mulai buat pertanyaan ARCS untuk kuesioner ini
+                </div>
+              </div>
+            }
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+          />
+        </Card>
+      )}
 
-      {/* Add/Edit Modal */}
+      {/* Question Form Modal */}
       <Modal
         title={
-          <div style={{ textAlign: "center" }}>
-            <QuestionCircleOutlined
-              style={{ fontSize: 20, color: "#11418b", marginRight: 8 }}
-            />
-            {editingQuestion ? "Edit Pertanyaan" : "Tambah Pertanyaan Baru"}
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div
+              style={{
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                borderRadius: "50%",
+                width: 40,
+                height: 40,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <BulbOutlined style={{ color: "white", fontSize: 16 }} />
+            </div>
+            <div>
+              <div style={{ fontSize: 16, fontWeight: 600, color: "#262626" }}>
+                {editingQuestion
+                  ? "📝 Edit Pertanyaan"
+                  : "➕ Tambah Pertanyaan"}
+              </div>
+              <div style={{ fontSize: 12, color: "#666" }}>
+                Kuesioner: {questionnaire.title}
+              </div>
+            </div>
           </div>
         }
         open={isModalVisible}
         onCancel={handleCancel}
+        width={isMobile ? "95%" : 800}
         footer={null}
-        width={600}
         destroyOnClose
+        style={{ top: isMobile ? 20 : 40 }}
       >
+        {/* ARCS Info */}
+        <Alert
+          message="Tentang Dimensi ARCS"
+          description={
+            <div style={{ fontSize: 12 }}>
+              <ul style={{ margin: 0, paddingLeft: 16 }}>
+                {Object.entries(dimensionDescriptions).map(([key, desc]) => (
+                  <li key={key} style={{ marginBottom: 4 }}>
+                    <strong style={{ color: dimensionColors[key] }}>
+                      {dimensionLabels[key]}:
+                    </strong>{" "}
+                    {desc}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          }
+          type="info"
+          showIcon
+          style={{
+            marginBottom: 24,
+            borderRadius: 8,
+            border: "1px solid #d6e4ff",
+            background: "#f0f9ff",
+          }}
+        />
+
         <Form
           form={form}
           layout="vertical"
           onFinish={handleSubmit}
-          style={{ marginTop: 16 }}
+          initialValues={{
+            dimension: "attention",
+            question_type: "likert_5",
+            is_required: true,
+          }}
         >
+          {/* Question Text */}
           <Form.Item
-            label="Teks Pertanyaan"
             name="text"
+            label={
+              <span style={{ fontWeight: 600, color: "#667eea" }}>
+                ❓ Teks Pertanyaan
+              </span>
+            }
             rules={[
               { required: true, message: "Teks pertanyaan harus diisi" },
               { min: 10, message: "Pertanyaan minimal 10 karakter" },
             ]}
           >
             <TextArea
-              placeholder="Masukkan teks pertanyaan..."
               rows={3}
-              maxLength={500}
-              showCount
+              placeholder="Masukkan pertanyaan yang akan diajukan kepada siswa..."
+              style={{ borderRadius: 8 }}
             />
           </Form.Item>
 
-          <Form.Item
-            label="Dimensi ARCS"
-            name="dimension"
-            rules={[{ required: true, message: "Pilih dimensi ARCS" }]}
-          >
-            <Select placeholder="Pilih dimensi ARCS">
-              <Option value="attention">Attention (Perhatian)</Option>
-              <Option value="relevance">Relevance (Relevansi)</Option>
-              <Option value="confidence">Confidence (Percaya Diri)</Option>
-              <Option value="satisfaction">Satisfaction (Kepuasan)</Option>
-            </Select>
+          <Row gutter={16}>
+            {/* Dimension */}
+            <Col xs={24} sm={12}>
+              <Form.Item
+                name="dimension"
+                label={
+                  <span style={{ fontWeight: 600, color: "#667eea" }}>
+                    🎯 Dimensi ARCS
+                  </span>
+                }
+                rules={[{ required: true, message: "Pilih dimensi ARCS" }]}
+              >
+                <Select
+                  placeholder="Pilih dimensi ARCS"
+                  style={{ borderRadius: 8 }}
+                >
+                  {Object.entries(dimensionLabels).map(([key, label]) => (
+                    <Option key={key} value={key}>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 8,
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: 12,
+                            height: 12,
+                            borderRadius: "50%",
+                            background: dimensionColors[key],
+                          }}
+                        />
+                        {label}
+                      </div>
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
+
+            {/* Question Type */}
+            <Col xs={24} sm={12}>
+              <Form.Item
+                name="question_type"
+                label={
+                  <span style={{ fontWeight: 600, color: "#667eea" }}>
+                    📝 Tipe Pertanyaan
+                  </span>
+                }
+                rules={[{ required: true, message: "Pilih tipe pertanyaan" }]}
+              >
+                <Select
+                  placeholder="Pilih tipe pertanyaan"
+                  style={{ borderRadius: 8 }}
+                >
+                  {Object.entries(typeLabels).map(([key, label]) => (
+                    <Option key={key} value={key}>
+                      {label}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+
+          {/* Multiple Choice Options */}
+          <Form.Item dependencies={["question_type"]}>
+            {() => renderChoiceInputs()}
           </Form.Item>
 
+          {/* Is Required */}
           <Form.Item
-            label="Tipe Pertanyaan"
-            name="question_type"
-            rules={[{ required: true, message: "Pilih tipe pertanyaan" }]}
-            initialValue="likert_5"
-          >
-            <Select placeholder="Pilih tipe pertanyaan">
-              <Option value="likert_5">Skala Likert 1-5</Option>
-              <Option value="likert_7">Skala Likert 1-7</Option>
-              <Option value="multiple_choice">Pilihan Ganda</Option>
-              <Option value="text">Input Teks</Option>
-            </Select>
-          </Form.Item>
-
-          {renderChoiceInputs()}
-
-          <Form.Item
-            label="Wajib Dijawab"
             name="is_required"
             valuePropName="checked"
-            initialValue={true}
+            style={{ marginBottom: 24 }}
           >
-            <Switch />
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                padding: "12px 16px",
+                background: "#f8fafc",
+                borderRadius: 8,
+                border: "1px solid #e5e7eb",
+              }}
+            >
+              <Switch size="small" />
+              <span style={{ fontWeight: 600, color: "#667eea" }}>
+                🔒 Pertanyaan Wajib Dijawab
+              </span>
+            </div>
           </Form.Item>
 
+          {/* Form Actions */}
           <div
             style={{
               display: "flex",
               justifyContent: "flex-end",
-              gap: 8,
+              gap: 12,
               paddingTop: 16,
               borderTop: "1px solid #f0f0f0",
             }}
           >
-            <Button onClick={handleCancel}>Batal</Button>
-            <Button type="primary" htmlType="submit" loading={submitting}>
-              {editingQuestion ? "Update" : "Tambah"} Pertanyaan
+            <Button
+              onClick={handleCancel}
+              size="large"
+              style={{
+                borderRadius: 8,
+                minWidth: 100,
+                height: 44,
+              }}
+            >
+              Batal
+            </Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={submitting}
+              size="large"
+              style={{
+                borderRadius: 8,
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                border: "none",
+                minWidth: 120,
+                height: 44,
+                fontWeight: 600,
+              }}
+            >
+              {editingQuestion ? "💾 Update" : "➕ Tambah"}
             </Button>
           </div>
         </Form>
