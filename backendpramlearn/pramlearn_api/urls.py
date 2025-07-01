@@ -13,6 +13,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+import os
 from rest_framework.routers import DefaultRouter
 from rest_framework import routers
 from pramlearnapp.views import (
@@ -588,5 +589,5 @@ websocket_urlpatterns = [
     ),
 ]
 
-if settings.DEBUG:
+if not settings.DEBUG or os.environ.get("SERVE_MEDIA", "False") == "True":
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
