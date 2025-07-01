@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "channels",
-    "storages",
+    # "storages",
 ]
 
 # Azure Blob Storage for media files
