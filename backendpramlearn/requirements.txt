@@ -126,3 +126,5 @@ whitenoise==6.6.0
 yarg==0.1.9
 zope.interface==7.2
 reportlab==4.0.4
+django-storages==1.12.3
+azure-storage-blob==12.14.0
