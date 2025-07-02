@@ -116,6 +116,9 @@ from pramlearnapp.views.teacher.sessions.teacherSessionsARCSUploadView import (
     TeacherSessionsARCSUploadView,
     TeacherSessionsARCSSampleView,
 )
+from pramlearnapp.views.teacher.sessions.teacherSessionsARCSAnalysisExportView import (
+    TeacherSessionsARCSAnalysisExportView,
+)
 from pramlearnapp.views.teacher.sessions.teacherSessionMaterialQuizView import (
     TeacherSessionMaterialQuizView,
     TeacherSessionQuizDetailView,
@@ -174,6 +177,11 @@ router.register(r"group-quizzes", GroupQuizViewSet, basename="groupquiz")
 urlpatterns = [
     path("admin/", admin.site.urls),
     path(
+        "api/teacher/sessions/arcs-analysis/export/",
+        TeacherSessionsARCSAnalysisExportView.as_view(),
+        name="sessions-arcs-analysis-export",
+    ),
+    path(
         "api/teacher/sessions/upload-arcs/",
         TeacherSessionsARCSUploadView.as_view(),
         name="sessions-arcs-upload",
@@ -184,7 +192,6 @@ urlpatterns = [
         name="sessions-arcs-sample",
     ),
     path("api/users/me/", CurrentUserView.as_view(), name="current-user"),
-    path("api/", include(router.urls)),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),

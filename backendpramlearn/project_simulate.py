@@ -334,6 +334,21 @@ def generate_quiz():
                 "created_at": "2025-07-01T08:00:00Z",
             },
         },
+        {
+            "model": "pramlearnapp.quiz",
+            "pk": 6,  # Quiz baru dengan ID 6
+            "fields": {
+                "title": "Quiz 6: Instrument Soal",
+                "slug": "quiz-6-instrument-soal",
+                "content": "Quiz kelompok komprehensif dengan 30 soal tentang jaringan komputer",
+                "material": 1,
+                "is_active": True,
+                "is_group_quiz": True,
+                "duration": 60,  # 60 menit untuk 30 soal
+                "end_time": "2025-08-02T23:59:59Z",
+                "created_at": "2025-07-01T08:00:00Z",
+            },
+        },
     ]
     return quizzes
 
@@ -751,6 +766,275 @@ def generate_quiz_questions():
                 "pk": question_id,
                 "fields": {
                     "quiz": 5,
+                    "text": text,
+                    "choice_a": choice_a,
+                    "choice_b": choice_b,
+                    "choice_c": choice_c,
+                    "choice_d": choice_d,
+                    "correct_choice": correct,
+                },
+            }
+        )
+        question_id += 1
+
+    # Quiz 6: Instrument Soal (30 questions)
+    quiz6_questions = [
+        (
+            "Apakah sebutan untuk sekumpulan dua atau lebih perangkat komputasi yang saling terhubung dengan tujuan untuk berbagi data dan sumber daya?",
+            "Sistem Operasi",
+            "Jaringan Komputer",
+            "Topologi",
+            "Protokol",
+            "B",
+        ),
+        (
+            "Jenis jaringan komputer apakah yang memiliki skala jangkauan paling kecil dan biasanya digunakan untuk menghubungkan perangkat pribadi seperti smartphone dengan headset bluetooth?",
+            "LAN",
+            "MAN",
+            "WAN",
+            "PAN",
+            "D",
+        ),
+        (
+            "Perangkat keras apakah yang berfungsi untuk menghubungkan dua atau lebih jaringan yang berbeda, seperti menghubungkan LAN ke internet?",
+            "Switch",
+            "Hub",
+            "Router",
+            "Repeater",
+            "C",
+        ),
+        (
+            "Apakah sebutan untuk alamat fisik unik yang tidak bisa diubah dan menjadi identitas pada setiap kartu jaringan (NIC)?",
+            "IP Address",
+            "Subnet Mask",
+            "Gateway",
+            "MAC Address",
+            "D",
+        ),
+        (
+            "Apakah nama kumpulan protokol yang menjadi aturan standar untuk komunikasi data di seluruh jaringan internet?",
+            "HTTP/FTP",
+            "TCP/IP",
+            "POP3/SMTP",
+            "LAN/WAN",
+            "B",
+        ),
+        (
+            "Manakah pernyataan yang paling tepat untuk menjelaskan perbedaan utama antara Hub dan Switch?",
+            "Hub lebih cepat dari Switch",
+            "Switch mengirimkan data ke semua port, sedangkan Hub hanya ke tujuan",
+            "Hub mengirimkan data ke semua port, sedangkan Switch hanya ke port tujuan",
+            "Hub digunakan untuk WAN, Switch untuk LAN",
+            "C",
+        ),
+        (
+            "Dalam sebuah jaringan nirkabel, apakah fungsi utama dari sebuah Access Point (AP)?",
+            "Polisi lalu lintas yang mengatur rute antar jaringan",
+            "Jembatan yang menghubungkan perangkat nirkabel ke jaringan kabel",
+            "Pustakawan yang menyimpan semua data penting",
+            "Satpam yang menjaga keamanan seluruh jaringan",
+            "B",
+        ),
+        (
+            "Jaringan komputer yang menghubungkan kantor-kantor cabang sebuah bank di seluruh kota Bandung merupakan contoh implementasi dari jenis jaringan apa?",
+            "LAN",
+            "MAN",
+            "WAN",
+            "PAN",
+            "B",
+        ),
+        (
+            "Ketika sebuah laboratorium komputer dengan 30 PC dapat menggunakan satu printer secara bersama-sama, manfaat jaringan komputer dalam hal apakah yang ditunjukkan oleh kondisi tersebut?",
+            "Keamanan data",
+            "Reliabilitas tinggi",
+            "Komunikasi efisien",
+            "Menghemat biaya dan sumber daya",
+            "D",
+        ),
+        (
+            "Manakah situasi yang paling baik dalam mendeskripsikan konsep reliabilitas tinggi dalam sebuah jaringan?",
+            "Jaringan memiliki kecepatan internet yang sangat tinggi",
+            "Data penting perusahaan disalin secara otomatis ke server cadangan",
+            "Semua komputer dalam jaringan menggunakan merek yang sama",
+            "Jaringan dapat diakses dari mana saja di seluruh dunia",
+            "B",
+        ),
+        (
+            "Anda ditugaskan membangun jaringan di lab komputer dengan 40 PC dan 1 server. Agar komunikasi efisien dan data terkirim ke tujuan yang tepat, perangkat sentral apakah yang paling tepat untuk digunakan?",
+            "Hub",
+            "Switch",
+            "Router",
+            "Modem",
+            "B",
+        ),
+        (
+            "Sebuah warung internet (warnet) memiliki 10 komputer untuk pelanggan yang semuanya harus bisa mengakses internet dan berbagi data. Jenis jaringan apakah yang paling tepat untuk dibangun di dalam warnet tersebut?",
+            "WAN",
+            "MAN",
+            "PAN",
+            "LAN",
+            "D",
+        ),
+        (
+            "Saat Anda membuka aplikasi browser dan mengetikkan alamat https://www.google.com/search?q=google.com, komputer atau laptop yang Anda gunakan sedang berperan sebagai apa?",
+            "Server",
+            "Client",
+            "Router",
+            "Switch",
+            "B",
+        ),
+        (
+            "Sebuah perusahaan multinasional ingin menghubungkan kantor pusat di Jakarta dengan kantor cabang di Singapura dan Kuala Lumpur. Jenis jaringan apakah yang harus mereka bangun?",
+            "LAN",
+            "MAN",
+            "WAN",
+            "PAN",
+            "C",
+        ),
+        (
+            "Jika Anda diminta untuk menghubungkan 5 komputer dan 1 printer di dalam satu ruangan kantor kecil agar bisa saling berbagi file, jenis jaringan apakah yang sedang Anda bangun?",
+            "WAN",
+            "MAN",
+            "Internet",
+            "PAN",
+            "E",
+        ),
+        (
+            "Sebuah jaringan LAN dengan 30 komputer yang menggunakan Hub terasa sangat lambat saat banyak pengguna aktif. Apakah penyebab yang paling mungkin dari masalah ini?",
+            "Kabel UTP yang digunakan terlalu panjang",
+            "Terlalu sering terjadi tabrakan data (collision) karena sifat Hub",
+            "Server yang digunakan memiliki spesifikasi rendah",
+            "Semua komputer terinfeksi virus yang sama",
+            "B",
+        ),
+        (
+            "Dibandingkan dengan kabel UTP, apakah keunggulan utama dari media transmisi Fiber Optic?",
+            "Harga yang lebih murah dan instalasi yang mudah",
+            "Fleksibilitas dan tidak memerlukan perangkat khusus",
+            "Kecepatan transfer data yang jauh lebih tinggi dan tahan interferensi",
+            "Ketersediaan yang lebih luas di pasaran",
+            "C",
+        ),
+        (
+            """Perhatikan pernyataan berikut:
+            - Menghubungkan perangkat dalam satu segmen jaringan lokal.
+            - Bekerja menggunakan MAC Address untuk mengirim data.
+            - Menentukan rute terbaik untuk mengirim data antar jaringan yang berbeda.
+            - Bekerja menggunakan IP Address untuk mengambil keputusan.
+            Dari pernyataan tersebut, manakah yang mendeskripsikan peran sebuah Router?""",
+            "1 dan 2",
+            "2 dan 3",
+            "3 dan 4",
+            "1 dan 4",
+            "C",
+        ),
+        (
+            "Untuk membangun jaringan Wi-Fi di rumah yang dapat terhubung ke internet, kombinasi perangkat minimal apakah yang harus dimiliki?",
+            "Switch, Hub, dan Kabel UTP",
+            "Modem, Router dengan fitur Wi-Fi/AP, dan NIC pada perangkat client",
+            "Server, Client, dan Kabel Fiber Optic",
+            "Repeater, Switch, dan Server",
+            "B",
+        ),
+        (
+            "Saat menggunakan jaringan Wi-Fi publik di kafe atau bandara, apakah risiko keamanan utama yang harus diwaspadai oleh pengguna?",
+            "Kecepatan internet yang menjadi lambat",
+            "Baterai perangkat menjadi cepat habis",
+            "Potensi pencurian data pribadi oleh pihak ketiga (Man-in-the-Middle Attack)",
+            "Perangkat menjadi panas karena terlalu banyak pengguna",
+            "C",
+        ),
+        (
+            "Menurut prinsip perancangan jaringan yang baik (Top-Down Network Design), langkah manakah yang paling krusial dan harus ditentukan pertama kali sebelum membeli perangkat?",
+            "Memilih merek perangkat yang paling terkenal",
+            "Menentukan skema pengalamatan IP Address",
+            "Menganalisis kebutuhan bisnis dan teknis dari pengguna",
+            "Menggambar topologi fisik jaringan secara detail",
+            "C",
+        ),
+        (
+            "Seorang teknisi menyarankan untuk menghubungkan server data penting perusahaan langsung ke internet tanpa pelindung seperti router atau firewall, dengan alasan agar mudah diakses. Mengapa saran ini sangat tidak direkomendasikan?",
+            "Akan membuat koneksi server menjadi lambat",
+            "Membuat server sangat rentan terhadap serangan langsung dari internet",
+            "Akan menghabiskan biaya internet yang sangat mahal",
+            "Akan menyulitkan karyawan untuk mengakses server",
+            "B",
+        ),
+        (
+            "Sebuah sekolah dengan anggaran terbatas ingin menyediakan koneksi internet untuk 30 komputer di lab. Pilihan media transmisi apakah yang paling realistis dari segi biaya dan kemudahan instalasi?",
+            "Fiber Optic",
+            "Kabel UTP",
+            "Satelit",
+            "Bluetooth",
+            "B",
+        ),
+        (
+            "Untuk sebuah turnamen e-sports yang menuntut koneksi paling stabil dan latensi (delay) terendah, mengapa penggunaan jaringan kabel (LAN) lebih direkomendasikan daripada Wi-Fi?",
+            "Jaringan kabel lebih mudah dipasang daripada Wi-Fi",
+            "Jaringan kabel memiliki jangkauan yang lebih luas",
+            "Jaringan kabel lebih aman dari peretasan",
+            "Jaringan kabel lebih stabil dan minim interferensi gelombang radio",
+            "D",
+        ),
+        (
+            "Seorang admin jaringan memutuskan untuk menggunakan Hub daripada Switch untuk jaringan kantor baru dengan 50 komputer dengan alasan harga Hub lebih murah. Dari sudut pandang performa, mengapa keputusan ini kurang tepat?",
+            "Hub memerlukan konfigurasi yang lebih rumit",
+            "Hub akan menyebabkan traffic jaringan menjadi padat dan lambat",
+            "Hub mengonsumsi daya listrik yang lebih besar",
+            "Hub tidak kompatibel dengan komputer modern",
+            "B",
+        ),
+        (
+            "Anda diminta merancang jaringan untuk acara live streaming di aula sekolah dengan kebutuhan koneksi stabil untuk 3 PC panitia dan koneksi nirkabel untuk tamu. Rancangan manakah yang paling efektif?",
+            "Menghubungkan semua perangkat ke satu Hub besar",
+            "Menggunakan satu Router Wi-Fi rumahan untuk semua perangkat",
+            "Menghubungkan 3 PC panitia ke Switch via kabel, lalu Switch dihubungkan ke Router. Untuk tamu, dipasang Access Point yang juga terhubung ke Router.",
+            "Hanya menyediakan koneksi Wi-Fi untuk semua perangkat agar lebih praktis",
+            "C",
+        ),
+        (
+            "Sebuah kafe ingin menyediakan Wi-Fi gratis untuk pelanggan dan jaringan terpisah untuk kasir agar transaksi aman. Konfigurasi perangkat apakah yang paling sederhana dan efektif untuk kebutuhan ini?",
+            "Memasang dua modem internet yang berbeda",
+            "Menggunakan satu modem yang terhubung ke Router yang mendukung fitur Guest Network",
+            "Menghubungkan kasir dan pelanggan ke satu Switch yang sama",
+            "Memasang banyak Repeater di seluruh area kafe",
+            "B",
+        ),
+        (
+            "Jaringan di sebuah sekolah seringkali lambat pada jam istirahat karena banyak siswa mengakses video. Usulan teknis apakah yang paling logis untuk diajukan guna mengatasi masalah ini?",
+            "Mengurangi jumlah komputer di sekolah",
+            "Mematikan jaringan pada jam istirahat",
+            "Meningkatkan paket bandwidth internet dan memasang sistem manajemen bandwidth (QoS)",
+            "Mengganti semua komputer dengan laptop",
+            "C",
+        ),
+        (
+            "Untuk melindungi data penting pada file server di sebuah kantor kecil dari risiko kerusakan hard disk, strategi backup data paling dasar apakah yang bisa Anda usulkan?",
+            "Menyimpan semua data hanya di server tanpa backup",
+            "Meminta setiap karyawan menyimpan data di komputernya masing-masing",
+            "Menjadwalkan backup otomatis setiap malam ke hard disk eksternal atau cloud storage",
+            "Mencetak semua data penting setiap hari",
+            "C",
+        ),
+        (
+            "Anda diminta membuat 3 aturan kebijakan keamanan paling dasar untuk jaringan Wi-Fi di rumah. Kombinasi kebijakan manakah yang paling efektif?",
+            "Membiarkan nama Wi-Fi default, tanpa password, dan menyala 24 jam",
+            "Mengganti nama Wi-Fi (SSID), menggunakan password WPA2/WPA3 yang kuat, dan mematikan fitur WPS",
+            "Memberitahu password Wi-Fi ke semua tetangga",
+            "Menggunakan password yang mudah diingat seperti 12345678",
+            "B",
+        ),
+    ]
+
+    for i, (text, choice_a, choice_b, choice_c, choice_d, correct) in enumerate(
+        quiz6_questions
+    ):
+        questions.append(
+            {
+                "model": "pramlearnapp.question",
+                "pk": question_id,
+                "fields": {
+                    "quiz": 6,  # Quiz ID 6
                     "text": text,
                     "choice_a": choice_a,
                     "choice_b": choice_b,

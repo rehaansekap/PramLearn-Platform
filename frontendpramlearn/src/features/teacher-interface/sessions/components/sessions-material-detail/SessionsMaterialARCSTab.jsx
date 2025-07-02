@@ -268,7 +268,7 @@ const SessionsMaterialARCSTab = ({ materialSlug, isMobile = false }) => {
   return (
     <div
       style={{
-        background: "linear-gradient(135deg, #f8fafc 0%, #e6f3ff 100%)",
+        // background: "linear-gradient(135deg, #f8fafc 0%, #e6f3ff 100%)",
         minHeight: "100vh",
         padding: isMobile ? 16 : 24,
         borderRadius: 16,

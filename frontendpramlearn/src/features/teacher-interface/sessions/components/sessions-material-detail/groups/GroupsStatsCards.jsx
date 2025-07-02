@@ -80,6 +80,7 @@ const GroupsStatsCards = ({ groups = [], isMobile = false }) => {
               boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
               transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
               overflow: "hidden",
+              height: "100%",
               position: "relative",
             }}
             bodyStyle={{

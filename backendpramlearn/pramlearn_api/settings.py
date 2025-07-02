@@ -5,7 +5,7 @@ import os
 import dj_database_url
 
 load_dotenv()  # Ini akan membaca file .env jika ada
-
+# APPEND_SLASH = True
 DEBUG = os.getenv("DEBUG", "False") == "True"
 SECRET_KEY = os.getenv(
     "SECRET_KEY", "django-insecure-4kh_a6m4m)l@eeg0%3#0#@!m)efo%otu@jp^z2qucjr9pt@y@9"
@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_extensions",
     "pramlearnapp",
     "corsheaders",
     "rest_framework",

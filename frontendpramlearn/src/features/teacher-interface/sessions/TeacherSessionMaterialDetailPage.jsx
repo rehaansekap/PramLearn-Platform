@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
-import { Spin, Alert, message } from "antd";
-import { LoadingOutlined } from "@ant-design/icons";
+import { Spin, Alert, message, Card } from "antd";
+import { LoadingOutlined, UploadOutlined } from "@ant-design/icons";
+
+import ARCSUploadContainer from "./components/sessions-material-detail/arcs-upload/ARCSUploadContainer";
 
 // Import hooks
 import useSessionMaterialDetail from "./hooks/useSessionMaterialDetail";
@@ -195,6 +197,13 @@ const TeacherSessionMaterialDetailPage = () => {
           <SessionsMaterialARCSTab
             materialSlug={materialSlug}
             materialDetail={materialDetail}
+            isMobile={isMobile}
+          />
+        );
+      case "upload-arcs":
+        return (
+          <ARCSUploadContainer
+            onUploadSuccess={handleDataUpdate}
             isMobile={isMobile}
           />
         );

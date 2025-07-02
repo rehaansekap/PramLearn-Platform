@@ -82,6 +82,7 @@ const StudentsStatsCards = ({
               transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
               overflow: "hidden",
               position: "relative",
+              height: "100%",
             }}
             bodyStyle={{
               padding: isMobile ? "16px" : "20px",

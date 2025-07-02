@@ -8,6 +8,7 @@ import {
   FileTextOutlined,
   BarChartOutlined,
   FormOutlined,
+  UploadOutlined,
 } from "@ant-design/icons";
 
 const { TabPane } = Tabs;
@@ -189,6 +190,25 @@ const SessionsMaterialDetailTabs = ({
             </span>
           }
           key="arcs"
+        />
+
+        {/* Tab baru untuk Upload ARCS */}
+        <TabPane
+          tab={
+            <span
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                fontSize: isMobile ? 12 : 14,
+                fontWeight: 600,
+              }}
+            >
+              <UploadOutlined />
+              <span>Upload Hasil ARCS</span>
+            </span>
+          }
+          key="upload-arcs"
         />
 
         {/* <TabPane
