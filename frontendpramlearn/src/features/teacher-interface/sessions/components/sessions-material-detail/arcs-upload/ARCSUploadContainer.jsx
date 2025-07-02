@@ -90,7 +90,7 @@ const ARCSUploadContainer = ({ onUploadSuccess, isMobile = false }) => {
           </h2>
           <p
             style={{
-              margin: 0,
+              // margin: 0,
               color: "#666",
               fontSize: isMobile ? "13px" : "14px",
               lineHeight: 1.5,

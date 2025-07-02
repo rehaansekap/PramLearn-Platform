@@ -2537,3 +2537,173 @@ Step 13: Final verification...
 Reset and Seed Process Completed Successfully!
 Tue Jul  1 04:12:11 UTC 2025
 ===============================================
+===============================================
+Starting Django Reset and Seed Process (PostgreSQL - Windows)
+Wed,  2 Jul, 2025 13:35:52
+===============================================
+Step 0: Checking PostgreSQL service...
+
+Status   Name               DisplayName                           
+------   ----               -----------                           
+Running  postgresql-x64-17  postgresql-x64-17 - PostgreSQL Serv...
+
+
+Step 1: Dropping and creating PostgreSQL database...
+DROP DATABASE
+CREATE DATABASE
+✓ Database created successfully
+Step 1.5: Creating PostgreSQL user...
+ERROR:  role "pramadmin" already exists
+GRANT
+GRANT
+ALTER ROLE
+✓ Database setup completed
+Step 2: Removing ALL migration files...
+Step 3: Removing existing SQLite databases...
+Step 4: Ensuring migrations directory...
+Step 5: Creating new migrations...
+D:\PramLearn\.venv\Lib\site-packages\rest_framework_simplejwt\__init__.py:1: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import DistributionNotFound, get_distribution
+Traceback (most recent call last):
+  File "D:\PramLearn\backendpramlearn\manage.py", line 22, in <module>
+    main()
+  File "D:\PramLearn\backendpramlearn\manage.py", line 18, in main
+    execute_from_command_line(sys.argv)
+  File "D:\PramLearn\.venv\Lib\site-packages\django\core\management\__init__.py", line 442, in execute_from_command_line
+    utility.execute()
+  File "D:\PramLearn\.venv\Lib\site-packages\django\core\management\__init__.py", line 416, in execute
+    django.setup()
+  File "D:\PramLearn\.venv\Lib\site-packages\django\__init__.py", line 24, in setup
+    apps.populate(settings.INSTALLED_APPS)
+  File "D:\PramLearn\.venv\Lib\site-packages\django\apps\registry.py", line 124, in populate
+    app_config.ready()
+  File "D:\PramLearn\backendpramlearn\pramlearnapp\apps.py", line 12, in ready
+    print("\u2705 Signals loaded successfully")
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 0: character maps to <undefined>
+✓ Migrations created successfully
+Step 6: Applying migrations...
+D:\PramLearn\.venv\Lib\site-packages\rest_framework_simplejwt\__init__.py:1: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import DistributionNotFound, get_distribution
+Traceback (most recent call last):
+  File "D:\PramLearn\backendpramlearn\manage.py", line 22, in <module>
+    main()
+  File "D:\PramLearn\backendpramlearn\manage.py", line 18, in main
+    execute_from_command_line(sys.argv)
+  File "D:\PramLearn\.venv\Lib\site-packages\django\core\management\__init__.py", line 442, in execute_from_command_line
+    utility.execute()
+  File "D:\PramLearn\.venv\Lib\site-packages\django\core\management\__init__.py", line 416, in execute
+    django.setup()
+  File "D:\PramLearn\.venv\Lib\site-packages\django\__init__.py", line 24, in setup
+    apps.populate(settings.INSTALLED_APPS)
+  File "D:\PramLearn\.venv\Lib\site-packages\django\apps\registry.py", line 124, in populate
+    app_config.ready()
+  File "D:\PramLearn\backendpramlearn\pramlearnapp\apps.py", line 12, in ready
+    print("\u2705 Signals loaded successfully")
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 0: character maps to <undefined>
+✓ Migrations applied successfully
+Step 7: Verifying database tables...
+D:\PramLearn\.venv\Lib\site-packages\rest_framework_simplejwt\__init__.py:1: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import DistributionNotFound, get_distribution
+Traceback (most recent call last):
+  File "<string>", line 5, in <module>
+  File "D:\PramLearn\.venv\Lib\site-packages\django\__init__.py", line 24, in setup
+    apps.populate(settings.INSTALLED_APPS)
+  File "D:\PramLearn\.venv\Lib\site-packages\django\apps\registry.py", line 124, in populate
+    app_config.ready()
+  File "D:\PramLearn\backendpramlearn\pramlearnapp\apps.py", line 12, in ready
+    print("\u2705 Signals loaded successfully")
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 0: character maps to <undefined>
+Step 8: Removing existing initial_data.json...
+Step 9: Generating initial_data.json...
+D:\PramLearn\.venv\Lib\site-packages\rest_framework_simplejwt\__init__.py:1: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import DistributionNotFound, get_distribution
+Traceback (most recent call last):
+  File "D:\PramLearn\backendpramlearn\generate_initial_data.py", line 13, in <module>
+    django.setup()
+  File "D:\PramLearn\.venv\Lib\site-packages\django\__init__.py", line 24, in setup
+    apps.populate(settings.INSTALLED_APPS)
+  File "D:\PramLearn\.venv\Lib\site-packages\django\apps\registry.py", line 124, in populate
+    app_config.ready()
+  File "D:\PramLearn\backendpramlearn\pramlearnapp\apps.py", line 12, in ready
+    print("\u2705 Signals loaded successfully")
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 0: character maps to <undefined>
+✓ Initial data generated successfully
+Step 10: Loading seed data...
+D:\PramLearn\.venv\Lib\site-packages\rest_framework_simplejwt\__init__.py:1: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import DistributionNotFound, get_distribution
+Traceback (most recent call last):
+  File "D:\PramLearn\backendpramlearn\manage.py", line 22, in <module>
+    main()
+  File "D:\PramLearn\backendpramlearn\manage.py", line 18, in main
+    execute_from_command_line(sys.argv)
+  File "D:\PramLearn\.venv\Lib\site-packages\django\core\management\__init__.py", line 442, in execute_from_command_line
+    utility.execute()
+  File "D:\PramLearn\.venv\Lib\site-packages\django\core\management\__init__.py", line 416, in execute
+    django.setup()
+  File "D:\PramLearn\.venv\Lib\site-packages\django\__init__.py", line 24, in setup
+    apps.populate(settings.INSTALLED_APPS)
+  File "D:\PramLearn\.venv\Lib\site-packages\django\apps\registry.py", line 124, in populate
+    app_config.ready()
+  File "D:\PramLearn\backendpramlearn\pramlearnapp\apps.py", line 12, in ready
+    print("\u2705 Signals loaded successfully")
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 0: character maps to <undefined>
+✓ Seed data loaded successfully
+Step 11: Generating ARCS CSV file...
+Traceback (most recent call last):
+  File "D:\PramLearn\backendpramlearn\generate_csv.py", line 36, in <module>
+    usernames = get_student_usernames('pramlearnapp/fixtures/initial_data.json')
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PramLearn\backendpramlearn\generate_csv.py", line 10, in get_student_usernames
+    with open(json_file, 'r') as file:
+         ^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'pramlearnapp/fixtures/initial_data.json'
+✓ ARCS CSV generated successfully
+Step 12: Creating superuser...
+D:\PramLearn\.venv\Lib\site-packages\rest_framework_simplejwt\__init__.py:1: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import DistributionNotFound, get_distribution
+Traceback (most recent call last):
+  File "<string>", line 5, in <module>
+  File "D:\PramLearn\.venv\Lib\site-packages\django\__init__.py", line 24, in setup
+    apps.populate(settings.INSTALLED_APPS)
+  File "D:\PramLearn\.venv\Lib\site-packages\django\apps\registry.py", line 124, in populate
+    app_config.ready()
+  File "D:\PramLearn\backendpramlearn\pramlearnapp\apps.py", line 12, in ready
+    print("\u2705 Signals loaded successfully")
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 0: character maps to <undefined>
+Step 13: Final verification...
+D:\PramLearn\.venv\Lib\site-packages\rest_framework_simplejwt\__init__.py:1: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import DistributionNotFound, get_distribution
+Traceback (most recent call last):
+  File "<string>", line 5, in <module>
+  File "D:\PramLearn\.venv\Lib\site-packages\django\__init__.py", line 24, in setup
+    apps.populate(settings.INSTALLED_APPS)
+  File "D:\PramLearn\.venv\Lib\site-packages\django\apps\registry.py", line 124, in populate
+    app_config.ready()
+  File "D:\PramLearn\backendpramlearn\pramlearnapp\apps.py", line 12, in ready
+    print("\u2705 Signals loaded successfully")
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 0: character maps to <undefined>
+===============================================
+Reset and Seed Process Completed Successfully!
+Wed,  2 Jul, 2025 13:36:11
+===============================================

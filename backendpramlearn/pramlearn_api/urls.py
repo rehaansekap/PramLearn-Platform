@@ -585,6 +585,8 @@ urlpatterns = [
     ),
     path("api/register/", RegisterView.as_view(), name="register"),
     path("api/login/", LoginView.as_view(), name="login"),
+    # add api/ route for the router
+    path("api/", include(router.urls)),
 ]
 
 websocket_urlpatterns = [
