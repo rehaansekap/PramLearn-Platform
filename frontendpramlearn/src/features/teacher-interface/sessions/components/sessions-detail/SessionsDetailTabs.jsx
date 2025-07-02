@@ -67,7 +67,7 @@ const SessionsDetailTabs = ({
           }
           key="materials"
         />
-        <TabPane
+        {/* <TabPane
           tab={
             <span
               style={{
@@ -83,7 +83,7 @@ const SessionsDetailTabs = ({
             </span>
           }
           key="analytics"
-        />
+        /> */}
         <TabPane
           tab={
             <span

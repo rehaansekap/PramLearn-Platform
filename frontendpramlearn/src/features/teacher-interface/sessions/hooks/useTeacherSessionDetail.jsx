@@ -17,10 +17,42 @@ const useTeacherSessionDetail = (subjectSlug) => {
 
       const response = await api.get(`teacher/sessions/${subjectSlug}/`);
       const data = response.data;
+
+      // Map students_performance to the expected format
+      const mappedStudents = (data.students_performance || []).map(
+        (student) => {
+          // Split full_name into first_name and last_name
+          const nameParts = (student.full_name || "").split(" ");
+          const firstName = nameParts[0] || "";
+          const lastName = nameParts.slice(1).join(" ") || "";
+
+          // Determine attendance status based on attendance_rate
+          let attendanceStatus = "unknown";
+          if (student.attendance_rate >= 90) {
+            attendanceStatus = "present";
+          } else if (student.attendance_rate >= 70) {
+            attendanceStatus = "late";
+          } else if (student.attendance_rate > 0) {
+            attendanceStatus = "excused";
+          } else {
+            attendanceStatus = "absent";
+          }
+
+          return {
+            ...student,
+            first_name: firstName,
+            last_name: lastName,
+            completion_percentage: student.average_progress || 0,
+            attendance_status: attendanceStatus,
+            is_online: false, // Default to false, you might want to add this to your API
+          };
+        }
+      );
+
       setSessionDetail({
         ...data,
         sessions_data: data.sessions || [],
-        students: data.students_performance || [],
+        students: mappedStudents,
         statistics: {
           ...data.statistics,
           students_count:

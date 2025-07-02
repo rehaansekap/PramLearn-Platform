@@ -191,54 +191,59 @@ const SessionsDetailStudents = ({
     {
       title: "Siswa",
       key: "student",
-      render: (_, record) => (
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <div style={{ position: "relative" }}>
-            <Avatar
-              icon={<UserOutlined />}
-              style={{
-                background: record.is_online
-                  ? "linear-gradient(135deg, #52c41a 0%, #73d13d 100%)"
-                  : "#d9d9d9",
-              }}
-            />
-            {record.is_online && (
-              <div
+      render: (_, record) => {
+        const isOnline = isUserOnline(record);
+        return (
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div style={{ position: "relative" }}>
+              <Avatar
+                icon={<UserOutlined />}
                 style={{
-                  position: "absolute",
-                  top: -2,
-                  right: -2,
-                  width: 12,
-                  height: 12,
-                  borderRadius: "50%",
-                  background: "#52c41a",
-                  border: "2px solid white",
-                  boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+                  background: isOnline
+                    ? "linear-gradient(135deg, #52c41a 0%, #73d13d 100%)"
+                    : "#d9d9d9",
                 }}
               />
-            )}
-          </div>
-          <div style={{ minWidth: 0, flex: 1 }}>
-            <Text strong style={{ display: "block", fontSize: 14 }}>
-              {record.username}
-            </Text>
-            {(record.first_name || record.last_name) && (
-              <Text
-                type="secondary"
-                style={{
-                  fontSize: 12,
-                  display: "block",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {`${record.first_name || ""} ${record.last_name || ""}`.trim()}
+              {isOnline && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: -2,
+                    right: -2,
+                    width: 12,
+                    height: 12,
+                    borderRadius: "50%",
+                    background: "#52c41a",
+                    border: "2px solid white",
+                    boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+                  }}
+                />
+              )}
+            </div>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <Text strong style={{ display: "block", fontSize: 14 }}>
+                {record.username}
               </Text>
-            )}
+              {(record.first_name || record.last_name) && (
+                <Text
+                  type="secondary"
+                  style={{
+                    fontSize: 12,
+                    display: "block",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {`${record.first_name || ""} ${
+                    record.last_name || ""
+                  }`.trim()}
+                </Text>
+              )}
+            </div>
           </div>
-        </div>
-      ),
+        );
+      },
       width: isMobile ? 150 : 200,
       sorter: (a, b) => a.username.localeCompare(b.username),
       sortOrder: sortedInfo.columnKey === "student" && sortedInfo.order,
@@ -329,58 +334,26 @@ const SessionsDetailStudents = ({
       responsive: ["sm"],
     },
     {
-      title: "Aktivitas Terakhir",
-      key: "lastActivity",
-      render: (_, record) => (
-        <div style={{ textAlign: "center" }}>
-          {record.last_activity ? (
-            <Tooltip
-              title={dayjs(record.last_activity).format("DD MMM YYYY, HH:mm")}
-            >
-              <div>
-                <ClockCircleOutlined
-                  style={{ marginBottom: 2, color: "#667eea" }}
-                />
-                <Text style={{ fontSize: 11, display: "block" }}>
-                  {dayjs(record.last_activity).fromNow()}
-                </Text>
-              </div>
-            </Tooltip>
-          ) : (
-            <Text type="secondary" style={{ fontSize: 11 }}>
-              Tidak ada aktivitas
-            </Text>
-          )}
-        </div>
-      ),
-      width: 120,
-      align: "center",
-      sorter: (a, b) => {
-        const aTime = a.last_activity ? dayjs(a.last_activity).unix() : 0;
-        const bTime = b.last_activity ? dayjs(b.last_activity).unix() : 0;
-        return aTime - bTime;
-      },
-      sortOrder: sortedInfo.columnKey === "lastActivity" && sortedInfo.order,
-      responsive: ["lg"],
-    },
-    {
       title: "Status",
       key: "status",
-      render: (_, record) => (
-        <Tag
-          color={record.is_online ? "green" : "default"}
-          style={{ borderRadius: 8 }}
-        >
-          {record.is_online ? "Online" : "Offline"}
-        </Tag>
-      ),
+      render: (_, record) => {
+        const isOnline = isUserOnline(record);
+        return (
+          <Tag
+            color={isOnline ? "green" : "default"}
+            style={{ borderRadius: 8 }}
+          >
+            {isOnline ? "Online" : "Offline"}
+          </Tag>
+        );
+      },
       width: 80,
       align: "center",
       filters: [
         { text: "Online", value: true },
         { text: "Offline", value: false },
       ],
-      onFilter: (value, record) => record.is_online === value,
+      onFilter: (value, record) => isUserOnline(record) === value,
       responsive: ["sm"],
     },
   ];
