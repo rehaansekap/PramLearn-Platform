@@ -16,6 +16,7 @@ import Sidebar from "./features/navigation/components/SideBar";
 import StudentLayout from "./features/student-interface/layout/StudentLayout";
 import TeacherLayout from "./features/teacher-interface/layout/TeacherLayout";
 import NotFound from "./pages/NotFound";
+import EvaluationGuide from "./pages/EvaluationGuide";
 
 // Management Components
 import Home from "./pages/Home";
@@ -133,6 +134,7 @@ const AppRoutes = () => {
 
   return (
     <Routes>
+      <Route path="/evaluation-guide" element={<EvaluationGuide />} />
       {/* Login Route - Landing Page */}
       <Route
         path="/login"
