@@ -154,7 +154,7 @@ def generate_classes():
         {
             "model": "pramlearnapp.class",
             "pk": 1,
-            "fields": {"name": "XII RPL 1", "slug": "xii-rpl-1"},
+            "fields": {"name": "XI TKJ 1", "slug": "xi-tkj-1"},
         }
     ]
 
@@ -1882,16 +1882,17 @@ def main():
     print("  • 1 Admin user")
     print("  • 1 Teacher user")
     print("  • 34 Student users")
-    print("  • 1 Class (XII RPL 1)")
+    print("  • 1 Class (XI TKJ 1)")
     print("  • 1 Subject (Administrasi Sistem Jaringan)")
     print("  • 1 Material (Pengenalan Jaringan Komputer)")
     print("  • 1 PDF file + 2 YouTube videos")
-    print("  • 5 Group quizzes (BELUM DIKERJAKAN)")
+    print("  • 6 Group quizzes (BELUM DIKERJAKAN)")
     print("    - Quiz 1: Pengenalan Jaringan (8 soal)")
     print("    - Quiz 2: Topologi Jaringan (7 soal)")
     print("    - Quiz 3: Protokol Jaringan (10 soal)")
     print("    - Quiz 4: Perangkat Jaringan (6 soal)")
     print("    - Quiz 5: Keamanan Jaringan (9 soal)")
+    print("    - Quiz 6: Instrument Soal (30 soal)")
     print("  • 5 Assignments (BELUM DIKERJAKAN)")
     print("    - Assignment 1: Analisis Konsep (4 soal)")
     print("    - Assignment 2: Desain Topologi (5 soal)")
