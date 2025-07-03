@@ -36,6 +36,12 @@ import {
   ArrowDownOutlined,
   WarningOutlined,
   SyncOutlined,
+  PlayCircleOutlined,
+  FileOutlined,
+  QuestionCircleOutlined,
+  EditOutlined,
+  StarOutlined,
+  FireOutlined,
 } from "@ant-design/icons";
 
 const { Title, Paragraph, Text } = Typography;
@@ -128,6 +134,116 @@ const EvaluationGuide = () => {
         "Rasakan pengalaman real-time collaboration saat mengerjakan quiz bersama",
         "Akses 5 assignment individual yang tersedia",
         "Evaluasi dashboard analytics untuk melihat progress belajar",
+      ],
+    },
+    {
+      title: "Evaluasi Progress Siswa 100%",
+      icon: <StarOutlined />,
+      color: "#eb2f96",
+      steps: [
+        "Login sebagai salah satu akun student (misal: student1, password: 123)",
+        "Masuk ke material 'Pengenalan Jaringan Komputer'",
+        "Lakukan semua aktivitas pembelajaran berikut secara berurutan:",
+        "• Buka dan baca semua PDF files (1 file) - otomatis tercatat sebagai aktivitas",
+        "• Tonton semua video YouTube (2 video) hingga selesai - progress akan bertambah",
+        "• Kerjakan semua quiz kelompok (6 quiz) - bergabung dengan kelompok dan selesaikan",
+        "• Kerjakan semua assignment individual (5 assignment) - submit semua jawaban",
+        "• Habiskan waktu pembelajaran minimal (sistem tracking time spent)",
+        "Monitor progress tracker di pojok kanan bawah - akan menampilkan persentase real-time",
+        "Progress 100% tercapai ketika semua komponen pembelajaran telah diselesaikan",
+      ],
+    },
+  ];
+
+  const progressAchievementGuide = [
+    {
+      step: 1,
+      title: "Aktivitas PDF Reading",
+      description: "Buka dan baca semua PDF files yang tersedia",
+      icon: <FileOutlined />,
+      color: "#1890ff",
+      actions: [
+        "Klik tab 'Dokumen PDF' di material",
+        "Buka setiap PDF file yang tersedia (1 file)",
+        "Sistem otomatis mencatat sebagai 'pdf_opened' activity",
+        "Progress akan bertambah sesuai bobot PDF dalam total komponen",
+      ],
+    },
+    {
+      step: 2,
+      title: "Video Learning",
+      description: "Tonton semua video YouTube pembelajaran",
+      icon: <PlayCircleOutlined />,
+      color: "#52c41a",
+      actions: [
+        "Klik tab 'Video Pembelajaran' di material",
+        "Tonton semua video YouTube yang tersedia (2 video)",
+        "Pastikan menonton hingga selesai untuk progress optimal",
+        "Sistem mencatat sebagai 'video_played' activity",
+      ],
+    },
+    {
+      step: 3,
+      title: "Quiz Collaboration",
+      description: "Kerjakan semua quiz kelompok yang tersedia",
+      icon: <QuestionCircleOutlined />,
+      color: "#722ed1",
+      actions: [
+        "Klik tab 'Kuis' di material",
+        "Bergabung dengan kelompok untuk quiz kolaboratif",
+        "Selesaikan semua quiz yang tersedia (6 quiz)",
+        "Sistem mencatat sebagai 'quiz_completed' activity",
+        "Progress akan bertambah signifikan setelah quiz selesai",
+      ],
+    },
+    {
+      step: 4,
+      title: "Assignment Submission",
+      description: "Kerjakan dan submit semua assignment individual",
+      icon: <EditOutlined />,
+      color: "#fa8c16",
+      actions: [
+        "Klik tab 'Tugas' di material",
+        "Kerjakan semua assignment yang tersedia (5 assignment)",
+        "Submit jawaban untuk setiap assignment",
+        "Sistem mencatat sebagai 'assignment_submitted' activity",
+        "Progress akan mencapai 100% setelah semua assignment di-submit",
+      ],
+    },
+  ];
+
+  const progressSystemDetails = [
+    {
+      category: "Komponen Yang Mempengaruhi Progress",
+      items: [
+        "PDF Files: Setiap PDF yang dibuka akan menambah progress (activity_type: 'pdf_opened')",
+        "YouTube Videos: Setiap video yang ditonton akan menambah progress (activity_type: 'video_played')",
+        "Quiz Completion: Setiap quiz kelompok yang diselesaikan menambah progress signifikan",
+        "Assignment Submission: Setiap assignment yang di-submit menambah progress",
+        "Time Spent: Waktu yang dihabiskan dalam pembelajaran juga mempengaruhi progress",
+        "Material Access: Akses ke material secara konsisten akan meningkatkan engagement",
+      ],
+    },
+    {
+      category: "Cara Kerja Perhitungan Progress",
+      items: [
+        "Sistem menggunakan StudentMaterialProgress model untuk tracking",
+        "Progress dihitung berdasarkan StudentMaterialActivity yang tercatat",
+        "Setiap aktivitas memiliki bobot yang sama dalam perhitungan total progress",
+        "Progress diupdate secara real-time melalui API calls",
+        "Progress 100% dicapai ketika semua komponen pembelajaran diselesaikan",
+        "Sistem menggunakan completion_percentage field untuk menyimpan progress",
+      ],
+    },
+    {
+      category: "Monitoring Progress Real-Time",
+      items: [
+        "Progress Tracker tampil di pojok kanan bawah (desktop) atau floating button (mobile)",
+        "Real-time update setiap kali siswa melakukan aktivitas pembelajaran",
+        "Progress Card menampilkan detail breakdown aktivitas yang sudah diselesaikan",
+        "Time tracking otomatis berjalan selama siswa aktif di halaman material",
+        "Progress Drawer (mobile) menampilkan checklist aktivitas yang sudah selesai",
+        "Visual feedback dengan warna hijau untuk aktivitas yang sudah completed",
       ],
     },
   ];
@@ -945,6 +1061,191 @@ const EvaluationGuide = () => {
           </Row>
         </Card>
 
+        {/* TAMBAHAN BARU: Progress Achievement Guide */}
+        <Card
+          title={
+            <Space>
+              <FireOutlined style={{ color: "#eb2f96" }} />
+              Panduan Mencapai 100% Progress Siswa
+            </Space>
+          }
+          style={{ marginBottom: 24, borderRadius: 12 }}
+        >
+          <Alert
+            message="Cara Mencapai Progress Pembelajaran 100%"
+            description="Progress siswa dihitung berdasarkan completion dari berbagai aktivitas pembelajaran. Untuk mencapai 100%, siswa harus menyelesaikan semua komponen pembelajaran yang tersedia di dalam material."
+            type="info"
+            showIcon
+            style={{ borderRadius: 8, marginBottom: 16 }}
+          />
+
+          <Timeline>
+            {progressAchievementGuide.map((guide, index) => (
+              <Timeline.Item
+                key={index}
+                dot={
+                  <div
+                    style={{
+                      background: guide.color,
+                      borderRadius: "50%",
+                      width: 32,
+                      height: 32,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "white",
+                    }}
+                  >
+                    {guide.icon}
+                  </div>
+                }
+              >
+                <Card
+                  size="small"
+                  title={`Step ${guide.step}: ${guide.title}`}
+                  style={{ marginBottom: 16, borderRadius: 8 }}
+                  bodyStyle={{ padding: 16 }}
+                >
+                  <Text
+                    style={{ fontSize: 14, marginBottom: 12, display: "block" }}
+                  >
+                    {guide.description}
+                  </Text>
+                  <List
+                    size="small"
+                    dataSource={guide.actions}
+                    renderItem={(action, actionIndex) => (
+                      <List.Item style={{ padding: "4px 0" }}>
+                        <Text style={{ fontSize: 13 }}>
+                          {actionIndex + 1}. {action}
+                        </Text>
+                      </List.Item>
+                    )}
+                  />
+                </Card>
+              </Timeline.Item>
+            ))}
+          </Timeline>
+
+          <Alert
+            message={
+              <Space>
+                <StarOutlined />
+                Tips untuk Monitoring Progress Real-Time
+              </Space>
+            }
+            description={
+              <div>
+                <div style={{ marginBottom: 12 }}>
+                  <Text strong style={{ color: "#eb2f96" }}>
+                    Cara Melihat Progress Real-Time:
+                  </Text>
+                </div>
+                <div style={{ marginLeft: 16, marginBottom: 8 }}>
+                  <Text>
+                    • <Text strong>Desktop:</Text> Progress Card di pojok kanan
+                    bawah menampilkan persentase progress
+                  </Text>
+                </div>
+                <div style={{ marginLeft: 16, marginBottom: 8 }}>
+                  <Text>
+                    • <Text strong>Mobile:</Text> Progress Drawer bisa dibuka
+                    dengan tap floating button
+                  </Text>
+                </div>
+                <div style={{ marginLeft: 16, marginBottom: 8 }}>
+                  <Text>
+                    • <Text strong>Real-time Update:</Text> Progress langsung
+                    terupdate setiap kali aktivitas selesai
+                  </Text>
+                </div>
+                <div style={{ marginLeft: 16, marginBottom: 8 }}>
+                  <Text>
+                    • <Text strong>Checklist:</Text> Aktivitas yang sudah
+                    completed akan menampilkan checkmark hijau
+                  </Text>
+                </div>
+                <div style={{ marginLeft: 16, marginBottom: 12 }}>
+                  <Text>
+                    • <Text strong>Time Tracking:</Text> Waktu pembelajaran
+                    tercatat otomatis selama siswa aktif
+                  </Text>
+                </div>
+                <div
+                  style={{
+                    background: "#fff0f6",
+                    padding: "12px",
+                    borderRadius: 6,
+                    border: "1px solid #ffadd2",
+                  }}
+                >
+                  <Text strong style={{ color: "#eb2f96" }}>
+                    Target untuk Evaluasi:
+                  </Text>
+                  <ul style={{ margin: "8px 0 0 16px", paddingLeft: 0 }}>
+                    <li>
+                      <Text style={{ color: "#eb2f96" }}>
+                        Test dengan minimal 2-3 akun student untuk melihat
+                        variasi progress
+                      </Text>
+                    </li>
+                    <li>
+                      <Text style={{ color: "#eb2f96" }}>
+                        Satu akun lakukan semua aktivitas (target 100%)
+                      </Text>
+                    </li>
+                    <li>
+                      <Text style={{ color: "#eb2f96" }}>
+                        Akun lain lakukan sebagian aktivitas (target 25%, 50%,
+                        75%)
+                      </Text>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            }
+            type="success"
+            showIcon
+            style={{ borderRadius: 8, marginTop: 16 }}
+          />
+        </Card>
+
+        {/* TAMBAHAN BARU: Progress System Details */}
+        <Card
+          title={
+            <Space>
+              <BarChartOutlined style={{ color: "#13c2c2" }} />
+              Detail Sistem Progress Pembelajaran
+            </Space>
+          }
+          style={{ marginBottom: 24, borderRadius: 12 }}
+        >
+          <Collapse
+            items={progressSystemDetails.map((detail, index) => ({
+              key: index.toString(),
+              label: detail.category,
+              children: (
+                <List
+                  size="small"
+                  dataSource={detail.items}
+                  renderItem={(item) => (
+                    <List.Item>
+                      <RightOutlined
+                        style={{
+                          color: "#13c2c2",
+                          marginRight: 8,
+                          fontSize: 12,
+                        }}
+                      />
+                      {item}
+                    </List.Item>
+                  )}
+                />
+              ),
+            }))}
+          />
+        </Card>
+
         {/* Evaluation Scenarios */}
         <Card
           title={
@@ -1077,6 +1378,8 @@ const EvaluationGuide = () => {
                     <li>6 quiz kelompok siap untuk dikerjakan</li>
                     <li>5 assignment individual tersedia</li>
                     <li>Real-time collaboration system aktif</li>
+                    <li>Progress tracking system berjalan real-time</li>
+                    <li>1 PDF dan 2 video pembelajaran tersedia</li>
                   </ul>
                 }
                 type="success"
@@ -1089,6 +1392,9 @@ const EvaluationGuide = () => {
                 message="Belum Dikerjakan ⏳"
                 description={
                   <ul style={{ marginBottom: 0, paddingLeft: 20 }}>
+                    <li>
+                      Progress siswa masih 0% (belum ada yang mengerjakan)
+                    </li>
                     <li>Quiz kelompok belum dikerjakan siswa</li>
                     <li>Assignment belum dikerjakan siswa</li>
                     <li>Kelompok belum dibentuk otomatis</li>
@@ -1116,7 +1422,7 @@ const EvaluationGuide = () => {
           style={{ marginBottom: 24, borderRadius: 12 }}
         >
           <Alert
-            message="Fokus Evaluasi Dual Input Method dan Teams Games Tournament"
+            message="Fokus Evaluasi: Dual Input Method, Teams Games Tournament, dan Progress Tracking"
             description={
               <List
                 size="small"
@@ -1125,11 +1431,12 @@ const EvaluationGuide = () => {
                   "Algoritma Clustering: Evaluasi efektivitas K-Means dari kedua sumber data dengan memahami limitasi sinkronisasi",
                   "Pembentukan Kelompok: Test DEAP Genetic Algorithm untuk optimasi kelompok heterogen vs homogen",
                   "Teams Games Tournament: Evaluasi 6 quiz kelompok dengan real-time collaboration menggunakan WebSocket",
+                  "Progress Tracking: Test sistem progress real-time dengan berbagai aktivitas pembelajaran untuk mencapai 100%",
                   "CSV Processing: Test fitur upload file CSV dengan template yang disediakan dan dampaknya pada clustering",
                   "Real-time Features: Test sinkronisasi jawaban, navigasi soal, dan auto-submit dalam kelompok",
-                  "Learning Analytics: Analisis student activities, attendance, dan progress tracking",
-                  "Usability Testing: Kemudahan penggunaan dari perspektif teacher (clustering) dan student (quiz collaboration)",
-                  "Educational Impact: Dampak clustering dan kolaborasi real-time terhadap efektivitas pembelajaran kelompok",
+                  "Learning Analytics: Analisis student activities, attendance, dan progress tracking dengan visualisasi real-time",
+                  "Usability Testing: Kemudahan penggunaan dari perspektif teacher (clustering) dan student (quiz collaboration + progress monitoring)",
+                  "Educational Impact: Dampak clustering, kolaborasi real-time, dan progress tracking terhadap efektivitas pembelajaran kelompok",
                 ]}
                 renderItem={(item, index) => (
                   <List.Item>
@@ -1175,7 +1482,7 @@ const EvaluationGuide = () => {
                 🧬 Genetic Algorithm
               </Tag>
               <Tag color="orange" style={{ margin: "4px" }}>
-                🏆 6 Quiz TGT
+                🏆 3 Quiz TGT
               </Tag>
               <Tag color="red" style={{ margin: "4px" }}>
                 📝 5 Assignment
