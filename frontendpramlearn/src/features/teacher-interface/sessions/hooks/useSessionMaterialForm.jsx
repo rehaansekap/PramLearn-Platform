@@ -72,7 +72,7 @@ const useSessionMaterialForm = (materialId, subjectId, onSuccess) => {
   const handleFileDelete = async (fileId) => {
     try {
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      await api.delete(`delete-file/${fileId}/`);
+      await api.delete(`files/${fileId}/delete/`);
 
       setFormData((prev) => ({
         ...prev,

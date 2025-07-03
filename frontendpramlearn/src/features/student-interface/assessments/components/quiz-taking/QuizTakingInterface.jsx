@@ -149,7 +149,7 @@ const QuizTakingInterface = () => {
       <Helmet>
         <title>Pengerjaan Quiz | PramLearn</title>
       </Helmet>
-      <Layout style={{ minHeight: "100vh", background: "#f0f2f5" }}>
+      <Layout style={{ minHeight: "100vh" }}>
         {/* Sidebar Navigasi Soal */}
         <Sider
           collapsible

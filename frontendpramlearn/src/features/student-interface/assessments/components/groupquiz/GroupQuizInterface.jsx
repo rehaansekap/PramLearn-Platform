@@ -171,7 +171,12 @@ const GroupQuizInterface = () => {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f0f2f5" }}>
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#fff",
+      }}
+    >
       <Helmet>
         <title>Pengerjaan Quiz Kelompok | PramLearn</title>
       </Helmet>
@@ -243,7 +248,7 @@ const GroupQuizInterface = () => {
           </div>
         ) : (
           // Desktop Layout - Original layout
-          <Layout style={{ background: "#f0f2f5" }}>
+          <Layout style={{ background: "transparent" }}>
             {/* Sidebar Navigasi Soal */}
             <Sider
               collapsible
@@ -274,7 +279,7 @@ const GroupQuizInterface = () => {
             </Sider>
 
             {/* Main Content Area */}
-            <Layout style={{ background: "#f0f2f5" }}>
+            <Layout style={{ background: "transparent" }}>
               <Content style={{ padding: 0 }}>
                 <div
                   style={{
