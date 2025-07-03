@@ -47,7 +47,7 @@ const ARCSResultsHeader = ({ results, onBack, isMobile }) => {
       case "low":
         return "RENDAH";
       default:
-        return level?.toUpperCase() || "SEDANG";
+        return level?.toUpperCase() || "Belum Terukur";
     }
   };
 

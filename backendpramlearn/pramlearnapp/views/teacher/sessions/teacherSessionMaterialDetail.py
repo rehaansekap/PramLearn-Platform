@@ -219,7 +219,7 @@ class TeacherSessionMaterialDetailView(APIView):
                 completion_percentage = 0.0
 
             # Ambil motivation profile (jika ada)
-            motivation_level = "Medium"
+            motivation_level = None
             if hasattr(student, "studentmotivationprofile"):
                 motivation_level = student.studentmotivationprofile.motivation_level
 

@@ -3,13 +3,12 @@ import { message } from "antd";
 import api from "../../../../api";
 import { AuthContext } from "../../../../context/AuthContext";
 import Swal from "sweetalert2";
-// import "../styles/styles.css";
 
 const useSessionGroupFormation = (materialSlug, onGroupsChanged) => {
   const { token } = useContext(AuthContext);
   const [groupMessage, setGroupMessage] = useState("");
   const [groupProcessing, setGroupProcessing] = useState(false);
-  const [exportingPdf, setExportingPdf] = useState(false); // Add export state
+  const [exportingPdf, setExportingPdf] = useState(false);
 
   // Export group analysis as PDF
   const exportGroupAnalysis = async () => {
@@ -21,41 +20,28 @@ const useSessionGroupFormation = (materialSlug, onGroupsChanged) => {
     setExportingPdf(true);
 
     try {
-      // Construct the correct API URL
-      const baseUrl =
-        import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
-      const apiUrl = `${baseUrl}/api/teacher/sessions/material/${materialSlug}/auto-group/?export=pdf`;
-
-      const response = await fetch(apiUrl, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          // Remove Content-Type header for PDF requests
-        },
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        let errorData = {};
-        try {
-          errorData = JSON.parse(errorText);
-        } catch (e) {
-          // If not JSON, use the text as error message
-          errorData = { error: errorText };
+      // FIX: Gunakan API instance yang sudah dikonfigurasi
+      const response = await api.get(
+        `teacher/sessions/material/${materialSlug}/auto-group/`,
+        {
+          params: { export: "pdf" },
+          responseType: "blob",
+          // headers: {
+          //   Accept: "application/pdf",
+          // },
         }
-        throw new Error(
-          errorData.error || `HTTP error! status: ${response.status}`
-        );
-      }
+      );
 
       // Check if response is actually a PDF
-      const contentType = response.headers.get("content-type");
-      if (!contentType || !contentType.includes("application/pdf")) {
+      if (
+        response.data.type &&
+        !response.data.type.includes("application/pdf")
+      ) {
         throw new Error("Response is not a PDF file");
       }
 
       // Get filename from Content-Disposition header or create default
-      const contentDisposition = response.headers.get("Content-Disposition");
+      const contentDisposition = response.headers["content-disposition"];
       let filename = `analisis_kelompok_${materialSlug}_${
         new Date().toISOString().split("T")[0]
       }.pdf`;
@@ -70,7 +56,7 @@ const useSessionGroupFormation = (materialSlug, onGroupsChanged) => {
       }
 
       // Convert response to blob
-      const blob = await response.blob();
+      const blob = response.data;
 
       // Verify blob size
       if (blob.size === 0) {
@@ -102,19 +88,19 @@ const useSessionGroupFormation = (materialSlug, onGroupsChanged) => {
       // Show detailed error message
       let errorMessage = "Gagal mengexport PDF. ";
 
-      if (error.message.includes("404")) {
+      if (error.response?.status === 404) {
         errorMessage += "Kelompok belum dibuat atau tidak ditemukan.";
-      } else if (error.message.includes("403")) {
+      } else if (error.response?.status === 403) {
         errorMessage +=
           "Anda tidak memiliki akses untuk mengexport analisis ini.";
-      } else if (error.message.includes("500")) {
+      } else if (error.response?.status === 500) {
         errorMessage += "Terjadi kesalahan server. Silakan coba lagi.";
       } else if (error.message.includes("empty")) {
         errorMessage += "File PDF kosong. Silakan coba lagi.";
       } else if (error.message.includes("not a PDF")) {
         errorMessage += "Response bukan file PDF. Silakan coba lagi.";
       } else {
-        errorMessage += error.message;
+        errorMessage += error.response?.data?.error || error.message;
       }
 
       await Swal.fire({
@@ -185,6 +171,16 @@ const useSessionGroupFormation = (materialSlug, onGroupsChanged) => {
 
       setGroupMessage(response.data.message);
 
+      let warningText = "";
+      if (response.data.warning) {
+        warningText = `
+        <div style="background: #fff7e6; padding: 12px; border-radius: 6px; margin-bottom: 12px; border-left: 4px solid #faad14;">
+          <strong>⚠️ Peringatan:</strong><br/>
+          ${response.data.warning}
+        </div>
+      `;
+      }
+
       // Show success with detailed info
       if (response.data.motivation_distribution) {
         const dist = response.data.motivation_distribution;
@@ -203,39 +199,44 @@ const useSessionGroupFormation = (materialSlug, onGroupsChanged) => {
         await Swal.fire({
           title: "Kelompok Berhasil Dibuat! 🎉",
           html: `
-            <div style="text-align: left;">
-              <p><strong>${response.data.message}</strong></p>
-              <p style="margin: 8px 0; color: #1677ff;"><strong>${
-                response.data.quality_message || ""
-              }</strong></p>
+          <div style="text-align: left;">
+            <p><strong>${response.data.message}</strong></p>
+            <p style="margin: 8px 0; color: #1677ff;"><strong>${
+              response.data.quality_message || ""
+            }</strong></p>
+            
+            ${warningText}
               <br/>
               
               <!-- Quality Analysis -->
-              ${
-                response.data.quality_analysis
-                  ? `
-                <div style="background: #f0f7ff; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
-                  <strong>📊 Analisis Kualitas Kelompok:</strong><br/>
-                  • Mode: ${response.data.quality_analysis.formation_mode}<br/>
-                  • Keseimbangan: ${
-                    response.data.quality_analysis.interpretation?.balance
-                  } (${(
-                      response.data.quality_analysis.balance_score * 100
-                    ).toFixed(1)}%)<br/>
-                  • Keberagaman: ${
-                    response.data.quality_analysis.interpretation?.heterogeneity
-                  } (${(
-                      response.data.quality_analysis.heterogeneity_score * 100
-                    ).toFixed(1)}%)<br/>
-                  • Keseragaman: ${
-                    response.data.quality_analysis.interpretation?.uniformity
-                  } (${(
-                      response.data.quality_analysis.uniformity_score * 100
-                    ).toFixed(1)}%)<br/>
-                </div>
-              `
-                  : ""
-              }
+             ${
+               response.data.quality_analysis
+                 ? `
+              <div style="background: #f0f7ff; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
+                <strong>📊 Analisis Kualitas Kelompok:</strong><br/>
+                • Mode: ${response.data.quality_analysis.formation_mode}<br/>
+                • Keseimbangan: ${
+                  response.data.quality_analysis.interpretation?.balance ||
+                  "Tidak Tersedia"
+                } (${(
+                     response.data.quality_analysis.balance_score * 100
+                   ).toFixed(1)}%)<br/>
+                • Keberagaman: ${
+                  response.data.quality_analysis.interpretation
+                    ?.heterogeneity || "Tidak Tersedia"
+                } (${(
+                     response.data.quality_analysis.heterogeneity_score * 100
+                   ).toFixed(1)}%)<br/>
+                • Keseragaman: ${
+                  response.data.quality_analysis.interpretation?.uniformity ||
+                  "Tidak Tersedia"
+                } (${(
+                     response.data.quality_analysis.uniformity_score * 100
+                   ).toFixed(1)}%)<br/>
+              </div>
+            `
+                 : ""
+             }
               
               <!-- Export Button -->
               <div style="text-align: center; margin: 16px 0; padding: 12px; background: #f8f9fa; border-radius: 6px;">

@@ -144,11 +144,30 @@ class TeacherSessionAutoGroupFormationView(APIView):
                 groups_for_analysis.append(group_students)
 
             quality_analysis = self.analyze_group_quality(groups_for_analysis)
-
-            # Determine formation mode based on heterogeneity
+    
+            # Check if there are any heterogeneous groups (mixed motivation levels)
+            has_mixed_groups = any(
+                len([level for level, count in group_data["motivation_distribution"].items() 
+                    if count > 0]) > 1 
+                for group_data in groups_data
+            )
+            
+            # Determine formation mode based on actual group composition
+            if has_mixed_groups:
+                formation_mode = "heterogen"
+            else:
+                formation_mode = "homogen"
+            
+            # Or better yet, store the formation mode when creating groups
+            # For now, we can infer from the group patterns
             avg_heterogeneity = quality_analysis.get("heterogeneity_score", 0)
-            formation_mode = "heterogen" if avg_heterogeneity > 0.5 else "homogen"
-
+            
+            # More accurate mode detection
+            if avg_heterogeneity > 0.3:  # If groups have some diversity
+                formation_mode = "heterogen"
+            else:
+                formation_mode = "homogen"
+            
             formation_params = {
                 "mode": formation_mode,
                 "groups": groups_data,
@@ -334,21 +353,16 @@ class TeacherSessionAutoGroupFormationView(APIView):
             else:  # heterogen
                 avg_heterogeneity = quality_analysis["heterogeneity_score"]
                 uniformity_score = quality_analysis.get("uniformity_score", 0)
-
-                if uniformity_score > 0.9 and avg_heterogeneity > 0.7:
-                    quality_message = "✅ Kelompok heterogen dengan distribusi seragam terbentuk dengan sangat baik"
+                
+                # FIX: Improved interpretation logic
+                if avg_heterogeneity < 0.3:
+                    quality_message = "❌ Kelompok terlalu homogen - tidak dapat membentuk kelompok heterogen yang baik karena data motivasi siswa tidak beragam"
+                elif avg_heterogeneity < 0.5:
+                    quality_message = "⚠️ Kelompok kurang heterogen - perlu data motivasi yang lebih beragam"
                 elif uniformity_score > 0.8 and avg_heterogeneity > 0.6:
-                    quality_message = (
-                        "✅ Kelompok heterogen dengan distribusi cukup seragam"
-                    )
-                elif avg_heterogeneity > 0.7:
-                    quality_message = (
-                        "✅ Kelompok heterogen terbentuk dengan sangat baik"
-                    )
-                elif avg_heterogeneity > 0.4:
-                    quality_message = "⚠️ Kelompok cukup heterogen"
+                    quality_message = "✅ Kelompok heterogen dengan distribusi seragam terbentuk dengan baik"
                 else:
-                    quality_message = "❌ Kelompok masih terlalu homogen"
+                    quality_message = "⚠️ Kelompok heterogen terbentuk namun belum optimal"
 
             return Response(
                 {
@@ -379,7 +393,7 @@ class TeacherSessionAutoGroupFormationView(APIView):
                                     "Cukup Beragam"
                                     if quality_analysis["heterogeneity_score"] > 0.4
                                     else (
-                                        "Cukup Homogen"
+                                        "Kurang Beragam"
                                         if quality_analysis["heterogeneity_score"] > 0.2
                                         else "Sangat Homogen"
                                     )
@@ -391,7 +405,11 @@ class TeacherSessionAutoGroupFormationView(APIView):
                                 else (
                                     "Cukup Seragam"
                                     if quality_analysis.get("uniformity_score", 0) > 0.6
-                                    else "Kurang Seragam"
+                                    else (
+                                        "Kurang Seragam"
+                                        if quality_analysis.get("uniformity_score", 0) > 0.3
+                                        else "Tidak Seragam"
+                                    )
                                 )
                             ),
                         },
@@ -1040,18 +1058,22 @@ class TeacherSessionAutoGroupFormationView(APIView):
             for k, v in motivation_distribution.items()
             if k != "Unanalyzed" and v > 0
         }
-        if len(analyzed_levels) < 2:
+        if len(analyzed_levels) < 3:
+            diversity_warning = f"⚠️ Peringatan: Hanya ditemukan {len(analyzed_levels)} tingkat motivasi yang berbeda. Untuk kelompok heterogen yang optimal, diperlukan siswa dengan tingkat motivasi High, Medium, dan Low."
+            
             return {
-                "is_valid": False,
-                "message": f"Variasi tingkat motivasi tidak cukup untuk pembentukan kelompok yang optimal. Saat ini hanya ada {len(analyzed_levels)} tingkat motivasi yang berbeda. Disarankan memiliki minimal 2 tingkat motivasi.",
+                "is_valid": True,
+                "message": f"Validasi berhasil dengan catatan. {analyzed_students}/{total_students} siswa siap untuk pembentukan kelompok.",
+                "warning": diversity_warning,
                 "distribution": motivation_distribution,
             }
-
+        
         return {
             "is_valid": True,
             "message": f"Validasi berhasil. {analyzed_students}/{total_students} siswa siap untuk pembentukan kelompok.",
             "distribution": motivation_distribution,
         }
+        
 
     def get_motivation_score(self, student):
         """Get motivation score from student profile"""

@@ -88,7 +88,7 @@ const GroupMembersModal = ({
       case "low":
         return "Rendah";
       default:
-        return "Belum Dianalisis";
+        return "Belum Terukur";
     }
   };
 

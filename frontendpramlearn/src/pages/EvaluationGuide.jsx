@@ -28,6 +28,12 @@ import {
   CheckCircleOutlined,
   InfoCircleOutlined,
   ExclamationCircleOutlined,
+  WifiOutlined,
+  ClockCircleOutlined,
+  FormOutlined,
+  DownloadOutlined,
+  UploadOutlined,
+  ArrowDownOutlined,
 } from "@ant-design/icons";
 
 const { Title, Paragraph, Text } = Typography;
@@ -36,17 +42,44 @@ const { Panel } = Collapse;
 const EvaluationGuide = () => {
   const evaluationScenarios = [
     {
-      title: "Evaluasi Algoritma Clustering",
+      title: "Evaluasi Algoritma Clustering ARCS",
       icon: <BarChartOutlined />,
       color: "#52c41a",
+      isMultiPath: true,
       steps: [
         "Login sebagai teacher1 (password: 123)",
         "Navigasi ke Management → Class Management → XI TKJ 1 → Materials → Pengenalan Jaringan Komputer",
-        "Klik tab Sessions → Upload ARCS Data",
-        "Sistem akan menampilkan data ARCS dari 34 siswa yang sudah tersedia",
-        "Jalankan algoritma clustering untuk mengelompokkan motivasi belajar siswa (High/Medium/Low)",
-        "Analisis hasil clustering berdasarkan 4 dimensi ARCS (Attention, Relevance, Confidence, Satisfaction)",
+        "Pilih salah satu metode untuk melakukan clustering ARCS:",
+      ],
+      pathOptions: [
+        {
+          title: "Metode 1: Data dari Kuesioner Siswa",
+          icon: <FormOutlined />,
+          color: "#1890ff",
+          steps: [
+            "Klik tab 'ARCS Questionnaire' untuk melihat kuesioner yang tersedia",
+            "Lihat responses dari 34 siswa yang sudah mengisi kuesioner ARCS (20 pertanyaan)",
+            "Sistem otomatis melakukan clustering K-Means berdasarkan jawaban siswa",
+            "Analisis hasil clustering otomatis berdasarkan 4 dimensi ARCS",
+          ],
+        },
+        {
+          title: "Metode 2: Upload File CSV",
+          icon: <UploadOutlined />,
+          color: "#fa8c16",
+          steps: [
+            "Download file template ARCS CSV dari: https://pramlearnstorage.blob.core.windows.net/media/arcs_data.csv",
+            "Klik tab 'Upload ARCS Data' pada material",
+            "Upload file CSV dengan data ARCS yang sudah didownload",
+            "Sistem akan memproses file dan melakukan clustering K-Means",
+            "Analisis hasil clustering berdasarkan data CSV yang diupload",
+          ],
+        },
+      ],
+      finalSteps: [
+        "Lihat hasil clustering dengan klasifikasi motivasi (High/Medium/Low)",
         "Export laporan analisis clustering dalam format PDF",
+        "Lanjutkan ke tahap pembentukan kelompok berdasarkan hasil clustering",
       ],
     },
     {
@@ -54,30 +87,29 @@ const EvaluationGuide = () => {
       icon: <TeamOutlined />,
       color: "#1890ff",
       steps: [
-        "Setelah melakukan clustering ARCS dari 34 siswa",
+        "Setelah clustering ARCS selesai (dari metode manapun)",
         "Masuk ke tab Groups pada material",
         "Pilih Generate Groups dan pilih mode pembentukan:",
         "• Heterogen: Menggunakan DEAP Genetic Algorithm untuk keberagaman motivasi",
         "• Homogen: Berdasarkan tingkat motivasi yang sama (High/Medium/Low)",
-        "Sistem akan membentuk kelompok optimal dari 34 siswa",
+        "Sistem akan membentuk kelompok optimal dari 34 siswa berdasarkan hasil clustering",
         "Analisis kualitas pembentukan kelompok (balance score, heterogeneity score)",
         "Export laporan pembentukan kelompok dalam format PDF",
       ],
     },
     {
-      title: "Evaluasi Quiz Kelompok (Teams Games Tournament)",
-      icon: <TrophyOutlined />,
+      title: "Evaluasi Quiz Kelompok Kolaboratif Real-Time",
+      icon: <WifiOutlined />,
       color: "#722ed1",
       steps: [
         "Setelah kelompok terbentuk, akses quiz kelompok yang tersedia",
-        "Tersedia 6 quiz kelompok dengan tema jaringan komputer:",
-        "• Quiz 1: Pengenalan Jaringan Komputer (8 soal, 30 menit)",
-        "• Quiz 2: Topologi Jaringan (7 soal, 35 menit)",
-        "• Quiz 3: Protokol Jaringan (10 soal, 40 menit)",
-        "• Quiz 4: Perangkat Jaringan (6 soal, 25 menit)",
-        "• Quiz 5: Keamanan Jaringan (9 soal, 45 menit)",
-        "• Quiz 6: Instrument Soal Komprehensif (30 soal, 60 menit)",
-        "Evaluasi kolaborasi real-time dalam kelompok",
+        "Sistem menggunakan teknologi WebSocket untuk koneksi real-time antar anggota kelompok",
+        "Saat satu anggota kelompok menjawab soal, anggota lain langsung melihat jawaban tersebut",
+        "Anggota kelompok dapat bernavigasi ke soal berbeda secara real-time",
+        "Status online/offline setiap anggota kelompok terlihat secara langsung",
+        "Jika salah satu anggota submit quiz, seluruh kelompok otomatis terhenti dan dialihkan ke hasil",
+        "Tersedia 6 quiz dengan tema jaringan komputer (total 40+ soal)",
+        "Evaluasi efektivitas kolaborasi dan komunikasi dalam pengerjaan kelompok",
       ],
     },
     {
@@ -88,12 +120,9 @@ const EvaluationGuide = () => {
         "Login sebagai salah satu dari 34 akun student (student1-student34, password: 123)",
         "Akses material 'Pengenalan Jaringan Komputer' yang tersedia",
         "Lihat hasil analisis ARCS personal dari kuesioner yang sudah diisi",
-        "Akses 5 assignment yang tersedia (belum dikerjakan):",
-        "• Assignment 1: Analisis Konsep Jaringan Komputer",
-        "• Assignment 2: Desain Topologi Jaringan",
-        "• Assignment 3: Konfigurasi Protokol Jaringan",
-        "• Assignment 4: Evaluasi Perangkat Jaringan",
-        "• Assignment 5: Implementasi Keamanan Jaringan",
+        "Bergabung dengan kelompok untuk mengerjakan quiz kolaboratif",
+        "Rasakan pengalaman real-time collaboration saat mengerjakan quiz bersama",
+        "Akses 5 assignment individual yang tersedia",
         "Evaluasi dashboard analytics untuk melihat progress belajar",
       ],
     },
@@ -118,6 +147,16 @@ const EvaluationGuide = () => {
         "Data Visualization: Chart dan grafik untuk analisis hasil clustering",
         "Real-time Collaboration: WebSocket untuk quiz kelompok",
         "PDF Generation: Laporan analisis dan pembentukan kelompok",
+      ],
+    },
+    {
+      category: "Sistem ARCS dan Clustering",
+      items: [
+        "Dual Input Method: Kuesioner siswa dan upload CSV file",
+        "K-Means Clustering: Otomatis berdasarkan kedua sumber data",
+        "ARCS Questionnaire: 20 pertanyaan dengan 4 dimensi motivasi",
+        "CSV Processing: Template file untuk import data eksternal",
+        "Motivation Profiling: Klasifikasi High/Medium/Low motivation",
       ],
     },
     {
@@ -148,7 +187,7 @@ const EvaluationGuide = () => {
       password: "123",
       name: "Ahmad Rizki, Siti Nurhaliza, dll (34 siswa)",
       access:
-        "Dapat melihat hasil analisis ARCS personal dan mengakses quiz/assignment",
+        "Dapat melihat hasil analisis ARCS personal dan mengakses quiz/assignment kolaboratif",
       recommended: false,
     },
     {
@@ -163,10 +202,19 @@ const EvaluationGuide = () => {
 
   const dataAvailable = [
     {
+      category: "Data ARCS untuk Clustering",
+      items: [
+        "34 siswa sudah mengisi kuesioner ARCS lengkap (20 pertanyaan)",
+        "File CSV template tersedia untuk download dan testing upload",
+        "ARCS responses dengan 4 dimensi: Attention, Relevance, Confidence, Satisfaction",
+        "Hasil clustering otomatis dari kedua metode input",
+        "Student motivation profiles dengan klasifikasi High/Medium/Low",
+      ],
+    },
+    {
       category: "Data Siswa Tersedia",
       items: [
         "34 siswa dengan nama Indonesia (Ahmad Rizki, Siti Nurhaliza, dll)",
-        "Data kuesioner ARCS lengkap (20 pertanyaan) yang sudah diisi semua siswa",
         "Student motivation profiles dengan klasifikasi High/Medium/Low",
         "Student attendance records untuk analisis kehadiran",
         "Student activities untuk learning analytics",
@@ -182,22 +230,149 @@ const EvaluationGuide = () => {
         "2 Pengumuman kelas yang informatif",
       ],
     },
-    {
-      category: "Data untuk Clustering Analysis",
-      items: [
-        "ARCS questionnaire dengan 4 dimensi (Attention, Relevance, Confidence, Satisfaction)",
-        "Real responses dari 34 siswa dengan variasi skor realistis",
-        "Motivation profiles yang sudah diklasifikasi otomatis",
-        "Data attendance untuk validasi analisis",
-      ],
-    },
   ];
+
+  const renderMultiPathScenario = (scenario) => {
+    return (
+      <Card
+        size="small"
+        title={scenario.title}
+        style={{ marginBottom: 16, borderRadius: 8 }}
+        bodyStyle={{ padding: 16 }}
+      >
+        {/* Initial Steps */}
+        <Steps
+          direction="vertical"
+          size="small"
+          current={-1}
+          items={scenario.steps.map((step, stepIndex) => ({
+            title: `Langkah ${stepIndex + 1}`,
+            description: step,
+          }))}
+        />
+
+        {/* Path Options */}
+        <div style={{ margin: "16px 0", textAlign: "center" }}>
+          <ArrowDownOutlined style={{ fontSize: 20, color: "#1890ff" }} />
+          <Text strong style={{ display: "block", margin: "8px 0" }}>
+            Pilih salah satu metode berikut:
+          </Text>
+        </div>
+
+        <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
+          {scenario.pathOptions.map((path, pathIndex) => (
+            <Col xs={24} md={12} key={pathIndex}>
+              <Card
+                size="small"
+                title={
+                  <Space>
+                    <div
+                      style={{
+                        background: path.color,
+                        borderRadius: "50%",
+                        width: 24,
+                        height: 24,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "white",
+                        fontSize: 12,
+                      }}
+                    >
+                      {path.icon}
+                    </div>
+                    {path.title}
+                  </Space>
+                }
+                style={{
+                  height: "100%",
+                  border: `2px solid ${path.color}20`,
+                  borderRadius: 8,
+                }}
+              >
+                <List
+                  size="small"
+                  dataSource={path.steps}
+                  renderItem={(step, stepIndex) => (
+                    <List.Item style={{ padding: "4px 0" }}>
+                      <Text style={{ fontSize: "13px" }}>
+                        {stepIndex + 1}. {step}
+                      </Text>
+                    </List.Item>
+                  )}
+                />
+
+                {/* Download Button for CSV Method */}
+                {pathIndex === 1 && (
+                  <div style={{ marginTop: 12, textAlign: "center" }}>
+                    <Button
+                      type="primary"
+                      size="small"
+                      icon={<DownloadOutlined />}
+                      href="https://pramlearnstorage.blob.core.windows.net/media/arcs_data.csv"
+                      target="_blank"
+                      style={{
+                        background: path.color,
+                        borderColor: path.color,
+                        borderRadius: 6,
+                      }}
+                    >
+                      Download Template CSV
+                    </Button>
+                  </div>
+                )}
+              </Card>
+            </Col>
+          ))}
+        </Row>
+
+        {/* Final Steps */}
+        <div style={{ margin: "16px 0", textAlign: "center" }}>
+          <ArrowDownOutlined style={{ fontSize: 20, color: "#52c41a" }} />
+          <Text strong style={{ display: "block", margin: "8px 0" }}>
+            Langkah selanjutnya (dari metode manapun):
+          </Text>
+        </div>
+
+        <Steps
+          direction="vertical"
+          size="small"
+          current={-1}
+          items={scenario.finalSteps.map((step, stepIndex) => ({
+            title: `Langkah ${stepIndex + 4}`,
+            description: step,
+          }))}
+        />
+      </Card>
+    );
+  };
+
+  const renderRegularScenario = (scenario) => {
+    return (
+      <Card
+        size="small"
+        title={scenario.title}
+        style={{ marginBottom: 16, borderRadius: 8 }}
+        bodyStyle={{ padding: 16 }}
+      >
+        <Steps
+          direction="vertical"
+          size="small"
+          current={-1}
+          items={scenario.steps.map((step, stepIndex) => ({
+            title: `Langkah ${stepIndex + 1}`,
+            description: step,
+          }))}
+        />
+      </Card>
+    );
+  };
 
   return (
     <div
       style={{
         minHeight: "100vh",
-        background: "linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)",
+        background: "#F5F5F5",
         padding: "24px",
       }}
     >
@@ -270,17 +445,18 @@ const EvaluationGuide = () => {
           style={{ marginBottom: 24, borderRadius: 12 }}
         >
           <Alert
-            message="Dataset Siap Evaluasi"
+            message="Dataset Siap Evaluasi dengan Dual Input Method"
             description={
               <List
                 size="small"
                 dataSource={[
                   "34 siswa kelas XI TKJ 1 dengan data ARCS lengkap",
+                  "Dual input method: Kuesioner siswa dan upload CSV file",
                   "6 quiz kelompok Teams Games Tournament (40+ soal jaringan komputer)",
+                  "Real-time collaborative quiz menggunakan teknologi WebSocket",
                   "5 assignment individual dengan berbagai tingkat kesulitan",
                   "Algoritma K-Means clustering untuk pengelompokan motivasi ARCS",
                   "DEAP Genetic Algorithm untuk optimasi pembentukan kelompok heterogen/homogen",
-                  "Real-time collaboration system untuk quiz kelompok",
                 ]}
                 renderItem={(item) => (
                   <List.Item>
@@ -295,6 +471,201 @@ const EvaluationGuide = () => {
             type="info"
             showIcon
             style={{ borderRadius: 8 }}
+          />
+        </Card>
+
+        {/* ARCS Dual Input Method */}
+        <Card
+          title={
+            <Space>
+              <FormOutlined style={{ color: "#52c41a" }} />
+              Dual Method Input untuk Clustering ARCS
+            </Space>
+          }
+          style={{ marginBottom: 24, borderRadius: 12 }}
+        >
+          <Alert
+            message="Sistem Mendukung Dua Metode Input Data ARCS"
+            description="Sistem PramLearn mendukung dua cara untuk mendapatkan data ARCS yang akan digunakan dalam clustering: (1) Pengisian kuesioner langsung oleh siswa di dalam sistem, atau (2) Upload file CSV dengan data ARCS dari sumber eksternal."
+            type="info"
+            showIcon
+            style={{ borderRadius: 8, marginBottom: 16 }}
+          />
+
+          <Row gutter={[16, 16]}>
+            <Col xs={24} md={12}>
+              <Card
+                title={
+                  <Space>
+                    <FormOutlined style={{ color: "#1890ff" }} />
+                    Metode 1: Kuesioner Siswa
+                  </Space>
+                }
+                size="small"
+                style={{
+                  height: "100%",
+                  borderRadius: 8,
+                  border: "2px solid #1890ff20",
+                }}
+              >
+                <List
+                  size="small"
+                  dataSource={[
+                    "✅ 34 siswa sudah mengisi kuesioner ARCS (20 pertanyaan)",
+                    "📊 Otomatis tersinkronisasi dengan database",
+                    "⚡ Clustering real-time berdasarkan jawaban",
+                    "🎯 Data asli dari pengalaman siswa",
+                    "📈 Terintegrasi dengan sistem learning analytics",
+                  ]}
+                  renderItem={(item) => (
+                    <List.Item style={{ padding: "4px 0" }}>
+                      <Text style={{ fontSize: "14px" }}>{item}</Text>
+                    </List.Item>
+                  )}
+                />
+              </Card>
+            </Col>
+            <Col xs={24} md={12}>
+              <Card
+                title={
+                  <Space>
+                    <UploadOutlined style={{ color: "#fa8c16" }} />
+                    Metode 2: Upload CSV File
+                  </Space>
+                }
+                size="small"
+                style={{
+                  height: "100%",
+                  borderRadius: 8,
+                  border: "2px solid #fa8c1620",
+                }}
+              >
+                <List
+                  size="small"
+                  dataSource={[
+                    "📁 Template CSV tersedia untuk download",
+                    "🔄 Dapat memperbarui data dari sistem lain",
+                    "⚙️ Fleksibel untuk import data eksternal",
+                    "🧪 Berguna untuk testing dengan data berbeda",
+                    "📋 Mendukung bulk update data ARCS",
+                  ]}
+                  renderItem={(item) => (
+                    <List.Item style={{ padding: "4px 0" }}>
+                      <Text style={{ fontSize: "14px" }}>{item}</Text>
+                    </List.Item>
+                  )}
+                />
+                <div style={{ marginTop: 12, textAlign: "center" }}>
+                  <Button
+                    type="primary"
+                    size="small"
+                    icon={<DownloadOutlined />}
+                    href="https://pramlearnstorage.blob.core.windows.net/media/arcs_data.csv"
+                    target="_blank"
+                    style={{
+                      background: "#fa8c16",
+                      borderColor: "#fa8c16",
+                      borderRadius: 6,
+                    }}
+                  >
+                    Download Template CSV
+                  </Button>
+                </div>
+              </Card>
+            </Col>
+          </Row>
+        </Card>
+
+        {/* Real-time Collaboration Feature */}
+        <Card
+          title={
+            <Space>
+              <WifiOutlined style={{ color: "#722ed1" }} />
+              Fitur Unggulan: Kuis Kolaboratif Real-Time
+            </Space>
+          }
+          style={{ marginBottom: 24, borderRadius: 12 }}
+        >
+          <Row gutter={[16, 16]}>
+            <Col xs={24} md={12}>
+              <Card
+                title="Bagaimana Cara Kerja Kolaborasi Real-Time?"
+                size="small"
+                style={{ height: "100%", borderRadius: 8 }}
+              >
+                <List
+                  size="small"
+                  dataSource={[
+                    "Anggota kelompok terhubung secara langsung melalui internet",
+                    "Ketika satu siswa menjawab soal, jawaban langsung terlihat oleh anggota lain",
+                    "Siswa dapat melihat siapa yang sedang online dan mengerjakan quiz",
+                    "Navigasi soal (pindah ke soal lain) juga terlihat secara real-time",
+                    "Sistem menampilkan nama siswa yang menjawab setiap soal",
+                  ]}
+                  renderItem={(item) => (
+                    <List.Item style={{ padding: "4px 0" }}>
+                      <Text style={{ fontSize: "14px" }}>• {item}</Text>
+                    </List.Item>
+                  )}
+                />
+              </Card>
+            </Col>
+            <Col xs={24} md={12}>
+              <Card
+                title="Apa yang Terjadi Saat Quiz Berakhir?"
+                size="small"
+                style={{ height: "100%", borderRadius: 8 }}
+              >
+                <List
+                  size="small"
+                  dataSource={[
+                    "Jika salah satu anggota menekan tombol 'Submit', seluruh kelompok otomatis berhenti",
+                    "Semua anggota kelompok langsung dialihkan ke halaman hasil quiz",
+                    "Quiz juga berhenti otomatis jika waktu habis",
+                    "Sistem menampilkan notifikasi kepada semua anggota",
+                    "Hasil quiz kelompok tersimpan untuk semua anggota",
+                  ]}
+                  renderItem={(item) => (
+                    <List.Item style={{ padding: "4px 0" }}>
+                      <Text style={{ fontSize: "14px" }}>• {item}</Text>
+                    </List.Item>
+                  )}
+                />
+              </Card>
+            </Col>
+          </Row>
+
+          <Alert
+            message={
+              <Space>
+                <ClockCircleOutlined />
+                Tips untuk Evaluasi Real-Time Collaboration
+              </Space>
+            }
+            description={
+              <div style={{ marginTop: 8 }}>
+                <Text strong>Untuk menguji fitur kolaborasi:</Text>
+                <ol style={{ marginTop: 8, marginBottom: 0, paddingLeft: 20 }}>
+                  <li>Buka 2-3 browser atau tab berbeda</li>
+                  <li>
+                    Login dengan akun student yang berbeda (misal: student1,
+                    student2, student3)
+                  </li>
+                  <li>Bergabung dalam quiz kelompok yang sama</li>
+                  <li>
+                    Amati bagaimana jawaban dan navigasi soal tersinkronisasi
+                    secara real-time
+                  </li>
+                  <li>
+                    Coba submit quiz dari salah satu akun dan lihat efeknya pada
+                    akun lain
+                  </li>
+                </ol>
+              </div>
+            }
+            type="success"
+            showIcon
+            style={{ borderRadius: 8, marginTop: 16 }}
           />
         </Card>
 
@@ -386,29 +757,16 @@ const EvaluationGuide = () => {
                   </div>
                 }
               >
-                <Card
-                  size="small"
-                  title={scenario.title}
-                  style={{ marginBottom: 16, borderRadius: 8 }}
-                  bodyStyle={{ padding: 16 }}
-                >
-                  <Steps
-                    direction="vertical"
-                    size="small"
-                    current={-1}
-                    items={scenario.steps.map((step, stepIndex) => ({
-                      title: `Langkah ${stepIndex + 1}`,
-                      description: step,
-                    }))}
-                  />
-                </Card>
+                {scenario.isMultiPath
+                  ? renderMultiPathScenario(scenario)
+                  : renderRegularScenario(scenario)}
               </Timeline.Item>
             ))}
           </Timeline>
         </Card>
 
         {/* Technical Aspects */}
-        {/* <Card
+        <Card
           title={
             <Space>
               <SettingOutlined style={{ color: "#722ed1" }} />
@@ -442,7 +800,7 @@ const EvaluationGuide = () => {
               ),
             }))}
           />
-        </Card> */}
+        </Card>
 
         {/* Data Available */}
         <Card
@@ -495,9 +853,11 @@ const EvaluationGuide = () => {
                   <ul style={{ marginBottom: 0, paddingLeft: 20 }}>
                     <li>34 siswa dengan profil ARCS lengkap</li>
                     <li>Data kuesioner pre-assessment sudah diisi</li>
+                    <li>Template CSV tersedia untuk download</li>
                     <li>Student motivation profiles tersedia</li>
                     <li>6 quiz kelompok siap untuk dikerjakan</li>
                     <li>5 assignment individual tersedia</li>
+                    <li>Real-time collaboration system aktif</li>
                   </ul>
                 }
                 type="success"
@@ -513,6 +873,7 @@ const EvaluationGuide = () => {
                     <li>Quiz kelompok belum dikerjakan siswa</li>
                     <li>Assignment belum dikerjakan siswa</li>
                     <li>Kelompok belum dibentuk otomatis</li>
+                    <li>Testing upload CSV belum dilakukan</li>
                     <li>ARCS post-assessment belum dibuat</li>
                     <li>Deadline semua: 2 Agustus 2025</li>
                   </ul>
@@ -536,18 +897,20 @@ const EvaluationGuide = () => {
           style={{ marginBottom: 24, borderRadius: 12 }}
         >
           <Alert
-            message="Fokus Evaluasi Algoritma Clustering dan Teams Games Tournament"
+            message="Fokus Evaluasi Dual Input Method dan Teams Games Tournament"
             description={
               <List
                 size="small"
                 dataSource={[
-                  "Algoritma Clustering: Evaluasi efektivitas K-Means dalam mengelompokkan 34 siswa berdasarkan motivasi ARCS (High/Medium/Low)",
+                  "Dual Input Method: Evaluasi kedua metode input data ARCS (kuesioner vs upload CSV)",
+                  "Algoritma Clustering: Evaluasi efektivitas K-Means dari kedua sumber data",
                   "Pembentukan Kelompok: Test DEAP Genetic Algorithm untuk optimasi kelompok heterogen vs homogen",
-                  "Teams Games Tournament: Evaluasi 6 quiz kelompok dengan real-time collaboration",
+                  "Teams Games Tournament: Evaluasi 6 quiz kelompok dengan real-time collaboration menggunakan WebSocket",
+                  "CSV Processing: Test fitur upload file CSV dengan template yang disediakan",
+                  "Real-time Features: Test sinkronisasi jawaban, navigasi soal, dan auto-submit dalam kelompok",
                   "Learning Analytics: Analisis student activities, attendance, dan progress tracking",
                   "Usability Testing: Kemudahan penggunaan dari perspektif teacher (clustering) dan student (quiz collaboration)",
-                  "Scalability: Test performa sistem dengan 34 siswa mock data",
-                  "Educational Impact: Dampak clustering terhadap efektivitas pembelajaran kelompok",
+                  "Educational Impact: Dampak clustering dan kolaborasi real-time terhadap efektivitas pembelajaran kelompok",
                 ]}
                 renderItem={(item, index) => (
                   <List.Item>
@@ -578,9 +941,9 @@ const EvaluationGuide = () => {
               Sistem PramLearn Siap untuk Evaluasi
             </Title>
             <Paragraph style={{ margin: 0, color: "#666" }}>
-              Dataset lengkap 34 siswa kelas XI TKJ 1 dengan implementasi
-              algoritma clustering untuk optimasi Teams Games Tournament dalam
-              pembelajaran Administrasi Sistem Jaringan.
+              Dataset lengkap 34 siswa kelas XI TKJ 1 dengan dual input method
+              untuk clustering ARCS dan implementasi Teams Games Tournament
+              dengan fitur kolaborasi real-time.
             </Paragraph>
             <div style={{ marginTop: 16 }}>
               <Tag color="blue" style={{ margin: "4px" }}>
@@ -597,6 +960,12 @@ const EvaluationGuide = () => {
               </Tag>
               <Tag color="red" style={{ margin: "4px" }}>
                 📝 5 Assignment
+              </Tag>
+              <Tag color="cyan" style={{ margin: "4px" }}>
+                📡 Real-time WebSocket
+              </Tag>
+              <Tag color="gold" style={{ margin: "4px" }}>
+                📁 Dual Input Method
               </Tag>
             </div>
             <Button
