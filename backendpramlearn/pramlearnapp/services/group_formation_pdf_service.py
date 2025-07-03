@@ -870,13 +870,18 @@ class GroupFormationPDFService:
         self.story.append(Paragraph("📋 DETAIL SETIAP KELOMPOK", self.heading_style))
 
         for group in groups_data:
+            anggota_list = []
+            for member in group["members"]:
+                motivation_level = (
+                    member.get("motivation_level", "Unanalyzed") or "Unanalyzed"
+                )
+                anggota_list.append(f"{member['username']} ({motivation_level})")
             group_text = f"""
             <b>{group['name']} (Kode: {group['code']})</b><br/>
             Ukuran: {group['size']} siswa<br/>
             Distribusi Motivasi: High={group['motivation_distribution']['High']}, Medium={group['motivation_distribution']['Medium']}, Low={group['motivation_distribution']['Low']}<br/>
-            Anggota: {', '.join([member['username'] + f" ({member['motivation_level']})" for member in group['members']])}<br/>
+            Anggota: {', '.join(anggota_list)}<br/>
             """
-
             group_para = Paragraph(group_text, self.normal_style)
             self.story.append(group_para)
             self.story.append(Spacer(1, 0.1 * inch))

@@ -430,6 +430,11 @@ urlpatterns = [
         name="session-material-content",
     ),
     path(
+        "api/teacher/sessions/material/<slug:material_slug>/class-analysis/",
+        TeacherSessionAutoGroupFormationView.as_view(),
+        name="teacher_session_class_analysis",
+    ),
+    path(
         "api/teacher/sessions/material/<slug:material_slug>/auto-group/",
         TeacherSessionAutoGroupFormationView.as_view(),
         name="session-auto-group-formation",
