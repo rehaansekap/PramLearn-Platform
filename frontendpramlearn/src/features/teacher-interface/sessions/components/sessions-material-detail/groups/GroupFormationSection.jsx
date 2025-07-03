@@ -58,6 +58,7 @@ const GroupFormationSection = ({
         background: "linear-gradient(135deg, #f8fafc 0%, #e6f3ff 100%)",
         overflow: "hidden",
         position: "relative",
+        marginTop: 24,
       }}
       bodyStyle={{ padding: isMobile ? "20px" : "32px" }}
     >

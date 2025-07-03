@@ -34,6 +34,8 @@ import {
   DownloadOutlined,
   UploadOutlined,
   ArrowDownOutlined,
+  WarningOutlined,
+  SyncOutlined,
 } from "@ant-design/icons";
 
 const { Title, Paragraph, Text } = Typography;
@@ -59,6 +61,7 @@ const EvaluationGuide = () => {
           steps: [
             "Klik tab 'ARCS Questionnaire' untuk melihat kuesioner yang tersedia",
             "Lihat responses dari 34 siswa yang sudah mengisi kuesioner ARCS (20 pertanyaan)",
+            "⚠️ CATATAN: Jika data siswa < 3, clustering tetap berjalan namun kualitas hasil kurang optimal",
             "Sistem otomatis melakukan clustering K-Means berdasarkan jawaban siswa",
             "Analisis hasil clustering otomatis berdasarkan 4 dimensi ARCS",
           ],
@@ -71,6 +74,7 @@ const EvaluationGuide = () => {
             "Download file template ARCS CSV dari: https://pramlearnstorage.blob.core.windows.net/media/arcs_data.csv",
             "Klik tab 'Upload ARCS Data' pada material",
             "Upload file CSV dengan data ARCS yang sudah didownload",
+            "⚠️ PENTING: Upload CSV akan langsung memperbarui skor ARCS dan clustering semua siswa",
             "Sistem akan memproses file dan melakukan clustering K-Means",
             "Analisis hasil clustering berdasarkan data CSV yang diupload",
           ],
@@ -295,7 +299,17 @@ const EvaluationGuide = () => {
                   dataSource={path.steps}
                   renderItem={(step, stepIndex) => (
                     <List.Item style={{ padding: "4px 0" }}>
-                      <Text style={{ fontSize: "13px" }}>
+                      <Text
+                        style={{
+                          fontSize: "13px",
+                          fontWeight: step.includes("⚠️ PENTING")
+                            ? "bold"
+                            : "normal",
+                          color: step.includes("⚠️ PENTING")
+                            ? "#fa8c16"
+                            : "inherit",
+                        }}
+                      >
                         {stepIndex + 1}. {step}
                       </Text>
                     </List.Item>
@@ -325,6 +339,60 @@ const EvaluationGuide = () => {
             </Col>
           ))}
         </Row>
+
+        {/* Important Warning Alert */}
+        <Alert
+          message={
+            <Space>
+              <WarningOutlined />
+              Perbedaan Penting Antara Kedua Metode Input
+            </Space>
+          }
+          description={
+            <div>
+              <div style={{ marginBottom: 8 }}>
+                <Text strong style={{ color: "#1890ff" }}>
+                  Metode 1 (Kuesioner Siswa):
+                </Text>
+                <Text style={{ marginLeft: 8 }}>
+                  Siswa mengisi kuesioner → Data tersimpan sebagai ARCSResponse
+                  → Clustering manual/otomatis
+                </Text>
+              </div>
+              <div style={{ marginBottom: 8 }}>
+                <Text strong style={{ color: "#fa8c16" }}>
+                  Metode 2 (Upload CSV):
+                </Text>
+                <Text style={{ marginLeft: 8 }}>
+                  Upload CSV → Langsung update StudentMotivationProfile →
+                  Clustering otomatis dijalankan
+                </Text>
+              </div>
+              <div
+                style={{
+                  background: "#fff2e8",
+                  padding: "8px 12px",
+                  borderRadius: 6,
+                  border: "1px solid #ffd591",
+                  marginTop: 8,
+                }}
+              >
+                <Text strong style={{ color: "#d46b08" }}>
+                  <ExclamationCircleOutlined style={{ marginRight: 4 }} />
+                  Catatan Penting:
+                </Text>
+                <Text style={{ color: "#d46b08", marginLeft: 4 }}>
+                  Jika siswa mengisi kuesioner setelah upload CSV, hasil
+                  clustering tidak otomatis berubah. Upload CSV akan menimpa
+                  data motivasi siswa yang sudah ada.
+                </Text>
+              </div>
+            </div>
+          }
+          type="warning"
+          showIcon
+          style={{ marginTop: 16, borderRadius: 8 }}
+        />
 
         {/* Final Steps */}
         <div style={{ margin: "16px 0", textAlign: "center" }}>
@@ -512,16 +580,101 @@ const EvaluationGuide = () => {
                   size="small"
                   dataSource={[
                     "✅ 34 siswa sudah mengisi kuesioner ARCS (20 pertanyaan)",
-                    "📊 Otomatis tersinkronisasi dengan database",
-                    "⚡ Clustering real-time berdasarkan jawaban",
+                    "📊 Data tersimpan sebagai ARCSResponse & ARCSAnswer",
+                    "⚠️ Clustering K-Means tetap berjalan meski data < 3 siswa",
+                    "🔄 Perlu sinkronisasi manual ke StudentMotivationProfile",
                     "🎯 Data asli dari pengalaman siswa",
                     "📈 Terintegrasi dengan sistem learning analytics",
                   ]}
                   renderItem={(item) => (
                     <List.Item style={{ padding: "4px 0" }}>
-                      <Text style={{ fontSize: "14px" }}>{item}</Text>
+                      <Text
+                        style={{
+                          fontSize: "14px",
+                          fontWeight: item.includes("⚠️ Clustering")
+                            ? "bold"
+                            : "normal",
+                          color: item.includes("⚠️ Clustering")
+                            ? "#fa8c16"
+                            : "inherit",
+                        }}
+                      >
+                        {item}
+                      </Text>
                     </List.Item>
                   )}
+                />
+                {/* New Alert about clustering with insufficient data */}
+                <Alert
+                  message={
+                    <Space>
+                      <InfoCircleOutlined />
+                      Perilaku Clustering dengan Data Terbatas
+                    </Space>
+                  }
+                  description={
+                    <div>
+                      <div style={{ marginBottom: 12 }}>
+                        <Text strong style={{ color: "#1890ff" }}>
+                          Apa yang terjadi jika data siswa kurang dari 3?
+                        </Text>
+                      </div>
+                      <div style={{ marginLeft: 16, marginBottom: 8 }}>
+                        <Text>
+                          • <Text strong>Sistem tetap berjalan:</Text> K-Means
+                          clustering tidak akan error
+                        </Text>
+                      </div>
+                      <div style={{ marginLeft: 16, marginBottom: 8 }}>
+                        <Text>
+                          • <Text strong>Kualitas clustering buruk:</Text>{" "}
+                          Beberapa cluster akan kosong atau duplikat
+                        </Text>
+                      </div>
+                      <div style={{ marginLeft: 16, marginBottom: 8 }}>
+                        <Text>
+                          • <Text strong>Klasifikasi tidak optimal:</Text> Label
+                          High/Medium/Low mungkin tidak representatif
+                        </Text>
+                      </div>
+                      <div style={{ marginLeft: 16, marginBottom: 12 }}>
+                        <Text>
+                          • <Text strong>Pembentukan kelompok terganggu:</Text>{" "}
+                          Genetic Algorithm dapat menghasilkan kelompok tidak
+                          seimbang
+                        </Text>
+                      </div>
+                      <div
+                        style={{
+                          background: "#f0f9ff",
+                          padding: "12px",
+                          borderRadius: 6,
+                          border: "1px solid #bae0ff",
+                        }}
+                      >
+                        <Text strong style={{ color: "#1890ff" }}>
+                          Rekomendasi untuk Evaluasi:
+                        </Text>
+                        <ul style={{ margin: "8px 0 0 16px", paddingLeft: 0 }}>
+                          <li>
+                            <Text style={{ color: "#1890ff" }}>
+                              Dataset saat ini (34 siswa) sudah optimal untuk
+                              clustering
+                            </Text>
+                          </li>
+                          <li>
+                            <Text style={{ color: "#1890ff" }}>
+                              Untuk testing edge case, bisa coba edit & upload
+                              CSV dengan 1-2 data saja
+                            </Text>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  }
+                  type="info"
+                  showIcon
+                  style={{ borderRadius: 8, marginTop: 16 }}
                 />
               </Card>
             </Col>
@@ -544,8 +697,8 @@ const EvaluationGuide = () => {
                   size="small"
                   dataSource={[
                     "📁 Template CSV tersedia untuk download",
-                    "🔄 Dapat memperbarui data dari sistem lain",
-                    "⚙️ Fleksibel untuk import data eksternal",
+                    "⚡ Langsung update StudentMotivationProfile",
+                    "🔄 Otomatis trigger clustering K-Means",
                     "🧪 Berguna untuk testing dengan data berbeda",
                     "📋 Mendukung bulk update data ARCS",
                   ]}
@@ -574,6 +727,72 @@ const EvaluationGuide = () => {
               </Card>
             </Col>
           </Row>
+
+          {/* New Critical Warning Alert */}
+          <Alert
+            message={
+              <Space>
+                <ExclamationCircleOutlined />
+                Peringatan Penting untuk Evaluasi Dual Input Method
+              </Space>
+            }
+            description={
+              <div>
+                <div style={{ marginBottom: 12 }}>
+                  <Text strong style={{ color: "#d46b08" }}>
+                    <SyncOutlined style={{ marginRight: 4 }} />
+                    Perbedaan Alur Data:
+                  </Text>
+                </div>
+                <div style={{ marginLeft: 16, marginBottom: 8 }}>
+                  <Text>
+                    • <Text strong>Kuesioner:</Text> ARCSResponse → (manual
+                    sync) → StudentMotivationProfile → Clustering
+                  </Text>
+                </div>
+                <div style={{ marginLeft: 16, marginBottom: 12 }}>
+                  <Text>
+                    • <Text strong>Upload CSV:</Text> File CSV → (langsung) →
+                    StudentMotivationProfile → Auto Clustering
+                  </Text>
+                </div>
+                <div
+                  style={{
+                    background: "#fff7e6",
+                    padding: "12px",
+                    borderRadius: 6,
+                    border: "1px solid #ffd591",
+                  }}
+                >
+                  <Text strong style={{ color: "#d46b08" }}>
+                    Implikasi untuk Evaluasi:
+                  </Text>
+                  <ul style={{ margin: "8px 0 0 16px", paddingLeft: 0 }}>
+                    <li>
+                      <Text style={{ color: "#d46b08" }}>
+                        Upload CSV akan menimpa data motivasi siswa yang sudah
+                        ada
+                      </Text>
+                    </li>
+                    <li>
+                      <Text style={{ color: "#d46b08" }}>
+                        Kuesioner siswa tidak otomatis memperbarui clustering
+                      </Text>
+                    </li>
+                    <li>
+                      <Text style={{ color: "#d46b08" }}>
+                        Untuk akurasi evaluasi, pilih satu metode dan gunakan
+                        konsisten
+                      </Text>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            }
+            type="warning"
+            showIcon
+            style={{ borderRadius: 8, marginTop: 16 }}
+          />
         </Card>
 
         {/* Real-time Collaboration Feature */}
@@ -776,7 +995,7 @@ const EvaluationGuide = () => {
           style={{ marginBottom: 24, borderRadius: 12 }}
         >
           <Collapse
-            defaultActiveKey={["0"]}
+            // defaultActiveKey={["0"]}
             items={technicalAspects.map((aspect, index) => ({
               key: index.toString(),
               label: aspect.category,
@@ -813,7 +1032,7 @@ const EvaluationGuide = () => {
           style={{ marginBottom: 24, borderRadius: 12 }}
         >
           <Collapse
-            defaultActiveKey={["0"]}
+            // defaultActiveKey={["0"]}
             items={dataAvailable.map((data, index) => ({
               key: index.toString(),
               label: data.category,
@@ -902,11 +1121,11 @@ const EvaluationGuide = () => {
               <List
                 size="small"
                 dataSource={[
-                  "Dual Input Method: Evaluasi kedua metode input data ARCS (kuesioner vs upload CSV)",
-                  "Algoritma Clustering: Evaluasi efektivitas K-Means dari kedua sumber data",
+                  "Dual Input Method: Evaluasi kedua metode input data ARCS (kuesioner vs upload CSV) dan perbedaan alur datanya",
+                  "Algoritma Clustering: Evaluasi efektivitas K-Means dari kedua sumber data dengan memahami limitasi sinkronisasi",
                   "Pembentukan Kelompok: Test DEAP Genetic Algorithm untuk optimasi kelompok heterogen vs homogen",
                   "Teams Games Tournament: Evaluasi 6 quiz kelompok dengan real-time collaboration menggunakan WebSocket",
-                  "CSV Processing: Test fitur upload file CSV dengan template yang disediakan",
+                  "CSV Processing: Test fitur upload file CSV dengan template yang disediakan dan dampaknya pada clustering",
                   "Real-time Features: Test sinkronisasi jawaban, navigasi soal, dan auto-submit dalam kelompok",
                   "Learning Analytics: Analisis student activities, attendance, dan progress tracking",
                   "Usability Testing: Kemudahan penggunaan dari perspektif teacher (clustering) dan student (quiz collaboration)",

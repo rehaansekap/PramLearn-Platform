@@ -174,159 +174,190 @@ const useSessionGroupFormation = (materialSlug, onGroupsChanged) => {
       let warningText = "";
       if (response.data.warning) {
         warningText = `
-        <div style="background: #fff7e6; padding: 12px; border-radius: 6px; margin-bottom: 12px; border-left: 4px solid #faad14;">
-          <strong>⚠️ Peringatan:</strong><br/>
-          ${response.data.warning}
-        </div>
-      `;
+      <div style="background: #fff7e6; padding: 12px; border-radius: 6px; margin-bottom: 12px; border-left: 4px solid #faad14;">
+        <strong>⚠️ Peringatan:</strong><br/>
+        ${response.data.warning}
+      </div>
+    `;
       }
 
       // Show success with detailed info
       if (response.data.motivation_distribution) {
         const dist = response.data.motivation_distribution;
         const distributionText = `
-          Distribusi Motivasi:
-          • Tinggi: ${dist.High} siswa
-          • Sedang: ${dist.Medium} siswa  
-          • Rendah: ${dist.Low} siswa
-          ${
-            dist.Unanalyzed > 0
-              ? `• Belum Dianalisis: ${dist.Unanalyzed} siswa`
-              : ""
-          }
-        `;
+        Distribusi Motivasi:
+        • Tinggi: ${dist.High} siswa
+        • Sedang: ${dist.Medium} siswa  
+        • Rendah: ${dist.Low} siswa
+        ${
+          dist.Unanalyzed > 0
+            ? `• Belum Dianalisis: ${dist.Unanalyzed} siswa`
+            : ""
+        }
+      `;
 
         await Swal.fire({
           title: "Kelompok Berhasil Dibuat! 🎉",
           html: `
-          <div style="text-align: left;">
-            <p><strong>${response.data.message}</strong></p>
-            <p style="margin: 8px 0; color: #1677ff;"><strong>${
-              response.data.quality_message || ""
-            }</strong></p>
+        <div style="text-align: left; max-height: 60vh; overflow-y: auto; padding-right: 10px;">
+          <p><strong>${response.data.message}</strong></p>
+          <p style="margin: 8px 0; color: #1677ff;"><strong>${
+            response.data.quality_message || ""
+          }</strong></p>
+          
+          ${warningText}
             
-            ${warningText}
-              <br/>
-              
-              <!-- Quality Analysis -->
-             ${
-               response.data.quality_analysis
-                 ? `
-              <div style="background: #f0f7ff; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
-                <strong>📊 Analisis Kualitas Kelompok:</strong><br/>
-                • Mode: ${response.data.quality_analysis.formation_mode}<br/>
-                • Keseimbangan: ${
-                  response.data.quality_analysis.interpretation?.balance ||
-                  "Tidak Tersedia"
-                } (${(
-                     response.data.quality_analysis.balance_score * 100
-                   ).toFixed(1)}%)<br/>
-                • Keberagaman: ${
-                  response.data.quality_analysis.interpretation
-                    ?.heterogeneity || "Tidak Tersedia"
-                } (${(
-                     response.data.quality_analysis.heterogeneity_score * 100
-                   ).toFixed(1)}%)<br/>
-                • Keseragaman: ${
-                  response.data.quality_analysis.interpretation?.uniformity ||
-                  "Tidak Tersedia"
-                } (${(
-                     response.data.quality_analysis.uniformity_score * 100
-                   ).toFixed(1)}%)<br/>
-              </div>
-            `
-                 : ""
-             }
-              
-              <!-- Export Button -->
-              <div style="text-align: center; margin: 16px 0; padding: 12px; background: #f8f9fa; border-radius: 6px;">
-                <p style="margin: 0 0 8px 0; color: #1677ff; font-weight: 500;">
-                  📄 Laporan analisis lengkap tersedia untuk didownload
-                </p>
-                <button 
-                  onclick="window.exportGroupAnalysisFromSwal && window.exportGroupAnalysisFromSwal()"
-                  style="
-                    background: #11418b; 
-                    color: white; 
-                    border: none; 
-                    padding: 8px 16px; 
-                    border-radius: 6px; 
-                    cursor: pointer; 
-                    font-weight: 500;
-                  "
-                >
-                  📥 Download Laporan PDF
-                </button>
-              </div>
-              
-              <!-- Group Summary -->
-              ${
-                response.data.groups && response.data.groups.length > 8
-                  ? `
-                <div style="background: #f8f9fa; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
-                  <strong>👥 Ringkasan Kelompok (${
-                    response.data.groups.length
-                  } kelompok):</strong><br/>
-                  <div style="max-height: 150px; overflow-y: auto; margin-top: 8px;">
-                    ${response.data.groups
-                      .map(
-                        (group, index) => `
-                      <div style="margin: 2px 0; padding: 4px; background: white; border-radius: 4px; font-size: 12px;">
-                        <strong>${group.name}</strong> (${group.size} siswa): 
-                        H:${group.motivation_distribution.High} 
-                        M:${group.motivation_distribution.Medium} 
-                        L:${group.motivation_distribution.Low}
-                      </div>
-                    `
-                      )
-                      .join("")}
-                  </div>
-                </div>
-              `
-                  : `
-                <div style="margin-top: 12px;">
-                  <strong>👥 Detail Kelompok:</strong><br/>
-                  ${
-                    response.data.groups
-                      ?.map(
-                        (group, index) => `
-                    <div style="margin: 4px 0; padding: 8px; background: #f8f9fa; border-radius: 4px;">
-                      <strong>${group.name}</strong> (${
-                          group.size
-                        } anggota)<br/>
-                      <small style="color: #666;">
-                        ${
-                          group.motivation_distribution.High > 0
-                            ? `Tinggi: ${group.motivation_distribution.High} `
-                            : ""
-                        }
-                        ${
-                          group.motivation_distribution.Medium > 0
-                            ? `Sedang: ${group.motivation_distribution.Medium} `
-                            : ""
-                        }
-                        ${
-                          group.motivation_distribution.Low > 0
-                            ? `Rendah: ${group.motivation_distribution.Low}`
-                            : ""
-                        }
-                        ${group.size === 0 ? "Kosong" : ""}
-                      </small>
+            <!-- Quality Analysis -->
+           ${
+             response.data.quality_analysis
+               ? `
+            <div style="background: #f0f7ff; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
+              <strong>📊 Analisis Kualitas Kelompok:</strong><br/>
+              • Mode: ${response.data.quality_analysis.formation_mode}<br/>
+              • Keseimbangan: ${
+                response.data.quality_analysis.interpretation?.balance ||
+                "Tidak Tersedia"
+              } (${(response.data.quality_analysis.balance_score * 100).toFixed(
+                   1
+                 )}%)<br/>
+              • Keberagaman: ${
+                response.data.quality_analysis.interpretation?.heterogeneity ||
+                "Tidak Tersedia"
+              } (${(
+                   response.data.quality_analysis.heterogeneity_score * 100
+                 ).toFixed(1)}%)<br/>
+              • Keseragaman: ${
+                response.data.quality_analysis.interpretation?.uniformity ||
+                "Tidak Tersedia"
+              } (${(
+                   response.data.quality_analysis.uniformity_score * 100
+                 ).toFixed(1)}%)<br/>
+            </div>
+          `
+               : ""
+           }
+            
+            <!-- Export Button -->
+            <div style="text-align: center; margin: 16px 0; padding: 12px; background: #f8f9fa; border-radius: 6px;">
+              <p style="margin: 0 0 8px 0; color: #1677ff; font-weight: 500;">
+                📄 Laporan analisis lengkap tersedia untuk didownload
+              </p>
+              <button 
+                onclick="window.exportGroupAnalysisFromSwal && window.exportGroupAnalysisFromSwal()"
+                style="
+                  background: #11418b; 
+                  color: white; 
+                  border: none; 
+                  padding: 8px 16px; 
+                  border-radius: 6px; 
+                  cursor: pointer; 
+                  font-weight: 500;
+                "
+              >
+                📥 Download Laporan PDF
+              </button>
+            </div>
+            
+            <!-- Group Summary -->
+            ${
+              response.data.groups && response.data.groups.length > 8
+                ? `
+              <div style="background: #f8f9fa; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
+                <strong>👥 Ringkasan Kelompok (${
+                  response.data.groups.length
+                } kelompok):</strong><br/>
+                <div style="max-height: 150px; overflow-y: auto; margin-top: 8px;">
+                  ${response.data.groups
+                    .map(
+                      (group, index) => `
+                    <div style="margin: 2px 0; padding: 4px; background: white; border-radius: 4px; font-size: 12px;">
+                      <strong>${group.name}</strong> (${group.size} siswa): 
+                      H:${group.motivation_distribution.High} 
+                      M:${group.motivation_distribution.Medium} 
+                      L:${group.motivation_distribution.Low}
                     </div>
                   `
-                      )
-                      .join("") || ""
-                  }
+                    )
+                    .join("")}
                 </div>
-              `
-              }
-            </div>
-          `,
+              </div>
+            `
+                : `
+              <div style="margin-top: 12px;">
+                <strong>👥 Detail Kelompok:</strong><br/>
+                ${
+                  response.data.groups
+                    ?.map(
+                      (group, index) => `
+                  <div style="margin: 4px 0; padding: 8px; background: #f8f9fa; border-radius: 4px;">
+                    <strong>${group.name}</strong> (${group.size} anggota)<br/>
+                    <small style="color: #666;">
+                      ${
+                        group.motivation_distribution.High > 0
+                          ? `Tinggi: ${group.motivation_distribution.High} `
+                          : ""
+                      }
+                      ${
+                        group.motivation_distribution.Medium > 0
+                          ? `Sedang: ${group.motivation_distribution.Medium} `
+                          : ""
+                      }
+                      ${
+                        group.motivation_distribution.Low > 0
+                          ? `Rendah: ${group.motivation_distribution.Low}`
+                          : ""
+                      }
+                      ${group.size === 0 ? "Kosong" : ""}
+                    </small>
+                  </div>
+                `
+                    )
+                    .join("") || ""
+                }
+              </div>
+            `
+            }
+          </div>
+        `,
           icon: "success",
           confirmButtonText: "Tutup",
           confirmButtonColor: "#11418b",
-          width: 700,
+          width: 600,
+          heightAuto: false,
+          customClass: {
+            popup: "swal-scrollable-modal",
+            htmlContainer: "swal-scrollable-content",
+          },
           didOpen: () => {
+            // Add custom CSS for scrolling
+            const style = document.createElement("style");
+            style.textContent = `
+            .swal-scrollable-modal {
+              max-height: 90vh !important;
+              overflow: hidden !important;
+            }
+            .swal-scrollable-content {
+              max-height: 60vh !important;
+              overflow-y: auto !important;
+              padding-right: 10px !important;
+            }
+            .swal-scrollable-content::-webkit-scrollbar {
+              width: 6px;
+            }
+            .swal-scrollable-content::-webkit-scrollbar-track {
+              background: #f1f1f1;
+              border-radius: 10px;
+            }
+            .swal-scrollable-content::-webkit-scrollbar-thumb {
+              background: #c1c1c1;
+              border-radius: 10px;
+            }
+            .swal-scrollable-content::-webkit-scrollbar-thumb:hover {
+              background: #a8a8a8;
+            }
+          `;
+            document.head.appendChild(style);
+
             // Make export function available to the button in SweetAlert
             window.exportGroupAnalysisFromSwal = () => {
               Swal.close();
@@ -336,6 +367,14 @@ const useSessionGroupFormation = (materialSlug, onGroupsChanged) => {
           willClose: () => {
             // Clean up the global function
             delete window.exportGroupAnalysisFromSwal;
+
+            // Remove custom CSS
+            const customStyle = document.querySelector(
+              "style[data-swal-scrollable]"
+            );
+            if (customStyle) {
+              customStyle.remove();
+            }
           },
         });
       }
@@ -416,7 +455,215 @@ const useSessionGroupFormation = (materialSlug, onGroupsChanged) => {
       setGroupMessage(response.data.message);
       message.success("Kelompok berhasil dibuat ulang!");
 
-      // IMPORTANT: Call the callback to refresh groups data
+      // Show detailed success alert with data for overwrite
+      let warningText = "";
+      if (response.data.warning) {
+        warningText = `
+        <div style="background: #fff7e6; padding: 12px; border-radius: 6px; margin-bottom: 12px; border-left: 4px solid #faad14;">
+          <strong>⚠️ Peringatan:</strong><br/>
+          ${response.data.warning}
+        </div>
+      `;
+      }
+
+      if (response.data.motivation_distribution) {
+        await Swal.fire({
+          title: "Kelompok Berhasil Ditimpa! 🔄",
+          html: `
+          <div style="text-align: left; max-height: 60vh; overflow-y: auto; padding-right: 10px;">
+            <p><strong>${response.data.message}</strong></p>
+            <p style="margin: 8px 0; color: #52c41a;"><strong>✅ Kelompok lama telah diganti dengan yang baru</strong></p>
+            <p style="margin: 8px 0; color: #1677ff;"><strong>${
+              response.data.quality_message || ""
+            }</strong></p>
+            
+            ${warningText}
+              
+              <!-- Quality Analysis -->
+             ${
+               response.data.quality_analysis
+                 ? `
+              <div style="background: #f0f7ff; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
+                <strong>📊 Analisis Kualitas Kelompok Baru:</strong><br/>
+                • Mode: ${response.data.quality_analysis.formation_mode}<br/>
+                • Keseimbangan: ${
+                  response.data.quality_analysis.interpretation?.balance ||
+                  "Tidak Tersedia"
+                } (${(
+                     response.data.quality_analysis.balance_score * 100
+                   ).toFixed(1)}%)<br/>
+                • Keberagaman: ${
+                  response.data.quality_analysis.interpretation
+                    ?.heterogeneity || "Tidak Tersedia"
+                } (${(
+                     response.data.quality_analysis.heterogeneity_score * 100
+                   ).toFixed(1)}%)<br/>
+                • Keseragaman: ${
+                  response.data.quality_analysis.interpretation?.uniformity ||
+                  "Tidak Tersedia"
+                } (${(
+                     response.data.quality_analysis.uniformity_score * 100
+                   ).toFixed(1)}%)<br/>
+              </div>
+            `
+                 : ""
+             }
+              
+              <!-- Export Button -->
+              <div style="text-align: center; margin: 16px 0; padding: 12px; background: #f8f9fa; border-radius: 6px;">
+                <p style="margin: 0 0 8px 0; color: #1677ff; font-weight: 500;">
+                  📄 Laporan analisis lengkap tersedia untuk didownload
+                </p>
+                <button 
+                  onclick="window.exportGroupAnalysisFromSwal && window.exportGroupAnalysisFromSwal()"
+                  style="
+                    background: #11418b; 
+                    color: white; 
+                    border: none; 
+                    padding: 8px 16px; 
+                    border-radius: 6px; 
+                    cursor: pointer; 
+                    font-weight: 500;
+                  "
+                >
+                  📥 Download Laporan PDF
+                </button>
+              </div>
+              
+              <!-- Group Summary -->
+              ${
+                response.data.groups && response.data.groups.length > 8
+                  ? `
+                <div style="background: #f8f9fa; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
+                  <strong>👥 Ringkasan Kelompok Baru (${
+                    response.data.groups.length
+                  } kelompok):</strong><br/>
+                  <div style="max-height: 150px; overflow-y: auto; margin-top: 8px;">
+                    ${response.data.groups
+                      .map(
+                        (group, index) => `
+                      <div style="margin: 2px 0; padding: 4px; background: white; border-radius: 4px; font-size: 12px;">
+                        <strong>${group.name}</strong> (${group.size} siswa): 
+                        H:${group.motivation_distribution.High} 
+                        M:${group.motivation_distribution.Medium} 
+                        L:${group.motivation_distribution.Low}
+                      </div>
+                    `
+                      )
+                      .join("")}
+                  </div>
+                </div>
+              `
+                  : `
+                <div style="margin-top: 12px;">
+                  <strong>👥 Detail Kelompok Baru:</strong><br/>
+                  ${
+                    response.data.groups
+                      ?.map(
+                        (group, index) => `
+                    <div style="margin: 4px 0; padding: 8px; background: #f8f9fa; border-radius: 4px;">
+                      <strong>${group.name}</strong> (${
+                          group.size
+                        } anggota)<br/>
+                      <small style="color: #666;">
+                        ${
+                          group.motivation_distribution.High > 0
+                            ? `Tinggi: ${group.motivation_distribution.High} `
+                            : ""
+                        }
+                        ${
+                          group.motivation_distribution.Medium > 0
+                            ? `Sedang: ${group.motivation_distribution.Medium} `
+                            : ""
+                        }
+                        ${
+                          group.motivation_distribution.Low > 0
+                            ? `Rendah: ${group.motivation_distribution.Low}`
+                            : ""
+                        }
+                        ${group.size === 0 ? "Kosong" : ""}
+                      </small>
+                    </div>
+                  `
+                      )
+                      .join("") || ""
+                  }
+                </div>
+              `
+              }
+            </div>
+          `,
+          icon: "success",
+          confirmButtonText: "Tutup",
+          confirmButtonColor: "#52c41a",
+          width: 600,
+          heightAuto: false,
+          customClass: {
+            popup: "swal-scrollable-modal",
+            htmlContainer: "swal-scrollable-content",
+          },
+          didOpen: () => {
+            // Add custom CSS for scrolling
+            const style = document.createElement("style");
+            style.textContent = `
+              .swal-scrollable-modal {
+                max-height: 90vh !important;
+                overflow: hidden !important;
+              }
+              .swal-scrollable-content {
+                max-height: 60vh !important;
+                overflow-y: auto !important;
+                padding-right: 10px !important;
+              }
+              .swal-scrollable-content::-webkit-scrollbar {
+                width: 6px;
+              }
+              .swal-scrollable-content::-webkit-scrollbar-track {
+                background: #f1f1f1;
+                border-radius: 10px;
+              }
+              .swal-scrollable-content::-webkit-scrollbar-thumb {
+                background: #c1c1c1;
+                border-radius: 10px;
+              }
+              .swal-scrollable-content::-webkit-scrollbar-thumb:hover {
+                background: #a8a8a8;
+              }
+            `;
+            document.head.appendChild(style);
+
+            // Make export function available to the button in SweetAlert
+            window.exportGroupAnalysisFromSwal = () => {
+              Swal.close();
+              exportGroupAnalysis();
+            };
+          },
+          willClose: () => {
+            // Clean up the global function
+            delete window.exportGroupAnalysisFromSwal;
+
+            // Remove custom CSS
+            const customStyle = document.querySelector(
+              "style[data-swal-scrollable]"
+            );
+            if (customStyle) {
+              customStyle.remove();
+            }
+          },
+        });
+      } else {
+        // Fallback jika tidak ada data detail
+        await Swal.fire({
+          title: "Kelompok Berhasil Ditimpa! 🔄",
+          text:
+            response.data.message ||
+            "Kelompok lama telah diganti dengan kelompok baru.",
+          icon: "success",
+          confirmButtonText: "Tutup",
+          confirmButtonColor: "#52c41a",
+        });
+      }
+
       if (onGroupsChanged) {
         await onGroupsChanged();
       }

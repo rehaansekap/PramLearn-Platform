@@ -1,0 +1,383 @@
+﻿1. Apakah sebutan untuk sekumpulan dua atau lebih perangkat komputasi yang saling terhubung untuk berbagi sumber daya?
+a. Sistem Operasi
+b. Jaringan Komputer
+c. Topologi
+d. Protokol
+e. Internet
+correct answer = b
+2. Jenis jaringan komputer apakah yang memiliki skala jangkauan paling kecil untuk menghubungkan perangkat pribadi seperti smartphone dengan headset bluetooth?
+a. LAN
+b. MAN
+c. WAN
+d. PAN
+e. Internet
+correct answer = d
+3. Perangkat keras apakah yang berfungsi untuk menghubungkan dua atau lebih jaringan yang berbeda, seperti menghubungkan LAN ke internet?
+a. Switch
+b. Hub
+c. Router
+d. Repeater
+e. Access Point
+correct answer = c
+4. Apakah sebutan untuk alamat fisik unik yang tidak bisa diubah dan menjadi identitas pada setiap kartu jaringan (NIC)?
+a. IP Address
+b. Subnet Mask
+c. Gateway
+d. MAC Address
+e. DNS Address
+correct answer = d
+5. Apakah nama kumpulan protokol yang menjadi aturan standar untuk komunikasi data di seluruh jaringan internet?
+a. HTTP/FTP
+b. TCP/IP
+c. POP3/SMTP
+d. LAN/WAN
+e. OSI Layer
+correct answer = b
+6. Dalam model client-server, apakah sebutan untuk komputer yang meminta atau mengakses layanan dari komputer lain?
+a. Server
+b. Host
+c. Client
+d. Node
+e. Terminal
+correct answer = c
+7. Manakah di bawah ini yang merupakan contoh dari media transmisi jaringan yang menggunakan kabel?
+a. Bluetooth
+b. Wi-Fi
+c. Infrared
+d. UTP dan Fiber Optic
+e. Satelit
+correct answer = d
+8. Apakah nama proyek penelitian di Amerika Serikat pada tahun 1960-an yang menjadi cikal bakal lahirnya internet?
+a. ETHERNET
+b. WWW
+c. ARPANET
+d. NSFNET
+e. SATNET
+correct answer = c
+9. Selain biaya dan manajemen, apakah salah satu kerugian atau risiko utama yang harus dihadapi dalam sebuah jaringan komputer?
+a. Kecepatan transfer data
+b. Masalah keamanan
+c. Keterbatasan jarak
+d. Kompatibilitas perangkat
+e. Kebutuhan listrik
+correct answer = b
+10. Manakah pernyataan yang paling tepat untuk menjelaskan perbedaan utama antara Hub dan Switch?
+a. Hub lebih cepat dari Switch
+b. Switch mengirimkan data ke semua port, sedangkan Hub hanya ke tujuan
+c. Hub mengirimkan data ke semua port, sedangkan Switch hanya ke port tujuan
+d. Hub digunakan untuk WAN, Switch untuk LAN
+e. Hub dan Switch memiliki fungsi yang sama persis
+correct answer = c
+11. Dalam sebuah jaringan nirkabel, apakah fungsi utama dari sebuah Access Point (AP)?
+a. Mengatur rute antar jaringan yang berbeda
+b. Menjadi jembatan antara jaringan kabel dan perangkat nirkabel
+c. Menyimpan semua data penting perusahaan
+d. Menjaga keamanan seluruh jaringan dari serangan luar
+e. Menerjemahkan alamat IP menjadi MAC Address
+correct answer = b
+12. Jaringan komputer yang menghubungkan kantor-kantor cabang sebuah bank di seluruh kota Bandung merupakan contoh implementasi dari jenis jaringan apa?
+a. LAN
+b. MAN
+c. WAN
+d. PAN
+e. Internet
+correct answer = b
+13. Ketika sebuah laboratorium komputer dengan 30 PC dapat menggunakan satu printer secara bersama-sama, manfaat jaringan komputer dalam hal apakah yang ditunjukkan?
+a. Keamanan data
+b. Reliabilitas tinggi
+c. Komunikasi efisien
+d. Menghemat biaya dan sumber daya
+e. Akses informasi global
+correct answer = d
+14. Manakah situasi yang paling baik dalam mendeskripsikan konsep reliabilitas tinggi dalam sebuah jaringan?
+a. Jaringan memiliki kecepatan internet yang sangat tinggi
+b. Data penting perusahaan disalin secara otomatis ke server cadangan
+c. Semua komputer dalam jaringan menggunakan merek yang sama
+d. Jaringan dapat diakses dari mana saja di seluruh dunia
+e. Biaya pembangunan jaringan sangat murah
+correct answer = b
+15. Apakah perbedaan mendasar antara Internet dengan World Wide Web (WWW)?
+a. Keduanya adalah hal yang sama persis
+b. Internet adalah layanannya, WWW adalah infrastrukturnya
+c. Internet adalah infrastruktur fisiknya, WWW adalah salah satu layanan di atasnya
+d. Internet hanya ada di Amerika, WWW ada di seluruh dunia
+e. WWW lebih cepat daripada Internet
+correct answer = c
+16. Mengapa tahap analisis kebutuhan pengguna dianggap sangat penting sebelum membangun jaringan?
+a. Agar bisa membeli perangkat dengan merek termahal
+b. Untuk memastikan jaringan yang dibangun sesuai dengan tujuan dan anggaran
+c. Untuk mempercepat proses instalasi kabel jaringan
+d. Agar bisa langsung menentukan alamat IP untuk setiap komputer
+e. Untuk memilih warna kabel yang paling bagus
+correct answer = b
+17. Bagaimana cara kerja sebuah Router dalam mengirimkan data antar jaringan?
+a. Dengan meneruskan data ke semua perangkat yang terhubung
+b. Dengan mengenali alamat fisik (MAC Address) perangkat tujuan
+c. Dengan memilih rute terbaik berdasarkan alamat logika (IP Address) tujuan
+d. Dengan memperkuat sinyal yang diterima lalu memancarkannya kembali
+e. Dengan mengubah sinyal digital menjadi sinyal analog
+correct answer = c
+18. Apakah contoh dampak yang terjadi jika server pusat sebuah bank mengalami kegagalan total tanpa adanya cadangan?
+a. Nasabah tidak bisa menarik uang melalui ATM
+b. Kecepatan internet di kantor bank menjadi lambat
+c. Tampilan website bank berubah menjadi jelek
+d. Semua komputer nasabah akan terinfeksi virus
+e. Biaya administrasi bulanan nasabah akan naik
+correct answer = a
+19. Anda ditugaskan membangun jaringan di lab komputer dengan 40 PC dan 1 server. Agar komunikasi efisien, perangkat sentral apakah yang paling tepat untuk digunakan?
+a. Hub
+b. Switch
+c. Router
+d. Modem
+e. Repeater
+correct answer = b
+20. Saat Anda mengunggah foto ke Instagram dari smartphone Anda, peran smartphone Anda dalam proses tersebut adalah sebagai?
+a. Server
+b. Client
+c. Router
+d. Switch
+e. Protokol
+correct answer = b
+21. Sebuah perusahaan multinasional ingin menghubungkan kantor pusat di Jakarta dengan kantor cabang di Singapura dan Kuala Lumpur. Jenis jaringan apakah yang harus mereka bangun?
+a. LAN
+b. MAN
+c. WAN
+d. PAN
+e. Peer-to-Peer
+correct answer = c
+22. Sebuah warung internet (warnet) memiliki 10 komputer untuk pelanggan yang semuanya harus bisa mengakses internet dan berbagi data. Jenis jaringan apakah yang paling tepat untuk dibangun di dalam warnet tersebut?
+a. WAN
+b. MAN
+c. PAN
+d. LAN
+e. Internet
+correct answer = d
+23. Jika Anda diminta untuk menghubungkan 5 komputer dan 1 printer di dalam satu ruangan kantor kecil agar bisa saling berbagi file, jenis jaringan apakah yang sedang Anda bangun?
+a. WAN
+b. MAN
+c. Internet
+d. LAN
+e. PAN
+correct answer = e
+24. Sebuah perusahaan ingin menghubungkan dua gedung yang terpisah sejauh 1 km dengan koneksi yang sangat cepat dan tahan terhadap gangguan cuaca. Media transmisi apakah yang paling ideal untuk kebutuhan ini?
+a. Kabel UTP Cat 5e
+b. Wi-Fi
+c. Bluetooth
+d. Kabel Fiber Optic
+e. Infrared
+correct answer = d
+25. Sebuah kantor hanya memiliki satu koneksi internet. Perangkat apakah yang dibutuhkan agar koneksi tersebut bisa dibagikan ke semua komputer karyawan?
+a. Server
+b. Switch
+c. Router
+d. Printer
+e. Scanner
+correct answer = c
+26. Di lantai dua sebuah rumah, sinyal Wi-Fi dari router di lantai satu sangat lemah. Perangkat apakah yang paling praktis untuk dipasang guna memperluas jangkauan sinyal nirkabel tersebut?
+a. Hub
+b. Access Point
+c. Modem baru
+d. Server
+e. Kabel LAN
+correct answer = b
+27. Dalam jaringan rumah Anda, perangkat manakah yang berfungsi sebagai gerbang utama (gateway) yang menghubungkan jaringan lokal Anda ke Internet?
+a. Switch
+b. NIC
+c. Server
+d. Router
+e. Kabel UTP
+correct answer = d
+28. Sebuah jaringan LAN dengan 30 komputer yang menggunakan Hub terasa sangat lambat saat banyak pengguna aktif. Apakah penyebab yang paling mungkin dari masalah ini?
+a. Kabel UTP yang digunakan terlalu panjang
+b. Terlalu sering terjadi tabrakan data (collision) karena sifat Hub
+c. Server yang digunakan memiliki spesifikasi rendah
+d. Semua komputer terinfeksi virus yang sama
+e. Kurangnya alamat IP yang tersedia
+correct answer = b
+29. Dibandingkan dengan kabel UTP, apakah keunggulan utama dari media transmisi Fiber Optic?
+a. Harga yang lebih murah dan instalasi yang mudah
+b. Fleksibilitas dan tidak memerlukan perangkat khusus
+c. Kecepatan transfer data yang jauh lebih tinggi dan tahan interferensi
+d. Ketersediaan yang lebih luas di pasaran
+e. Kompatibilitas dengan semua jenis perangkat lama
+correct answer = c
+30. Perhatikan pernyataan berikut:
+   * Menghubungkan perangkat dalam satu segmen jaringan lokal.
+   * Bekerja menggunakan MAC Address untuk mengirim data.
+   * Menentukan rute terbaik untuk mengirim data antar jaringan yang berbeda.
+   * Bekerja menggunakan IP Address untuk mengambil keputusan.
+Dari pernyataan tersebut, manakah yang mendeskripsikan peran sebuah Router?
+a. 1 dan 2
+b. 2 dan 3
+c. 3 dan 4
+d. 1 dan 4
+e. 2 dan 4
+correct answer = c
+   31. Untuk membangun jaringan Wi-Fi di rumah yang dapat terhubung ke internet, kombinasi perangkat minimal apakah yang harus dimiliki?
+a. Switch, Hub, dan Kabel UTP
+b. Modem, Router dengan fitur Wi-Fi/AP, dan NIC pada perangkat client
+c. Server, Client, dan Kabel Fiber Optic
+d. Repeater, Switch, dan Server
+e. Hub, NIC, dan Modem
+correct answer = b
+   32. Saat menggunakan jaringan Wi-Fi publik di kafe atau bandara, apakah risiko keamanan utama yang harus diwaspadai oleh pengguna?
+a. Kecepatan internet yang menjadi lambat
+b. Baterai perangkat menjadi cepat habis
+c. Potensi pencurian data pribadi oleh pihak ketiga (Man-in-the-Middle Attack)
+d. Perangkat menjadi panas karena terlalu banyak pengguna
+e. Sinyal yang diterima tidak stabil
+correct answer = c
+   33. Apakah perbedaan mendasar antara MAC Address dan IP Address?
+a. MAC Address bisa diubah, IP Address tidak bisa
+b. MAC Address digunakan untuk identifikasi di internet, IP Address di LAN
+c. MAC Address adalah alamat fisik permanen, IP Address adalah alamat logika yang bisa berubah
+d. Keduanya adalah alamat yang sama, hanya beda nama
+e. MAC Address hanya ada di router, IP Address di semua perangkat
+correct answer = c
+   34. Mengapa koneksi menggunakan Wi-Fi umumnya dianggap kurang stabil dibandingkan koneksi menggunakan kabel Ethernet?
+a. Karena Wi-Fi lebih mahal
+b. Karena sinyal Wi-Fi rentan terhadap interferensi dari perangkat lain dan halangan fisik
+c. Karena Wi-Fi memerlukan driver khusus yang sulit ditemukan
+d. Karena Wi-Fi mengonsumsi lebih banyak daya listrik
+e. Karena Wi-Fi tidak bisa digunakan untuk bermain game
+correct answer = b
+   35. Jika semua komputer di sebuah LAN bisa saling berkomunikasi tetapi tidak ada satupun yang bisa mengakses internet, di manakah kemungkinan besar letak masalahnya?
+a. Pada masing-masing NIC komputer
+b. Pada Switch yang menghubungkan komputer
+c. Pada kabel UTP setiap komputer
+d. Pada Router atau koneksi ke modem
+e. Pada sistem operasi setiap komputer
+correct answer = d
+   36. Dalam sebuah jaringan kantor, komputer-komputer karyawan terhubung ke sebuah Switch, dan Switch tersebut terhubung ke sebuah Router yang tersambung ke internet. Apakah fungsi utama Switch dalam skenario ini?
+a. Memberikan koneksi internet ke semua komputer
+b. Menjadi jembatan komunikasi antar komputer di dalam kantor
+c. Memberikan keamanan dari serangan virus
+d. Menyimpan semua file pekerjaan karyawan
+e. Menentukan rute terbaik ke server Google
+correct answer = b
+   37. Menurut prinsip perancangan jaringan yang baik, langkah manakah yang paling krusial dan harus ditentukan pertama kali sebelum membeli perangkat?
+a. Memilih merek perangkat yang paling terkenal
+b. Menentukan skema pengalamatan IP Address
+c. Menganalisis kebutuhan bisnis dan teknis dari pengguna
+d. Menggambar topologi fisik jaringan secara detail
+e. Membeli kabel dengan kualitas paling mahal
+correct answer = c
+   38. Seorang teknisi menyarankan untuk menghubungkan server data penting perusahaan langsung ke internet tanpa pelindung seperti router atau firewall, dengan alasan agar mudah diakses. Mengapa saran ini sangat tidak direkomendasikan?
+a. Akan membuat koneksi server menjadi lambat
+b. Membuat server sangat rentan terhadap serangan langsung dari internet
+c. Akan menghabiskan biaya internet yang sangat mahal
+d. Akan menyulitkan karyawan untuk mengakses server
+e. Akan merusak kartu jaringan (NIC) pada server
+correct answer = b
+   39. Sebuah sekolah dengan anggaran terbatas ingin menyediakan koneksi internet untuk 30 komputer di lab. Pilihan media transmisi apakah yang paling realistis dari segi biaya dan kemudahan instalasi?
+a. Fiber Optic
+b. Kabel UTP
+c. Satelit
+d. Bluetooth
+e. Infrared
+correct answer = b
+   40. Untuk sebuah turnamen e-sports yang menuntut koneksi paling stabil dan latensi (delay) terendah, mengapa penggunaan jaringan kabel (LAN) lebih direkomendasikan daripada Wi-Fi?
+a. Jaringan kabel lebih mudah dipasang daripada Wi-Fi
+b. Jaringan kabel memiliki jangkauan yang lebih luas
+c. Jaringan kabel lebih aman dari peretasan
+d. Jaringan kabel lebih stabil dan minim interferensi gelombang radio
+e. Jaringan kabel tidak memerlukan router
+correct answer = d
+   41. Seorang admin jaringan memutuskan untuk menggunakan Hub daripada Switch untuk jaringan kantor baru dengan 50 komputer dengan alasan harga Hub lebih murah. Dari sudut pandang performa, mengapa keputusan ini kurang tepat?
+a. Hub memerlukan konfigurasi yang lebih rumit
+b. Hub akan menyebabkan traffic jaringan menjadi padat dan lambat
+c. Hub mengonsumsi daya listrik yang lebih besar
+d. Hub tidak kompatibel dengan komputer modern
+e. Hub tidak dapat terhubung ke internet
+correct answer = b
+   42. Mengapa sebuah perusahaan besar lebih memilih menggunakan server fisik sendiri (on-premise) daripada hanya mengandalkan cloud storage untuk data yang sangat rahasia?
+a. Karena server sendiri lebih murah dalam segala aspek
+b. Untuk memiliki kendali penuh atas keamanan dan akses fisik terhadap data
+c. Karena cloud storage tidak bisa diakses dari Indonesia
+d. Karena server sendiri memiliki kapasitas tidak terbatas
+e. Karena cloud storage tidak menyediakan fitur backup
+correct answer = b
+   43. Dalam konteks jaringan nirkabel, mengapa penggunaan password yang kuat dan terenkripsi dianggap sebagai langkah keamanan yang fundamental?
+a. Agar koneksi menjadi lebih cepat
+b. Untuk mencegah pengguna tidak sah mengakses jaringan dan mencuri data
+c. Agar nama Wi-Fi (SSID) bisa disembunyikan
+d. Untuk meningkatkan jangkauan sinyal Wi-Fi
+e. Agar router tidak cepat panas
+correct answer = b
+   44. Dua kantor kecil ingin berbagi satu koneksi internet. Kantor A menggunakan Hub, Kantor B menggunakan Switch. Jaringan kantor manakah yang akan memiliki performa lebih baik dan mengapa?
+a. Kantor A, karena Hub lebih sederhana
+b. Kantor B, karena Switch mengurangi tabrakan data
+c. Keduanya sama saja, karena kecepatan internetnya sama
+d. Kantor A, karena Hub bisa terhubung ke lebih banyak komputer
+e. Kantor B, karena Switch lebih hemat listrik
+correct answer = b
+   45. Analogi yang menyatakan bahwa "Router adalah polisi lalu lintas di perempatan jalan" paling tepat menggambarkan fungsi router dalam hal apa?
+a. Kemampuannya untuk menghentikan semua data
+b. Kemampuannya untuk mencatat semua pelanggaran
+c. Kemampuannya untuk mengarahkan data ke jaringan tujuan yang benar
+d. Kemampuannya untuk mempercepat laju semua data
+e. Kemampuannya untuk menangkap paket data yang berbahaya
+correct answer = c
+   46. Anda diminta merancang jaringan untuk acara live streaming di aula sekolah dengan kebutuhan koneksi stabil untuk 3 PC panitia dan koneksi nirkabel untuk tamu. Rancangan manakah yang paling efektif?
+a. Menghubungkan semua perangkat ke satu Hub besar
+b. Menggunakan satu Router Wi-Fi rumahan untuk semua perangkat
+c. Menghubungkan 3 PC panitia ke Switch via kabel, lalu Switch dihubungkan ke Router. Untuk tamu, dipasang Access Point yang juga terhubung ke Router.
+d. Hanya menyediakan koneksi Wi-Fi untuk semua perangkat agar lebih praktis
+e. Menghubungkan semua PC panitia langsung ke modem tanpa Switch atau Router
+correct answer = c
+   47. Sebuah kafe ingin menyediakan Wi-Fi untuk pelanggan, namun ingin transaksi kasir menggunakan koneksi kabel yang lebih aman dan stabil. Desain manakah yang paling efektif?
+a. Menghubungkan kasir dan pelanggan ke satu Hub yang sama
+b. Menghubungkan kasir via kabel ke Switch, dan pelanggan via Wi-Fi ke AP, di mana Switch dan AP terhubung ke satu Router
+c. Hanya menyediakan koneksi kabel untuk semua perangkat
+d. Hanya menyediakan koneksi Wi-Fi untuk semua perangkat
+e. Memasang dua koneksi internet yang terpisah
+correct answer = b
+   48. Jaringan di sebuah sekolah seringkali lambat pada jam istirahat karena banyak siswa mengakses video. Usulan teknis apakah yang paling logis untuk diajukan guna mengatasi masalah ini?
+a. Mengurangi jumlah komputer di sekolah
+b. Mematikan jaringan pada jam istirahat
+c. Meningkatkan paket bandwidth internet dan menerapkan aturan pembatasan akses video pada jam sibuk
+d. Mengganti semua komputer dengan laptop
+e. Melarang siswa mengakses internet
+correct answer = c
+   49. Untuk melindungi data penting pada file server di sebuah kantor kecil dari risiko kerusakan hard disk, strategi backup data paling dasar apakah yang bisa Anda usulkan?
+a. Menyimpan semua data hanya di server tanpa backup
+b. Meminta setiap karyawan menyimpan data di komputernya masing-masing
+c. Menjadwalkan backup otomatis setiap malam ke hard disk eksternal atau cloud storage
+d. Mencetak semua data penting setiap hari
+e. Membeli server baru setiap bulan
+correct answer = c
+   50. Anda diminta membuat 3 aturan kebijakan keamanan paling dasar untuk jaringan Wi-Fi di rumah. Kombinasi kebijakan manakah yang paling efektif?
+a. Membiarkan nama Wi-Fi default, tanpa password, dan menyala 24 jam
+b. Mengganti nama Wi-Fi (SSID) agar tidak mudah ditebak, menggunakan password yang kuat, dan tidak membagikannya secara sembarangan
+c. Memberitahu password Wi-Fi ke semua tetangga
+d. Menggunakan password yang mudah diingat seperti "12345678"
+e. Hanya menggunakan kabel dan tidak menggunakan Wi-Fi sama sekali
+correct answer = b
+   51. Sebuah rumah bertingkat tiga ingin semua lantainya ter-cover sinyal Wi-Fi yang kuat dari satu sumber internet. Kombinasi perangkat apakah yang paling sesuai untuk menciptakan jaringan seperti ini?
+a. Satu Router di lantai 1, dan satu Access Point di lantai 2 dan 3
+b. Tiga modem internet terpisah untuk setiap lantai
+c. Tiga Hub di setiap lantai
+d. Satu Switch besar di lantai 1
+e. Hanya menggunakan koneksi Bluetooth di setiap lantai
+correct answer = a
+   52. Jika Anda diminta merancang jaringan untuk sebuah perpustakaan baru, urutan langkah analisis kebutuhan manakah yang paling logis?
+a. Membeli router, menghitung pengguna, menentukan anggaran
+b. Menentukan anggaran, menghitung pengguna, menentukan jenis layanan
+c. Menghitung jumlah pengguna, menentukan jenis layanan yang dibutuhkan, menentukan anggaran
+d. Memasang kabel, membeli switch, menghitung pengguna
+e. Menentukan anggaran, memasang kabel, membeli router
+correct answer = c
+   53. Untuk sebuah kantor dengan 10 staf yang semuanya perlu akses cepat ke server file dan internet, desain koneksi manakah yang paling masuk akal?
+a. Semua staf terhubung ke Hub, lalu Hub ke internet
+b. Semua staf terhubung ke Router secara nirkabel
+c. Semua staf dan server terhubung ke satu Switch menggunakan kabel, lalu Switch terhubung ke Router untuk akses internet
+d. Setiap staf terhubung langsung ke modem internet
+e. Semua staf terhubung ke server, dan server terhubung ke internet
+correct answer = c
+   54. Mengingat risiko kegagalan server pusat adalah salah satu kerugian jaringan, rencana mitigasi atau pencegahan apakah yang paling tepat untuk sebuah perusahaan?
+a. Mematikan server setiap malam untuk menghemat listrik
+b. Membuat jadwal backup data secara rutin ke lokasi yang berbeda
+c. Membatasi jumlah pengguna yang bisa mengakses server
+d. Tidak menyimpan data apapun di server
+e. Menggunakan komputer client sebagai server cadangan
+correct answer = b

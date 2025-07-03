@@ -256,7 +256,6 @@ const GroupsTable = ({
         border: "none",
         boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
         overflow: "hidden",
-        marginBottom: 24,
       }}
       bodyStyle={{ padding: 0 }}
     >
