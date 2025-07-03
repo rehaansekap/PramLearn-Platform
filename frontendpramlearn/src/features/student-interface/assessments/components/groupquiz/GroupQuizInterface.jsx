@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
-import { Layout, Alert, Spin, message } from "antd";
+import { Layout, Alert, Spin, message, Grid } from "antd";
 import { AuthContext } from "../../../../../context/AuthContext";
 import { useOnlineStatus } from "../../../../../context/OnlineStatusContext";
 import useGroupQuizCollaboration from "../../hooks/useGroupQuizCollaboration";
@@ -9,16 +9,21 @@ import GroupQuizHeader from "./GroupQuizHeader";
 import GroupQuizSidebar from "./GroupQuizSidebar";
 import GroupQuizQuestionCard from "./GroupQuizQuestionCard";
 import GroupQuizSubmitModal from "./GroupQuizSubmitModal";
+import GroupQuizNavigation from "./GroupQuizNavigation";
 
-const { Content } = Layout;
+const { Content, Sider } = Layout;
+const { useBreakpoint } = Grid;
 
 const GroupQuizInterface = () => {
   const { isUserOnline } = useOnlineStatus();
   const { quizSlug } = useParams();
   const { user, token } = useContext(AuthContext);
   const navigate = useNavigate();
+  const screens = useBreakpoint();
+  const isMobile = !screens.md;
 
   const [submitModalVisible, setSubmitModalVisible] = useState(false);
+  const [siderCollapsed, setSiderCollapsed] = useState(isMobile);
 
   const {
     quiz,
@@ -37,6 +42,11 @@ const GroupQuizInterface = () => {
     submitQuiz,
     connectWebSocket,
   } = useGroupQuizCollaboration(quizSlug);
+
+  // Auto collapse sidebar on mobile
+  useEffect(() => {
+    setSiderCollapsed(isMobile);
+  }, [isMobile]);
 
   useEffect(() => {
     if (quiz && groupId && user && token && connectWebSocket) {
@@ -161,68 +171,161 @@ const GroupQuizInterface = () => {
   };
 
   return (
-    <div
-      style={{
-        maxWidth: 1200,
-        margin: "0 auto",
-        padding: "24px 16px",
-        minHeight: "calc(100vh - 64px)",
-      }}
-    >
+    <div style={{ minHeight: "100vh", background: "#f0f2f5" }}>
       <Helmet>
         <title>Pengerjaan Quiz Kelompok | PramLearn</title>
       </Helmet>
-      <GroupQuizHeader
-        quiz={quiz}
-        currentQuestionIndex={currentQuestionIndex}
-        timeRemaining={timeRemaining}
-        onTimeUp={handleAutoSubmit}
-      />
 
-      <div style={{ marginBottom: 24 }}>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            gap: 24,
-            flexWrap: "wrap",
-          }}
-        >
-          <div style={{ flex: 1, minWidth: 320, maxWidth: 400 }}>
-            <GroupQuizSidebar
-              wsConnected={wsConnected}
-              groupMembers={groupMembers}
-              isUserOnline={isUserOnline}
-              answeredCount={answeredCount}
-              totalQuestions={quiz.questions.length}
-              progress={progress}
-            />
+      <div
+        style={{
+          maxWidth: isMobile ? "100%" : 1400,
+          margin: "0 auto",
+          padding: isMobile ? "16px 8px" : "24px 16px",
+        }}
+      >
+        <GroupQuizHeader
+          quiz={quiz}
+          currentQuestionIndex={currentQuestionIndex}
+          timeRemaining={timeRemaining}
+          onTimeUp={handleAutoSubmit}
+        />
+
+        {isMobile ? (
+          // Mobile Layout - Stack vertically
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            {/* Mobile Navigation - Collapsible */}
+            <div
+              style={{
+                background: "#fff",
+                borderRadius: 12,
+                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                overflow: "hidden",
+              }}
+            >
+              <GroupQuizNavigation
+                questions={quiz.questions}
+                answers={answers}
+                currentQuestionIndex={currentQuestionIndex}
+                onQuestionSelect={setCurrentQuestionIndex}
+                collapsed={false}
+                isMobile={true}
+              />
+            </div>
+
+            {/* Mobile Question Card */}
+            <div>
+              <GroupQuizQuestionCard
+                quiz={quiz}
+                currentQuestion={currentQuestion}
+                currentQuestionIndex={currentQuestionIndex}
+                answers={answers}
+                currentAnswer={currentAnswer}
+                answeredCount={answeredCount}
+                onAnswerChange={setAnswer}
+                onPrev={() => handleQuestionNavigation("prev")}
+                onNext={() => handleQuestionNavigation("next")}
+                onSubmit={handleSubmitQuiz}
+              />
+            </div>
+
+            {/* Mobile Group Sidebar */}
+            <div>
+              <GroupQuizSidebar
+                wsConnected={wsConnected}
+                groupMembers={groupMembers}
+                isUserOnline={isUserOnline}
+                answeredCount={answeredCount}
+                totalQuestions={quiz.questions.length}
+                progress={progress}
+                isMobile={true}
+              />
+            </div>
           </div>
-          <div style={{ flex: 2, minWidth: 320 }}>
-            <GroupQuizQuestionCard
-              quiz={quiz}
-              currentQuestion={currentQuestion}
-              currentQuestionIndex={currentQuestionIndex}
-              answers={answers}
-              currentAnswer={currentAnswer}
-              answeredCount={answeredCount}
-              onAnswerChange={setAnswer}
-              onPrev={() => handleQuestionNavigation("prev")}
-              onNext={() => handleQuestionNavigation("next")}
-              onSubmit={handleSubmitQuiz}
-            />
-          </div>
-        </div>
+        ) : (
+          // Desktop Layout - Original layout
+          <Layout style={{ background: "#f0f2f5" }}>
+            {/* Sidebar Navigasi Soal */}
+            <Sider
+              collapsible
+              collapsed={siderCollapsed}
+              onCollapse={setSiderCollapsed}
+              width={300}
+              style={{
+                background: "#fff",
+                boxShadow: "2px 0 8px rgba(0,0,0,0.1)",
+                borderRadius: 12,
+                overflow: "hidden",
+                marginRight: 16,
+                height: "100%",
+                paddingTop: 16,
+                paddingBottom: 16,
+              }}
+              breakpoint="lg"
+              collapsedWidth={0}
+            >
+              <GroupQuizNavigation
+                questions={quiz.questions}
+                answers={answers}
+                currentQuestionIndex={currentQuestionIndex}
+                onQuestionSelect={setCurrentQuestionIndex}
+                collapsed={siderCollapsed}
+                isMobile={false}
+              />
+            </Sider>
+
+            {/* Main Content Area */}
+            <Layout style={{ background: "#f0f2f5" }}>
+              <Content style={{ padding: 0 }}>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: 16,
+                    alignItems: "flex-start",
+                  }}
+                >
+                  {/* Question Card - Area Utama */}
+                  <div style={{ flex: 1 }}>
+                    <GroupQuizQuestionCard
+                      quiz={quiz}
+                      currentQuestion={currentQuestion}
+                      currentQuestionIndex={currentQuestionIndex}
+                      answers={answers}
+                      currentAnswer={currentAnswer}
+                      answeredCount={answeredCount}
+                      onAnswerChange={setAnswer}
+                      onPrev={() => handleQuestionNavigation("prev")}
+                      onNext={() => handleQuestionNavigation("next")}
+                      onSubmit={handleSubmitQuiz}
+                    />
+                  </div>
+
+                  {/* Sidebar Kelompok - Area Kanan */}
+                  <div style={{ width: 320, flexShrink: 0 }}>
+                    <GroupQuizSidebar
+                      wsConnected={wsConnected}
+                      groupMembers={groupMembers}
+                      isUserOnline={isUserOnline}
+                      answeredCount={answeredCount}
+                      totalQuestions={quiz.questions.length}
+                      progress={progress}
+                      isMobile={false}
+                    />
+                  </div>
+                </div>
+              </Content>
+            </Layout>
+          </Layout>
+        )}
+
+        <GroupQuizSubmitModal
+          visible={submitModalVisible}
+          onOk={handleSubmitConfirm}
+          onCancel={() => setSubmitModalVisible(false)}
+          answeredCount={answeredCount}
+          totalQuestions={quiz.questions.length}
+          progress={progress}
+        />
       </div>
-
-      <GroupQuizSubmitModal
-        visible={submitModalVisible}
-        onOk={handleSubmitConfirm}
-        onCancel={() => setSubmitModalVisible(false)}
-        answeredCount={answeredCount}
-        totalQuestions={quiz.questions.length}
-        progress={progress}
-      />
     </div>
   );
 };

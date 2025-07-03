@@ -333,7 +333,7 @@ const AssignmentsTable = ({
 
             <div style={{ marginBottom: 4 }}>
               <Text style={{ fontSize: 11, color: "#666" }}>
-                Progress: {progress.rate}%
+                Progress: {progress.rate.toFixed(1)}%
               </Text>
             </div>
 

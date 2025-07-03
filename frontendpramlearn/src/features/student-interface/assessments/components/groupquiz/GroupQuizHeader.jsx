@@ -8,6 +8,7 @@ import {
 import QuizTimer from "../QuizTimer";
 
 const { Title, Text } = Typography;
+const isMobile = window.innerWidth <= 768;
 
 const GroupQuizHeader = ({
   quiz,
@@ -126,7 +127,9 @@ const GroupQuizHeader = ({
                 borderRadius: 12,
                 padding: 16,
                 backdropFilter: "blur(10px)",
-                display: "inline-block",
+                display: isMobile ? "flex" : "inline-block",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
               <QuizTimer

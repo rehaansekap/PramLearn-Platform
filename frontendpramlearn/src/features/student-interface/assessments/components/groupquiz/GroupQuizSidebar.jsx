@@ -70,10 +70,7 @@ const GroupQuizSidebar = ({
                 : "1px solid #f0f0f0",
             }}
           >
-            <Badge
-              status={isUserOnline(member) ? "success" : "default"}
-              dot
-            >
+            <Badge status={isUserOnline(member) ? "success" : "default"} dot>
               <Avatar size="small" icon={<UserOutlined />} />
             </Badge>
             <div style={{ flex: 1 }}>
@@ -120,7 +117,7 @@ const GroupQuizSidebar = ({
           <Text type="secondary">Soal Terjawab</Text>
         </div>
         <Progress
-          percent={progress}
+          percent={progress.toFixed(1)}
           strokeColor={{
             "0%": "#722ed1",
             "100%": "#9254de",

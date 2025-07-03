@@ -88,7 +88,7 @@ const SubjectCardHeader = ({ subject }) => {
           fontWeight: 500,
         }}
       >
-        {progressValue}% Selesai
+        {progressValue.toFixed(1)}% Selesai
       </Text>
     </div>
   );

@@ -188,7 +188,7 @@ const ProgressDrawer = ({
                     display: "block",
                   }}
                 >
-                  {progressPercent}%
+                  {progressPercent.toFixed(0)}%
                 </Text>
                 <StarOutlined style={{ color: "#ffd700", fontSize: 16 }} />
               </div>

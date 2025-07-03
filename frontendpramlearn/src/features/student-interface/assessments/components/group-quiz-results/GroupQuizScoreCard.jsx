@@ -74,7 +74,7 @@ const GroupQuizScoreCard = ({ results }) => {
                 border: "none",
               }}
             >
-              Grade: {getGradeText(results.score)}
+              Grade: {getGradeText(results.score.toFixed(1))}
             </Tag>
           </div>
         }
@@ -92,8 +92,8 @@ const GroupQuizScoreCard = ({ results }) => {
               benar
             </Text>
             <Progress
-              percent={results.score}
-              strokeColor={getScoreColor(results.score)}
+              percent={results.score.toFixed(1)}
+              strokeColor={getScoreColor(results.score.toFixed(1))}
               style={{
                 maxWidth: 300,
                 margin: "0 auto",
