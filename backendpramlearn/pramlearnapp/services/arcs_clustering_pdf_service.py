@@ -92,7 +92,7 @@ class ARCSClusteringPDFService:
             self._add_statistical_analysis()
 
             # 7. NEW: Mathematical Process Analysis
-            # self._add_mathematical_process_analysis()
+            self._add_mathematical_process_analysis()
 
             # # 8. Recommendations
             # self._add_recommendations()

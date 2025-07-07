@@ -90,8 +90,8 @@ class GroupFormationPDFService:
             # self._add_recommendations(quality_analysis, formation_params)
 
             # # 8. NEW: Mathematical explanation of DEAP processes
-            # if formation_params["mode"] == "heterogen":
-            #     self._add_deap_mathematical_explanation()
+            if formation_params["mode"] == "heterogen":
+                self._add_deap_mathematical_explanation()
 
             # Build PDF
             self.doc.build(self.story)
