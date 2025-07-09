@@ -1,4 +1,5 @@
 #!/bin/bash
+
 LOGDIR="log"
 LOGFILE="$LOGDIR/reset_and_seed_postgresql_windows.log"
 
@@ -57,6 +58,7 @@ fi
 psql -U $POSTGRES_USER -h $DB_HOST -p $DB_PORT -c "GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $DB_USER;" 2>&1 | tee -a $LOGFILE
 psql -U $POSTGRES_USER -h $DB_HOST -p $DB_PORT -d $DB_NAME -c "GRANT ALL ON SCHEMA public TO $DB_USER;" 2>&1 | tee -a $LOGFILE
 psql -U $POSTGRES_USER -h $DB_HOST -p $DB_PORT -c "ALTER USER $DB_USER CREATEDB;" 2>&1 | tee -a $LOGFILE
+psql -U $POSTGRES_USER -h $DB_HOST -p $DB_PORT -c "ALTER USER $DB_USER WITH SUPERUSER;" 2>&1 | tee -a $LOGFILE
 
 
 echo "✓ Database setup completed" | tee -a $LOGFILE

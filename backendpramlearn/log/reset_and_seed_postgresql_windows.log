@@ -2707,3 +2707,32 @@ UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 
 Reset and Seed Process Completed Successfully!
 Wed,  2 Jul, 2025 13:36:11
 ===============================================
+===============================================
+Starting Django Reset and Seed Process (PostgreSQL - Windows)
+Wed, Jul  9, 2025 12:05:20 PM
+===============================================
+Step 0: Checking PostgreSQL service...
+
+Status   Name               DisplayName                           
+------   ----               -----------                           
+Running  postgresql-x64-17  postgresql-x64-17                     
+
+
+Step 1: Dropping and creating PostgreSQL database...
+reset_and_seed_postgresql.sh: line 35: psql: command not found
+reset_and_seed_postgresql.sh: line 41: psql: command not found
+✓ Database created successfully
+Step 1.5: Creating PostgreSQL user...
+reset_and_seed_postgresql.sh: line 51: psql: command not found
+reset_and_seed_postgresql.sh: line 57: psql: command not found
+reset_and_seed_postgresql.sh: line 58: psql: command not found
+reset_and_seed_postgresql.sh: line 59: psql: command not found
+reset_and_seed_postgresql.sh: line 60: psql: command not found
+✓ Database setup completed
+Step 2: Removing ALL migration files...
+Step 3: Removing existing SQLite databases...
+Step 4: Ensuring migrations directory...
+Step 5: Creating new migrations...
+D:\PramLearn\.venv\Lib\site-packages\rest_framework_simplejwt\__init__.py:1: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import DistributionNotFound, get_distribution
+✅ Signals loaded successfully
