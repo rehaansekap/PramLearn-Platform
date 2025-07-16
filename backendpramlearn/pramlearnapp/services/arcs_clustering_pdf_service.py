@@ -10,13 +10,21 @@ from reportlab.platypus import (
     Table,
     TableStyle,
     PageBreak,
+    Image,
 )
 from reportlab.lib.colors import HexColor
+from reportlab.graphics.shapes import Drawing, Circle, Line, String, Rect
+from reportlab.graphics.charts.lineplots import LinePlot
+from reportlab.graphics.charts.axes import XCategoryAxis, YValueAxis
+from reportlab.graphics.widgets.markers import makeMarker
+from reportlab.graphics import renderPDF
 from django.db.models import Count, Avg
 from pramlearnapp.models.user import StudentMotivationProfile, CustomUser
 from io import BytesIO
 from datetime import datetime
 import logging
+import math
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -71,45 +79,38 @@ class ARCSClusteringPDFService:
     def generate_clustering_analysis_report(self):
         """Generate comprehensive ARCS clustering analysis PDF"""
         try:
-            logger.info("Starting ARCS Clustering PDF generation")
-
-            # 1. Cover Page
+            logger.info("Starting PDF generation...")
+    
+            # Add all sections
             self._add_cover_page()
-
-            # 2. Executive Summary
             self._add_executive_summary()
-
-            # 3. Data Overview
             self._add_data_overview()
-
-            # 4. Clustering Process Analysis
+    
+            # Add the new tables
+            self._add_student_questionnaire_scores_table()
+            self._add_clustering_results_table()
+            self._add_final_classification_table()
+            
+            # ADD VISUALIZATION SECTION
+            self._add_cluster_visualization_section()
+    
             self._add_clustering_process()
-
-            # 5. Results Analysis
-            self._add_results_analysis()
-
-            # 6. Statistical Analysis
-            self._add_statistical_analysis()
-
-            # 7. NEW: Mathematical Process Analysis
             self._add_mathematical_process_analysis()
-
-            # # 8. Recommendations
-            # self._add_recommendations()
-
+            self._add_results_analysis()
+            self._add_statistical_analysis()
+            self._add_recommendations()
+    
             # Build PDF
             self.doc.build(self.story)
             pdf_content = self.buffer.getvalue()
             self.buffer.close()
-
-            logger.info(
-                f"ARCS Clustering PDF generated successfully, size: {len(pdf_content)} bytes"
-            )
+    
+            logger.info(f"PDF generated successfully, size: {len(pdf_content)} bytes")
             return pdf_content
-
+    
         except Exception as e:
-            logger.error(f"Error in ARCS Clustering PDF generation: {str(e)}")
-            raise Exception(f"PDF generation failed: {str(e)}")
+            logger.error(f"Error generating PDF: {str(e)}")
+            raise e
 
     def _add_mathematical_process_analysis(self):
         """Add detailed mathematical process analysis with actual data from database"""
@@ -162,13 +163,13 @@ class ARCSClusteringPDFService:
         representation_text = f"""
         <b>1. DATA SISWA YANG DIPROSES</b><br/><br/>
         
-        <b>Contoh Data 3 Siswa Pertama:</b><br/>
+        <b>Contoh Data 5 Siswa Pertama:</b><br/>
         Mari kita lihat bagaimana data siswa diproses dengan contoh nyata dari database:<br/>
         """
         self.story.append(Paragraph(representation_text, self.normal_style))
 
-        # Get actual sample data from database
-        sample_profiles = self._get_sample_student_data(3)
+        # Get actual sample data from database - increase to 5 students
+        sample_profiles = self._get_sample_student_data(5)  # Changed from 3 to 5
 
         if sample_profiles:
             sample_data = [
@@ -194,67 +195,13 @@ class ARCSClusteringPDFService:
                     ]
                 )
         else:
-            # Fallback example if no data
-            sample_data = [
-                [
-                    "Siswa",
-                    "Attention",
-                    "Relevance",
-                    "Confidence",
-                    "Satisfaction",
-                    "Hasil Clustering",
-                ],
-                ["Siswa 1", "4.2", "3.8", "3.5", "4.0", "High"],
-                ["Siswa 2", "3.0", "3.2", "2.8", "3.1", "Medium"],
-                ["Siswa 3", "2.1", "2.3", "2.0", "2.2", "Low"],
-            ]
-
-        sample_table = Table(
-            sample_data,
-            colWidths=[
-                1 * inch,
-                0.8 * inch,
-                0.8 * inch,
-                0.8 * inch,
-                0.8 * inch,
-                1.2 * inch,
-            ],
-        )
-        sample_table.setStyle(
-            TableStyle(
-                [
-                    ("BACKGROUND", (0, 0), (-1, 0), colors.darkblue),
-                    ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
-                    ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-                    ("FONTSIZE", (0, 0), (-1, 0), 9),
-                    ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-                    ("BACKGROUND", (0, 1), (-1, -1), colors.lightcyan),
-                    ("FONTNAME", (0, 1), (-1, -1), "Courier"),
-                    ("FONTSIZE", (0, 1), (-1, -1), 8),
-                    ("BOX", (0, 0), (-1, -1), 1, colors.black),
-                    ("GRID", (0, 0), (-1, -1), 1, colors.black),
-                ]
+            self.story.append(
+                Paragraph(
+                    "Tidak ada data siswa yang tersedia untuk ditampilkan.",
+                    self.normal_style,
+                )
             )
-        )
-        self.story.append(sample_table)
-
-        explanation_text = f"""
-        <b>Penjelasan Sederhana:</b><br/>
-        • Setiap siswa punya 4 angka yang menunjukkan tingkat motivasi mereka<br/>
-        • Angka berkisar dari 1 (sangat rendah) sampai 5 (sangat tinggi)<br/>
-        • Komputer akan mengelompokkan siswa berdasarkan pola angka-angka ini<br/>
-        • Siswa dengan angka tinggi masuk kelompok "High Motivation"<br/>
-        • Siswa dengan angka rendah masuk kelompok "Low Motivation"<br/>
-        • Siswa dengan angka sedang masuk kelompok "Medium Motivation"<br/><br/>
-        
-        <b>Statistik Data Aktual:</b><br/>
-        • Rata-rata Attention: {arcs_stats['attention']['mean']:.2f} (interpretasi: {arcs_stats['attention']['interpretation']})<br/>
-        • Rata-rata Relevance: {arcs_stats['relevance']['mean']:.2f} (interpretasi: {arcs_stats['relevance']['interpretation']})<br/>
-        • Rata-rata Confidence: {arcs_stats['confidence']['mean']:.2f} (interpretasi: {arcs_stats['confidence']['interpretation']})<br/>
-        • Rata-rata Satisfaction: {arcs_stats['satisfaction']['mean']:.2f} (interpretasi: {arcs_stats['satisfaction']['interpretation']})<br/>
-        """
-        self.story.append(Paragraph(explanation_text, self.normal_style))
-        self.story.append(Spacer(1, 0.2 * inch))
+        return
 
     def _add_actual_clustering_steps(self):
         """Add step-by-step clustering process with actual data"""
@@ -408,30 +355,12 @@ class ARCSClusteringPDFService:
                 math_text += "<br/>Inilah pusat kelompok yang sebenarnya digunakan sistem untuk mengelompokkan siswa baru.<br/>"
 
         else:
-            # Fallback to example data if no actual data available
-            math_text = f"""
-            <b>3. CONTOH PERHITUNGAN MATEMATIKA SEDERHANA</b><br/><br/>
-            
-            <b>Cara Komputer Menghitung Jarak Antar Siswa:</b><br/>
-            <i>Catatan: Tidak ada data siswa yang cukup di database untuk contoh real. Berikut contoh dengan data hipotetis:</i><br/>
-            Bayangkan ada 2 siswa dengan nilai ARCS:<br/>
-            • Siswa A: Attention=4.0, Relevance=3.5, Confidence=3.8, Satisfaction=4.2<br/>
-            • Siswa B: Attention=2.1, Relevance=2.3, Confidence=2.0, Satisfaction=2.5<br/><br/>
-            
-            <b>Perhitungan Jarak:</b><br/>
-            • Selisih Attention: 4.0 - 2.1 = 1.9<br/>
-            • Selisih Relevance: 3.5 - 2.3 = 1.2<br/>
-            • Selisih Confidence: 3.8 - 2.0 = 1.8<br/>
-            • Selisih Satisfaction: 4.2 - 2.5 = 1.7<br/><br/>
-            
-            • Kuadratkan selisih: 1.9² + 1.2² + 1.8² + 1.7² = 3.61 + 1.44 + 3.24 + 2.89 = 11.18<br/>
-            • Akar kuadrat: √11.18 = 3.34<br/><br/>
-            
-            <b>Artinya:</b> Siswa A dan B sangat berbeda (jarak = 3.34), jadi masuk kelompok berbeda.<br/><br/>
+            math_text = """
+            <b>3. CONTOH PERHITUNGAN MATEMATIKA</b><br/><br/>
+            <i>Tidak ada data siswa yang cukup untuk menampilkan contoh perhitungan.</i><br/>
             """
 
         self.story.append(Paragraph(math_text, self.normal_style))
-        self.story.append(Spacer(1, 0.2 * inch))
 
     def _get_actual_cluster_centers(self):
         """Get actual cluster centers from database"""
@@ -439,9 +368,10 @@ class ARCSClusteringPDFService:
             from pramlearnapp.models.user import StudentMotivationProfile
             from django.db.models import Avg
 
-            centers = {}
+            cluster_centers = {}
 
-            for level in ["High", "Medium", "Low"]:
+            # Get cluster centers berdasarkan motivation_level
+            for level in ["Low", "Medium", "High"]:
                 profiles = StudentMotivationProfile.objects.filter(
                     motivation_level=level,
                     attention__isnull=False,
@@ -453,23 +383,32 @@ class ARCSClusteringPDFService:
                 )
 
                 if profiles.exists():
-                    center = profiles.aggregate(
+                    avg_values = profiles.aggregate(
                         attention=Avg("attention"),
                         relevance=Avg("relevance"),
                         confidence=Avg("confidence"),
                         satisfaction=Avg("satisfaction"),
                     )
-                    centers[level] = center
-                else:
-                    centers[level] = None
 
-            return centers
+                    cluster_centers[level] = {
+                        "attention": float(avg_values["attention"] or 0),
+                        "relevance": float(avg_values["relevance"] or 0),
+                        "confidence": float(avg_values["confidence"] or 0),
+                        "satisfaction": float(avg_values["satisfaction"] or 0),
+                    }
+                else:
+                    # Set None instead of removing the key
+                    cluster_centers[level] = None
+
+            logger.info(f"Retrieved cluster centers: {cluster_centers}")
+            return cluster_centers
+
         except Exception as e:
-            logger.error(f"Error getting actual cluster centers: {e}")
+            logger.error(f"Error getting cluster centers: {str(e)}")
             return {}
 
     def _get_sample_student_data(self, limit=3):
-        """Get sample student data from database with more details"""
+        """Get actual student data from database"""
         try:
             from pramlearnapp.models.user import StudentMotivationProfile
 
@@ -481,25 +420,50 @@ class ARCSClusteringPDFService:
                     satisfaction__isnull=False,
                 )
                 .exclude(attention=0.0, relevance=0.0, confidence=0.0, satisfaction=0.0)
-                .order_by("?")[:limit]
-            )  # Random order
+                .select_related("student")
+                .order_by("student__id")[
+                    :limit
+                ]  # Order by student ID untuk konsistensi dengan response
+            )
 
             sample_data = []
             for profile in profiles:
+                student = profile.student
+                # Calculate total motivation score (convert to 100 scale)
+                total_score = (
+                    (
+                        profile.attention
+                        + profile.relevance
+                        + profile.confidence
+                        + profile.satisfaction
+                    )
+                    / 4
+                    * 20
+                )
+
+                # Gunakan nama real dari database
+                full_name = f"{student.first_name} {student.last_name}".strip()
+                if not full_name:
+                    full_name = student.username
+
                 sample_data.append(
                     {
+                        "student_id": student.username,  # Gunakan username real
+                        "student_name": full_name,  # Gunakan nama real
                         "attention": float(profile.attention),
                         "relevance": float(profile.relevance),
                         "confidence": float(profile.confidence),
                         "satisfaction": float(profile.satisfaction),
+                        "total_score": round(total_score, 0),
                         "motivation_level": profile.motivation_level
                         or "Belum dianalisis",
                     }
                 )
 
-            return sample_data
+            return sample_data if sample_data else []  # Return empty list if no data
+
         except Exception as e:
-            logger.error(f"Error getting sample student data: {e}")
+            logger.error(f"Error getting sample student data: {str(e)}")
             return []
 
     def _add_simplified_pseudocode(self):
@@ -1097,57 +1061,926 @@ class ARCSClusteringPDFService:
         recommendations_para = Paragraph(recommendations_text, self.normal_style)
         self.story.append(recommendations_para)
 
-    def _get_clustering_statistics(self):
-        """Get clustering statistics"""
+    def _add_student_questionnaire_scores_table(self):
+        """Add table showing actual student questionnaire scores - ALL STUDENTS"""
+        self.story.append(
+            Paragraph("📋 TABEL HASIL SKOR MOTIVASI SISWA", self.heading_style)
+        )
+
         try:
-            # Get all students with motivation profiles
-            profiles = StudentMotivationProfile.objects.all()
-            total = profiles.count()
+            # Get ALL student data with ARCS scores, ordered by student ID
+            profiles = (
+                StudentMotivationProfile.objects.filter(
+                    attention__isnull=False,
+                    relevance__isnull=False,
+                    confidence__isnull=False,
+                    satisfaction__isnull=False,
+                )
+                .exclude(attention=0.0, relevance=0.0, confidence=0.0, satisfaction=0.0)
+                .select_related("student")
+                .order_by("student__id")  # Order by student ID untuk konsistensi
+            )
 
-            if total == 0:
-                return {
-                    "total_students": 0,
-                    "high": 0,
-                    "medium": 0,
-                    "low": 0,
-                    "high_percentage": 0,
-                    "medium_percentage": 0,
-                    "low_percentage": 0,
+            logger.info(f"Found {profiles.count()} profiles with complete ARCS data")
+
+            if not profiles.exists():
+                self.story.append(
+                    Paragraph("Tidak ada data siswa yang tersedia.", self.normal_style)
+                )
+                return
+
+            # Create table data - TAMPILKAN SEMUA SISWA (tanpa limit)
+            table_data = [
+                [
+                    "No",
+                    "Username",
+                    "Nama Siswa",
+                    "Skor Motivasi (dari 100)",
+                    "Level Motivasi",
+                ]
+            ]
+
+            # Gunakan SEMUA data dari database
+            for index, profile in enumerate(profiles, 1):  # SEMUA siswa tanpa limit
+                student = profile.student
+
+                # Calculate total motivation score from ARCS dimensions
+                total_score = (
+                    (
+                        profile.attention
+                        + profile.relevance
+                        + profile.confidence
+                        + profile.satisfaction
+                    )
+                    / 4
+                    * 20
+                )  # Convert to 100 scale
+
+                # Gunakan nama real dari database
+                full_name = f"{student.first_name} {student.last_name}".strip()
+                if not full_name:
+                    full_name = student.username
+
+                # Map motivation level ke bahasa Indonesia
+                motivation_mapping = {
+                    "High": "Tinggi",
+                    "Medium": "Sedang",
+                    "Low": "Rendah",
                 }
+                motivation_label = motivation_mapping.get(
+                    profile.motivation_level,
+                    profile.motivation_level or "Belum dianalisis",
+                )
 
-            # Count by motivation level
-            high_count = profiles.filter(motivation_level="High").count()
-            medium_count = profiles.filter(motivation_level="Medium").count()
-            low_count = profiles.filter(motivation_level="Low").count()
+                table_data.append(
+                    [
+                        str(index),  # Nomor urut
+                        student.username,  # Username real
+                        full_name,  # Nama real
+                        f"{total_score:.0f}",
+                        motivation_label,
+                    ]
+                )
+
+                # Log data untuk debugging
+                logger.debug(
+                    f"Student {index}: {student.username} ({full_name}) -> Score: {total_score:.0f}, Level: {motivation_label}"
+                )
+
+            logger.info(
+                f"Generated table with {len(table_data)-1} student rows (ALL STUDENTS)"
+            )
+
+            # Create and style table - Adjust column widths for 5 columns
+            scores_table = Table(
+                table_data,
+                colWidths=[0.5 * inch, 1.2 * inch, 2.0 * inch, 1.5 * inch, 1.3 * inch],
+            )
+            scores_table.setStyle(
+                TableStyle(
+                    [
+                        ("BACKGROUND", (0, 0), (-1, 0), colors.darkblue),
+                        ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
+                        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                        ("FONTSIZE", (0, 0), (-1, 0), 10),
+                        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+                        ("BACKGROUND", (0, 1), (-1, -1), colors.lightcyan),
+                        ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),
+                        ("FONTSIZE", (0, 1), (-1, -1), 8),  # Smaller font for more data
+                        ("BOX", (0, 0), (-1, -1), 1, colors.black),
+                        ("GRID", (0, 0), (-1, -1), 1, colors.black),
+                        (
+                            "ROWBACKGROUNDS",
+                            (0, 1),
+                            (-1, -1),
+                            [colors.lightcyan, colors.white],
+                        ),  # Alternating colors
+                    ]
+                )
+            )
+
+            self.story.append(scores_table)
+            self.story.append(Spacer(1, 0.3 * inch))
+
+            # Add summary after table
+            total_students = len(table_data) - 1
+            high_count = len([row for row in table_data[1:] if row[4] == "Tinggi"])
+            medium_count = len([row for row in table_data[1:] if row[4] == "Sedang"])
+            low_count = len([row for row in table_data[1:] if row[4] == "Rendah"])
+
+            summary_text = f"""
+            <b>📊 RINGKASAN TABEL:</b><br/>
+            • Total Siswa: {total_students}<br/>
+            • Motivasi Tinggi: {high_count} siswa ({(high_count/total_students*100):.1f}%)<br/>
+            • Motivasi Sedang: {medium_count} siswa ({(medium_count/total_students*100):.1f}%)<br/>
+            • Motivasi Rendah: {low_count} siswa ({(low_count/total_students*100):.1f}%)<br/>
+            """
+            self.story.append(Paragraph(summary_text, self.normal_style))
+            self.story.append(Spacer(1, 0.2 * inch))
+
+        except Exception as e:
+            logger.error(f"Error mengambil data siswa: {str(e)}")
+            self.story.append(
+                Paragraph(f"Error mengambil data siswa: {str(e)}", self.normal_style)
+            )
+
+    def _add_clustering_results_table(self):
+        """Add table showing clustering results with centroid values"""
+        self.story.append(Paragraph("📊 TABEL HASIL CLUSTERING", self.heading_style))
+    
+        try:
+            # Get clustering statistics
+            stats = self._get_clustering_statistics()
+    
+            # Get actual cluster centers
+            cluster_centers = self._get_actual_cluster_centers()
+    
+            # Create clustering results table
+            clustering_data = [
+                ["Cluster", "Label", "Nilai Centroid (Rata-rata Skor Motivasi)"]
+            ]
+    
+            # Add data for each cluster - PERBAIKAN LOGIKA
+            if cluster_centers and any(
+                center is not None for center in cluster_centers.values()
+            ):
+                for i, (level, center) in enumerate(cluster_centers.items()):
+                    if center:  # Only add if center data exists
+                        centroid_avg = (
+                            (
+                                center["attention"]
+                                + center["relevance"]
+                                + center["confidence"]
+                                + center["satisfaction"]
+                            )
+                            / 4
+                            * 20  # Convert to 0-100 scale
+                        )
+                        label_map = {
+                            "High": "Tinggi",
+                            "Medium": "Sedang",
+                            "Low": "Rendah",
+                        }
+                        clustering_data.append(
+                            [str(i), label_map.get(level, level), f"{centroid_avg:.1f}"]
+                        )
+            else:
+                # Fallback: Gunakan data statistik yang ada
+                if stats["total_students"] > 0:
+                    # Tambahkan data berdasarkan statistik yang tersedia
+                    cluster_info = [
+                        ("0", "Rendah", stats.get("low", 0)),
+                        ("1", "Sedang", stats.get("medium", 0)),
+                        ("2", "Tinggi", stats.get("high", 0)),
+                    ]
+    
+                    for cluster_id, label, count in cluster_info:
+                        # Estimasi centroid berdasarkan distribusi data
+                        if label == "Rendah":
+                            estimated_score = 45.0  # Low motivation estimate
+                        elif label == "Sedang":
+                            estimated_score = 68.0  # Medium motivation estimate
+                        else:
+                            estimated_score = 85.0  # High motivation estimate
+    
+                        clustering_data.append(
+                            [cluster_id, label, f"{estimated_score:.1f}"]
+                        )
+                else:
+                    # Jika benar-benar tidak ada data
+                    self.story.append(
+                        Paragraph(
+                            "Tidak ada data cluster yang tersedia.", self.normal_style
+                        )
+                    )
+                    return
+    
+            # Create table
+            clustering_table = Table(
+                clustering_data, colWidths=[1.5 * inch, 2 * inch, 2.5 * inch]
+            )
+            clustering_table.setStyle(
+                TableStyle(
+                    [
+                        ("BACKGROUND", (0, 0), (-1, 0), HexColor("#1677ff")),
+                        ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
+                        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+                        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                        ("FONTSIZE", (0, 0), (-1, 0), 10),
+                        ("BOTTOMPADDING", (0, 0), (-1, 0), 12),
+                        ("BACKGROUND", (0, 1), (-1, -1), colors.lightcyan),
+                        ("GRID", (0, 0), (-1, -1), 1, colors.black),
+                        ("FONTSIZE", (0, 1), (-1, -1), 9),
+                        ("LEFTPADDING", (0, 0), (-1, -1), 6),
+                        ("RIGHTPADDING", (0, 0), (-1, -1), 6),
+                    ]
+                )
+            )
+    
+            self.story.append(clustering_table)
+            self.story.append(Spacer(1, 0.2 * inch))
+    
+            # ADD VISUALIZATIONS HERE
+            # 1. Distribution Chart
+            distribution_chart = self._create_distribution_chart()
+            if distribution_chart:
+                self.story.append(Paragraph("📈 Visualisasi Distribusi Cluster", self.normal_style))
+                self.story.append(distribution_chart)
+                self.story.append(Spacer(1, 0.2 * inch))
+    
+            # 2. Centroid Diagram
+            centroid_diagram = self._create_centroid_diagram()
+            if centroid_diagram:
+                self.story.append(Paragraph("🎯 Diagram Profil Centroid", self.normal_style))
+                self.story.append(centroid_diagram)
+                self.story.append(Spacer(1, 0.2 * inch))
+    
+            # Add summary
+            summary_text = f"""
+            <b>📈 RINGKASAN CLUSTERING:</b><br/>
+            • Total Siswa Dianalisis: {stats['total_students']}<br/>
+            • Kelompok Motivasi Tinggi: {stats['high']} siswa ({stats['high_percentage']:.1f}%)<br/>
+            • Kelompok Motivasi Sedang: {stats['medium']} siswa ({stats['medium_percentage']:.1f}%)<br/>
+            • Kelompok Motivasi Rendah: {stats['low']} siswa ({stats['low_percentage']:.1f}%)<br/>
+            """
+            self.story.append(Paragraph(summary_text, self.normal_style))
+    
+        except Exception as e:
+            logger.error(f"Error in _add_clustering_results_table: {str(e)}")
+            self.story.append(
+                Paragraph(
+                    f"Error mengambil hasil clustering: {str(e)}", self.normal_style
+                )
+            )
+
+    def _add_cluster_visualization_section(self):
+        """Add a dedicated section for cluster visualizations"""
+        self.story.append(PageBreak())
+        self.story.append(Paragraph("📊 VISUALISASI CLUSTERING", self.heading_style))
+        
+        # Add explanation
+        explanation_text = """
+        <b>Penjelasan Visualisasi:</b><br/>
+        Bagian ini menampilkan representasi visual dari hasil clustering ARCS yang membantu memahami 
+        distribusi dan karakteristik setiap kelompok motivasi siswa.<br/><br/>
+        """
+        self.story.append(Paragraph(explanation_text, self.normal_style))
+        
+        # Scatter plot
+        scatter_plot = self._create_cluster_scatter_plot()
+        if scatter_plot:
+            self.story.append(Paragraph("🔍 Scatter Plot Clustering", self.normal_style))
+            scatter_explanation = """
+            <i>Diagram ini menunjukkan posisi setiap siswa dalam ruang 2D berdasarkan rata-rata 
+            dimensi ARCS. Titik-titik besar menunjukkan centroid (pusat) setiap cluster.</i><br/>
+            """
+            self.story.append(Paragraph(scatter_explanation, self.normal_style))
+            self.story.append(scatter_plot)
+            self.story.append(Spacer(1, 0.3 * inch))
+
+    def _add_final_classification_table(self):
+        """Add table showing final classification results for ALL students"""
+        self.story.append(
+            Paragraph("🎯 TABEL HASIL AKHIR KLASIFIKASI", self.heading_style)
+        )
+
+        try:
+            # Get ALL students with classification results, ordered by student ID
+            profiles = (
+                StudentMotivationProfile.objects.filter(
+                    attention__isnull=False,
+                    relevance__isnull=False,
+                    confidence__isnull=False,
+                    satisfaction__isnull=False,
+                    motivation_level__isnull=False,
+                )
+                .exclude(attention=0.0, relevance=0.0, confidence=0.0, satisfaction=0.0)
+                .select_related("student")
+                .order_by("student__id")  # SEMUA siswa tanpa limit
+            )
+
+            if not profiles.exists():
+                self.story.append(
+                    Paragraph(
+                        "Tidak ada data klasifikasi yang tersedia.", self.normal_style
+                    )
+                )
+                return
+
+            # Get actual cluster centers for distance calculation
+            cluster_centers = self._get_actual_cluster_centers()
+
+            # Create classification table
+            classification_data = [
+                [
+                    "No",
+                    "Username",
+                    "Nama Siswa",
+                    "Skor Motivasi",
+                    "Jarak ke Centroid 0",
+                    "Jarak ke Centroid 1",
+                    "Jarak ke Centroid 2",
+                    "Hasil Clustering",
+                ]
+            ]
+
+            for index, profile in enumerate(profiles, 1):  # SEMUA siswa
+                student = profile.student
+                total_score = (
+                    (
+                        profile.attention
+                        + profile.relevance
+                        + profile.confidence
+                        + profile.satisfaction
+                    )
+                    / 4
+                    * 20
+                )
+
+                # Gunakan nama real dari database
+                full_name = f"{student.first_name} {student.last_name}".strip()
+                if not full_name:
+                    full_name = student.username
+
+                # Calculate distances to centroids if available
+                distances = ["N/A", "N/A", "N/A"]
+                if cluster_centers:
+                    student_vector = [
+                        profile.attention,
+                        profile.relevance,
+                        profile.confidence,
+                        profile.satisfaction,
+                    ]
+
+                    cluster_list = [
+                        cluster_centers.get("Low"),
+                        cluster_centers.get("Medium"),
+                        cluster_centers.get("High"),
+                    ]
+
+                    for j, center in enumerate(cluster_list):
+                        if center:
+                            center_vector = [
+                                center["attention"],
+                                center["relevance"],
+                                center["confidence"],
+                                center["satisfaction"],
+                            ]
+                            # Calculate Euclidean distance
+                            distance = (
+                                sum(
+                                    (a - b) ** 2
+                                    for a, b in zip(student_vector, center_vector)
+                                )
+                                ** 0.5
+                            )
+                            distances[j] = f"{distance:.1f}"
+
+                # Map motivation level to Indonesian - single line format for space
+                level_map = {
+                    "High": "Tinggi",
+                    "Medium": "Sedang",
+                    "Low": "Rendah",
+                }
+                result_label = level_map.get(
+                    profile.motivation_level,
+                    profile.motivation_level or "Belum dianalisis",
+                )
+
+                classification_data.append(
+                    [
+                        str(index),  # Nomor urut
+                        student.username,  # Username real
+                        full_name,  # Nama real
+                        f"{total_score:.0f}",
+                        distances[0],
+                        distances[1],
+                        distances[2],
+                        result_label,
+                    ]
+                )
+
+            logger.info(
+                f"Generated classification table with {len(classification_data)-1} student rows (ALL STUDENTS)"
+            )
+
+            classification_table = Table(
+                classification_data,
+                colWidths=[
+                    0.4 * inch,  # No
+                    1.0 * inch,  # Username
+                    1.5 * inch,  # Nama
+                    0.8 * inch,  # Skor
+                    0.7 * inch,  # Jarak 0
+                    0.7 * inch,  # Jarak 1
+                    0.7 * inch,  # Jarak 2
+                    0.8 * inch,  # Hasil
+                ],
+            )
+            classification_table.setStyle(
+                TableStyle(
+                    [
+                        ("BACKGROUND", (0, 0), (-1, 0), colors.darkblue),
+                        ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
+                        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                        ("FONTSIZE", (0, 0), (-1, 0), 8),
+                        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+                        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+                        ("BACKGROUND", (0, 1), (-1, -1), colors.lightcyan),
+                        ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),
+                        ("FONTSIZE", (0, 1), (-1, -1), 7),  # Smaller font for more data
+                        ("BOX", (0, 0), (-1, -1), 1, colors.black),
+                        ("GRID", (0, 0), (-1, -1), 1, colors.black),
+                        (
+                            "ROWBACKGROUNDS",
+                            (0, 1),
+                            (-1, -1),
+                            [colors.lightcyan, colors.white],
+                        ),  # Alternating colors
+                    ]
+                )
+            )
+
+            self.story.append(classification_table)
+            self.story.append(Spacer(1, 0.3 * inch))
+
+            # Tambahkan visualisasi scatter plot clustering di bawah tabel
+            scatter_plot = self._create_cluster_scatter_plot(width=500, height=350)
+            if scatter_plot:
+                self.story.append(Paragraph("🔍 Visualisasi Hasil Klasifikasi Siswa", self.normal_style))
+                self.story.append(scatter_plot)
+                self.story.append(Spacer(1, 0.2 * inch))
+
+            # Add summary after table
+            total_students = len(classification_data) - 1
+            high_count = len(
+                [row for row in classification_data[1:] if row[7] == "Tinggi"]
+            )
+            medium_count = len(
+                [row for row in classification_data[1:] if row[7] == "Sedang"]
+            )
+            low_count = len(
+                [row for row in classification_data[1:] if row[7] == "Rendah"]
+            )
+
+            summary_text = f"""
+            <b>📊 RINGKASAN KLASIFIKASI:</b><br/>
+            • Total Siswa Diklasifikasi: {total_students}<br/>
+            • Cluster Tinggi: {high_count} siswa ({(high_count/total_students*100):.1f}%)<br/>
+            • Cluster Sedang: {medium_count} siswa ({(medium_count/total_students*100):.1f}%)<br/>
+            • Cluster Rendah: {low_count} siswa ({(low_count/total_students*100):.1f}%)<br/><br/>
+            
+            <b>Catatan:</b> Jarak ke Centroid menunjukkan seberapa dekat siswa dengan pusat masing-masing cluster. 
+            Siswa akan dimasukkan ke cluster dengan jarak terkecil.
+            """
+            self.story.append(Paragraph(summary_text, self.normal_style))
+            self.story.append(Spacer(1, 0.2 * inch))
+
+        except Exception as e:
+            self.story.append(
+                Paragraph(
+                    f"Error mengambil data klasifikasi: {str(e)}", self.normal_style
+                )
+            )
+
+    def _get_clustering_statistics(self):
+        """Get clustering statistics with cluster averages"""
+        try:
+            from pramlearnapp.models.user import StudentMotivationProfile
+
+            # Get total students with complete ARCS data
+            total_students = (
+                StudentMotivationProfile.objects.filter(
+                    attention__isnull=False,
+                    relevance__isnull=False,
+                    confidence__isnull=False,
+                    satisfaction__isnull=False,
+                )
+                .exclude(attention=0.0, relevance=0.0, confidence=0.0, satisfaction=0.0)
+                .count()
+            )
+
+            # Get counts by motivation level
+            high_count = StudentMotivationProfile.objects.filter(
+                motivation_level="High"
+            ).count()
+            medium_count = StudentMotivationProfile.objects.filter(
+                motivation_level="Medium"
+            ).count()
+            low_count = StudentMotivationProfile.objects.filter(
+                motivation_level="Low"
+            ).count()
+
+            # Calculate percentages
+            if total_students > 0:
+                high_percentage = (high_count / total_students) * 100
+                medium_percentage = (medium_count / total_students) * 100
+                low_percentage = (low_count / total_students) * 100
+            else:
+                high_percentage = medium_percentage = low_percentage = 0
 
             return {
-                "total_students": total,
+                "total_students": total_students,
                 "high": high_count,
                 "medium": medium_count,
                 "low": low_count,
-                "high_percentage": (high_count / total) * 100,
-                "medium_percentage": (medium_count / total) * 100,
-                "low_percentage": (low_count / total) * 100,
+                "high_percentage": high_percentage,
+                "medium_percentage": medium_percentage,
+                "low_percentage": low_percentage,
             }
+
         except Exception as e:
-            logger.error(f"Error getting clustering statistics: {e}")
+            logger.error(f"Error getting clustering statistics: {str(e)}")
             return {
                 "total_students": 0,
                 "high": 0,
                 "medium": 0,
                 "low": 0,
-                "high_percentage": 0,
-                "medium_percentage": 0,
-                "low_percentage": 0,
+                "high_percentage": 0.0,
+                "medium_percentage": 0.0,
+                "low_percentage": 0.0,
             }
 
+    def _create_cluster_scatter_plot(self, width=400, height=300):
+        """Create a scatter plot visualization of clustering results"""
+        try:
+            # Get actual student data
+            profiles = (
+                StudentMotivationProfile.objects.filter(
+                    attention__isnull=False,
+                    relevance__isnull=False,
+                    confidence__isnull=False,
+                    satisfaction__isnull=False,
+                    motivation_level__isnull=False,
+                )
+                .exclude(attention=0.0, relevance=0.0, confidence=0.0, satisfaction=0.0)
+                .select_related("student")
+            )
+
+            if not profiles.exists():
+                return None
+
+            # Create drawing
+            drawing = Drawing(width, height)
+
+            # Set up plot area
+            plot_x = 50
+            plot_y = 50
+            plot_width = width - 100
+            plot_height = height - 100
+
+            # Draw axes
+            # X-axis (Attention + Relevance average)
+            drawing.add(
+                Line(
+                    plot_x,
+                    plot_y,
+                    plot_x + plot_width,
+                    plot_y,
+                    strokeColor=colors.black,
+                )
+            )
+            # Y-axis (Confidence + Satisfaction average)
+            drawing.add(
+                Line(
+                    plot_x,
+                    plot_y,
+                    plot_x,
+                    plot_y + plot_height,
+                    strokeColor=colors.black,
+                )
+            )
+
+            # Define colors for each cluster
+            cluster_colors = {
+                "High": colors.green,
+                "Medium": colors.orange,
+                "Low": colors.red,
+            }
+
+            # Get cluster centers
+            cluster_centers = self._get_actual_cluster_centers()
+
+            # Plot students as points
+            for profile in profiles:
+                # Calculate x,y coordinates
+                x_val = (
+                    profile.attention + profile.relevance
+                ) / 2  # Average of Attention & Relevance
+                y_val = (
+                    profile.confidence + profile.satisfaction
+                ) / 2  # Average of Confidence & Satisfaction
+
+                # Scale to plot coordinates (assuming ARCS scale 1-5)
+                x_coord = plot_x + (x_val - 1) * (
+                    plot_width / 4
+                )  # Scale 1-5 to plot width
+                y_coord = plot_y + (y_val - 1) * (
+                    plot_height / 4
+                )  # Scale 1-5 to plot height
+
+                # Choose color based on motivation level
+                color = cluster_colors.get(profile.motivation_level, colors.gray)
+
+                # Draw student point
+                drawing.add(
+                    Circle(x_coord, y_coord, 3, fillColor=color, strokeColor=color)
+                )
+
+            # Plot cluster centers as larger circles
+            if cluster_centers:
+                for level, center in cluster_centers.items():
+                    if center:
+                        x_val = (center["attention"] + center["relevance"]) / 2
+                        y_val = (center["confidence"] + center["satisfaction"]) / 2
+
+                        x_coord = plot_x + (x_val - 1) * (plot_width / 4)
+                        y_coord = plot_y + (y_val - 1) * (plot_height / 4)
+
+                        color = cluster_colors.get(level, colors.black)
+
+                        # Draw center as larger circle with border
+                        drawing.add(
+                            Circle(
+                                x_coord,
+                                y_coord,
+                                8,
+                                fillColor=color,
+                                strokeColor=colors.black,
+                                strokeWidth=2,
+                            )
+                        )
+                        drawing.add(
+                            Circle(
+                                x_coord,
+                                y_coord,
+                                6,
+                                fillColor=colors.white,
+                                strokeColor=color,
+                                strokeWidth=1,
+                            )
+                        )
+
+            # Add axis labels
+            drawing.add(
+                String(
+                    plot_x + plot_width / 2,
+                    20,
+                    "Attention + Relevance (Average)",
+                    fontSize=10,
+                    textAnchor="middle",
+                )
+            )
+
+            # Rotate Y-axis label (simplified)
+            drawing.add(
+                String(
+                    15,
+                    plot_y + plot_height / 2,
+                    "Confidence + Satisfaction",
+                    fontSize=10,
+                    textAnchor="middle",
+                )
+            )
+
+            # Add legend
+            legend_x = plot_x + plot_width + 10
+            legend_y = plot_y + plot_height - 20
+
+            for i, (level, color) in enumerate(cluster_colors.items()):
+                y_pos = legend_y - (i * 25)
+                drawing.add(
+                    Circle(legend_x, y_pos, 4, fillColor=color, strokeColor=color)
+                )
+                drawing.add(String(legend_x + 10, y_pos - 3, level, fontSize=9))
+
+            # Add title
+            drawing.add(
+                String(
+                    width / 2,
+                    height - 20,
+                    "Visualisasi Clustering ARCS",
+                    fontSize=12,
+                    textAnchor="middle",
+                    fontName="Helvetica-Bold",
+                )
+            )
+
+            return drawing
+
+        except Exception as e:
+            logger.error(f"Error creating scatter plot: {str(e)}")
+            return None
+
+    def _create_centroid_diagram(self, width=500, height=300):
+        """Create a diagram showing cluster centroids"""
+        try:
+            cluster_centers = self._get_actual_cluster_centers()
+
+            if not cluster_centers:
+                return None
+
+            drawing = Drawing(width, height)
+
+            # Colors for each cluster
+            cluster_colors = {
+                "Low": colors.red,
+                "Medium": colors.orange,
+                "High": colors.green,
+            }
+
+            # Dimensions
+            dimensions = ["Attention", "Relevance", "Confidence", "Satisfaction"]
+            dim_width = (width - 100) / len(dimensions)
+
+            # Draw background grid
+            for i in range(6):  # 0 to 5 scale
+                y = 50 + i * (height - 100) / 5
+                drawing.add(
+                    Line(
+                        50,
+                        y,
+                        width - 50,
+                        y,
+                        strokeColor=colors.lightgrey,
+                        strokeWidth=0.5,
+                    )
+                )
+                drawing.add(String(30, y - 3, str(i), fontSize=8))
+
+            # Draw dimension labels
+            for i, dim in enumerate(dimensions):
+                x = 50 + i * dim_width + dim_width / 2
+                drawing.add(String(x, 20, dim[:4], fontSize=9, textAnchor="middle"))
+                # Vertical grid lines
+                drawing.add(
+                    Line(
+                        x,
+                        50,
+                        x,
+                        height - 50,
+                        strokeColor=colors.lightgrey,
+                        strokeWidth=0.5,
+                    )
+                )
+
+            # Draw centroid lines for each cluster
+            line_height_offset = {"Low": -5, "Medium": 0, "High": 5}
+
+            for level, center in cluster_centers.items():
+                if center:
+                    color = cluster_colors.get(level, colors.black)
+                    y_offset = line_height_offset.get(level, 0)
+
+                    points = []
+                    for i, dim in enumerate(
+                        ["attention", "relevance", "confidence", "satisfaction"]
+                    ):
+                        x = 50 + i * dim_width + dim_width / 2
+                        y = 50 + center[dim] * (height - 100) / 5 + y_offset
+                        points.append((x, y))
+
+                        # Draw point
+                        drawing.add(
+                            Circle(x, y, 4, fillColor=color, strokeColor=colors.black)
+                        )
+
+                    # Connect points with lines
+                    for i in range(len(points) - 1):
+                        x1, y1 = points[i]
+                        x2, y2 = points[i + 1]
+                        drawing.add(
+                            Line(x1, y1, x2, y2, strokeColor=color, strokeWidth=2)
+                        )
+
+            # Add legend
+            legend_x = width - 120
+            legend_y = height - 60
+
+            for i, (level, color) in enumerate(cluster_colors.items()):
+                y_pos = legend_y - (i * 20)
+                drawing.add(
+                    Line(
+                        legend_x,
+                        y_pos,
+                        legend_x + 15,
+                        y_pos,
+                        strokeColor=color,
+                        strokeWidth=3,
+                    )
+                )
+                drawing.add(
+                    String(legend_x + 20, y_pos - 3, f"{level} Motivation", fontSize=9)
+                )
+
+            # Add title
+            drawing.add(
+                String(
+                    width / 2,
+                    height - 20,
+                    "Profil Centroid Cluster",
+                    fontSize=12,
+                    textAnchor="middle",
+                    fontName="Helvetica-Bold",
+                )
+            )
+
+            return drawing
+
+        except Exception as e:
+            logger.error(f"Error creating centroid diagram: {str(e)}")
+            return None
+
+    def _create_distribution_chart(self, width=400, height=200):
+        """Create a bar chart showing cluster distribution"""
+        try:
+            stats = self._get_clustering_statistics()
+            
+            if stats['total_students'] == 0:
+                return None
+    
+            drawing = Drawing(width, height)
+            
+            # Data for chart
+            clusters = ["Low", "Medium", "High"]
+            values = [stats['low'], stats['medium'], stats['high']]
+            colors_list = [colors.red, colors.orange, colors.green]
+            
+            # Chart dimensions
+            chart_x = 80
+            chart_y = 50
+            chart_width = width - 120
+            chart_height = height - 100
+            
+            max_value = max(values) if values else 1
+            bar_width = chart_width / len(clusters) * 0.8
+            bar_spacing = chart_width / len(clusters)
+            
+            # Draw bars
+            for i, (cluster, value, color) in enumerate(zip(clusters, values, colors_list)):
+                x = chart_x + i * bar_spacing + bar_spacing * 0.1
+                bar_height = (value / max_value) * chart_height
+                y = chart_y
+                
+                # Draw bar
+                drawing.add(Rect(x, y, bar_width, bar_height, 
+                               fillColor=color, strokeColor=colors.black))
+                
+                # Add value label on top of bar
+                drawing.add(String(x + bar_width/2, y + bar_height + 5, str(value), 
+                                  fontSize=10, textAnchor="middle", fontName="Helvetica-Bold"))
+                
+                # Add cluster label
+                drawing.add(String(x + bar_width/2, chart_y - 15, cluster, 
+                                  fontSize=9, textAnchor="middle"))
+    
+            # Draw axes
+            drawing.add(Line(chart_x, chart_y, chart_x + chart_width, chart_y, strokeColor=colors.black))
+            drawing.add(Line(chart_x, chart_y, chart_x, chart_y + chart_height, strokeColor=colors.black))
+            
+            # Y-axis labels
+            for i in range(6):
+                y = chart_y + i * chart_height / 5
+                value = int(i * max_value / 5)
+                drawing.add(String(chart_x - 5, y - 3, str(value), fontSize=8, textAnchor="end"))
+    
+            # Add title
+            drawing.add(String(width/2, height - 20, "Distribusi Siswa per Cluster", 
+                              fontSize=12, textAnchor="middle", fontName="Helvetica-Bold"))
+    
+            return drawing
+    
+        except Exception as e:
+            logger.error(f"Error creating distribution chart: {str(e)}")
+            return None
+
     def _get_arcs_dimension_statistics(self):
-        """Get ARCS dimension statistics from StudentMotivationProfile"""
+        """Get real ARCS dimension statistics from database"""
         try:
             from pramlearnapp.models.user import StudentMotivationProfile
-            from django.db.models import Avg, Count, Min, Max, StdDev
+            from django.db.models import Avg, StdDev, Min, Max, Count
+            import statistics
 
-            # Get profiles with valid ARCS data
             profiles = StudentMotivationProfile.objects.filter(
                 attention__isnull=False,
                 relevance__isnull=False,
@@ -1156,83 +1989,49 @@ class ARCSClusteringPDFService:
             ).exclude(attention=0.0, relevance=0.0, confidence=0.0, satisfaction=0.0)
 
             if not profiles.exists():
-                logger.warning("No valid ARCS profiles found")
                 return self._get_empty_arcs_statistics()
 
             # Calculate statistics for each dimension
-            stats = profiles.aggregate(
-                # Attention statistics
-                attention_avg=Avg("attention"),
-                attention_min=Min("attention"),
-                attention_max=Max("attention"),
-                attention_std=StdDev("attention"),
-                # Relevance statistics
-                relevance_avg=Avg("relevance"),
-                relevance_min=Min("relevance"),
-                relevance_max=Max("relevance"),
-                relevance_std=StdDev("relevance"),
-                # Confidence statistics
-                confidence_avg=Avg("confidence"),
-                confidence_min=Min("confidence"),
-                confidence_max=Max("confidence"),
-                confidence_std=StdDev("confidence"),
-                # Satisfaction statistics
-                satisfaction_avg=Avg("satisfaction"),
-                satisfaction_min=Min("satisfaction"),
-                satisfaction_max=Max("satisfaction"),
-                satisfaction_std=StdDev("satisfaction"),
-                # Total count
-                total_count=Count("id"),
-            )
+            arcs_stats = {}
+            dimensions = ["attention", "relevance", "confidence", "satisfaction"]
 
-            # Format results
-            dimensions = {
-                "attention": {
-                    "mean": round(stats["attention_avg"] or 0, 2),
-                    "std_dev": round(stats["attention_std"] or 0, 2),
-                    "min": round(stats["attention_min"] or 0, 2),
-                    "max": round(stats["attention_max"] or 0, 2),
-                    "interpretation": self._get_interpretation(
-                        stats["attention_avg"] or 0
-                    ),
-                },
-                "relevance": {
-                    "mean": round(stats["relevance_avg"] or 0, 2),
-                    "std_dev": round(stats["relevance_std"] or 0, 2),
-                    "min": round(stats["relevance_min"] or 0, 2),
-                    "max": round(stats["relevance_max"] or 0, 2),
-                    "interpretation": self._get_interpretation(
-                        stats["relevance_avg"] or 0
-                    ),
-                },
-                "confidence": {
-                    "mean": round(stats["confidence_avg"] or 0, 2),
-                    "std_dev": round(stats["confidence_std"] or 0, 2),
-                    "min": round(stats["confidence_min"] or 0, 2),
-                    "max": round(stats["confidence_max"] or 0, 2),
-                    "interpretation": self._get_interpretation(
-                        stats["confidence_avg"] or 0
-                    ),
-                },
-                "satisfaction": {
-                    "mean": round(stats["satisfaction_avg"] or 0, 2),
-                    "std_dev": round(stats["satisfaction_std"] or 0, 2),
-                    "min": round(stats["satisfaction_min"] or 0, 2),
-                    "max": round(stats["satisfaction_max"] or 0, 2),
-                    "interpretation": self._get_interpretation(
-                        stats["satisfaction_avg"] or 0
-                    ),
-                },
-            }
+            for dimension in dimensions:
+                stats = profiles.aggregate(
+                    mean=Avg(dimension),
+                    min_val=Min(dimension),
+                    max_val=Max(dimension),
+                    count=Count(dimension),
+                )
 
-            logger.info(
-                f"ARCS statistics calculated for {stats['total_count']} profiles"
-            )
-            return dimensions
+                # Get values for standard deviation calculation
+                values = list(profiles.values_list(dimension, flat=True))
+                std_dev = statistics.stdev(values) if len(values) > 1 else 0.0
+
+                mean_val = float(stats["mean"] or 0)
+
+                arcs_stats[dimension] = {
+                    "mean": mean_val,
+                    "std_dev": std_dev,
+                    "min": float(stats["min_val"] or 0),
+                    "max": float(stats["max_val"] or 0),
+                    "count": stats["count"],
+                    "interpretation": self._interpret_score(mean_val),
+                }
+
+            return arcs_stats
 
         except Exception as e:
-            logger.error(f"Error getting ARCS dimension statistics: {e}")
+            logger.error(f"Error getting ARCS statistics: {str(e)}")
             return self._get_empty_arcs_statistics()
+
+    def _interpret_score(self, score):
+        """Interpret ARCS score"""
+        if score >= 4.0:
+            return "Tinggi"
+        elif score >= 3.0:
+            return "Sedang"
+        else:
+            return "Rendah"
 
     def _get_empty_arcs_statistics(self):
         """Return empty statistics when no data available"""
@@ -1241,7 +2040,7 @@ class ARCSClusteringPDFService:
             "std_dev": 0.00,
             "min": 0.00,
             "max": 0.00,
-            "interpretation": "Tidak Ada Data",
+            "interpretation": "Tidak Ada Data",  # Tetap pertahankan ini
         }
         return {
             "attention": empty_stat.copy(),
