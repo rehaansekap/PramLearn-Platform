@@ -131,7 +131,7 @@ const ARCSResultsActions = ({ materialSlug, results, isMobile }) => {
                 color: "#1890ff",
               }}
             >
-              {results.motivation_level.toUpperCase()}
+              {results.motivation_level?.toUpperCase()}
             </div>
             <Text
               style={{
