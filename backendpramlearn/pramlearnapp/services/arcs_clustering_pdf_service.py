@@ -1624,7 +1624,7 @@ class ARCSClusteringPDFService:
     def _create_cluster_scatter_plot(self, width=400, height=300):
         """Create a scatter plot visualization of clustering results"""
         try:
-            # Get actual student data
+            # Get ALL student data - remove any limits
             profiles = (
                 StudentMotivationProfile.objects.filter(
                     attention__isnull=False,
@@ -1635,21 +1635,45 @@ class ARCSClusteringPDFService:
                 )
                 .exclude(attention=0.0, relevance=0.0, confidence=0.0, satisfaction=0.0)
                 .select_related("student")
+                # Remove any .order_by()[:limit] that might limit the data
             )
 
             if not profiles.exists():
+                logger.warning("No student profiles found for scatter plot")
                 return None
 
-            # Create drawing
+            total_students = profiles.count()
+            logger.info(f"Creating scatter plot for {total_students} students")
+
+            # Create drawing with adequate size for all points
             drawing = Drawing(width, height)
 
-            # Set up plot area
-            plot_x = 50
-            plot_y = 50
-            plot_width = width - 100
-            plot_height = height - 100
+            # Set up plot area with margins for labels
+            plot_x = 60
+            plot_y = 60
+            plot_width = width - 120  # More space for labels
+            plot_height = height - 120
 
-            # Draw axes
+            # Draw background grid for better readability
+            grid_color = colors.Color(0.9, 0.9, 0.9)
+            
+            # Vertical grid lines
+            for i in range(5):
+                x = plot_x + (i * plot_width / 4)
+                drawing.add(
+                    Line(x, plot_y, x, plot_y + plot_height, 
+                        strokeColor=grid_color, strokeWidth=0.5)
+                )
+            
+            # Horizontal grid lines
+            for i in range(5):
+                y = plot_y + (i * plot_height / 4)
+                drawing.add(
+                    Line(plot_x, y, plot_x + plot_width, y, 
+                        strokeColor=grid_color, strokeWidth=0.5)
+                )
+
+            # Draw main axes with thicker lines
             # X-axis (Attention + Relevance average)
             drawing.add(
                 Line(
@@ -1658,6 +1682,7 @@ class ARCSClusteringPDFService:
                     plot_x + plot_width,
                     plot_y,
                     strokeColor=colors.black,
+                    strokeWidth=2,
                 )
             )
             # Y-axis (Confidence + Satisfaction average)
@@ -1668,46 +1693,46 @@ class ARCSClusteringPDFService:
                     plot_x,
                     plot_y + plot_height,
                     strokeColor=colors.black,
+                    strokeWidth=2,
                 )
             )
 
             # Define colors for each cluster
             cluster_colors = {
-                "High": colors.green,
-                "Medium": colors.orange,
-                "Low": colors.red,
+                "High": colors.Color(0.2, 0.8, 0.4),    # Green
+                "Medium": colors.Color(0.8, 0.6, 0.2),  # Orange  
+                "Low": colors.Color(0.8, 0.2, 0.2),     # Red
             }
 
-            # Get cluster centers
+            # Get cluster centers for display
             cluster_centers = self._get_actual_cluster_centers()
 
-            # Plot students as points
+            # Plot ALL students as points
+            student_count_by_cluster = {"High": 0, "Medium": 0, "Low": 0}
+            
             for profile in profiles:
-                # Calculate x,y coordinates
-                x_val = (
-                    profile.attention + profile.relevance
-                ) / 2  # Average of Attention & Relevance
-                y_val = (
-                    profile.confidence + profile.satisfaction
-                ) / 2  # Average of Confidence & Satisfaction
+                # Calculate x,y coordinates based on ARCS dimensions
+                x_val = (profile.attention + profile.relevance) / 2  # Average of Attention & Relevance
+                y_val = (profile.confidence + profile.satisfaction) / 2  # Average of Confidence & Satisfaction
 
                 # Scale to plot coordinates (assuming ARCS scale 1-5)
-                x_coord = plot_x + (x_val - 1) * (
-                    plot_width / 4
-                )  # Scale 1-5 to plot width
-                y_coord = plot_y + (y_val - 1) * (
-                    plot_height / 4
-                )  # Scale 1-5 to plot height
+                x_coord = plot_x + (x_val - 1) * (plot_width / 4)  # Scale 1-5 to plot width
+                y_coord = plot_y + (y_val - 1) * (plot_height / 4)  # Scale 1-5 to plot height
 
                 # Choose color based on motivation level
                 color = cluster_colors.get(profile.motivation_level, colors.gray)
+                
+                # Count students by cluster
+                if profile.motivation_level in student_count_by_cluster:
+                    student_count_by_cluster[profile.motivation_level] += 1
 
-                # Draw student point
+                # Draw student point - slightly larger for better visibility
+                from reportlab.graphics.shapes import Circle
                 drawing.add(
-                    Circle(x_coord, y_coord, 3, fillColor=color, strokeColor=color)
+                    Circle(x_coord, y_coord, 3, fillColor=color, strokeColor=colors.black, strokeWidth=0.5)
                 )
 
-            # Plot cluster centers as larger circles
+            # Plot cluster centers as larger, distinct markers
             if cluster_centers:
                 for level, center in cluster_centers.items():
                     if center:
@@ -1719,17 +1744,18 @@ class ARCSClusteringPDFService:
 
                         color = cluster_colors.get(level, colors.black)
 
-                        # Draw center as larger circle with border
+                        # Draw center as larger circle with distinctive border
                         drawing.add(
                             Circle(
                                 x_coord,
                                 y_coord,
-                                8,
+                                10,  # Larger radius for centroids
                                 fillColor=color,
                                 strokeColor=colors.black,
-                                strokeWidth=2,
+                                strokeWidth=3,
                             )
                         )
+                        # Add white inner circle for contrast
                         drawing.add(
                             Circle(
                                 x_coord,
@@ -1737,55 +1763,142 @@ class ARCSClusteringPDFService:
                                 6,
                                 fillColor=colors.white,
                                 strokeColor=color,
-                                strokeWidth=1,
+                                strokeWidth=2,
+                            )
+                        )
+                        
+                        # Add label for centroid
+                        from reportlab.graphics.shapes import String
+                        drawing.add(
+                            String(
+                                x_coord + 15, y_coord - 3,
+                                f"Centroid {level}",
+                                fontSize=8,
+                                fontName="Helvetica-Bold",
+                                fillColor=color
                             )
                         )
 
             # Add axis labels
+            from reportlab.graphics.shapes import String
             drawing.add(
                 String(
                     plot_x + plot_width / 2,
-                    20,
+                    25,
                     "Attention + Relevance (Average)",
                     fontSize=10,
                     textAnchor="middle",
+                    fontName="Helvetica",
                 )
             )
 
-            # Rotate Y-axis label (simplified)
+            # Y-axis label
             drawing.add(
                 String(
-                    15,
+                    20,
                     plot_y + plot_height / 2,
-                    "Confidence + Satisfaction",
+                    "Confidence + Satisfaction (Average)",
                     fontSize=10,
                     textAnchor="middle",
+                    fontName="Helvetica",
                 )
             )
 
-            # Add legend
-            legend_x = plot_x + plot_width + 10
-            legend_y = plot_y + plot_height - 20
+            # Add axis scale labels
+            # X-axis scale (1-5)
+            for i in range(5):
+                x_pos = plot_x + (i * plot_width / 4)
+                value = i + 1
+                drawing.add(
+                    String(x_pos, plot_y - 15, str(value), fontSize=8, textAnchor="middle")
+                )
 
+            # Y-axis scale (1-5)
+            for i in range(5):
+                y_pos = plot_y + (i * plot_height / 4)
+                value = i + 1
+                drawing.add(
+                    String(plot_x - 15, y_pos - 3, str(value), fontSize=8, textAnchor="end")
+                )
+
+            # Add comprehensive legend
+            legend_x = plot_x + plot_width + 20
+            legend_y = plot_y + plot_height - 30
+
+            # Legend title
+            drawing.add(
+                String(
+                    legend_x, legend_y + 20,
+                    "LEGEND:",
+                    fontSize=10,
+                    fontName="Helvetica-Bold"
+                )
+            )
+
+            # Legend items with actual counts
             for i, (level, color) in enumerate(cluster_colors.items()):
                 y_pos = legend_y - (i * 25)
+                count = student_count_by_cluster.get(level, 0)
+                
+                # Legend marker (small circle)
                 drawing.add(
-                    Circle(legend_x, y_pos, 4, fillColor=color, strokeColor=color)
+                    Circle(legend_x, y_pos, 4, fillColor=color, strokeColor=colors.black, strokeWidth=0.5)
                 )
-                drawing.add(String(legend_x + 10, y_pos - 3, level, fontSize=9))
+                
+                # Legend text with count
+                drawing.add(
+                    String(
+                        legend_x + 15, y_pos - 3,
+                        f"{level}: {count} students",
+                        fontSize=9,
+                        fontName="Helvetica"
+                    )
+                )
 
-            # Add title
+            # Add centroid legend
+            y_pos = legend_y - 80
+            drawing.add(
+                Circle(legend_x, y_pos, 8, fillColor=colors.gray, strokeColor=colors.black, strokeWidth=2)
+            )
+            drawing.add(
+                Circle(legend_x, y_pos, 5, fillColor=colors.white, strokeColor=colors.gray, strokeWidth=1)
+            )
+            drawing.add(
+                String(
+                    legend_x + 15, y_pos - 3,
+                    "Cluster Centroid",
+                    fontSize=9,
+                    fontName="Helvetica"
+                )
+            )
+
+            # Add title with total count
             drawing.add(
                 String(
                     width / 2,
                     height - 20,
-                    "Visualisasi Clustering ARCS",
+                    f"Visualisasi Clustering ARCS ({total_students} Siswa)",
                     fontSize=12,
                     textAnchor="middle",
                     fontName="Helvetica-Bold",
                 )
             )
 
+            # Add subtitle with distribution info
+            distribution_text = f"High: {student_count_by_cluster['High']}, Medium: {student_count_by_cluster['Medium']}, Low: {student_count_by_cluster['Low']}"
+            drawing.add(
+                String(
+                    width / 2,
+                    height - 35,
+                    distribution_text,
+                    fontSize=10,
+                    textAnchor="middle",
+                    fontName="Helvetica",
+                    fillColor=colors.Color(0.4, 0.4, 0.4)
+                )
+            )
+
+            logger.info(f"Scatter plot created successfully with {total_students} student points")
             return drawing
 
         except Exception as e:

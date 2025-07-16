@@ -697,6 +697,17 @@ class GroupFormationPDFService:
         self.story.append(metrics_table)
         self.story.append(Spacer(1, 0.2 * inch))
 
+        # ADD: Quality metrics bar chart
+        quality_chart = self._create_quality_metrics_chart(
+            balance_score, heterogeneity_score, uniformity_score
+        )
+        if quality_chart:
+            self.story.append(
+                Paragraph("📊 GRAFIK PERBANDINGAN SKOR KUALITAS", self.heading_style)
+            )
+            self.story.append(quality_chart)
+            self.story.append(Spacer(1, 0.2 * inch))
+
         # Add interpretation details
         interpretation_text = f"""
         <b>INTERPRETASI HASIL:</b><br/>
@@ -708,6 +719,149 @@ class GroupFormationPDFService:
         interpretation_para = Paragraph(interpretation_text, self.normal_style)
         self.story.append(interpretation_para)
         self.story.append(PageBreak())
+
+    def _create_quality_metrics_chart(
+        self, balance_score, heterogeneity_score, uniformity_score
+    ):
+        """Create a bar chart showing quality metrics comparison"""
+        try:
+            from reportlab.graphics.charts.barcharts import VerticalBarChart
+            from reportlab.graphics.shapes import Drawing
+            from reportlab.lib import colors
+
+            # Create drawing
+            drawing = Drawing(500, 350)
+
+            # Create bar chart
+            chart = VerticalBarChart()
+            chart.x = 50
+            chart.y = 80
+            chart.height = 200
+            chart.width = 400
+
+            # Data for the chart (convert to percentages)
+            chart.data = [
+                [balance_score * 100, heterogeneity_score * 100, uniformity_score * 100]
+            ]
+
+            # Labels for categories
+            chart.categoryAxis.categoryNames = [
+                "Keseimbangan\nUkuran",
+                "Keberagaman\nMotivasi",
+                "Keseragaman\nDistribusi",
+            ]
+
+            # Customize chart appearance
+            chart.valueAxis.valueMin = 0
+            chart.valueAxis.valueMax = 100
+            chart.valueAxis.valueStep = 20
+
+            # Bar colors - different color for each metric
+            chart.bars[0].fillColor = colors.Color(0.2, 0.4, 0.8)  # Blue for Balance
+            chart.bars[1].fillColor = colors.Color(
+                0.8, 0.4, 0.2
+            )  # Orange for Heterogeneity
+            chart.bars[2].fillColor = colors.Color(
+                0.2, 0.8, 0.4
+            )  # Green for Uniformity
+
+            # Make bars have different colors
+            for i in range(3):
+                if i == 0:
+                    chart.bars[i].fillColor = colors.Color(0.2, 0.4, 0.8)  # Blue
+                elif i == 1:
+                    chart.bars[i].fillColor = colors.Color(0.8, 0.4, 0.2)  # Orange
+                else:
+                    chart.bars[i].fillColor = colors.Color(0.2, 0.8, 0.4)  # Green
+
+            # Chart styling
+            chart.bars.strokeColor = colors.black
+            chart.bars.strokeWidth = 1
+
+            # Category axis styling
+            chart.categoryAxis.labels.boxAnchor = "n"
+            chart.categoryAxis.labels.fontSize = 10
+            chart.categoryAxis.labels.fontName = "Helvetica"
+
+            # Value axis styling
+            chart.valueAxis.labels.fontSize = 10
+            chart.valueAxis.labels.fontName = "Helvetica"
+            chart.valueAxis.labelTextFormat = "%d%%"
+
+            # Add title
+            from reportlab.graphics.shapes import String
+
+            drawing.add(
+                String(
+                    250,
+                    320,
+                    "Perbandingan Skor Kualitas Kelompok",
+                    fontSize=14,
+                    textAnchor="middle",
+                    fontName="Helvetica-Bold",
+                )
+            )
+
+            # Add value labels on top of bars
+            bar_width = chart.width / len(chart.data[0])
+            for i, value in enumerate(
+                [balance_score * 100, heterogeneity_score * 100, uniformity_score * 100]
+            ):
+                x_pos = chart.x + (i * bar_width) + (bar_width / 2)
+                y_pos = chart.y + (value / 100 * chart.height) + 10
+                drawing.add(
+                    String(
+                        x_pos,
+                        y_pos,
+                        f"{value:.1f}%",
+                        fontSize=10,
+                        textAnchor="middle",
+                        fontName="Helvetica-Bold",
+                    )
+                )
+
+            # Add legend
+            legend_y = 40
+            legend_items = [
+                ("Keseimbangan Ukuran", colors.Color(0.2, 0.4, 0.8)),
+                ("Keberagaman Motivasi", colors.Color(0.8, 0.4, 0.2)),
+                ("Keseragaman Distribusi", colors.Color(0.2, 0.8, 0.4)),
+            ]
+
+            for i, (label, color) in enumerate(legend_items):
+                x_pos = 50 + (i * 150)
+                # Legend box
+                from reportlab.graphics.shapes import Rect
+
+                drawing.add(
+                    Rect(
+                        x_pos,
+                        legend_y,
+                        15,
+                        10,
+                        fillColor=color,
+                        strokeColor=colors.black,
+                    )
+                )
+                # Legend text
+                drawing.add(
+                    String(
+                        x_pos + 20,
+                        legend_y + 3,
+                        label,
+                        fontSize=9,
+                        fontName="Helvetica",
+                    )
+                )
+
+            # Add chart to drawing
+            drawing.add(chart)
+
+            return drawing
+
+        except Exception as e:
+            logger.error(f"Error creating quality metrics chart: {str(e)}")
+            return None
 
     def _add_groups_overview(self, groups_data, quality_analysis):
         """Add groups overview with visualization"""
@@ -722,10 +876,9 @@ class GroupFormationPDFService:
         # Motivation distribution across all groups
         total_motivation = {"High": 0, "Medium": 0, "Low": 0}
         for group in groups_data:
-            dist = group["motivation_distribution"]
-            for level, count in dist.items():
-                if level in total_motivation:
-                    total_motivation[level] += count
+            dist = group.get("motivation_distribution", {})
+            for level in ["High", "Medium", "Low"]:
+                total_motivation[level] += dist.get(level, 0)
 
         # Create overview table
         overview_data = [
@@ -770,7 +923,329 @@ class GroupFormationPDFService:
         )
 
         self.story.append(overview_table)
-        self.story.append(Spacer(1, 0.3 * inch))
+        self.story.append(Spacer(1, 0.2 * inch))
+
+        # ADD: Stacked bar chart for group motivation distribution
+        stacked_chart = self._create_group_distribution_stacked_chart(groups_data)
+        if stacked_chart:
+            self.story.append(
+                Paragraph("📊 DISTRIBUSI MOTIVASI PER KELOMPOK", self.heading_style)
+            )
+            self.story.append(stacked_chart)
+            self.story.append(Spacer(1, 0.3 * inch))
+
+    def _create_group_distribution_stacked_chart(self, groups_data):
+        """Create a stacked bar chart showing motivation distribution per group"""
+        try:
+            from reportlab.graphics.shapes import Drawing, Rect, String
+            from reportlab.lib import colors
+
+            # Chart dimensions
+            width = 500
+            height = 350
+            drawing = Drawing(width, height)
+
+            # Chart area
+            chart_x = 80
+            chart_y = 60
+            chart_width = 350
+            chart_height = 200
+
+            # Colors for different motivation levels
+            color_map = {
+                "High": colors.Color(0.2, 0.8, 0.4),  # Green
+                "Medium": colors.Color(0.8, 0.6, 0.2),  # Orange
+                "Low": colors.Color(0.8, 0.2, 0.2),  # Red
+            }
+
+            # Prepare data
+            n_groups = len(groups_data)
+            if n_groups == 0:
+                return None
+
+            # Limit to maximum 6 groups for better visibility
+            display_groups = groups_data[:6]
+            n_display_groups = len(display_groups)
+
+            # Calculate bar dimensions
+            bar_width = chart_width / n_display_groups * 0.8
+            bar_spacing = chart_width / n_display_groups
+
+            # Find maximum total for scaling
+            max_total = max(group.get("size", 0) for group in display_groups)
+            if max_total == 0:
+                max_total = 1
+
+            # Draw bars for each group
+            for i, group in enumerate(display_groups):
+                group_name = group.get("name", f"Kelompok {i+1}")
+                motivation_dist = group.get("motivation_distribution", {})
+
+                # Get counts for each motivation level
+                high_count = motivation_dist.get("High", 0)
+                medium_count = motivation_dist.get("Medium", 0)
+                low_count = motivation_dist.get("Low", 0)
+                total_count = high_count + medium_count + low_count
+
+                if total_count == 0:
+                    continue
+
+                # Calculate bar position
+                bar_x = chart_x + i * bar_spacing + (bar_spacing - bar_width) / 2
+
+                # Calculate segment heights
+                scale_factor = chart_height / max_total
+                high_height = high_count * scale_factor
+                medium_height = medium_count * scale_factor
+                low_height = low_count * scale_factor
+
+                # Draw stacked segments (bottom to top: Low, Medium, High)
+                current_y = chart_y
+
+                # Low segment (bottom)
+                if low_count > 0:
+                    drawing.add(
+                        Rect(
+                            bar_x,
+                            current_y,
+                            bar_width,
+                            low_height,
+                            fillColor=color_map["Low"],
+                            strokeColor=colors.black,
+                            strokeWidth=1,
+                        )
+                    )
+                    # Add count label if significant height
+                    if low_height > 15:
+                        label_y = current_y + low_height / 2
+                        drawing.add(
+                            String(
+                                bar_x + bar_width / 2,
+                                label_y,
+                                str(low_count),
+                                fontSize=9,
+                                textAnchor="middle",
+                                fontName="Helvetica-Bold",
+                                fillColor=colors.white,
+                            )
+                        )
+                    current_y += low_height
+
+                # Medium segment (middle)
+                if medium_count > 0:
+                    drawing.add(
+                        Rect(
+                            bar_x,
+                            current_y,
+                            bar_width,
+                            medium_height,
+                            fillColor=color_map["Medium"],
+                            strokeColor=colors.black,
+                            strokeWidth=1,
+                        )
+                    )
+                    # Add count label if significant height
+                    if medium_height > 15:
+                        label_y = current_y + medium_height / 2
+                        drawing.add(
+                            String(
+                                bar_x + bar_width / 2,
+                                label_y,
+                                str(medium_count),
+                                fontSize=9,
+                                textAnchor="middle",
+                                fontName="Helvetica-Bold",
+                                fillColor=colors.white,
+                            )
+                        )
+                    current_y += medium_height
+
+                # High segment (top)
+                if high_count > 0:
+                    drawing.add(
+                        Rect(
+                            bar_x,
+                            current_y,
+                            bar_width,
+                            high_height,
+                            fillColor=color_map["High"],
+                            strokeColor=colors.black,
+                            strokeWidth=1,
+                        )
+                    )
+                    # Add count label if significant height
+                    if high_height > 15:
+                        label_y = current_y + high_height / 2
+                        drawing.add(
+                            String(
+                                bar_x + bar_width / 2,
+                                label_y,
+                                str(high_count),
+                                fontSize=9,
+                                textAnchor="middle",
+                                fontName="Helvetica-Bold",
+                                fillColor=colors.white,
+                            )
+                        )
+
+                # Add group label below bar
+                drawing.add(
+                    String(
+                        bar_x + bar_width / 2,
+                        chart_y - 15,
+                        group_name.replace("Kelompok ", "Kel."),
+                        fontSize=9,
+                        textAnchor="middle",
+                        fontName="Helvetica",
+                    )
+                )
+
+                # Add total count above bar
+                total_height = high_height + medium_height + low_height
+                drawing.add(
+                    String(
+                        bar_x + bar_width / 2,
+                        chart_y + total_height + 5,
+                        f"Total: {total_count}",
+                        fontSize=8,
+                        textAnchor="middle",
+                        fontName="Helvetica-Bold",
+                    )
+                )
+
+            # Draw axes
+            from reportlab.graphics.shapes import Line
+
+            # X-axis
+            drawing.add(
+                Line(
+                    chart_x,
+                    chart_y,
+                    chart_x + chart_width,
+                    chart_y,
+                    strokeColor=colors.black,
+                    strokeWidth=2,
+                )
+            )
+            # Y-axis
+            drawing.add(
+                Line(
+                    chart_x,
+                    chart_y,
+                    chart_x,
+                    chart_y + chart_height,
+                    strokeColor=colors.black,
+                    strokeWidth=2,
+                )
+            )
+
+            # Y-axis labels (student count)
+            for i in range(6):
+                y_value = i * max_total / 5
+                y_pos = chart_y + i * chart_height / 5
+                if y_value % 1 == 0:  # Only show integer values
+                    drawing.add(
+                        String(
+                            chart_x - 5,
+                            y_pos - 3,
+                            str(int(y_value)),
+                            fontSize=8,
+                            textAnchor="end",
+                            fontName="Helvetica",
+                        )
+                    )
+
+            # Chart title
+            drawing.add(
+                String(
+                    width / 2,
+                    height - 30,
+                    "Distribusi Motivasi Siswa per Kelompok",
+                    fontSize=14,
+                    textAnchor="middle",
+                    fontName="Helvetica-Bold",
+                )
+            )
+
+            # Y-axis title
+            drawing.add(
+                String(
+                    20,
+                    height / 2,
+                    "Jumlah Siswa",
+                    fontSize=10,
+                    textAnchor="middle",
+                    fontName="Helvetica-Bold",
+                )
+            )
+
+            # Legend
+            legend_y = 20
+            legend_spacing = 100
+            legend_items = [
+                ("Motivasi Tinggi", color_map["High"]),
+                ("Motivasi Sedang", color_map["Medium"]),
+                ("Motivasi Rendah", color_map["Low"]),
+            ]
+
+            for i, (label, color) in enumerate(legend_items):
+                legend_x = chart_x + i * legend_spacing
+                # Legend color box
+                drawing.add(
+                    Rect(
+                        legend_x,
+                        legend_y,
+                        15,
+                        10,
+                        fillColor=color,
+                        strokeColor=colors.black,
+                    )
+                )
+                # Legend text
+                drawing.add(
+                    String(
+                        legend_x + 20,
+                        legend_y + 2,
+                        label,
+                        fontSize=9,
+                        fontName="Helvetica",
+                    )
+                )
+
+            # Add summary statistics
+            summary_y = height - 50
+            total_students = sum(group.get("size", 0) for group in display_groups)
+            total_high = sum(
+                group.get("motivation_distribution", {}).get("High", 0)
+                for group in display_groups
+            )
+            total_medium = sum(
+                group.get("motivation_distribution", {}).get("Medium", 0)
+                for group in display_groups
+            )
+            total_low = sum(
+                group.get("motivation_distribution", {}).get("Low", 0)
+                for group in display_groups
+            )
+
+            summary_text = f"Total: {total_students} siswa | Tinggi: {total_high} | Sedang: {total_medium} | Rendah: {total_low}"
+            drawing.add(
+                String(
+                    width / 2,
+                    summary_y,
+                    summary_text,
+                    fontSize=10,
+                    textAnchor="middle",
+                    fontName="Helvetica",
+                    fillColor=colors.darkblue,
+                )
+            )
+
+            return drawing
+
+        except Exception as e:
+            logger.error(f"Error creating stacked bar chart: {str(e)}")
+            return None
 
     def _add_detailed_group_analysis(self, groups_data, quality_analysis):
         """Add detailed analysis for each group"""
