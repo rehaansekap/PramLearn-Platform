@@ -1,0 +1,33 @@
+
+flowchart TD
+    A[Teacher Login] --> B[Akses Class Management]
+    B --> C[Pilih Material]
+    C --> D[Klik tab 'Upload ARCS Data']
+    
+    D --> E[Download template CSV<br/>arcs_data.csv]
+    E --> F[Teacher mengisi data ARCS siswa<br/>di Excel/spreadsheet]
+    
+    F --> G[Upload file CSV yang sudah diisi]
+    G --> H[Validasi format CSV]
+    H --> I{Format CSV valid?}
+    
+    I -->|Tidak| J[Tampilkan error message]
+    I -->|Ya| K[Parse data CSV]
+    
+    K --> L[Untuk setiap siswa dalam CSV]
+    L --> M[Hitung rata-rata per dimensi ARCS<br/>Attention, Relevance, Confidence, Satisfaction]
+    M --> N[Kumpulkan semua data untuk clustering]
+    
+    N --> O[Jalankan K-Means clustering k=3]
+    O --> P[StandardScaler normalization]
+    P --> Q[fit_predict pada features]
+    Q --> R[Map clusters berdasarkan centroid<br/>Low/Medium/High]
+    
+    R --> S[Batch update StudentMotivationProfile]
+    S --> T[Tampilkan hasil upload:<br/>- Jumlah siswa diproses<br/>- Distribusi motivation level<br/>- Success statistics]
+    
+    T --> U[Teacher dapat export laporan PDF]
+    U --> V[Teacher dapat lanjut ke group formation]
+    
+    J --> W[End]
+    V --> W

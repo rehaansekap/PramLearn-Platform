@@ -1,0 +1,33 @@
+
+flowchart TD
+    A[Student login setelah clustering selesai] --> B[Akses dashboard/material]
+    B --> C[Klik 'Lihat Hasil Analisis ARCS']
+    
+    C --> D[Load StudentMotivationProfile data]
+    D --> E{Apakah data clustering tersedia?}
+    
+    E -->|Tidak| F[Tampilkan pesan:<br/>Analisis belum tersedia]
+    E -->|Ya| G[Tampilkan dashboard hasil ARCS]
+    
+    G --> H[Display Motivation Level:<br/>High/Medium/Low dengan visual indikator]
+    H --> I[Show skor per dimensi ARCS:<br/>- Attention: X.X/5.0<br/>- Relevance: X.X/5.0<br/>- Confidence: X.X/5.0<br/>- Satisfaction: X.X/5.0]
+    
+    I --> J[Analisis strengths & weaknesses:<br/>Dimensi tertinggi dan terendah]
+    J --> K[Generate rekomendasi personal<br/>berdasarkan motivation level]
+    
+    K --> L{Berdasarkan motivation level}
+    L -->|High| M[Rekomendasi untuk High Motivation:<br/>- Tantangan lebih kompleks<br/>- Peer mentoring<br/>- Advanced materials]
+    
+    L -->|Medium| N[Rekomendasi untuk Medium Motivation:<br/>- Variasi metode belajar<br/>- Goal setting yang jelas<br/>- Regular feedback]
+    
+    L -->|Low| O[Rekomendasi untuk Low Motivation:<br/>- Break down tasks<br/>- Reward system<br/>- Extra support<br/>- Motivational content]
+    
+    M --> P[Tampilkan insight pembelajaran:<br/>- Tips study yang sesuai<br/>- Strategi improvement<br/>- Resource recommendations]
+    N --> P
+    O --> P
+    
+    P --> Q[Student dapat bookmark/save insights]
+    Q --> R[Student dapat track progress over time]
+    
+    F --> S[End]
+    R --> S

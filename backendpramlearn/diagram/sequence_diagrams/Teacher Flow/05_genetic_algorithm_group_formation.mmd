@@ -1,0 +1,39 @@
+
+sequenceDiagram
+    participant T as Teacher
+    participant F as Frontend (React)
+    participant B as Backend API
+    participant GA as Genetic Algorithm
+    participant DB as Database
+    
+    Note over T,DB: Genetic Algorithm - Heterogeneous Group Formation
+    
+    T->>+F: Pilih "Heterogeneous Groups"
+    F->>+B: POST /api/groups/genetic-formation/
+    B->>+DB: Ambil StudentMotivationProfile
+    DB-->>-B: Data siswa dengan motivation levels
+    
+    B->>+GA: initialize_population()
+    GA->>GA: Create random group combinations
+    GA-->>-B: Initial population
+    
+    loop Evolusi (Max 100 generasi)
+        B->>+GA: evaluate_fitness()
+        GA->>GA: Hitung diversity score per kelompok
+        GA->>GA: Hitung balance score antar kelompok
+        GA-->>-B: Fitness scores
+        
+        B->>+GA: selection_crossover_mutation()
+        GA->>GA: Tournament selection
+        GA->>GA: Crossover (swap students)
+        GA->>GA: Mutation (random reassignment)
+        GA-->>-B: New generation
+        
+        B->>B: Check convergence
+    end
+    
+    B->>B: Pilih solusi terbaik
+    B->>+DB: Simpan kelompok hasil GA
+    DB-->>-B: Groups saved
+    B-->>-F: Optimal group formation
+    F-->>-T: Kelompok heterogen terbentuk

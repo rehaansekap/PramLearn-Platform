@@ -1,0 +1,26 @@
+
+sequenceDiagram
+    participant T as Teacher
+    participant F as Frontend (React)
+    participant B as Backend API
+    participant PDF as PDF Service
+    participant DB as Database
+    
+    Note over T,DB: Analysis & Export
+    
+    T->>+F: Lihat hasil clustering
+    F->>+B: GET /api/clustering/statistics/
+    B->>+DB: Query StudentMotivationProfile grouped
+    DB-->>-B: Distribution statistics
+    B-->>-F: High: X, Medium: Y, Low: Z
+    F-->>-T: Dashboard analytics
+    
+    T->>+F: Export laporan PDF
+    F->>+B: POST /api/export/clustering-report/
+    B->>+PDF: ARCSClusteringPDFService.generate()
+    PDF->>+DB: Ambil data lengkap untuk laporan
+    DB-->>-PDF: All student profiles + statistics
+    PDF->>PDF: Generate comprehensive report
+    PDF-->>-B: PDF file content
+    B-->>-F: PDF download response
+    F-->>-T: File laporan clustering.pdf

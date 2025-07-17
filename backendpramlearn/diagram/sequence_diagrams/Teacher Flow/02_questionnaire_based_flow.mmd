@@ -1,0 +1,33 @@
+
+sequenceDiagram
+    participant T as Teacher
+    participant F as Frontend (React)
+    participant B as Backend API
+    participant ARCS as ARCSProcessor
+    participant KM as K-Means
+    participant DB as Database
+    
+    Note over T,DB: Questionnaire-based Flow
+    
+    T->>+F: Klik tab "ARCS Questionnaire"
+    F->>+B: GET /api/arcs/responses/
+    B->>+DB: Ambil responses siswa
+    DB-->>-B: Data responses (34 siswa)
+    B-->>-F: Statistics responses
+    F-->>-T: Overview kuesioner
+    
+    T->>+F: Trigger clustering manual
+    F->>+B: POST /api/arcs/trigger-clustering/
+    B->>+ARCS: update_all_motivation_levels()
+    ARCS->>+DB: Query semua StudentMotivationProfile
+    DB-->>-ARCS: Dataset ARCS lengkap
+    
+    ARCS->>+KM: Perform clustering
+    KM->>KM: StandardScaler + K-Means
+    KM-->>-ARCS: Motivation levels
+    
+    ARCS->>+DB: Update motivation_level untuk semua siswa
+    DB-->>-ARCS: Batch update selesai
+    ARCS-->>-B: Clustering statistics
+    B-->>-F: Results summary
+    F-->>-T: Hasil clustering

@@ -1,0 +1,133 @@
+
+classDiagram
+    %% Genetic Algorithm Group Formation System
+    
+    class Group {
+        +int id
+        +Material material
+        +string name
+        +string code
+        +__str__() string
+    }
+    
+    class GroupMember {
+        +int id
+        +Group group
+        +CustomUser student
+    }
+    
+    class GroupFormationAlgorithms {
+        +create_homogeneous_groups(student_data, n_clusters) list
+        +create_heterogeneous_groups_deap(student_data, n_clusters, priority_mode) list
+        +create_heterogeneous_groups_improved(student_data, n_clusters, priority_mode) list
+        +distribute_by_size_first(motivation_groups, n_groups, target_sizes) list
+    }
+    
+    class TeacherSessionAutoGroupFormationView {
+        +GroupFormationAlgorithms algorithms
+        +GroupService group_service
+        +AdaptiveGroupFormationService adaptive_service
+        +get(request, material_slug) Response
+        +post(request, material_slug) Response
+        +create_groups(request, material_slug) Response
+        +handle_pdf_export(request, material_slug) Response
+        +get_class_analysis(request, material_slug) Response
+    }
+    
+    class StudentMotivationProfile {
+        +CustomUser student
+        +float attention
+        +float relevance
+        +float confidence
+        +float satisfaction
+        +string motivation_level
+    }
+    
+    class CustomUser {
+        +string username
+        +Role role
+        +boolean is_active
+    }
+    
+    class Material {
+        +string title
+        +string slug
+        +Subject subject
+    }
+    
+    class GroupQuiz {
+        +int id
+        +Group group
+        +Quiz quiz
+        +datetime start_time
+        +datetime end_time
+        +boolean is_completed
+        +datetime submitted_at
+        +calculate_and_save_score() GroupQuizResult
+        +__str__() string
+    }
+    
+    class GroupQuizSubmission {
+        +int id
+        +GroupQuiz group_quiz
+        +Question question
+        +CustomUser student
+        +string selected_choice
+        +boolean is_correct
+        +datetime submitted_at
+        +save() void
+        +__str__() string
+    }
+    
+    class GroupQuizResult {
+        +int id
+        +GroupQuiz group_quiz
+        +float score
+        +datetime completed_at
+        +datetime created_at
+        +datetime updated_at
+        +save() void
+        +__str__() string
+    }
+    
+    class Quiz {
+        +string title
+        +string content
+        +boolean is_group_quiz
+        +int duration
+        +boolean is_active
+    }
+    
+    class Question {
+        +Quiz quiz
+        +string text
+        +string choice_a
+        +string choice_b
+        +string choice_c
+        +string choice_d
+        +string correct_choice
+    }
+    
+    %% Relationships
+    Material "1" -- "many" Group : "has groups"
+    Group "1" -- "many" GroupMember : "has members"
+    CustomUser "1" -- "many" GroupMember : "is member of"
+    CustomUser -- StudentMotivationProfile : "has profile"
+    
+    TeacherSessionAutoGroupFormationView ..> GroupFormationAlgorithms : "uses"
+    GroupFormationAlgorithms ..> StudentMotivationProfile : "analyzes"
+    GroupFormationAlgorithms ..> CustomUser : "groups"
+    
+    Group "1" -- "many" GroupQuiz : "takes"
+    Quiz "1" -- "many" GroupQuiz : "is assigned to"
+    Quiz "1" -- "many" Question : "contains"
+    
+    GroupQuiz -- GroupQuizResult : "has one"
+    GroupQuiz "1" -- "many" GroupQuizSubmission : "has submissions"
+    Question "1" -- "many" GroupQuizSubmission : "is answered in"
+    CustomUser "1" -- "many" GroupQuizSubmission : "submits"
+    
+    %% Notes
+    note for GroupFormationAlgorithms "Menggunakan Algoritma Genetika DEAP\nuntuk pembentukan kelompok heterogen"
+    note for StudentMotivationProfile "Menyediakan data motivasi (Tinggi/Sedang/Rendah)\nuntuk algoritma pembentukan kelompok"
+    note for TeacherSessionAutoGroupFormationView "Kontroler utama untuk pembentukan\nkelompok otomatis dengan parameter adaptif"

@@ -1,0 +1,107 @@
+
+classDiagram
+    %% Detailed ARCS Questionnaire System
+    
+    class ARCSQuestionnaire {
+        +Material material
+        +string title
+        +string description
+        +string questionnaire_type
+        +boolean is_active
+        +datetime start_date
+        +datetime end_date
+        +int duration_minutes
+        +CustomUser created_by
+        +string slug
+        +is_available_for_submission() tuple
+        +time_remaining() int
+    }
+    
+    class ARCSQuestion {
+        +ARCSQuestionnaire questionnaire
+        +string text
+        +string dimension
+        +string question_type
+        +int order
+        +boolean is_required
+        +string choice_a
+        +string choice_b
+        +string choice_c
+        +string choice_d
+        +string choice_e
+        +int scale_min
+        +int scale_max
+        +string scale_label_min
+        +string scale_label_max
+        +choices() list
+        +scale_labels() dict
+    }
+    
+    class ARCSResponse {
+        +ARCSQuestionnaire questionnaire
+        +CustomUser student
+        +datetime submitted_at
+        +datetime completed_at
+        +boolean is_completed
+    }
+    
+    class ARCSAnswer {
+        +ARCSResponse response
+        +ARCSQuestion question
+        +int likert_value
+        +string choice_value
+        +string text_value
+        +datetime answered_at
+    }
+    
+    class CustomUser {
+        +string username
+        +Role role
+    }
+    
+    class Material {
+        +string title
+        +string slug
+    }
+    
+    class StudentMotivationProfile {
+        +CustomUser student
+        +string motivation_level
+    }
+    
+    %% Relationships
+    Material "1" -- "many" ARCSQuestionnaire : "contains"
+    CustomUser "1" -- "many" ARCSQuestionnaire : "creates"
+    CustomUser "1" -- "many" ARCSResponse : "responds to"
+    CustomUser -- StudentMotivationProfile : "has"
+    
+    ARCSQuestionnaire "1" -- "many" ARCSQuestion : "contains"
+    ARCSQuestionnaire "1" -- "many" ARCSResponse : "receives"
+    
+    ARCSResponse "1" -- "many" ARCSAnswer : "is composed of"
+    ARCSQuestion "1" -- "many" ARCSAnswer : "is answered by"
+    
+    %% Enumerations
+    class QuestionTypes {
+        <<enumeration>>
+        LIKERT_5
+        LIKERT_7
+        MULTIPLE_CHOICE
+        TEXT
+    }
+    
+    class ARCSDimensions {
+        <<enumeration>>
+        ATTENTION
+        RELEVANCE
+        CONFIDENCE
+        SATISFACTION
+    }
+    
+    ARCSQuestion ..> QuestionTypes : "uses"
+    ARCSQuestion ..> ARCSDimensions : "is categorized by"
+    
+    %% Notes
+    note for ARCSQuestionnaire "Mengontrol ketersediaan kuesioner\ndengan batasan waktu"
+    note for ARCSQuestion "Mendukung berbagai jenis pertanyaan\ndan terhubung ke dimensi ARCS"
+    note for ARCSAnswer "Penyimpanan jawaban yang fleksibel\nuntuk berbagai jenis pertanyaan"

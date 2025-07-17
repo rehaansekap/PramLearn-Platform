@@ -1,0 +1,33 @@
+
+sequenceDiagram
+    participant ARCS as ARCSProcessor
+    participant SC as StandardScaler
+    participant KM as KMeans
+    
+    Note over ARCS,KM: Normalization & Clustering
+    
+    ARCS->>+SC: fit_transform(features)
+    SC->>SC: Standardize: (X - mean) / std
+    SC-->>-ARCS: features_scaled
+    
+    ARCS->>+KM: __init__(n_clusters=3, random_state=42, n_init=10)
+    KM-->>-ARCS: KMeans object
+    
+    ARCS->>+KM: fit_predict(features_scaled)
+    KM->>KM: Initialize centroids (k-means++)
+    
+    loop Max 300 iterations
+        KM->>KM: Assign points to nearest centroid
+        KM->>KM: Update centroids
+        KM->>KM: Check convergence
+    end
+    
+    KM-->>-ARCS: cluster_labels [0,1,2,...]
+    
+    ARCS->>+KM: cluster_centers_
+    KM-->>-ARCS: centroids matrix
+    
+    ARCS->>ARCS: centroid_means = np.mean(centroids, axis=1)
+    ARCS->>ARCS: sorted_indices = np.argsort(centroid_means)
+    
+    ARCS->>ARCS: level_mapping = {<br/>  sorted_indices[0]: "Low",<br/>  sorted_indices[1]: "Medium",<br/>  sorted_indices[2]: "High"<br/>}

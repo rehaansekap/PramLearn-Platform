@@ -1,0 +1,470 @@
+import os
+import sys
+import django
+from datetime import datetime
+
+# Add the parent directory to the system path to import Django settings
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.insert(0, parent_dir)
+
+# Setup Django
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "pramlearn_api.settings")
+django.setup()
+
+def generate_student_arcs_clustering_activity():
+    """Generate activity diagram untuk ARCS Clustering - Student Flow"""
+    return """
+flowchart TD
+    A[Student Login] --> B[Akses Material Pembelajaran]
+    B --> C{Apakah ARCS Questionnaire tersedia?}
+    C -->|Ya| D[Klik 'Isi Kuesioner ARCS']
+    C -->|Tidak| E[Tampilkan pesan: Kuesioner belum tersedia]
+    
+    D --> F[Load 20 pertanyaan ARCS<br/>4 dimensi: Attention, Relevance, Confidence, Satisfaction]
+    F --> G[Mulai mengisi kuesioner]
+    
+    G --> H{Untuk setiap pertanyaan 1-20}
+    H --> I[Jawab dengan skala 1-5<br/>1=Sangat Tidak Setuju, 5=Sangat Setuju]
+    I --> J{Apakah semua pertanyaan sudah dijawab?}
+    J -->|Tidak| H
+    J -->|Ya| K[Submit kuesioner lengkap]
+    
+    K --> L[Simpan ARCSResponse & ARCSAnswer ke database]
+    L --> M[Trigger automatic clustering process]
+    
+    M --> N[Hitung rata-rata skor per dimensi ARCS]
+    N --> O[Normalisasi data dengan StandardScaler]
+    O --> P[Jalankan K-Means clustering k=3]
+    P --> Q[Mapping hasil cluster ke motivation level<br/>Low/Medium/High]
+    Q --> R[Update StudentMotivationProfile]
+    
+    R --> S[Tampilkan konfirmasi pengiriman]
+    S --> T[Student dapat melihat hasil analisis]
+    T --> U[Dashboard menampilkan:<br/>- Motivation Level<br/>- Skor per dimensi ARCS<br/>- Rekomendasi personal]
+    
+    E --> V[End]
+    U --> V
+"""
+
+def generate_teacher_csv_clustering_activity():
+    """Generate activity diagram untuk CSV Upload Clustering - Teacher Flow"""
+    return """
+flowchart TD
+    A[Teacher Login] --> B[Akses Class Management]
+    B --> C[Pilih Material]
+    C --> D[Klik tab 'Upload ARCS Data']
+    
+    D --> E[Download template CSV<br/>arcs_data.csv]
+    E --> F[Teacher mengisi data ARCS siswa<br/>di Excel/spreadsheet]
+    
+    F --> G[Upload file CSV yang sudah diisi]
+    G --> H[Validasi format CSV]
+    H --> I{Format CSV valid?}
+    
+    I -->|Tidak| J[Tampilkan error message]
+    I -->|Ya| K[Parse data CSV]
+    
+    K --> L[Untuk setiap siswa dalam CSV]
+    L --> M[Hitung rata-rata per dimensi ARCS<br/>Attention, Relevance, Confidence, Satisfaction]
+    M --> N[Kumpulkan semua data untuk clustering]
+    
+    N --> O[Jalankan K-Means clustering k=3]
+    O --> P[StandardScaler normalization]
+    P --> Q[fit_predict pada features]
+    Q --> R[Map clusters berdasarkan centroid<br/>Low/Medium/High]
+    
+    R --> S[Batch update StudentMotivationProfile]
+    S --> T[Tampilkan hasil upload:<br/>- Jumlah siswa diproses<br/>- Distribusi motivation level<br/>- Success statistics]
+    
+    T --> U[Teacher dapat export laporan PDF]
+    U --> V[Teacher dapat lanjut ke group formation]
+    
+    J --> W[End]
+    V --> W
+"""
+
+def generate_teacher_questionnaire_clustering_activity():
+    """Generate activity diagram untuk Questionnaire-based Clustering - Teacher Flow"""
+    return """
+flowchart TD
+    A[Teacher Login] --> B[Akses Class Management]
+    B --> C[Pilih Material]
+    C --> D[Klik tab 'ARCS Questionnaire']
+    
+    D --> E[Lihat overview responses siswa]
+    E --> F{Apakah ada responses dari siswa?}
+    
+    F -->|Tidak| G[Tampilkan pesan: Belum ada responses]
+    F -->|Ya| H[Tampilkan statistik responses<br/>Contoh: 34 siswa sudah mengisi]
+    
+    H --> I[Klik 'Trigger Clustering Manual']
+    I --> J[Jalankan update_all_motivation_levels]
+    
+    J --> K[Query semua StudentMotivationProfile<br/>dengan data ARCS lengkap]
+    K --> L{Apakah data cukup untuk clustering?}
+    
+    L -->|Tidak| M[Tampilkan error: Data tidak cukup<br/>Minimal 3 siswa dengan data lengkap]
+    L -->|Ya| N[Prepare features untuk clustering]
+    
+    N --> O[StandardScaler normalization]
+    O --> P[K-Means clustering k=3]
+    P --> Q[Evaluate cluster centroids]
+    Q --> R[Map clusters ke motivation levels<br/>Berdasarkan rata-rata centroid]
+    
+    R --> S[Update motivation_level semua siswa]
+    S --> T[Tampilkan hasil clustering:<br/>- Total profiles updated<br/>- High: X siswa<br/>- Medium: Y siswa<br/>- Low: Z siswa]
+    
+    T --> U[Export laporan PDF clustering]
+    U --> V[Lanjut ke group formation]
+    
+    G --> W[End]
+    M --> W
+    V --> W
+"""
+
+def generate_genetic_algorithm_group_formation_activity():
+    """Generate activity diagram untuk Genetic Algorithm Group Formation - Teacher Flow"""
+    return """
+flowchart TD
+    A[Teacher sudah selesai ARCS clustering] --> B[Masuk ke tab Groups]
+    B --> C[Klik 'Generate Groups']
+    C --> D[Pilih mode: Heterogeneous Groups]
+    
+    D --> E[Validasi data motivation profiles]
+    E --> F{Apakah semua siswa punya motivation level?}
+    
+    F -->|Tidak| G[Tampilkan warning:<br/>Ada siswa yang belum dianalisis]
+    F -->|Ya| H[Mulai Genetic Algorithm]
+    
+    G --> I{Teacher tetap lanjut?}
+    I -->|Tidak| J[Cancel group formation]
+    I -->|Ya| H
+    
+    H --> K[Initialize Population<br/>Create random group combinations]
+    K --> L[Set parameters:<br/>- Population size: 50<br/>- Max generations: 100<br/>- Mutation rate: 0.1]
+    
+    L --> M{Loop: Evolusi generasi}
+    M --> N[Evaluate Fitness untuk setiap individu:<br/>- Diversity score per kelompok<br/>- Balance score antar kelompok<br/>- Heterogeneity motivation levels]
+    
+    N --> O[Selection: Tournament selection<br/>Pilih individu terbaik sebagai parent]
+    O --> P[Crossover: Swap students antar kelompok<br/>dengan probabilitas crossover]
+    P --> Q[Mutation: Random reassignment<br/>dengan probabilitas mutasi]
+    
+    Q --> R{Apakah sudah convergence<br/>atau max generation?}
+    R -->|Tidak| M
+    R -->|Ya| S[Pilih solusi terbaik<br/>dari generasi terakhir]
+    
+    S --> T[Simpan kelompok optimal ke database<br/>Group & GroupMember]
+    T --> U[Hitung final quality metrics:<br/>- Heterogeneity score<br/>- Balance score<br/>- Diversity index]
+    
+    U --> V[Tampilkan hasil group formation:<br/>- Jumlah kelompok terbentuk<br/>- Komposisi motivation level per kelompok<br/>- Quality analysis]
+    
+    V --> W[Export laporan PDF group formation]
+    W --> X[Teacher dapat assign quiz/tasks ke kelompok]
+    
+    J --> Y[End]
+    X --> Y
+"""
+
+def generate_student_view_clustering_results_activity():
+    """Generate activity diagram untuk Student View Clustering Results"""
+    return """
+flowchart TD
+    A[Student login setelah clustering selesai] --> B[Akses dashboard/material]
+    B --> C[Klik 'Lihat Hasil Analisis ARCS']
+    
+    C --> D[Load StudentMotivationProfile data]
+    D --> E{Apakah data clustering tersedia?}
+    
+    E -->|Tidak| F[Tampilkan pesan:<br/>Analisis belum tersedia]
+    E -->|Ya| G[Tampilkan dashboard hasil ARCS]
+    
+    G --> H[Display Motivation Level:<br/>High/Medium/Low dengan visual indikator]
+    H --> I[Show skor per dimensi ARCS:<br/>- Attention: X.X/5.0<br/>- Relevance: X.X/5.0<br/>- Confidence: X.X/5.0<br/>- Satisfaction: X.X/5.0]
+    
+    I --> J[Analisis strengths & weaknesses:<br/>Dimensi tertinggi dan terendah]
+    J --> K[Generate rekomendasi personal<br/>berdasarkan motivation level]
+    
+    K --> L{Berdasarkan motivation level}
+    L -->|High| M[Rekomendasi untuk High Motivation:<br/>- Tantangan lebih kompleks<br/>- Peer mentoring<br/>- Advanced materials]
+    
+    L -->|Medium| N[Rekomendasi untuk Medium Motivation:<br/>- Variasi metode belajar<br/>- Goal setting yang jelas<br/>- Regular feedback]
+    
+    L -->|Low| O[Rekomendasi untuk Low Motivation:<br/>- Break down tasks<br/>- Reward system<br/>- Extra support<br/>- Motivational content]
+    
+    M --> P[Tampilkan insight pembelajaran:<br/>- Tips study yang sesuai<br/>- Strategi improvement<br/>- Resource recommendations]
+    N --> P
+    O --> P
+    
+    P --> Q[Student dapat bookmark/save insights]
+    Q --> R[Student dapat track progress over time]
+    
+    F --> S[End]
+    R --> S
+"""
+
+def generate_teacher_analysis_export_activity():
+    """Generate activity diagram untuk Teacher Analysis & Export"""
+    return """
+flowchart TD
+    A[Teacher selesai clustering] --> B[Lihat hasil clustering statistics]
+    B --> C[Dashboard menampilkan:<br/>- High: X siswa (X%)<br/>- Medium: Y siswa (Y%)<br/>- Low: Z siswa (Z%)]
+    
+    C --> D[Klik 'Export Laporan PDF']
+    D --> E[ARCSClusteringPDFService.generate]
+    
+    E --> F[Kumpulkan data lengkap:<br/>- All student profiles<br/>- Clustering statistics<br/>- Centroid analysis<br/>- Distribution charts]
+    
+    F --> G[Generate comprehensive report sections:]
+    G --> H[1. Executive Summary<br/>Overview clustering results]
+    H --> I[2. Methodology<br/>K-Means algorithm explanation]
+    I --> J[3. Student Data Table<br/>All students dengan motivation levels]
+    J --> K[4. Statistical Analysis<br/>Distribution dan centroids]
+    K --> L[5. Visualization<br/>Charts dan graphs]
+    L --> M[6. Recommendations<br/>Teaching strategies per level]
+    
+    M --> N[Compile ke PDF format]
+    N --> O[Download file: clustering_report.pdf]
+    
+    O --> P{Teacher action selanjutnya}
+    P -->|Group Formation| Q[Lanjut ke pembentukan kelompok]
+    P -->|Share Report| R[Share laporan ke stakeholder]
+    P -->|Review Data| S[Review individual student data]
+    
+    Q --> T[End]
+    R --> T
+    S --> T
+"""
+
+def save_activity_diagrams():
+    """Save all activity diagrams to organized folders"""
+    
+    # Create main output directory
+    output_dir = "activity_diagrams"
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # Define folder structure and diagrams
+    diagram_structure = {
+        "ARCS Clustering System - Student Flow": {
+            "01_student_arcs_clustering_process": generate_student_arcs_clustering_activity(),
+            "02_student_view_clustering_results": generate_student_view_clustering_results_activity()
+        },
+        "ARCS Clustering System - Teacher Flow": {
+            "01_teacher_csv_upload_clustering": generate_teacher_csv_clustering_activity(),
+            "02_teacher_questionnaire_clustering": generate_teacher_questionnaire_clustering_activity(),
+            "03_teacher_analysis_export": generate_teacher_analysis_export_activity()
+        },
+        "Group Formation with Genetic Algorithm": {
+            "01_genetic_algorithm_group_formation": generate_genetic_algorithm_group_formation_activity()
+        }
+    }
+    
+    all_diagrams = {}
+    
+    # Create folders and save diagrams
+    for folder_name, diagrams in diagram_structure.items():
+        folder_path = os.path.join(output_dir, folder_name)
+        os.makedirs(folder_path, exist_ok=True)
+        
+        for filename, diagram_content in diagrams.items():
+            file_path = os.path.join(folder_path, f"{filename}.mmd")
+            with open(file_path, 'w', encoding='utf-8') as f:
+                f.write(diagram_content)
+            print(f"✅ Generated: {file_path}")
+            
+            # Store for HTML preview with full path as key
+            all_diagrams[f"{folder_name}/{filename}"] = diagram_content
+    
+    # Generate HTML preview with organized structure
+    html_content = generate_html_preview(diagram_structure)
+    html_filename = os.path.join(output_dir, "activity_diagrams_preview.html")
+    with open(html_filename, 'w', encoding='utf-8') as f:
+        f.write(html_content)
+    print(f"✅ Generated: {html_filename}")
+    
+    print(f"\n🎯 Activity diagrams berhasil di-generate dengan struktur folder!")
+    print(f"📁 Lokasi: {os.path.abspath(output_dir)}/")
+    print(f"🌐 Preview: Buka {html_filename} di browser")
+    print(f"\n📂 Struktur folder:")
+    for folder_name, diagrams in diagram_structure.items():
+        print(f"   📁 {folder_name}/")
+        for filename in diagrams.keys():
+            print(f"      📄 {filename}.mmd")
+
+def generate_html_preview(diagram_structure):
+    """Generate HTML file untuk preview semua activity diagrams dengan struktur folder"""
+    
+    html_content = f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PramLearn ARCS Clustering & Group Formation - Activity Diagrams</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body {{ 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 20px; 
+            background-color: #f8f9fa;
+            line-height: 1.6;
+        }}
+        .diagram-container {{ 
+            background: white; 
+            margin: 30px 0; 
+            padding: 25px; 
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-left: 4px solid #11418b;
+        }}
+        .folder-header {{
+            background: linear-gradient(135deg, #11418b, #1a5bb8);
+            color: white;
+            padding: 20px 25px;
+            margin: 50px 0 0 0;
+            border-radius: 12px 12px 0 0;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }}
+        .diagram-title {{ 
+            color: #11418b; 
+            border-bottom: 3px solid #11418b; 
+            padding-bottom: 12px;
+            margin-bottom: 25px;
+            font-size: 18px;
+            font-weight: 600;
+        }}
+        .mermaid {{ 
+            text-align: center; 
+            background: white;
+            margin: 25px 0;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }}
+        .header {{
+            text-align: center;
+            color: #11418b;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }}
+        .header h1 {{
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #11418b, #1a5bb8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }}
+        .header h2 {{
+            font-size: 1.5em;
+            color: #666;
+            font-weight: 400;
+        }}
+        .timestamp {{
+            color: #666;
+            font-size: 14px;
+            text-align: right;
+            margin-top: 30px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }}
+        .folder-section {{
+            margin-bottom: 60px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        }}
+        .description {{
+            background: #f8f9fa;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            border-left: 4px solid #17a2b8;
+            color: #495057;
+        }}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔄 PramLearn Activity Diagrams</h1>
+        <h2>ARCS Clustering & Genetic Algorithm Group Formation</h2>
+        <div class="description">
+            <strong>Activity diagrams</strong> ini menggambarkan alur proses lengkap dari fitur-fitur khusus sistem PramLearn:
+            <br>• <strong>ARCS Clustering System</strong> - Analisis motivasi siswa dengan K-Means
+            <br>• <strong>Genetic Algorithm Group Formation</strong> - Pembentukan kelompok heterogen optimal
+        </div>
+    </div>
+"""
+
+    # Generate content for each folder
+    for folder_name, diagrams in diagram_structure.items():
+        html_content += f"""
+    <div class="folder-section">
+        <div class="folder-header">
+            📁 {folder_name}
+        </div>
+"""
+        
+        for diagram_name, diagram_content in diagrams.items():
+            # Clean up diagram name for display
+            display_name = diagram_name.replace('_', ' ').replace('01 ', '').replace('02 ', '').replace('03 ', '').title()
+            
+            html_content += f"""
+        <div class="diagram-container">
+            <h3 class="diagram-title">📊 {display_name}</h3>
+            <div class="mermaid">
+{diagram_content}
+            </div>
+        </div>
+"""
+        
+        html_content += "    </div>\n"
+
+    html_content += f"""
+    <div class="timestamp">
+        <strong>Generated on:</strong> {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+        <br><strong>System:</strong> PramLearn ARCS Clustering & Group Formation
+        <br><strong>Algorithm:</strong> K-Means Clustering + DEAP Genetic Algorithm
+    </div>
+
+    <script>
+        mermaid.initialize({{ 
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {{
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            }},
+            themeVariables: {{
+                primaryColor: '#11418b',
+                primaryTextColor: '#fff',
+                primaryBorderColor: '#11418b',
+                lineColor: '#11418b',
+                secondaryColor: '#f8f9fa',
+                tertiaryColor: '#e9ecef'
+            }}
+        }});
+    </script>
+</body>
+</html>
+"""
+    
+    return html_content
+
+if __name__ == "__main__":
+    print("🚀 Generating Activity Diagrams for PramLearn Features...")
+    print("=" * 70)
+    print("📊 Features covered:")
+    print("   • ARCS Clustering System (Student & Teacher Flow)")
+    print("   • Genetic Algorithm Group Formation")
+    print("   • Analysis & Export Processes")
+    print("=" * 70)
+    
+    save_activity_diagrams()

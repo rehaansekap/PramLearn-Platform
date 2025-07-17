@@ -1,0 +1,93 @@
+
+classDiagram
+    %% Integrated ARCS Clustering & Group Formation System
+    
+    class CustomUser {
+        +string username
+        +Role role
+        +string first_name
+        +string last_name
+    }
+    
+    class StudentMotivationProfile {
+        +CustomUser student
+        +float attention
+        +float relevance
+        +float confidence
+        +float satisfaction
+        +string motivation_level
+    }
+    
+    class ARCSProcessor {
+        +int n_clusters
+        +update_all_motivation_levels() dict
+    }
+    
+    class GroupFormationAlgorithms {
+        +create_heterogeneous_groups_deap() list
+        +create_homogeneous_groups() list
+    }
+    
+    class Material {
+        +string title
+        +string slug
+        +Subject subject
+    }
+    
+    class Group {
+        +Material material
+        +string name
+        +string code
+    }
+    
+    class GroupMember {
+        +Group group
+        +CustomUser student
+    }
+    
+    class ARCSQuestionnaire {
+        +Material material
+        +string title
+        +string questionnaire_type
+    }
+    
+    class ARCSResponse {
+        +ARCSQuestionnaire questionnaire
+        +CustomUser student
+        +boolean is_completed
+    }
+    
+    class TeacherSessionAutoGroupFormationView {
+        +GroupFormationAlgorithms algorithms
+        +create_groups() Response
+    }
+    
+    %% Core Relationships
+    CustomUser -- StudentMotivationProfile : "analyzed as"
+    Material "1" -- "many" ARCSQuestionnaire : "has"
+    Material "1" -- "many" Group : "forms groups in"
+    
+    ARCSQuestionnaire "1" -- "many" ARCSResponse : "receives"
+    CustomUser "1" -- "many" ARCSResponse : "responds to"
+    
+    Group "1" -- "many" GroupMember : "contains"
+    CustomUser "1" -- "many" GroupMember : "is member of"
+    
+    %% Process Flow Relationships
+    ARCSProcessor ..> ARCSResponse : "analyzes"
+    ARCSProcessor ..> StudentMotivationProfile : "updates"
+    
+    GroupFormationAlgorithms ..> StudentMotivationProfile : "uses motivation data from"
+    TeacherSessionAutoGroupFormationView ..> GroupFormationAlgorithms : "executes"
+    TeacherSessionAutoGroupFormationView ..> Group : "creates"
+    
+    %% Data Flow
+    ARCSResponse -->> ARCSProcessor : input data
+    ARCSProcessor -->> StudentMotivationProfile : clustering results
+    StudentMotivationProfile -->> GroupFormationAlgorithms : motivation levels
+    GroupFormationAlgorithms -->> Group : optimal groups
+    
+    %% Notes
+    note for ARCSProcessor "K-Means clustering memetakan\nrespons ARCS ke level motivasi"
+    note for GroupFormationAlgorithms "Algoritma Genetika DEAP mengoptimalkan\nkeragaman kelompok berdasarkan level motivasi"
+    note for StudentMotivationProfile "Jembatan antara analisis ARCS\ndan pembentukan kelompok"

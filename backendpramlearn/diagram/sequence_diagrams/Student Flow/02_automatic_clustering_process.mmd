@@ -1,0 +1,23 @@
+
+sequenceDiagram
+    participant B as Backend API
+    participant ARCS as ARCSProcessor
+    participant DB as Database
+    participant KM as K-Means
+    
+    Note over B,KM: Automatic Clustering Process
+    
+    B->>+ARCS: _process_arcs_scores()
+    ARCS->>+DB: Ambil semua data ARCS siswa
+    DB-->>-ARCS: Dataset lengkap (Attention, Relevance, Confidence, Satisfaction)
+    
+    ARCS->>ARCS: Hitung rata-rata per dimensi
+    ARCS->>+KM: fit_predict(features_scaled)
+    KM->>KM: StandardScaler normalization
+    KM->>KM: K-Means clustering (k=3)
+    KM->>KM: Map clusters to motivation levels
+    KM-->>-ARCS: cluster_labels (High/Medium/Low)
+    
+    ARCS->>+DB: Update StudentMotivationProfile
+    DB-->>-ARCS: Profile updated
+    ARCS-->>-B: Clustering selesai

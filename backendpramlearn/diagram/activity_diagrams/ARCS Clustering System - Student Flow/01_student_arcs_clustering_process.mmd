@@ -1,0 +1,31 @@
+
+flowchart TD
+    A[Student Login] --> B[Akses Material Pembelajaran]
+    B --> C{Apakah ARCS Questionnaire tersedia?}
+    C -->|Ya| D[Klik 'Isi Kuesioner ARCS']
+    C -->|Tidak| E[Tampilkan pesan: Kuesioner belum tersedia]
+    
+    D --> F[Load 20 pertanyaan ARCS<br/>4 dimensi: Attention, Relevance, Confidence, Satisfaction]
+    F --> G[Mulai mengisi kuesioner]
+    
+    G --> H{Untuk setiap pertanyaan 1-20}
+    H --> I[Jawab dengan skala 1-5<br/>1=Sangat Tidak Setuju, 5=Sangat Setuju]
+    I --> J{Apakah semua pertanyaan sudah dijawab?}
+    J -->|Tidak| H
+    J -->|Ya| K[Submit kuesioner lengkap]
+    
+    K --> L[Simpan ARCSResponse & ARCSAnswer ke database]
+    L --> M[Trigger automatic clustering process]
+    
+    M --> N[Hitung rata-rata skor per dimensi ARCS]
+    N --> O[Normalisasi data dengan StandardScaler]
+    O --> P[Jalankan K-Means clustering k=3]
+    P --> Q[Mapping hasil cluster ke motivation level<br/>Low/Medium/High]
+    Q --> R[Update StudentMotivationProfile]
+    
+    R --> S[Tampilkan konfirmasi pengiriman]
+    S --> T[Student dapat melihat hasil analisis]
+    T --> U[Dashboard menampilkan:<br/>- Motivation Level<br/>- Skor per dimensi ARCS<br/>- Rekomendasi personal]
+    
+    E --> V[End]
+    U --> V

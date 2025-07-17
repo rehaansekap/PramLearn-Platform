@@ -1,0 +1,22 @@
+
+sequenceDiagram
+    participant API as API Endpoint
+    participant ARCS as ARCSProcessor
+    participant DB as Database
+    
+    Note over API,DB: Data Preparation
+    
+    API->>+ARCS: update_all_motivation_levels()
+    
+    ARCS->>+DB: Query StudentMotivationProfile
+    Note right of DB: Filter: attention, relevance,<br/>confidence, satisfaction not null<br/>Exclude: semua nilai = 0.0
+    DB-->>-ARCS: profiles (N siswa)
+    
+    ARCS->>ARCS: Validasi: len(profiles) >= n_clusters (3)
+    
+    loop Untuk setiap profile
+        ARCS->>ARCS: features.append([attention, relevance, confidence, satisfaction])
+        ARCS->>ARCS: profile_ids.append(profile.id)
+    end
+    
+    ARCS->>ARCS: features = np.array(features)
