@@ -275,34 +275,6 @@ def generate_materials():
     ]
 
 
-def generate_files():
-    """Generate 1 PDF file for material"""
-    return [
-        {
-            "model": "pramlearnapp.file",
-            "pk": 1,
-            "fields": {
-                "file": "materials/files/pengenalan-jaringan-komputer.pdf",
-                "uploaded_at": "2024-01-15T10:00:00Z",
-            },
-        }
-    ]
-
-
-def generate_material_pdf_relations():
-    """Generate many-to-many relations between Material and File"""
-    return [
-        {
-            "model": "pramlearnapp.material_pdf_files",
-            "pk": 1,
-            "fields": {
-                "material_id": 1,
-                "file_id": 1,
-            },
-        }
-    ]
-
-
 def generate_youtube_videos():
     """Generate 3 YouTube videos for material"""
     videos = [
@@ -825,8 +797,6 @@ def main():
 
     print("📚 Generating material and content...")
     data.extend(generate_materials())
-    data.extend(generate_files())
-    data.extend(generate_material_pdf_relations())
     data.extend(generate_youtube_videos())
 
     print("🧩 Generating quizzes...")
