@@ -10,6 +10,7 @@ import GroupQuizSidebar from "./GroupQuizSidebar";
 import GroupQuizQuestionCard from "./GroupQuizQuestionCard";
 import GroupQuizSubmitModal from "./GroupQuizSubmitModal";
 import GroupQuizNavigation from "./GroupQuizNavigation";
+import GroupQuizChatManager from "./chat/GroupQuizChatManager";
 
 const { Content, Sider } = Layout;
 const { useBreakpoint } = Grid;
@@ -175,6 +176,7 @@ const GroupQuizInterface = () => {
       style={{
         minHeight: "100vh",
         background: "#fff",
+        position: "relative", // ← TAMBAHKAN INI untuk floating button
       }}
     >
       <Helmet>
@@ -234,7 +236,9 @@ const GroupQuizInterface = () => {
             </div>
 
             {/* Mobile Group Sidebar */}
-            <div>
+            <div style={{ marginBottom: 100 }}>
+              {" "}
+              {/* ← TAMBAH MARGIN BOTTOM untuk floating button */}
               <GroupQuizSidebar
                 wsConnected={wsConnected}
                 groupMembers={groupMembers}
@@ -331,6 +335,11 @@ const GroupQuizInterface = () => {
           progress={progress}
         />
       </div>
+
+      {/* ← TAMBAHKAN CHAT MANAGER DI SINI */}
+      {quiz?.material?.slug && (
+        <GroupQuizChatManager materialSlug={quiz.material.slug} />
+      )}
     </div>
   );
 };
