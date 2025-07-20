@@ -8,6 +8,7 @@ export const OnlineStatusProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
   const [connectionAttempts, setConnectionAttempts] = useState(0);
+  const [forceUpdate, setForceUpdate] = useState(0);
   const maxReconnectAttempts = 5;
 
   useEffect(() => {
@@ -51,6 +52,17 @@ export const OnlineStatusProvider = ({ children }) => {
                   last_activity: data.last_activity,
                 },
               }));
+              setForceUpdate((prev) => prev + 1);
+
+              window.dispatchEvent(
+                new CustomEvent("userStatusUpdate", {
+                  detail: {
+                    user_id: data.user_id,
+                    is_online: data.is_online,
+                    last_activity: data.last_activity,
+                  },
+                })
+              );
             }
           } catch (e) {
             console.error("❌ Error parsing WebSocket message:", e);
@@ -137,6 +149,8 @@ export const OnlineStatusProvider = ({ children }) => {
     socket,
     isConnected,
     connectionAttempts,
+    forceUpdate,
+    setUserStatuses,
   };
 
   return (

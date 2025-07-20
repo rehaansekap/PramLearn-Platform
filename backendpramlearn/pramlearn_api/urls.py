@@ -145,6 +145,7 @@ from pramlearnapp.views.student.arcs.studentARCSQuestionnaireView import (
     StudentARCSBySlugView,
     StudentARCSResultsView,
 )
+from pramlearnapp.views.student.groupChatView import StudentGroupChatView
 
 
 router = DefaultRouter()
@@ -382,6 +383,11 @@ urlpatterns = [
         "api/student/materials/<slug:material_slug>/arcs/<slug:arcs_slug>/results/",
         StudentARCSResultsView.as_view(),
         name="student-arcs-results-by-slug",
+    ),
+    path(
+        "api/student/group-chat/<str:material_slug>/",
+        StudentGroupChatView.as_view(),
+        name="student-group-chat",
     ),
     path(
         "api/teacher/dashboard/",

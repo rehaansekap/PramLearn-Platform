@@ -1,7 +1,15 @@
 from .user import Role, CustomUser, StudentMotivationProfile
 from .classes import Class, ClassStudent
 from .subject import Subject, SubjectClass
-from .group import Group, GroupMember, GroupQuiz, GroupQuizSubmission, GroupQuizResult
+from .group import (
+    Group,
+    GroupMember,
+    GroupQuiz,
+    GroupQuizSubmission,
+    GroupQuizResult,
+    GroupChat,
+    GroupChatRead,
+)
 from .quiz import Quiz, Question, StudentQuizAttempt, StudentQuizAnswer
 from .assignment import (
     Assignment,
@@ -50,6 +58,8 @@ __all__ = [
     "GroupQuiz",
     "GroupQuizSubmission",
     "GroupQuizResult",
+    "GroupChat",
+    "GroupChatRead",
     "Quiz",
     "Question",
     "Assignment",

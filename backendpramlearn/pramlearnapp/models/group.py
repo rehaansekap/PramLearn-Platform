@@ -73,7 +73,7 @@ class GroupQuiz(models.Model):
         # Update submission time if not already set
         if not self.submitted_at:
             self.submitted_at = timezone.now()
-        
+
         self.is_completed = True
         self.save()
 
@@ -178,3 +178,30 @@ class GroupQuizResult(models.Model):
         return (
             f"{self.group_quiz.group.name} - {self.group_quiz.quiz.title}: {self.score}"
         )
+
+
+class GroupChat(models.Model):
+    """Model untuk chat kelompok"""
+
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="chats")
+    sender = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    message = models.TextField()
+    created_at = models.DateTimeField(default=timezone.now)
+    is_read = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.sender.username}: {self.message[:50]}..."
+
+
+class GroupChatRead(models.Model):
+    """Model untuk tracking read status per user"""
+
+    chat = models.ForeignKey(GroupChat, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    read_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        unique_together = ("chat", "user")

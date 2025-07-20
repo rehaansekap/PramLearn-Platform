@@ -7,8 +7,10 @@ import {
   EditOutlined,
   BookOutlined,
   FormOutlined,
+  TeamOutlined,
+  MessageOutlined,
 } from "@ant-design/icons";
-
+import GroupChatTab from "../group/GroupChatTab";
 import StudentPDFViewer from "../pdfviewer/StudentPDFViewer";
 import StudentVideoPlayer from "../videoplayer/StudentVideoPlayer";
 import MaterialQuizList from "../MaterialQuizList";
@@ -124,6 +126,20 @@ const MaterialContentTabs = ({
               recordQuizCompletion={recordQuizCompletion}
               completedActivities={completedActivities}
             />
+          </div>
+        </TabPane>
+
+        <TabPane
+          tab={
+            <Space>
+              <TeamOutlined />
+              <span>Kelompok</span>
+            </Space>
+          }
+          key="kelompok"
+        >
+          <div style={{ padding: "24px" }}>
+            <GroupChatTab materialSlug={materialSlug} />
           </div>
         </TabPane>
 
