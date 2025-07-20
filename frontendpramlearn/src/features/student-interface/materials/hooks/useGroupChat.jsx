@@ -440,6 +440,49 @@ const useGroupChat = (materialSlug) => {
     };
   }, []);
 
+  const manualRefresh = useCallback(async () => {
+    console.log("🔄 Manual refresh triggered");
+
+    // Reset data fetched flag to allow refetch
+    dataFetchedRef.current = false;
+
+    // Clear current data
+    setMessages([]);
+    setMembers([]);
+    setGroupInfo(null);
+
+    // Refetch data
+    await fetchGroupChat();
+  }, [fetchGroupChat]);
+
+  // Force reconnect function
+  const forceReconnect = useCallback(() => {
+    console.log("🔌 Force reconnect triggered");
+
+    // Close existing connection
+    if (wsRef.current) {
+      wsRef.current.close(1000);
+      wsRef.current = null;
+    }
+
+    // Reset connection state
+    setWsConnected(false);
+    reconnectAttemptsRef.current = 0;
+
+    // Clear any pending reconnection
+    if (reconnectTimeoutRef.current) {
+      clearTimeout(reconnectTimeoutRef.current);
+      reconnectTimeoutRef.current = null;
+    }
+
+    // Reconnect after a short delay
+    setTimeout(() => {
+      if (mountedRef.current) {
+        connectWebSocket();
+      }
+    }, 1000);
+  }, [connectWebSocket]);
+
   return {
     loading,
     groupInfo,
@@ -451,6 +494,8 @@ const useGroupChat = (materialSlug) => {
     sendMessage,
     handleTyping,
     isUserOnline,
+    manualRefresh,
+    forceReconnect,
   };
 };
 

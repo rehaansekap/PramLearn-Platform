@@ -23,6 +23,7 @@ import {
   UpOutlined,
 } from "@ant-design/icons";
 import moment from "moment";
+import GroupChatHeader from "./GroupChatHeader";
 
 const { Text, Title } = Typography;
 const { TextArea } = Input;
@@ -42,6 +43,8 @@ const GroupChatDrawer = ({
   handleTyping,
   user,
   isUserOnline,
+  manualRefresh,
+  forceReconnect,
 }) => {
   const [messageText, setMessageText] = useState("");
   const [membersCollapsed, setMembersCollapsed] = useState(true);
@@ -135,6 +138,9 @@ const GroupChatDrawer = ({
       bodyStyle={{
         padding: 0,
         background: "#f5f5f5",
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
       }}
       style={{
         borderTopLeftRadius: 24,
@@ -142,6 +148,14 @@ const GroupChatDrawer = ({
         overflow: "hidden",
       }}
     >
+      <GroupChatHeader
+        groupInfo={groupInfo}
+        wsConnected={wsConnected}
+        onClose={onClose}
+        manualRefresh={manualRefresh}
+        forceReconnect={forceReconnect}
+        loading={loading}
+      />
       {loading ? (
         <div style={{ textAlign: "center", padding: "60px 0" }}>
           <Spin size="large" tip="Memuat chat kelompok..." />
@@ -158,7 +172,7 @@ const GroupChatDrawer = ({
       ) : (
         <>
           {/* Header */}
-          <div
+          {/* <div
             style={{
               background: "linear-gradient(135deg, #1890ff 0%, #40a9ff 100%)",
               padding: "20px 16px 16px",
@@ -198,10 +212,10 @@ const GroupChatDrawer = ({
                   {wsConnected ? "Terhubung Real-time" : "Koneksi Terputus"}
                 </Text>
               </Space>
-            </div>
+            </div> */}
 
-            {/* Handle bar */}
-            <div
+          {/* Handle bar */}
+          {/* <div
               style={{
                 position: "absolute",
                 top: 8,
@@ -213,10 +227,10 @@ const GroupChatDrawer = ({
                 background: "rgba(255, 255, 255, 0.5)",
               }}
             />
-          </div>
+          </div> */}
 
           {/* Members List */}
-          <div
+          {/* <div
             style={{
               backgroundColor: "#fafafa",
               borderBottom: "1px solid #f0f0f0",
@@ -292,7 +306,7 @@ const GroupChatDrawer = ({
                 </div>
               </Panel>
             </Collapse>
-          </div>
+          </div> */}
 
           {/* Messages */}
           <div
@@ -300,7 +314,6 @@ const GroupChatDrawer = ({
               flex: 1,
               overflowY: "auto",
               padding: "16px",
-              height: "calc(80vh - 280px)",
               background: "#f5f5f5",
             }}
           >

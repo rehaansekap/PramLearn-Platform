@@ -336,7 +336,27 @@ const GroupQuizInterface = () => {
         />
       </div>
 
-      {/* ← TAMBAHKAN CHAT MANAGER DI SINI */}
+      {!wsConnected && (
+        <div
+          style={{
+            position: "fixed",
+            top: 20,
+            right: 20,
+            background: "#ff4d4f",
+            color: "white",
+            padding: "8px 16px",
+            borderRadius: 8,
+            fontSize: 12,
+            fontWeight: 600,
+            zIndex: 1002,
+            boxShadow: "0 4px 12px rgba(255, 77, 79, 0.3)",
+          }}
+        >
+          Koneksi Terputus - Mencoba menyambung kembali...
+        </div>
+      )}
+
+      {/* Chat Manager dengan delay */}
       {quiz?.material?.slug && (
         <GroupQuizChatManager materialSlug={quiz.material.slug} />
       )}

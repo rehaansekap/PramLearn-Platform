@@ -29,6 +29,8 @@ const GroupQuizChatManager = ({ materialSlug }) => {
     onlineUsers,
     sendMessage,
     handleTyping,
+    manualRefresh,
+    forceReconnect,
   } = useGroupChat(materialSlug);
 
   // Calculate unread messages (simple implementation)
@@ -75,6 +77,8 @@ const GroupQuizChatManager = ({ materialSlug }) => {
     onlineUsers,
     sendMessage,
     handleTyping,
+    manualRefresh,
+    forceReconnect,
     user,
     isUserOnline,
   };

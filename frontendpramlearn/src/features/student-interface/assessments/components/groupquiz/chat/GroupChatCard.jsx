@@ -25,6 +25,7 @@ import {
   UpOutlined,
 } from "@ant-design/icons";
 import moment from "moment";
+import GroupChatHeader from "./GroupChatHeader";
 
 const { Text, Title } = Typography;
 const { TextArea } = Input;
@@ -44,6 +45,8 @@ const GroupChatCard = ({
   user,
   isUserOnline,
   closing,
+  manualRefresh,
+  forceReconnect,
 }) => {
   const [messageText, setMessageText] = useState("");
   const [membersCollapsed, setMembersCollapsed] = useState(true);
@@ -203,8 +206,16 @@ const GroupChatCard = ({
         flexDirection: "column",
       }}
     >
+      <GroupChatHeader
+        groupInfo={groupInfo}
+        wsConnected={wsConnected}
+        onClose={onClose}
+        manualRefresh={manualRefresh}
+        forceReconnect={forceReconnect}
+        loading={loading}
+      />
       {/* Header */}
-      <div
+      {/* <div
         style={{
           background: "linear-gradient(135deg, #1890ff 0%, #40a9ff 100%)",
           padding: "16px 20px",
@@ -266,10 +277,10 @@ const GroupChatCard = ({
             />
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Members List */}
-      <div
+      {/* <div
         style={{
           backgroundColor: "#fafafa",
           borderBottom: "1px solid #f0f0f0",
@@ -342,7 +353,7 @@ const GroupChatCard = ({
             </div>
           </Panel>
         </Collapse>
-      </div>
+      </div> */}
 
       {/* Messages */}
       <div
