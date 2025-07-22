@@ -48,7 +48,7 @@ def generate_random_password(length=5):
 
 
 def generate_users():
-    """Generate 1 admin, 1 teacher, 36 students"""
+    """Generate 1 admin, 1 teacher, 35 students"""
     users = []
 
     # 1 Admin
@@ -95,44 +95,43 @@ def generate_users():
         }
     )
 
-    # 36 Students from XI TJ 2.csv
+    # 35 Students from XI TJ 2.csv
     students_data = [
-        ("ahmad_d_f", "Ahmad Dhani", "Firmansyah"),
-        ("ahmad_f_k", "Ahmad Faza", "Kurniawan"),
-        ("aisyah_n_a", "Aisyah Nur", "Azizah"),
-        ("alifia_p_r", "Alifia Putri", "Rahmadani"),
-        ("alika_n", "Alika", "Nuraini"),
-        ("ananda_a_r", "Ananda Aurellia", "Rahma"),
-        ("angga_p_s", "Angga Prasetyo", "Saputro"),
-        ("aqila_n_r", "Aqila Najwa", "Rahmadhani"),
-        ("archelsea_d_p", "Archelsea Dwi", "Pangestu"),
-        ("ardiansyah_e_p", "Ardiansyah Eka", "Prasetya"),
-        ("arief_r", "Arief", "Rahman"),
-        ("arkan_a_p", "Arkan Altaaf", "Prasetyo"),
-        ("arsya_a_w", "Arsya Aditya", "Wardana"),
-        ("aulia_n", "Aulia", "Nuraini"),
-        ("bagas_d_w", "Bagas Dwi", "Waskito"),
-        ("cahya_a_f", "Cahya Ahmad", "Fauzi"),
-        ("davin_p_w", "Davin Putra", "Winarno"),
-        ("desta_a_s", "Desta Aditya", "Saputra"),
-        ("devi_k_s", "Devi Kurnia", "Safitri"),
-        ("devita_a", "Devita", "Anggraini"),
-        ("dimas_a_s", "Dimas Adji", "Saputro"),
-        ("dinda_a", "Dinda", "Ayunda"),
-        ("dwi_a_p", "Dwi Agung", "Prasetyo"),
-        ("erik_s", "Erik", "Saputra"),
-        ("fadli_a_r", "Fadli Akbar", "Ramadhan"),
-        ("fahmi_a", "Fahmi", "Aziz"),
-        ("fatkhur_r_s", "Fatkhur Rozaq", "Saputra"),
-        ("fauzan_a_a", "Fauzan Adhima", "Akbar"),
-        ("febi_k", "Febi", "Kristanti"),
-        ("fernando_y_s", "Fernando Yoga", "Saputra"),
-        ("hafiz_a_s", "Hafiz Adi", "Saputra"),
-        ("imam_s", "Imam", "Syaifullah"),
-        ("kevin_a_p", "Kevin Aditya", "Pratama"),
-        ("kevin_e_p", "Kevin Eka", "Prastyawan"),
-        ("m_dafik_a_k", "Moch. Dafik Ardiansyah", "K."),
-        ("m_farrel_a_p", "Muhamad Farrel Aditya", "Putra"),
+        ("adryan_z_s", "Adryan Zulfi", "Syaputra"),
+        ("aldiansyah_r", "Aldiansyah", "Ramdani"),
+        ("arya_a", "Arya", "Adhitia"),
+        ("bagas_s", "Bagas", "Setiadi"),
+        ("davi_f_r", "Davi Firaldy", "Rahadian"),
+        ("deviana_f_p", "Deviana Febrianti", "Putri"),
+        ("erick_s_s", "Erick Setiawan", "Syahputra"),
+        ("fahri_r", "Fahri", "Romansyah"),
+        ("fajril_s_a", "Fajril Septian", "Alkodar"),
+        ("fauza_a_p", "Fauza Ayudia", "Putra"),
+        ("haikal_m", "Haikal", "Maljamjam"),
+        ("imam_s", "Imam", "Sulaeman"),
+        ("julhuda_m_p", "Julhuda Mulyana", "Putra"),
+        ("kiano_r_s", "Kiano Raditya", "Saputro"),
+        ("lucky_j_k", "Lucky Januara", "Kusnadi"),
+        ("meisya_i_b", "Meisya Intan", "Berlyan"),
+        ("moch_s_h", "Moch. Syarif", "Hidayatullah"),
+        ("m_fikri_r", "Muhamad Fikri", "Ramadhani"),
+        ("m_dafik_a", "Muhammad Dafik Al", "Kavani"),
+        ("m_renaldi_r", "Muhammad Renaldi Rezky", "Pratama"),
+        ("m_zaky_s", "Muhammad Zaky", "Saputra"),
+        ("nasywaan_r", "Nasywaan", "Ramadhan"),
+        ("nauval_f_s", "Nauval Fadillah", "Sofyan"),
+        ("nazwa_a_r", "Nazwa Aulia", "Ramdani"),
+        ("pascha_g_p", "Pascha Gerhana", "Putra"),
+        ("raden_m_b", "Raden Muhammad Bara", "Abdurrohman"),
+        ("raffi_a_a", "Raffi Aurellio", "Ardhani"),
+        ("raihan_g_a", "Raihan Ghaza", "Al-Ghifari"),
+        ("rega_f", "Rega", "Firmansyah"),
+        ("reizan_f_k", "Reizan Febrian", "Kurniawan"),
+        ("rifa_n_z", "Rifa Nabilah", "Zalfa"),
+        ("risma_d_w", "Risma Dania", "Wijayanti"),
+        ("robby_a_n", "Robby Aditya", "Nugraha"),
+        ("satria_p_s", "Satria Putra", "Setiawan"),
+        ("yusuf_m_b", "Yusuf Maulana", "Bachtiar"),
     ]
 
     # Generate random passwords dan print untuk referensi
@@ -242,9 +241,9 @@ def generate_subject_class_update():
 
 
 def generate_class_students():
-    """Generate 36 class student relationships"""
+    """Generate 35 class student relationships"""
     class_students = []
-    for i in range(36):
+    for i in range(35):  # Changed from 36 to 35
         class_students.append(
             {
                 "model": "pramlearnapp.classstudent",
@@ -744,12 +743,12 @@ def generate_arcs_questions():
 
 
 def generate_student_attendance():
-    """Generate student attendance for all 36 students"""
+    """Generate student attendance for all 35 students"""
     attendance_records = []
     statuses = ["present", "absent", "late", "excused"]
     weights = [70, 15, 10, 5]  # 70% present, 15% absent, 10% late, 5% excused
 
-    for i in range(36):
+    for i in range(35):  # Changed from 36 to 35
         student_id = i + 3  # Student IDs start from 3
         status = random.choices(statuses, weights=weights)[0]
 
@@ -816,7 +815,7 @@ def main():
 
     print("💾 Writing to file...")
     with open(
-        "pramlearnapp/fixtures/initial_data_xi_tj_1.json", "w", encoding="utf-8"
+        "pramlearnapp/fixtures/initial_data_xi_tj_2.json", "w", encoding="utf-8"
     ) as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
 
@@ -827,7 +826,7 @@ def main():
     print("\n📋 Summary:")
     print("  • 1 Admin user")
     print("  • 1 Teacher user (Raihan Syeka Pramukastie)")
-    print("  • 36 Student users (from XI TJ 1.csv)")
+    print("  • 35 Student users (from XI TJ 1.csv)")
     print("  • 1 Class (XI TJ 1)")
     print("  • 1 Subject (Administrasi Sistem Jaringan)")
     print("  • 1 Material (Pengenalan Jaringan Komputer)")
@@ -849,7 +848,7 @@ def main():
     print("  • Attendance records TIDAK DIBUAT (biarkan default)")
     print("  • Semua deadline: 2 Agustus 2025")
     print(
-        "\n🎉 Ready to load with: python manage.py loaddata pramlearnapp/fixtures/initial_data_xi_tj_1.json"
+        "\n🎉 Ready to load with: python manage.py loaddata pramlearnapp/fixtures/initial_data_xi_tj_2.json"
     )
 
 

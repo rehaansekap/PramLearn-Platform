@@ -63,11 +63,11 @@
     "model": "pramlearnapp.customuser",
     "pk": 3,
     "fields": {
-      "username": "ahmad_d_f",
+      "username": "adryan_z_s",
       "password": "pbkdf2_sha256$600000$dummy$dummy",
-      "email": "ahmad_d_f@pramlearn.com",
-      "first_name": "Ahmad Dhani",
-      "last_name": "Firmansyah",
+      "email": "adryan_z_s@pramlearn.com",
+      "first_name": "Adryan Zulfi",
+      "last_name": "Syaputra",
       "role": 3,
       "is_staff": false,
       "is_superuser": false,
@@ -81,11 +81,11 @@
     "model": "pramlearnapp.customuser",
     "pk": 4,
     "fields": {
-      "username": "ahmad_f_k",
+      "username": "aldiansyah_r",
       "password": "pbkdf2_sha256$600000$dummy$dummy",
-      "email": "ahmad_f_k@pramlearn.com",
-      "first_name": "Ahmad Faza",
-      "last_name": "Kurniawan",
+      "email": "aldiansyah_r@pramlearn.com",
+      "first_name": "Aldiansyah",
+      "last_name": "Ramdani",
       "role": 3,
       "is_staff": false,
       "is_superuser": false,
@@ -99,11 +99,11 @@
     "model": "pramlearnapp.customuser",
     "pk": 5,
     "fields": {
-      "username": "aisyah_n_a",
+      "username": "arya_a",
       "password": "pbkdf2_sha256$600000$dummy$dummy",
-      "email": "aisyah_n_a@pramlearn.com",
-      "first_name": "Aisyah Nur",
-      "last_name": "Azizah",
+      "email": "arya_a@pramlearn.com",
+      "first_name": "Arya",
+      "last_name": "Adhitia",
       "role": 3,
       "is_staff": false,
       "is_superuser": false,
@@ -117,11 +117,11 @@
     "model": "pramlearnapp.customuser",
     "pk": 6,
     "fields": {
-      "username": "alifia_p_r",
+      "username": "bagas_s",
       "password": "pbkdf2_sha256$600000$dummy$dummy",
-      "email": "alifia_p_r@pramlearn.com",
-      "first_name": "Alifia Putri",
-      "last_name": "Rahmadani",
+      "email": "bagas_s@pramlearn.com",
+      "first_name": "Bagas",
+      "last_name": "Setiadi",
       "role": 3,
       "is_staff": false,
       "is_superuser": false,
@@ -135,11 +135,11 @@
     "model": "pramlearnapp.customuser",
     "pk": 7,
     "fields": {
-      "username": "alika_n",
+      "username": "davi_f_r",
       "password": "pbkdf2_sha256$600000$dummy$dummy",
-      "email": "alika_n@pramlearn.com",
-      "first_name": "Alika",
-      "last_name": "Nuraini",
+      "email": "davi_f_r@pramlearn.com",
+      "first_name": "Davi Firaldy",
+      "last_name": "Rahadian",
       "role": 3,
       "is_staff": false,
       "is_superuser": false,
@@ -153,11 +153,11 @@
     "model": "pramlearnapp.customuser",
     "pk": 8,
     "fields": {
-      "username": "ananda_a_r",
+      "username": "deviana_f_p",
       "password": "pbkdf2_sha256$600000$dummy$dummy",
-      "email": "ananda_a_r@pramlearn.com",
-      "first_name": "Ananda Aurellia",
-      "last_name": "Rahma",
+      "email": "deviana_f_p@pramlearn.com",
+      "first_name": "Deviana Febrianti",
+      "last_name": "Putri",
       "role": 3,
       "is_staff": false,
       "is_superuser": false,
@@ -171,11 +171,11 @@
     "model": "pramlearnapp.customuser",
     "pk": 9,
     "fields": {
-      "username": "angga_p_s",
+      "username": "erick_s_s",
       "password": "pbkdf2_sha256$600000$dummy$dummy",
-      "email": "angga_p_s@pramlearn.com",
-      "first_name": "Angga Prasetyo",
-      "last_name": "Saputro",
+      "email": "erick_s_s@pramlearn.com",
+      "first_name": "Erick Setiawan",
+      "last_name": "Syahputra",
       "role": 3,
       "is_staff": false,
       "is_superuser": false,
@@ -189,11 +189,11 @@
     "model": "pramlearnapp.customuser",
     "pk": 10,
     "fields": {
-      "username": "aqila_n_r",
+      "username": "fahri_r",
       "password": "pbkdf2_sha256$600000$dummy$dummy",
-      "email": "aqila_n_r@pramlearn.com",
-      "first_name": "Aqila Najwa",
-      "last_name": "Rahmadhani",
+      "email": "fahri_r@pramlearn.com",
+      "first_name": "Fahri",
+      "last_name": "Romansyah",
       "role": 3,
       "is_staff": false,
       "is_superuser": false,
@@ -207,11 +207,11 @@
     "model": "pramlearnapp.customuser",
     "pk": 11,
     "fields": {
-      "username": "archelsea_d_p",
+      "username": "fajril_s_a",
       "password": "pbkdf2_sha256$600000$dummy$dummy",
-      "email": "archelsea_d_p@pramlearn.com",
-      "first_name": "Archelsea Dwi",
-      "last_name": "Pangestu",
+      "email": "fajril_s_a@pramlearn.com",
+      "first_name": "Fajril Septian",
+      "last_name": "Alkodar",
       "role": 3,
       "is_staff": false,
       "is_superuser": false,
@@ -225,11 +225,11 @@
     "model": "pramlearnapp.customuser",
     "pk": 12,
     "fields": {
-      "username": "ardiansyah_e_p",
+      "username": "fauza_a_p",
       "password": "pbkdf2_sha256$600000$dummy$dummy",
-      "email": "ardiansyah_e_p@pramlearn.com",
-      "first_name": "Ardiansyah Eka",
-      "last_name": "Prasetya",
+      "email": "fauza_a_p@pramlearn.com",
+      "first_name": "Fauza Ayudia",
+      "last_name": "Putra",
       "role": 3,
       "is_staff": false,
       "is_superuser": false,
@@ -243,11 +243,11 @@
     "model": "pramlearnapp.customuser",
     "pk": 13,
     "fields": {
-      "username": "arief_r",
+      "username": "haikal_m",
       "password": "pbkdf2_sha256$600000$dummy$dummy",
-      "email": "arief_r@pramlearn.com",
-      "first_name": "Arief",
-      "last_name": "Rahman",
+      "email": "haikal_m@pramlearn.com",
+      "first_name": "Haikal",
+      "last_name": "Maljamjam",
       "role": 3,
       "is_staff": false,
       "is_superuser": false,
@@ -261,11 +261,11 @@
     "model": "pramlearnapp.customuser",
     "pk": 14,
     "fields": {
-      "username": "arkan_a_p",
+      "username": "imam_s",
       "password": "pbkdf2_sha256$600000$dummy$dummy",
-      "email": "arkan_a_p@pramlearn.com",
-      "first_name": "Arkan Altaaf",
-      "last_name": "Prasetyo",
+      "email": "imam_s@pramlearn.com",
+      "first_name": "Imam",
+      "last_name": "Sulaeman",
       "role": 3,
       "is_staff": false,
       "is_superuser": false,
@@ -279,11 +279,11 @@
     "model": "pramlearnapp.customuser",
     "pk": 15,
     "fields": {
-      "username": "arsya_a_w",
+      "username": "julhuda_m_p",
       "password": "pbkdf2_sha256$600000$dummy$dummy",
-      "email": "arsya_a_w@pramlearn.com",
-      "first_name": "Arsya Aditya",
-      "last_name": "Wardana",
+      "email": "julhuda_m_p@pramlearn.com",
+      "first_name": "Julhuda Mulyana",
+      "last_name": "Putra",
       "role": 3,
       "is_staff": false,
       "is_superuser": false,
@@ -297,11 +297,11 @@
     "model": "pramlearnapp.customuser",
     "pk": 16,
     "fields": {
-      "username": "aulia_n",
+      "username": "kiano_r_s",
       "password": "pbkdf2_sha256$600000$dummy$dummy",
-      "email": "aulia_n@pramlearn.com",
-      "first_name": "Aulia",
-      "last_name": "Nuraini",
+      "email": "kiano_r_s@pramlearn.com",
+      "first_name": "Kiano Raditya",
+      "last_name": "Saputro",
       "role": 3,
       "is_staff": false,
       "is_superuser": false,
@@ -315,11 +315,11 @@
     "model": "pramlearnapp.customuser",
     "pk": 17,
     "fields": {
-      "username": "bagas_d_w",
+      "username": "lucky_j_k",
       "password": "pbkdf2_sha256$600000$dummy$dummy",
-      "email": "bagas_d_w@pramlearn.com",
-      "first_name": "Bagas Dwi",
-      "last_name": "Waskito",
+      "email": "lucky_j_k@pramlearn.com",
+      "first_name": "Lucky Januara",
+      "last_name": "Kusnadi",
       "role": 3,
       "is_staff": false,
       "is_superuser": false,
@@ -333,11 +333,11 @@
     "model": "pramlearnapp.customuser",
     "pk": 18,
     "fields": {
-      "username": "cahya_a_f",
+      "username": "meisya_i_b",
       "password": "pbkdf2_sha256$600000$dummy$dummy",
-      "email": "cahya_a_f@pramlearn.com",
-      "first_name": "Cahya Ahmad",
-      "last_name": "Fauzi",
+      "email": "meisya_i_b@pramlearn.com",
+      "first_name": "Meisya Intan",
+      "last_name": "Berlyan",
       "role": 3,
       "is_staff": false,
       "is_superuser": false,
@@ -351,11 +351,11 @@
     "model": "pramlearnapp.customuser",
     "pk": 19,
     "fields": {
-      "username": "davin_p_w",
+      "username": "moch_s_h",
       "password": "pbkdf2_sha256$600000$dummy$dummy",
-      "email": "davin_p_w@pramlearn.com",
-      "first_name": "Davin Putra",
-      "last_name": "Winarno",
+      "email": "moch_s_h@pramlearn.com",
+      "first_name": "Moch. Syarif",
+      "last_name": "Hidayatullah",
       "role": 3,
       "is_staff": false,
       "is_superuser": false,
@@ -369,11 +369,11 @@
     "model": "pramlearnapp.customuser",
     "pk": 20,
     "fields": {
-      "username": "desta_a_s",
+      "username": "m_fikri_r",
       "password": "pbkdf2_sha256$600000$dummy$dummy",
-      "email": "desta_a_s@pramlearn.com",
-      "first_name": "Desta Aditya",
-      "last_name": "Saputra",
+      "email": "m_fikri_r@pramlearn.com",
+      "first_name": "Muhamad Fikri",
+      "last_name": "Ramadhani",
       "role": 3,
       "is_staff": false,
       "is_superuser": false,
@@ -387,11 +387,11 @@
     "model": "pramlearnapp.customuser",
     "pk": 21,
     "fields": {
-      "username": "devi_k_s",
+      "username": "m_dafik_a",
       "password": "pbkdf2_sha256$600000$dummy$dummy",
-      "email": "devi_k_s@pramlearn.com",
-      "first_name": "Devi Kurnia",
-      "last_name": "Safitri",
+      "email": "m_dafik_a@pramlearn.com",
+      "first_name": "Muhammad Dafik Al",
+      "last_name": "Kavani",
       "role": 3,
       "is_staff": false,
       "is_superuser": false,
@@ -405,11 +405,11 @@
     "model": "pramlearnapp.customuser",
     "pk": 22,
     "fields": {
-      "username": "devita_a",
+      "username": "m_renaldi_r",
       "password": "pbkdf2_sha256$600000$dummy$dummy",
-      "email": "devita_a@pramlearn.com",
-      "first_name": "Devita",
-      "last_name": "Anggraini",
+      "email": "m_renaldi_r@pramlearn.com",
+      "first_name": "Muhammad Renaldi Rezky",
+      "last_name": "Pratama",
       "role": 3,
       "is_staff": false,
       "is_superuser": false,
@@ -423,11 +423,11 @@
     "model": "pramlearnapp.customuser",
     "pk": 23,
     "fields": {
-      "username": "dimas_a_s",
+      "username": "m_zaky_s",
       "password": "pbkdf2_sha256$600000$dummy$dummy",
-      "email": "dimas_a_s@pramlearn.com",
-      "first_name": "Dimas Adji",
-      "last_name": "Saputro",
+      "email": "m_zaky_s@pramlearn.com",
+      "first_name": "Muhammad Zaky",
+      "last_name": "Saputra",
       "role": 3,
       "is_staff": false,
       "is_superuser": false,
@@ -441,11 +441,11 @@
     "model": "pramlearnapp.customuser",
     "pk": 24,
     "fields": {
-      "username": "dinda_a",
+      "username": "nasywaan_r",
       "password": "pbkdf2_sha256$600000$dummy$dummy",
-      "email": "dinda_a@pramlearn.com",
-      "first_name": "Dinda",
-      "last_name": "Ayunda",
+      "email": "nasywaan_r@pramlearn.com",
+      "first_name": "Nasywaan",
+      "last_name": "Ramadhan",
       "role": 3,
       "is_staff": false,
       "is_superuser": false,
@@ -459,11 +459,11 @@
     "model": "pramlearnapp.customuser",
     "pk": 25,
     "fields": {
-      "username": "dwi_a_p",
+      "username": "nauval_f_s",
       "password": "pbkdf2_sha256$600000$dummy$dummy",
-      "email": "dwi_a_p@pramlearn.com",
-      "first_name": "Dwi Agung",
-      "last_name": "Prasetyo",
+      "email": "nauval_f_s@pramlearn.com",
+      "first_name": "Nauval Fadillah",
+      "last_name": "Sofyan",
       "role": 3,
       "is_staff": false,
       "is_superuser": false,
@@ -477,11 +477,11 @@
     "model": "pramlearnapp.customuser",
     "pk": 26,
     "fields": {
-      "username": "erik_s",
+      "username": "nazwa_a_r",
       "password": "pbkdf2_sha256$600000$dummy$dummy",
-      "email": "erik_s@pramlearn.com",
-      "first_name": "Erik",
-      "last_name": "Saputra",
+      "email": "nazwa_a_r@pramlearn.com",
+      "first_name": "Nazwa Aulia",
+      "last_name": "Ramdani",
       "role": 3,
       "is_staff": false,
       "is_superuser": false,
@@ -495,11 +495,11 @@
     "model": "pramlearnapp.customuser",
     "pk": 27,
     "fields": {
-      "username": "fadli_a_r",
+      "username": "pascha_g_p",
       "password": "pbkdf2_sha256$600000$dummy$dummy",
-      "email": "fadli_a_r@pramlearn.com",
-      "first_name": "Fadli Akbar",
-      "last_name": "Ramadhan",
+      "email": "pascha_g_p@pramlearn.com",
+      "first_name": "Pascha Gerhana",
+      "last_name": "Putra",
       "role": 3,
       "is_staff": false,
       "is_superuser": false,
@@ -513,11 +513,11 @@
     "model": "pramlearnapp.customuser",
     "pk": 28,
     "fields": {
-      "username": "fahmi_a",
+      "username": "raden_m_b",
       "password": "pbkdf2_sha256$600000$dummy$dummy",
-      "email": "fahmi_a@pramlearn.com",
-      "first_name": "Fahmi",
-      "last_name": "Aziz",
+      "email": "raden_m_b@pramlearn.com",
+      "first_name": "Raden Muhammad Bara",
+      "last_name": "Abdurrohman",
       "role": 3,
       "is_staff": false,
       "is_superuser": false,
@@ -531,11 +531,11 @@
     "model": "pramlearnapp.customuser",
     "pk": 29,
     "fields": {
-      "username": "fatkhur_r_s",
+      "username": "raffi_a_a",
       "password": "pbkdf2_sha256$600000$dummy$dummy",
-      "email": "fatkhur_r_s@pramlearn.com",
-      "first_name": "Fatkhur Rozaq",
-      "last_name": "Saputra",
+      "email": "raffi_a_a@pramlearn.com",
+      "first_name": "Raffi Aurellio",
+      "last_name": "Ardhani",
       "role": 3,
       "is_staff": false,
       "is_superuser": false,
@@ -549,11 +549,11 @@
     "model": "pramlearnapp.customuser",
     "pk": 30,
     "fields": {
-      "username": "fauzan_a_a",
+      "username": "raihan_g_a",
       "password": "pbkdf2_sha256$600000$dummy$dummy",
-      "email": "fauzan_a_a@pramlearn.com",
-      "first_name": "Fauzan Adhima",
-      "last_name": "Akbar",
+      "email": "raihan_g_a@pramlearn.com",
+      "first_name": "Raihan Ghaza",
+      "last_name": "Al-Ghifari",
       "role": 3,
       "is_staff": false,
       "is_superuser": false,
@@ -567,11 +567,11 @@
     "model": "pramlearnapp.customuser",
     "pk": 31,
     "fields": {
-      "username": "febi_k",
+      "username": "rega_f",
       "password": "pbkdf2_sha256$600000$dummy$dummy",
-      "email": "febi_k@pramlearn.com",
-      "first_name": "Febi",
-      "last_name": "Kristanti",
+      "email": "rega_f@pramlearn.com",
+      "first_name": "Rega",
+      "last_name": "Firmansyah",
       "role": 3,
       "is_staff": false,
       "is_superuser": false,
@@ -585,11 +585,11 @@
     "model": "pramlearnapp.customuser",
     "pk": 32,
     "fields": {
-      "username": "fernando_y_s",
+      "username": "reizan_f_k",
       "password": "pbkdf2_sha256$600000$dummy$dummy",
-      "email": "fernando_y_s@pramlearn.com",
-      "first_name": "Fernando Yoga",
-      "last_name": "Saputra",
+      "email": "reizan_f_k@pramlearn.com",
+      "first_name": "Reizan Febrian",
+      "last_name": "Kurniawan",
       "role": 3,
       "is_staff": false,
       "is_superuser": false,
@@ -603,11 +603,11 @@
     "model": "pramlearnapp.customuser",
     "pk": 33,
     "fields": {
-      "username": "hafiz_a_s",
+      "username": "rifa_n_z",
       "password": "pbkdf2_sha256$600000$dummy$dummy",
-      "email": "hafiz_a_s@pramlearn.com",
-      "first_name": "Hafiz Adi",
-      "last_name": "Saputra",
+      "email": "rifa_n_z@pramlearn.com",
+      "first_name": "Rifa Nabilah",
+      "last_name": "Zalfa",
       "role": 3,
       "is_staff": false,
       "is_superuser": false,
@@ -621,11 +621,11 @@
     "model": "pramlearnapp.customuser",
     "pk": 34,
     "fields": {
-      "username": "imam_s",
+      "username": "risma_d_w",
       "password": "pbkdf2_sha256$600000$dummy$dummy",
-      "email": "imam_s@pramlearn.com",
-      "first_name": "Imam",
-      "last_name": "Syaifullah",
+      "email": "risma_d_w@pramlearn.com",
+      "first_name": "Risma Dania",
+      "last_name": "Wijayanti",
       "role": 3,
       "is_staff": false,
       "is_superuser": false,
@@ -639,11 +639,11 @@
     "model": "pramlearnapp.customuser",
     "pk": 35,
     "fields": {
-      "username": "kevin_a_p",
+      "username": "robby_a_n",
       "password": "pbkdf2_sha256$600000$dummy$dummy",
-      "email": "kevin_a_p@pramlearn.com",
-      "first_name": "Kevin Aditya",
-      "last_name": "Pratama",
+      "email": "robby_a_n@pramlearn.com",
+      "first_name": "Robby Aditya",
+      "last_name": "Nugraha",
       "role": 3,
       "is_staff": false,
       "is_superuser": false,
@@ -657,11 +657,11 @@
     "model": "pramlearnapp.customuser",
     "pk": 36,
     "fields": {
-      "username": "kevin_e_p",
+      "username": "satria_p_s",
       "password": "pbkdf2_sha256$600000$dummy$dummy",
-      "email": "kevin_e_p@pramlearn.com",
-      "first_name": "Kevin Eka",
-      "last_name": "Prastyawan",
+      "email": "satria_p_s@pramlearn.com",
+      "first_name": "Satria Putra",
+      "last_name": "Setiawan",
       "role": 3,
       "is_staff": false,
       "is_superuser": false,
@@ -675,29 +675,11 @@
     "model": "pramlearnapp.customuser",
     "pk": 37,
     "fields": {
-      "username": "m_dafik_a_k",
+      "username": "yusuf_m_b",
       "password": "pbkdf2_sha256$600000$dummy$dummy",
-      "email": "m_dafik_a_k@pramlearn.com",
-      "first_name": "Moch. Dafik Ardiansyah",
-      "last_name": "K.",
-      "role": 3,
-      "is_staff": false,
-      "is_superuser": false,
-      "is_active": true,
-      "is_online": false,
-      "last_activity": null,
-      "date_joined": "2024-01-01T00:00:00Z"
-    }
-  },
-  {
-    "model": "pramlearnapp.customuser",
-    "pk": 38,
-    "fields": {
-      "username": "m_farrel_a_p",
-      "password": "pbkdf2_sha256$600000$dummy$dummy",
-      "email": "m_farrel_a_p@pramlearn.com",
-      "first_name": "Muhamad Farrel Aditya",
-      "last_name": "Putra",
+      "email": "yusuf_m_b@pramlearn.com",
+      "first_name": "Yusuf Maulana",
+      "last_name": "Bachtiar",
       "role": 3,
       "is_staff": false,
       "is_superuser": false,
@@ -1023,14 +1005,6 @@
     }
   },
   {
-    "model": "pramlearnapp.classstudent",
-    "pk": 36,
-    "fields": {
-      "student": 38,
-      "class_id": 1
-    }
-  },
-  {
     "model": "pramlearnapp.material",
     "pk": 1,
     "fields": {
@@ -1039,22 +1013,6 @@
       "slug": "pengenalan-jaringan-komputer",
       "created_at": "2024-01-15T10:00:00Z",
       "updated_at": "2024-01-15T10:00:00Z"
-    }
-  },
-  {
-    "model": "pramlearnapp.file",
-    "pk": 1,
-    "fields": {
-      "file": "materials/files/pengenalan-jaringan-komputer.pdf",
-      "uploaded_at": "2024-01-15T10:00:00Z"
-    }
-  },
-  {
-    "model": "pramlearnapp.material_pdf_files",
-    "pk": 1,
-    "fields": {
-      "material_id": 1,
-      "file_id": 1
     }
   },
   {
@@ -1089,7 +1047,7 @@
       "title": "Instrumen Soal Jaringan Komputer",
       "content": "Kuis komprehensif tentang konsep dasar jaringan komputer",
       "created_at": "2025-07-01T10:00:00Z",
-      "is_group_quiz": false,
+      "is_group_quiz": true,
       "end_time": "2025-08-02T23:59:59Z",
       "slug": "instrumen-soal-jaringan-komputer",
       "duration": 120,
@@ -1104,7 +1062,7 @@
       "title": "Konsep Dasar Jaringan",
       "content": "Evaluasi pemahaman konsep dasar jaringan komputer",
       "created_at": "2025-07-01T11:00:00Z",
-      "is_group_quiz": false,
+      "is_group_quiz": true,
       "end_time": "2025-08-02T23:59:59Z",
       "slug": "konsep-dasar-jaringan",
       "duration": 60,
@@ -1119,7 +1077,7 @@
       "title": "Perangkat dan Protokol Jaringan",
       "content": "Evaluasi pemahaman perangkat dan protokol jaringan",
       "created_at": "2025-07-01T12:00:00Z",
-      "is_group_quiz": false,
+      "is_group_quiz": true,
       "end_time": "2025-08-02T23:59:59Z",
       "slug": "perangkat-dan-protokol-jaringan",
       "duration": 60,
@@ -1406,10 +1364,10 @@
       "quiz": 1,
       "text": "Jika Anda diminta untuk menghubungkan 5 komputer dan 1 printer di dalam satu ruangan kantor kecil agar bisa saling berbagi file, jenis jaringan apakah yang sedang Anda bangun?",
       "choice_a": "WAN",
-      "choice_b": "",
-      "choice_c": "Internet",
+      "choice_b": "MAN",
+      "choice_c": "",
       "choice_d": "LAN",
-      "correct_choice": "D"
+      "correct_choice": "A"
     }
   },
   {
@@ -2139,7 +2097,7 @@
       "choice_b": "Opsi B untuk soal analisis 2",
       "choice_c": "Opsi C untuk soal analisis 2",
       "choice_d": "Opsi D untuk soal analisis 2",
-      "correct_choice": "B"
+      "correct_choice": "C"
     }
   },
   {
@@ -2153,7 +2111,7 @@
       "choice_b": "Opsi B untuk soal analisis 3",
       "choice_c": "Opsi C untuk soal analisis 3",
       "choice_d": "Opsi D untuk soal analisis 3",
-      "correct_choice": "D"
+      "correct_choice": "A"
     }
   },
   {
@@ -2195,7 +2153,7 @@
       "choice_b": "Opsi B untuk soal analisis 6",
       "choice_c": "Opsi C untuk soal analisis 6",
       "choice_d": "Opsi D untuk soal analisis 6",
-      "correct_choice": "C"
+      "correct_choice": "D"
     }
   },
   {
@@ -2209,7 +2167,7 @@
       "choice_b": "Opsi B untuk soal analisis 7",
       "choice_c": "Opsi C untuk soal analisis 7",
       "choice_d": "Opsi D untuk soal analisis 7",
-      "correct_choice": "C"
+      "correct_choice": "B"
     }
   },
   {
@@ -2251,7 +2209,7 @@
       "choice_b": "Opsi B untuk soal analisis 10",
       "choice_c": "Opsi C untuk soal analisis 10",
       "choice_d": "Opsi D untuk soal analisis 10",
-      "correct_choice": "A"
+      "correct_choice": "C"
     }
   },
   {
@@ -2265,7 +2223,7 @@
       "choice_b": "Opsi B untuk soal perancangan 1",
       "choice_c": "Opsi C untuk soal perancangan 1",
       "choice_d": "Opsi D untuk soal perancangan 1",
-      "correct_choice": "B"
+      "correct_choice": "C"
     }
   },
   {
@@ -2279,7 +2237,7 @@
       "choice_b": "Opsi B untuk soal perancangan 2",
       "choice_c": "Opsi C untuk soal perancangan 2",
       "choice_d": "Opsi D untuk soal perancangan 2",
-      "correct_choice": "A"
+      "correct_choice": "D"
     }
   },
   {
@@ -2293,7 +2251,7 @@
       "choice_b": "Opsi B untuk soal perancangan 3",
       "choice_c": "Opsi C untuk soal perancangan 3",
       "choice_d": "Opsi D untuk soal perancangan 3",
-      "correct_choice": "B"
+      "correct_choice": "A"
     }
   },
   {
@@ -2307,7 +2265,7 @@
       "choice_b": "Opsi B untuk soal perancangan 4",
       "choice_c": "Opsi C untuk soal perancangan 4",
       "choice_d": "Opsi D untuk soal perancangan 4",
-      "correct_choice": "B"
+      "correct_choice": "A"
     }
   },
   {
@@ -2321,7 +2279,7 @@
       "choice_b": "Opsi B untuk soal perancangan 5",
       "choice_c": "Opsi C untuk soal perancangan 5",
       "choice_d": "Opsi D untuk soal perancangan 5",
-      "correct_choice": "B"
+      "correct_choice": "C"
     }
   },
   {
@@ -2349,7 +2307,7 @@
       "choice_b": "Opsi B untuk soal perancangan 7",
       "choice_c": "Opsi C untuk soal perancangan 7",
       "choice_d": "Opsi D untuk soal perancangan 7",
-      "correct_choice": "B"
+      "correct_choice": "C"
     }
   },
   {
@@ -2377,7 +2335,7 @@
       "choice_b": "Opsi B untuk soal perancangan 9",
       "choice_c": "Opsi C untuk soal perancangan 9",
       "choice_d": "Opsi D untuk soal perancangan 9",
-      "correct_choice": "A"
+      "correct_choice": "D"
     }
   },
   {

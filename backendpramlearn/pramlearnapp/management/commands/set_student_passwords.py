@@ -17,9 +17,9 @@ class Command(BaseCommand):
         students = CustomUser.objects.filter(role=3)
 
         self.stdout.write("\n📝 SETTING STUDENT PASSWORDS:")
-        self.stdout.write("=" * 50)
+        self.stdout.write("=" * 70)
 
-        student_passwords = {}
+        student_data = []
 
         for student in students:
             # Generate random password 5 karakter
@@ -29,18 +29,32 @@ class Command(BaseCommand):
             student.set_password(random_password)
             student.save()
 
-            student_passwords[student.username] = random_password
+            # Get full name
+            full_name = f"{student.first_name} {student.last_name}".strip()
+
+            student_data.append(
+                {
+                    "name": full_name,
+                    "username": student.username,
+                    "password": random_password,
+                }
+            )
+
             self.stdout.write(
-                f"Username: {student.username:<20} Password: {random_password}"
+                f"Name: {full_name:<35} Username: {student.username:<20} Password: {random_password}"
             )
 
         # Save passwords to file for reference
         with open("student_passwords.txt", "w", encoding="utf-8") as f:
             f.write("STUDENT LOGIN CREDENTIALS - XI TJ 2\n")
-            f.write("=" * 50 + "\n")
-            for username, password in student_passwords.items():
-                f.write(f"Username: {username:<20} Password: {password}\n")
+            f.write("=" * 70 + "\n")
+            f.write(f"{'NAMA':<35} {'USERNAME':<20} {'PASSWORD'}\n")
+            f.write("-" * 70 + "\n")
+            for data in student_data:
+                f.write(
+                    f"{data['name']:<35} {data['username']:<20} {data['password']}\n"
+                )
 
-        self.stdout.write("=" * 50)
+        self.stdout.write("=" * 70)
         self.stdout.write(f"✅ Passwords set for {len(students)} students")
         self.stdout.write("💾 Passwords saved to: student_passwords.txt")
