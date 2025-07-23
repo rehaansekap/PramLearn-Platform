@@ -1044,43 +1044,13 @@
     "pk": 1,
     "fields": {
       "material": 1,
-      "title": "Instrumen Soal Jaringan Komputer",
-      "content": "Kuis komprehensif tentang konsep dasar jaringan komputer",
+      "title": "Kuis Jaringan Komputer - XI TJ 2",
+      "content": "Kuis komprehensif tentang konsep dasar jaringan komputer dengan 54 soal",
       "created_at": "2025-07-01T10:00:00Z",
       "is_group_quiz": true,
       "end_time": "2025-08-02T23:59:59Z",
-      "slug": "instrumen-soal-jaringan-komputer",
-      "duration": 120,
-      "is_active": true
-    }
-  },
-  {
-    "model": "pramlearnapp.quiz",
-    "pk": 2,
-    "fields": {
-      "material": 1,
-      "title": "Konsep Dasar Jaringan",
-      "content": "Evaluasi pemahaman konsep dasar jaringan komputer",
-      "created_at": "2025-07-01T11:00:00Z",
-      "is_group_quiz": true,
-      "end_time": "2025-08-02T23:59:59Z",
-      "slug": "konsep-dasar-jaringan",
-      "duration": 60,
-      "is_active": true
-    }
-  },
-  {
-    "model": "pramlearnapp.quiz",
-    "pk": 3,
-    "fields": {
-      "material": 1,
-      "title": "Perangkat dan Protokol Jaringan",
-      "content": "Evaluasi pemahaman perangkat dan protokol jaringan",
-      "created_at": "2025-07-01T12:00:00Z",
-      "is_group_quiz": true,
-      "end_time": "2025-08-02T23:59:59Z",
-      "slug": "perangkat-dan-protokol-jaringan",
-      "duration": 60,
+      "slug": "kuis-jaringan-komputer-xi-tj-2",
+      "duration": 150,
       "is_active": true
     }
   },
@@ -1089,7 +1059,20 @@
     "pk": 1,
     "fields": {
       "quiz": 1,
-      "text": "Jenis jaringan komputer apakah yang memiliki skala jangkauan paling kecil untuk menghubungkan perangkat pribadi seperti smartphone dengan headset bluetooth?",
+      "text": "Sekumpulan dua atau lebih perangkat komputasi yang saling terhubung dengan tujuan untuk berbagi data dan sumber daya disebut…",
+      "choice_a": "Sistem Operasi",
+      "choice_b": "Jaringan Komputer",
+      "choice_c": "Topologi",
+      "choice_d": "Protokol",
+      "correct_choice": "B"
+    }
+  },
+  {
+    "model": "pramlearnapp.question",
+    "pk": 2,
+    "fields": {
+      "quiz": 1,
+      "text": "Jaringan komputer dengan skala jangkauan paling kecil yang biasanya digunakan untuk menghubungkan perangkat pribadi seperti smartphone dengan headset bluetooth adalah…",
       "choice_a": "LAN",
       "choice_b": "MAN",
       "choice_c": "WAN",
@@ -1099,10 +1082,10 @@
   },
   {
     "model": "pramlearnapp.question",
-    "pk": 2,
+    "pk": 3,
     "fields": {
       "quiz": 1,
-      "text": "Perangkat keras apakah yang berfungsi untuk menghubungkan dua atau lebih jaringan yang berbeda, seperti menghubungkan LAN ke internet?",
+      "text": "Perangkat keras yang berfungsi untuk menghubungkan dua atau lebih jaringan yang berbeda, misalnya menghubungkan jaringan lokal (LAN) ke jaringan internet adalah…",
       "choice_a": "Switch",
       "choice_b": "Hub",
       "choice_c": "Router",
@@ -1112,10 +1095,10 @@
   },
   {
     "model": "pramlearnapp.question",
-    "pk": 3,
+    "pk": 4,
     "fields": {
       "quiz": 1,
-      "text": "Apakah sebutan untuk alamat fisik unik yang tidak bisa diubah dan menjadi identitas pada setiap kartu jaringan (NIC)?",
+      "text": "Setiap kartu jaringan (NIC) memiliki sebuah alamat fisik unik yang tidak bisa diubah dan menjadi identitas perangkat keras tersebut. Alamat ini disebut…",
       "choice_a": "IP Address",
       "choice_b": "Subnet Mask",
       "choice_c": "Gateway",
@@ -1125,7 +1108,7 @@
   },
   {
     "model": "pramlearnapp.question",
-    "pk": 4,
+    "pk": 5,
     "fields": {
       "quiz": 1,
       "text": "Apakah nama kumpulan protokol yang menjadi aturan standar untuk komunikasi data di seluruh jaringan internet?",
@@ -1138,10 +1121,10 @@
   },
   {
     "model": "pramlearnapp.question",
-    "pk": 5,
+    "pk": 6,
     "fields": {
       "quiz": 1,
-      "text": "Dalam model client-server, apakah sebutan untuk komputer yang meminta atau mengakses layanan dari komputer lain?",
+      "text": "Apakah sebutan untuk komputer yang meminta atau mengakses layanan dari komputer lain?",
       "choice_a": "Server",
       "choice_b": "Host",
       "choice_c": "Client",
@@ -1151,20 +1134,20 @@
   },
   {
     "model": "pramlearnapp.question",
-    "pk": 6,
+    "pk": 7,
     "fields": {
       "quiz": 1,
       "text": "Manakah di bawah ini yang merupakan contoh dari media transmisi jaringan yang menggunakan kabel?",
       "choice_a": "Bluetooth",
       "choice_b": "Wi-Fi",
       "choice_c": "Infrared",
-      "choice_d": "UTP dan Fiber Optic",
+      "choice_d": "UTP",
       "correct_choice": "D"
     }
   },
   {
     "model": "pramlearnapp.question",
-    "pk": 7,
+    "pk": 8,
     "fields": {
       "quiz": 1,
       "text": "Apakah nama proyek penelitian di Amerika Serikat pada tahun 1960-an yang menjadi cikal bakal lahirnya internet?",
@@ -1177,10 +1160,10 @@
   },
   {
     "model": "pramlearnapp.question",
-    "pk": 8,
+    "pk": 9,
     "fields": {
       "quiz": 1,
-      "text": "Selain biaya dan manajemen, apakah salah satu kerugian atau risiko utama yang harus dihadapi dalam sebuah jaringan komputer?",
+      "text": "Selain biaya dan manajemen, apakah salah satu risiko utama yang harus dihadapi dalam sebuah jaringan komputer?",
       "choice_a": "Kecepatan transfer data",
       "choice_b": "Masalah keamanan",
       "choice_c": "Keterbatasan jarak",
@@ -1190,28 +1173,15 @@
   },
   {
     "model": "pramlearnapp.question",
-    "pk": 9,
-    "fields": {
-      "quiz": 1,
-      "text": "Manakah pernyataan yang paling tepat untuk menjelaskan perbedaan utama antara Hub dan Switch?",
-      "choice_a": "Hub lebih cepat dari Switch",
-      "choice_b": "Switch mengirimkan data ke semua port, sedangkan Hub hanya ke tujuan",
-      "choice_c": "Hub mengirimkan data ke semua port, sedangkan Switch hanya ke port tujuan",
-      "choice_d": "Hub digunakan untuk WAN, Switch untuk LAN",
-      "correct_choice": "C"
-    }
-  },
-  {
-    "model": "pramlearnapp.question",
     "pk": 10,
     "fields": {
       "quiz": 1,
-      "text": "Dalam sebuah jaringan nirkabel, apakah fungsi utama dari sebuah Access Point (AP)?",
-      "choice_a": "Mengatur rute antar jaringan yang berbeda",
-      "choice_b": "Menjadi jembatan antara jaringan kabel dan perangkat nirkabel",
-      "choice_c": "Menyimpan semua data penting perusahaan",
-      "choice_d": "Menjaga keamanan seluruh jaringan dari serangan luar",
-      "correct_choice": "B"
+      "text": "Pernyataan yang paling tepat untuk menjelaskan perbedaan utama antara Hub dan Switch adalah…",
+      "choice_a": "Hub lebih cepat dari Switch",
+      "choice_b": "Switch meneruskan data ke seluruh port",
+      "choice_c": "Hub meneruskan data ke seluruh port.",
+      "choice_d": "Switch hanya untuk jaringan skala besar.",
+      "correct_choice": "C"
     }
   },
   {
@@ -1219,7 +1189,20 @@
     "pk": 11,
     "fields": {
       "quiz": 1,
-      "text": "Jaringan komputer yang menghubungkan kantor-kantor cabang sebuah bank di seluruh kota Bandung merupakan contoh implementasi dari jenis jaringan apa?",
+      "text": "Dalam sebuah jaringan nirkabel, fungsi utama dari Access Point (AP) dapat diibaratkan sebagai…",
+      "choice_a": "Polisi lalu lintas yang mengatur rute antar jaringan",
+      "choice_b": "Jembatan yang menghubungkan perangkat nirkabel ke jaringan kabel",
+      "choice_c": "Pustakawan yang menyimpan semua data penting",
+      "choice_d": "Satpam yang menjaga keamanan seluruh jaringan",
+      "correct_choice": "B"
+    }
+  },
+  {
+    "model": "pramlearnapp.question",
+    "pk": 12,
+    "fields": {
+      "quiz": 1,
+      "text": "Jaringan komputer yang menghubungkan kantor-kantor cabang sebuah bank yang tersebar di seluruh kota Bandung merupakan contoh implementasi dari…",
       "choice_a": "LAN",
       "choice_b": "MAN",
       "choice_c": "WAN",
@@ -1229,20 +1212,20 @@
   },
   {
     "model": "pramlearnapp.question",
-    "pk": 12,
+    "pk": 13,
     "fields": {
       "quiz": 1,
-      "text": "Ketika sebuah laboratorium komputer dengan 30 PC dapat menggunakan satu printer secara bersama-sama, manfaat jaringan komputer dalam hal apakah yang ditunjukkan?",
+      "text": "Ketika sebuah laboratorium komputer dengan 30 PC dapat menggunakan satu printer secara bersama-sama, hal ini menunjukkan manfaat jaringan komputer dalam hal…",
       "choice_a": "Keamanan data",
       "choice_b": "Reliabilitas tinggi",
       "choice_c": "Komunikasi efisien",
-      "choice_d": "Menghemat biaya dan sumber daya",
+      "choice_d": "Menghemat Sumber Daya",
       "correct_choice": "D"
     }
   },
   {
     "model": "pramlearnapp.question",
-    "pk": 13,
+    "pk": 14,
     "fields": {
       "quiz": 1,
       "text": "Manakah situasi yang paling baik dalam mendeskripsikan konsep reliabilitas tinggi dalam sebuah jaringan?",
@@ -1255,7 +1238,7 @@
   },
   {
     "model": "pramlearnapp.question",
-    "pk": 14,
+    "pk": 15,
     "fields": {
       "quiz": 1,
       "text": "Apakah perbedaan mendasar antara Internet dengan World Wide Web (WWW)?",
@@ -1268,7 +1251,7 @@
   },
   {
     "model": "pramlearnapp.question",
-    "pk": 15,
+    "pk": 16,
     "fields": {
       "quiz": 1,
       "text": "Mengapa tahap analisis kebutuhan pengguna dianggap sangat penting sebelum membangun jaringan?",
@@ -1281,7 +1264,7 @@
   },
   {
     "model": "pramlearnapp.question",
-    "pk": 16,
+    "pk": 17,
     "fields": {
       "quiz": 1,
       "text": "Bagaimana cara kerja sebuah Router dalam mengirimkan data antar jaringan?",
@@ -1294,7 +1277,7 @@
   },
   {
     "model": "pramlearnapp.question",
-    "pk": 17,
+    "pk": 18,
     "fields": {
       "quiz": 1,
       "text": "Apakah contoh dampak yang terjadi jika server pusat sebuah bank mengalami kegagalan total tanpa adanya cadangan?",
@@ -1307,10 +1290,10 @@
   },
   {
     "model": "pramlearnapp.question",
-    "pk": 18,
+    "pk": 19,
     "fields": {
       "quiz": 1,
-      "text": "Anda ditugaskan membangun jaringan di lab komputer dengan 40 PC dan 1 server. Agar komunikasi efisien, perangkat sentral apakah yang paling tepat untuk digunakan?",
+      "text": "Anda ditugaskan untuk membangun jaringan baru di laboratorium komputer yang terdiri dari 40 PC dan 1 server. Agar komunikasi data antar PC berjalan efisien dan data hanya dikirim ke PC yang dituju, perangkat sentral yang paling tepat untuk digunakan adalah…",
       "choice_a": "Hub",
       "choice_b": "Switch",
       "choice_c": "Router",
@@ -1320,10 +1303,10 @@
   },
   {
     "model": "pramlearnapp.question",
-    "pk": 19,
+    "pk": 20,
     "fields": {
       "quiz": 1,
-      "text": "Saat Anda mengunggah foto ke Instagram dari smartphone Anda, peran smartphone Anda dalam proses tersebut adalah sebagai?",
+      "text": "Saat Anda membuka aplikasi browser dan mengetikkan alamat https://www.google.com/search?q=google.com, maka komputer atau laptop yang Anda gunakan sedang berperan sebagai…",
       "choice_a": "Server",
       "choice_b": "Client",
       "choice_c": "Router",
@@ -1333,10 +1316,10 @@
   },
   {
     "model": "pramlearnapp.question",
-    "pk": 20,
+    "pk": 21,
     "fields": {
       "quiz": 1,
-      "text": "Sebuah perusahaan multinasional ingin menghubungkan kantor pusat di Jakarta dengan kantor cabang di Singapura dan Kuala Lumpur. Jenis jaringan apakah yang harus mereka bangun?",
+      "text": "Sebuah perusahaan multinasional ingin menghubungkan kantor pusat mereka di Jakarta dengan kantor cabang di Singapura dan Kuala Lumpur. Jenis jaringan yang harus mereka bangun adalah…",
       "choice_a": "LAN",
       "choice_b": "MAN",
       "choice_c": "WAN",
@@ -1346,7 +1329,7 @@
   },
   {
     "model": "pramlearnapp.question",
-    "pk": 21,
+    "pk": 22,
     "fields": {
       "quiz": 1,
       "text": "Sebuah warung internet (warnet) memiliki 10 komputer untuk pelanggan yang semuanya harus bisa mengakses internet dan berbagi data. Jenis jaringan apakah yang paling tepat untuk dibangun di dalam warnet tersebut?",
@@ -1359,33 +1342,33 @@
   },
   {
     "model": "pramlearnapp.question",
-    "pk": 22,
+    "pk": 23,
     "fields": {
       "quiz": 1,
       "text": "Jika Anda diminta untuk menghubungkan 5 komputer dan 1 printer di dalam satu ruangan kantor kecil agar bisa saling berbagi file, jenis jaringan apakah yang sedang Anda bangun?",
       "choice_a": "WAN",
       "choice_b": "MAN",
-      "choice_c": "",
-      "choice_d": "LAN",
-      "correct_choice": "A"
+      "choice_c": "Internet",
+      "choice_d": "PAN",
+      "correct_choice": "E"
     }
   },
   {
     "model": "pramlearnapp.question",
-    "pk": 23,
+    "pk": 24,
     "fields": {
       "quiz": 1,
       "text": "Sebuah perusahaan ingin menghubungkan dua gedung yang terpisah sejauh 1 km dengan koneksi yang sangat cepat dan tahan terhadap gangguan cuaca. Media transmisi apakah yang paling ideal untuk kebutuhan ini?",
-      "choice_a": "Kabel UTP Cat 5e",
-      "choice_b": "Wi-Fi",
-      "choice_c": "Bluetooth",
+      "choice_a": "Kabel UTP Cat",
+      "choice_b": "Sinyal Wi-Fi",
+      "choice_c": "Sinyal Bluetooth",
       "choice_d": "Kabel Fiber Optic",
       "correct_choice": "D"
     }
   },
   {
     "model": "pramlearnapp.question",
-    "pk": 24,
+    "pk": 25,
     "fields": {
       "quiz": 1,
       "text": "Sebuah kantor hanya memiliki satu koneksi internet. Perangkat apakah yang dibutuhkan agar koneksi tersebut bisa dibagikan ke semua komputer karyawan?",
@@ -1398,12 +1381,12 @@
   },
   {
     "model": "pramlearnapp.question",
-    "pk": 25,
+    "pk": 26,
     "fields": {
       "quiz": 1,
       "text": "Di lantai dua sebuah rumah, sinyal Wi-Fi dari router di lantai satu sangat lemah. Perangkat apakah yang paling praktis untuk dipasang guna memperluas jangkauan sinyal nirkabel tersebut?",
       "choice_a": "Hub",
-      "choice_b": "Access Point",
+      "choice_b": "Wi-Fi Extender",
       "choice_c": "Modem baru",
       "choice_d": "Server",
       "correct_choice": "B"
@@ -1411,7 +1394,7 @@
   },
   {
     "model": "pramlearnapp.question",
-    "pk": 26,
+    "pk": 27,
     "fields": {
       "quiz": 1,
       "text": "Dalam jaringan rumah Anda, perangkat manakah yang berfungsi sebagai gerbang utama (gateway) yang menghubungkan jaringan lokal Anda ke Internet?",
@@ -1424,10 +1407,10 @@
   },
   {
     "model": "pramlearnapp.question",
-    "pk": 27,
+    "pk": 28,
     "fields": {
       "quiz": 1,
-      "text": "Sebuah jaringan LAN dengan 30 komputer yang menggunakan Hub terasa sangat lambat saat banyak pengguna aktif. Apakah penyebab yang paling mungkin dari masalah ini?",
+      "text": "Sebuah jaringan LAN dengan 30 komputer yang menggunakan Hub sebagai pusat koneksi terasa sangat lambat, terutama saat banyak pengguna aktif. Penyebab paling mungkin dari masalah ini adalah...",
       "choice_a": "Kabel UTP yang digunakan terlalu panjang",
       "choice_b": "Terlalu sering terjadi tabrakan data (collision) karena sifat Hub",
       "choice_c": "Server yang digunakan memiliki spesifikasi rendah",
@@ -1437,23 +1420,23 @@
   },
   {
     "model": "pramlearnapp.question",
-    "pk": 28,
+    "pk": 29,
     "fields": {
       "quiz": 1,
-      "text": "Dibandingkan dengan kabel UTP, apakah keunggulan utama dari media transmisi Fiber Optic?",
-      "choice_a": "Harga yang lebih murah dan instalasi yang mudah",
-      "choice_b": "Fleksibilitas dan tidak memerlukan perangkat khusus",
-      "choice_c": "Kecepatan transfer data yang jauh lebih tinggi dan tahan interferensi",
-      "choice_d": "Ketersediaan yang lebih luas di pasaran",
+      "text": "Dibandingkan dengan kabel UTP, keunggulan utama dari media transmisi Fiber Optic adalah...",
+      "choice_a": "Biaya instalasi yang murah",
+      "choice_b": "Tingkat fleksibilitas kabel",
+      "choice_c": "Kecepatan sinyal",
+      "choice_d": "Ketersediaan di pasaran",
       "correct_choice": "C"
     }
   },
   {
     "model": "pramlearnapp.question",
-    "pk": 29,
+    "pk": 30,
     "fields": {
       "quiz": 1,
-      "text": "Perhatikan pernyataan berikut:",
+      "text": "Pernyataan yang mendeskripsikan peran sebuah Router adalah…",
       "choice_a": "1 dan 2",
       "choice_b": "2 dan 3",
       "choice_c": "3 dan 4",
@@ -1463,12 +1446,12 @@
   },
   {
     "model": "pramlearnapp.question",
-    "pk": 30,
+    "pk": 31,
     "fields": {
       "quiz": 1,
-      "text": "Untuk membangun jaringan Wi-Fi di rumah yang dapat terhubung ke internet, kombinasi perangkat minimal apakah yang harus dimiliki?",
+      "text": "Untuk membangun jaringan Wi-Fi di rumah agar terhubung ke internet, kombinasi perangkat minimal yang harus ada adalah…",
       "choice_a": "Switch, Hub, dan Kabel UTP",
-      "choice_b": "Modem, Router dengan fitur Wi-Fi/AP, dan NIC pada perangkat client",
+      "choice_b": "Modem, Router Wi-Fi, dan Perangkat Client",
       "choice_c": "Server, Client, dan Kabel Fiber Optic",
       "choice_d": "Repeater, Switch, dan Server",
       "correct_choice": "B"
@@ -1476,20 +1459,20 @@
   },
   {
     "model": "pramlearnapp.question",
-    "pk": 31,
+    "pk": 32,
     "fields": {
       "quiz": 1,
       "text": "Saat menggunakan jaringan Wi-Fi publik di kafe atau bandara, apakah risiko keamanan utama yang harus diwaspadai oleh pengguna?",
       "choice_a": "Kecepatan internet yang menjadi lambat",
       "choice_b": "Baterai perangkat menjadi cepat habis",
-      "choice_c": "Potensi pencurian data pribadi oleh pihak ketiga (Man-in-the-Middle Attack)",
+      "choice_c": "pencurian data pribadi oleh pihak ketiga (Man-in-the-Middle Attack)",
       "choice_d": "Perangkat menjadi panas karena terlalu banyak pengguna",
       "correct_choice": "C"
     }
   },
   {
     "model": "pramlearnapp.question",
-    "pk": 32,
+    "pk": 33,
     "fields": {
       "quiz": 1,
       "text": "Apakah perbedaan mendasar antara MAC Address dan IP Address?",
@@ -1502,7 +1485,7 @@
   },
   {
     "model": "pramlearnapp.question",
-    "pk": 33,
+    "pk": 34,
     "fields": {
       "quiz": 1,
       "text": "Mengapa koneksi menggunakan Wi-Fi umumnya dianggap kurang stabil dibandingkan koneksi menggunakan kabel Ethernet?",
@@ -1515,7 +1498,7 @@
   },
   {
     "model": "pramlearnapp.question",
-    "pk": 34,
+    "pk": 35,
     "fields": {
       "quiz": 1,
       "text": "Jika semua komputer di sebuah LAN bisa saling berkomunikasi tetapi tidak ada satupun yang bisa mengakses internet, di manakah kemungkinan besar letak masalahnya?",
@@ -1528,7 +1511,7 @@
   },
   {
     "model": "pramlearnapp.question",
-    "pk": 35,
+    "pk": 36,
     "fields": {
       "quiz": 1,
       "text": "Dalam sebuah jaringan kantor, komputer-komputer karyawan terhubung ke sebuah Switch, dan Switch tersebut terhubung ke sebuah Router yang tersambung ke internet. Apakah fungsi utama Switch dalam skenario ini?",
@@ -1541,27 +1524,14 @@
   },
   {
     "model": "pramlearnapp.question",
-    "pk": 36,
-    "fields": {
-      "quiz": 1,
-      "text": "Menurut prinsip perancangan jaringan yang baik, langkah manakah yang paling krusial dan harus ditentukan pertama kali sebelum membeli perangkat?",
-      "choice_a": "Memilih merek perangkat yang paling terkenal",
-      "choice_b": "Menentukan skema pengalamatan IP Address",
-      "choice_c": "Menganalisis kebutuhan bisnis dan teknis dari pengguna",
-      "choice_d": "Menggambar topologi fisik jaringan secara detail",
-      "correct_choice": "C"
-    }
-  },
-  {
-    "model": "pramlearnapp.question",
     "pk": 37,
     "fields": {
       "quiz": 1,
-      "text": "Seorang teknisi menyarankan untuk menghubungkan server data penting perusahaan langsung ke internet tanpa pelindung seperti router atau firewall, dengan alasan agar mudah diakses. Mengapa saran ini sangat tidak direkomendasikan?",
-      "choice_a": "Akan membuat koneksi server menjadi lambat",
-      "choice_b": "Membuat server sangat rentan terhadap serangan langsung dari internet",
-      "choice_c": "Akan menghabiskan biaya internet yang sangat mahal",
-      "choice_d": "Akan menyulitkan karyawan untuk mengakses server",
+      "text": "Sebuah kantor merancang jaringan tanpa bertanya pada pengguna. Mereka membeli switch 24-port dan paket internet 50 Mbps. Ternyata, ada 30 karyawan yang sering melakukan video conference. Akibatnya, jaringan sangat lambat dan port tidak cukup. Evaluasi manakah yang paling tepat mengenai kesalahan fundamental dalam kasus ini?",
+      "choice_a": "Kesalahan terjadi karena merek switch yang dibeli memiliki kualitas yang buruk.",
+      "choice_b": "Kesalahan terjadi karena tidak melakukan analisis kebutuhan pengguna dan aplikasi.",
+      "choice_c": "Kesalahan terjadi karena tata letak fisik ruangan tidak diukur dengan benar.",
+      "choice_d": "Kesalahan terjadi karena tidak menggunakan kabel Fiber Optic untuk semua koneksi.",
       "correct_choice": "B"
     }
   },
@@ -1570,11 +1540,11 @@
     "pk": 38,
     "fields": {
       "quiz": 1,
-      "text": "Sebuah sekolah dengan anggaran terbatas ingin menyediakan koneksi internet untuk 30 komputer di lab. Pilihan media transmisi apakah yang paling realistis dari segi biaya dan kemudahan instalasi?",
-      "choice_a": "Fiber Optic",
-      "choice_b": "Kabel UTP",
-      "choice_c": "Satelit",
-      "choice_d": "Bluetooth",
+      "text": "Seorang admin jaringan memutuskan untuk tidak memasang Firewall dengan alasan dapat memperlambat koneksi. Ia hanya mengandalkan password yang kuat untuk setiap komputer. Evaluasi manakah yang paling tepat mengenai keputusan admin tersebut?",
+      "choice_a": "Keputusan tersebut sudah tepat karena password yang kuat cukup untuk semua keamanan.",
+      "choice_b": "Keputusan tersebut sangat berisiko karena menghilangkan \"pagar\" pelindung utama jaringan.",
+      "choice_c": "Keputusan tersebut dapat diterima karena Firewall memang tidak terlalu penting untuk jaringan.",
+      "choice_d": "Keputusan tersebut bagus untuk performa karena koneksi internet akan menjadi lebih cepat.",
       "correct_choice": "B"
     }
   },
@@ -1583,11 +1553,11 @@
     "pk": 39,
     "fields": {
       "quiz": 1,
-      "text": "Untuk sebuah turnamen e-sports yang menuntut koneksi paling stabil dan latensi (delay) terendah, mengapa penggunaan jaringan kabel (LAN) lebih direkomendasikan daripada Wi-Fi?",
-      "choice_a": "Jaringan kabel lebih mudah dipasang daripada Wi-Fi",
-      "choice_b": "Jaringan kabel memiliki jangkauan yang lebih luas",
-      "choice_c": "Jaringan kabel lebih aman dari peretasan",
-      "choice_d": "Jaringan kabel lebih stabil dan minim interferensi gelombang radio",
+      "text": "Sebuah bank ingin menghubungkan kantor pusatnya di Bandung dengan seluruh kantor cabang yang tersebar di beberapa kota besar di Jawa Barat. Mereka membutuhkan koneksi privat yang andal. Evaluasi manakah yang paling tepat mengenai jenis jaringan yang harus mereka bangun?",
+      "choice_a": "PAN",
+      "choice_b": "LAN",
+      "choice_c": "MAN",
+      "choice_d": "WAN",
       "correct_choice": "D"
     }
   },
@@ -1596,11 +1566,11 @@
     "pk": 40,
     "fields": {
       "quiz": 1,
-      "text": "Seorang admin jaringan memutuskan untuk menggunakan Hub daripada Switch untuk jaringan kantor baru dengan 50 komputer dengan alasan harga Hub lebih murah. Dari sudut pandang performa, mengapa keputusan ini kurang tepat?",
-      "choice_a": "Hub memerlukan konfigurasi yang lebih rumit",
-      "choice_b": "Hub akan menyebabkan traffic jaringan menjadi padat dan lambat",
-      "choice_c": "Hub mengonsumsi daya listrik yang lebih besar",
-      "choice_d": "Hub tidak kompatibel dengan komputer modern",
+      "text": "Sebuah kafe ingin menyediakan koneksi internet untuk pelanggan yang sering berpindah-pindah tempat duduk dengan laptopnya. Teknisi menyarankan untuk menggunakan jaringan kabel (Ethernet) ke setiap meja agar koneksi stabil. Evaluasi manakah yang paling tepat mengenai saran teknisi tersebut?",
+      "choice_a": "Saran tersebut sangat tepat karena kabel memberikan kecepatan tertinggi untuk pelanggan.",
+      "choice_b": "Saran tersebut kurang tepat karena tidak mendukung mobilitas dan fleksibilitas pengguna.",
+      "choice_c": "Saran tersebut adalah satu-satunya cara agar koneksi internet di kafe bisa aman.",
+      "choice_d": "Saran tersebut bagus karena biaya instalasi kabel jauh lebih murah daripada Wi-Fi.",
       "correct_choice": "B"
     }
   },
@@ -1609,11 +1579,11 @@
     "pk": 41,
     "fields": {
       "quiz": 1,
-      "text": "Mengapa sebuah perusahaan besar lebih memilih menggunakan server fisik sendiri (on-premise) daripada hanya mengandalkan cloud storage untuk data yang sangat rahasia?",
-      "choice_a": "Karena server sendiri lebih murah dalam segala aspek",
-      "choice_b": "Untuk memiliki kendali penuh atas keamanan dan akses fisik terhadap data",
-      "choice_c": "Karena cloud storage tidak bisa diakses dari Indonesia",
-      "choice_d": "Karena server sendiri memiliki kapasitas tidak terbatas",
+      "text": "Seorang admin jaringan memutuskan untuk menggunakan Hub daripada Switch untuk jaringan kantor baru dengan 50 komputer dengan alasan harga Hub lebih murah. Dari sudut pandang performa, mengapa keputusan ini kurang tepat?",
+      "choice_a": "Hub memerlukan konfigurasi yang lebih rumit",
+      "choice_b": "Hub akan menyebabkan traffic jaringan menjadi padat dan lambat",
+      "choice_c": "Hub mengkonsumsi daya listrik yang lebih besar",
+      "choice_d": "Hub tidak kompatibel dengan komputer modern",
       "correct_choice": "B"
     }
   },
@@ -1622,12 +1592,12 @@
     "pk": 42,
     "fields": {
       "quiz": 1,
-      "text": "Dalam konteks jaringan nirkabel, mengapa penggunaan password yang kuat dan terenkripsi dianggap sebagai langkah keamanan yang fundamental?",
-      "choice_a": "Agar koneksi menjadi lebih cepat",
-      "choice_b": "Untuk mencegah pengguna tidak sah mengakses jaringan dan mencuri data",
-      "choice_c": "Agar nama Wi-Fi (SSID) bisa disembunyikan",
-      "choice_d": "Untuk meningkatkan jangkauan sinyal Wi-Fi",
-      "correct_choice": "B"
+      "text": "Rumah sakit menyimpan semua data pasien penting hanya di satu server utama dengan spesifikasi sangat tinggi. Evaluasi manakah yang paling tepat mengenai strategi penyimpanan data rumah sakit tersebut?",
+      "choice_a": "Strategi ini sangat baik karena server tunggal lebih mudah untuk dikelola dan dirawat.",
+      "choice_b": "Strategi ini sudah cukup aman karena spesifikasi server yang tinggi menjamin tidak akan rusak.",
+      "choice_c": "Strategi ini sangat berisiko karena menciptakan Single Point of Failure (titik kegagalan tunggal).",
+      "choice_d": "Strategi ini hemat biaya karena tidak perlu membeli server tambahan untuk cadangan.",
+      "correct_choice": "C"
     }
   },
   {
@@ -1635,11 +1605,11 @@
     "pk": 43,
     "fields": {
       "quiz": 1,
-      "text": "Dua kantor kecil ingin berbagi satu koneksi internet. Kantor A menggunakan Hub, Kantor B menggunakan Switch. Jaringan kantor manakah yang akan memiliki performa lebih baik dan mengapa?",
-      "choice_a": "Kantor A, karena Hub lebih sederhana",
-      "choice_b": "Kantor B, karena Switch mengurangi tabrakan data",
-      "choice_c": "Keduanya sama saja, karena kecepatan internetnya sama",
-      "choice_d": "Kantor A, karena Hub bisa terhubung ke lebih banyak komputer",
+      "text": "Sebuah kantor memiliki 30 komputer yang terhubung ke sebuah Switch dan semuanya bisa saling berbagi file dengan cepat. Namun, tidak ada satupun komputer yang bisa mengakses Google. Perangkat Router ada, namun belum terhubung ke Switch. Evaluasi manakah yang paling tepat mengenai situasi ini?",
+      "choice_a": "Situasi terjadi karena Switch tidak berfungsi untuk menghubungkan komputer dalam satu LAN.",
+      "choice_b": "Situasi terjadi karena Switch tidak bisa meneruskan data ke jaringan luar seperti internet.",
+      "choice_c": "Situasi terjadi karena jumlah komputer terlalu banyak untuk ditangani oleh satu Switch.",
+      "choice_d": "Situasi terjadi karena kabel yang digunakan untuk menghubungkan komputer salah jenis.",
       "correct_choice": "B"
     }
   },
@@ -1648,12 +1618,12 @@
     "pk": 44,
     "fields": {
       "quiz": 1,
-      "text": "Analogi yang menyatakan bahwa \"Router adalah polisi lalu lintas di perempatan jalan\" paling tepat menggambarkan fungsi router dalam hal apa?",
-      "choice_a": "Kemampuannya untuk menghentikan semua data",
-      "choice_b": "Kemampuannya untuk mencatat semua pelanggaran",
-      "choice_c": "Kemampuannya untuk mengarahkan data ke jaringan tujuan yang benar",
-      "choice_d": "Kemampuannya untuk mempercepat laju semua data",
-      "correct_choice": "C"
+      "text": "Anda berhasil menghubungkan smartwatch ke smartphone Anda menggunakan Bluetooth untuk menerima notifikasi. Evaluasi manakah yang paling tepat untuk mendeskripsikan jaringan yang baru saja Anda buat?",
+      "choice_a": "Anda telah membangun sebuah jaringan LAN kecil karena menghubungkan dua perangkat.",
+      "choice_b": "Anda telah membangun sebuah jaringan WAN karena menggunakan teknologi nirkabel.",
+      "choice_c": "Anda telah membangun sebuah jaringan MAN karena perangkat bisa dibawa keliling kota.",
+      "choice_d": "Anda telah membangun sebuah jaringan PAN karena jangkauannya sangat pendek dan personal.",
+      "correct_choice": "D"
     }
   },
   {
@@ -1661,12 +1631,12 @@
     "pk": 45,
     "fields": {
       "quiz": 1,
-      "text": "Anda diminta merancang jaringan untuk acara live streaming di aula sekolah dengan kebutuhan koneksi stabil untuk 3 PC panitia dan koneksi nirkabel untuk tamu. Rancangan manakah yang paling efektif?",
-      "choice_a": "Menghubungkan semua perangkat ke satu Hub besar",
-      "choice_b": "Menggunakan satu Router Wi-Fi rumahan untuk semua perangkat",
-      "choice_c": "Menghubungkan 3 PC panitia ke Switch via kabel, lalu Switch dihubungkan ke Router. Untuk tamu, dipasang Access Point yang juga terhubung ke Router.",
-      "choice_d": "Hanya menyediakan koneksi Wi-Fi untuk semua perangkat agar lebih praktis",
-      "correct_choice": "C"
+      "text": "Di Bahan Ajar 3, Switch diibaratkan sebagai \"kurir paket yang cerdas\" karena kemampuannya membaca alamat tujuan (MAC Address) dan mengantar data hanya ke penerima yang tepat. Evaluasi manakah yang paling mendukung kebenaran analogi tersebut?",
+      "choice_a": "Switch mampu mengirimkan satu paket data ke semua komputer.",
+      "choice_b": "Switch mampu mengurangi tabrakan data dan meningkatkan efisiensi.",
+      "choice_c": "Switch mampu menghubungkan jaringan yang berbeda, seperti antar kota.",
+      "choice_d": "Switch mampu memilih rute tercepat untuk pengiriman data ke internet.",
+      "correct_choice": "B"
     }
   },
   {
@@ -1674,12 +1644,12 @@
     "pk": 46,
     "fields": {
       "quiz": 1,
-      "text": "Sebuah kafe ingin menyediakan Wi-Fi untuk pelanggan, namun ingin transaksi kasir menggunakan koneksi kabel yang lebih aman dan stabil. Desain manakah yang paling efektif?",
-      "choice_a": "Menghubungkan kasir dan pelanggan ke satu Hub yang sama",
-      "choice_b": "Menghubungkan kasir via kabel ke Switch, dan pelanggan via Wi-Fi ke AP, di mana Switch dan AP terhubung ke satu Router",
-      "choice_c": "Hanya menyediakan koneksi kabel untuk semua perangkat",
-      "choice_d": "Hanya menyediakan koneksi Wi-Fi untuk semua perangkat",
-      "correct_choice": "B"
+      "text": "Anda diminta merancang jaringan untuk acara live streaming di aula sekolah. Kebutuhan utamanya adalah koneksi kabel yang stabil untuk 3 PC panitia dan koneksi nirkabel untuk tamu. Kombinasi perangkat dan koneksi yang paling efektif untuk memenuhi kebutuhan tersebut adalah...",
+      "choice_a": "Menghubungkan PC panitia dan Access Point untuk tamu ke satu Hub besar yang sama.",
+      "choice_b": "Menghubungkan semua PC panitia dan menyediakan Wi-Fi untuk tamu menggunakan satu Router rumahan.",
+      "choice_c": "Menghubungkan PC panitia ke Switch via kabel dan memasang Access Point untuk tamu, dimana keduanya terhubung ke Router.",
+      "choice_d": "Menghubungkan semua PC panitia dan tamu ke beberapa Wi-Fi Extender yang terhubung secara nirkabel ke modem utama.",
+      "correct_choice": "C"
     }
   },
   {
@@ -1687,11 +1657,11 @@
     "pk": 47,
     "fields": {
       "quiz": 1,
-      "text": "Jaringan di sebuah sekolah seringkali lambat pada jam istirahat karena banyak siswa mengakses video. Usulan teknis apakah yang paling logis untuk diajukan guna mengatasi masalah ini?",
-      "choice_a": "Mengurangi jumlah komputer di sekolah",
-      "choice_b": "Mematikan jaringan pada jam istirahat",
-      "choice_c": "Meningkatkan paket bandwidth internet dan menerapkan aturan pembatasan akses video pada jam sibuk",
-      "choice_d": "Mengganti semua komputer dengan laptop",
+      "text": "Sebuah kafe ingin menyediakan Wi-Fi untuk pelanggan serta koneksi kabel yang aman untuk mesin kasir. Untuk memisahkan lalu lintas data antara kasir dan pelanggan, desain jaringan yang paling tepat adalah...",
+      "choice_a": "Menghubungkan mesin kasir dan Access Point untuk pelanggan ke sebuah Hub yang sama agar mudah dikelola.",
+      "choice_b": "Menghubungkan mesin kasir via kabel ke Router dan menyediakan Wi-Fi untuk pelanggan dari Router yang sama.",
+      "choice_c": "Menghubungkan mesin kasir via kabel ke Switch dan menyediakan Wi-Fi dari Access Point yang terhubung ke Router.",
+      "choice_d": "Menyediakan dua jaringan Wi-Fi terpisah dari satu Router, satu untuk kasir dan satu untuk pelanggan.",
       "correct_choice": "C"
     }
   },
@@ -1700,175 +1670,6 @@
     "pk": 48,
     "fields": {
       "quiz": 1,
-      "text": "Untuk melindungi data penting pada file server di sebuah kantor kecil dari risiko kerusakan hard disk, strategi backup data paling dasar apakah yang bisa Anda usulkan?",
-      "choice_a": "Menyimpan semua data hanya di server tanpa backup",
-      "choice_b": "Meminta setiap karyawan menyimpan data di komputernya masing-masing",
-      "choice_c": "Menjadwalkan backup otomatis setiap malam ke hard disk eksternal atau cloud storage",
-      "choice_d": "Mencetak semua data penting setiap hari",
-      "correct_choice": "C"
-    }
-  },
-  {
-    "model": "pramlearnapp.question",
-    "pk": 49,
-    "fields": {
-      "quiz": 1,
-      "text": "Anda diminta membuat 3 aturan kebijakan keamanan paling dasar untuk jaringan Wi-Fi di rumah. Kombinasi kebijakan manakah yang paling efektif?",
-      "choice_a": "Membiarkan nama Wi-Fi default, tanpa password, dan menyala 24 jam",
-      "choice_b": "Mengganti nama Wi-Fi (SSID) agar tidak mudah ditebak, menggunakan password yang kuat, dan tidak membagikannya secara sembarangan",
-      "choice_c": "Memberitahu password Wi-Fi ke semua tetangga",
-      "choice_d": "Menggunakan password yang mudah diingat seperti \"12345678\"",
-      "correct_choice": "B"
-    }
-  },
-  {
-    "model": "pramlearnapp.question",
-    "pk": 50,
-    "fields": {
-      "quiz": 1,
-      "text": "Sebuah rumah bertingkat tiga ingin semua lantainya ter-cover sinyal Wi-Fi yang kuat dari satu sumber internet. Kombinasi perangkat apakah yang paling sesuai untuk menciptakan jaringan seperti ini?",
-      "choice_a": "Satu Router di lantai 1, dan satu Access Point di lantai 2 dan 3",
-      "choice_b": "Tiga modem internet terpisah untuk setiap lantai",
-      "choice_c": "Tiga Hub di setiap lantai",
-      "choice_d": "Satu Switch besar di lantai 1",
-      "correct_choice": "A"
-    }
-  },
-  {
-    "model": "pramlearnapp.question",
-    "pk": 51,
-    "fields": {
-      "quiz": 1,
-      "text": "Jika Anda diminta merancang jaringan untuk sebuah perpustakaan baru, urutan langkah analisis kebutuhan manakah yang paling logis?",
-      "choice_a": "Membeli router, menghitung pengguna, menentukan anggaran",
-      "choice_b": "Menentukan anggaran, menghitung pengguna, menentukan jenis layanan",
-      "choice_c": "Menghitung jumlah pengguna, menentukan jenis layanan yang dibutuhkan, menentukan anggaran",
-      "choice_d": "Memasang kabel, membeli switch, menghitung pengguna",
-      "correct_choice": "C"
-    }
-  },
-  {
-    "model": "pramlearnapp.question",
-    "pk": 52,
-    "fields": {
-      "quiz": 1,
-      "text": "Untuk sebuah kantor dengan 10 staf yang semuanya perlu akses cepat ke server file dan internet, desain koneksi manakah yang paling masuk akal?",
-      "choice_a": "Semua staf terhubung ke Hub, lalu Hub ke internet",
-      "choice_b": "Semua staf terhubung ke Router secara nirkabel",
-      "choice_c": "Semua staf dan server terhubung ke satu Switch menggunakan kabel, lalu Switch terhubung ke Router untuk akses internet",
-      "choice_d": "Setiap staf terhubung langsung ke modem internet",
-      "correct_choice": "C"
-    }
-  },
-  {
-    "model": "pramlearnapp.question",
-    "pk": 53,
-    "fields": {
-      "quiz": 1,
-      "text": "Mengingat risiko kegagalan server pusat adalah salah satu kerugian jaringan, rencana mitigasi atau pencegahan apakah yang paling tepat untuk sebuah perusahaan?",
-      "choice_a": "Mematikan server setiap malam untuk menghemat listrik",
-      "choice_b": "Membuat jadwal backup data secara rutin ke lokasi yang berbeda",
-      "choice_c": "Membatasi jumlah pengguna yang bisa mengakses server",
-      "choice_d": "Tidak menyimpan data apapun di server",
-      "correct_choice": "B"
-    }
-  },
-  {
-    "model": "pramlearnapp.question",
-    "pk": 54,
-    "fields": {
-      "quiz": 1,
-      "text": "Jenis jaringan komputer apakah yang memiliki skala jangkauan paling kecil untuk menghubungkan perangkat pribadi seperti smartphone dengan headset bluetooth?",
-      "choice_a": "LAN",
-      "choice_b": "MAN",
-      "choice_c": "WAN",
-      "choice_d": "PAN",
-      "correct_choice": "D"
-    }
-  },
-  {
-    "model": "pramlearnapp.question",
-    "pk": 55,
-    "fields": {
-      "quiz": 2,
-      "text": "Mengapa sebuah perusahaan besar lebih memilih menggunakan server fisik sendiri (on-premise) daripada hanya mengandalkan cloud storage untuk data yang sangat rahasia?",
-      "choice_a": "Karena server sendiri lebih murah dalam segala aspek",
-      "choice_b": "Untuk memiliki kendali penuh atas keamanan dan akses fisik terhadap data",
-      "choice_c": "Karena cloud storage tidak bisa diakses dari Indonesia",
-      "choice_d": "Karena server sendiri memiliki kapasitas tidak terbatas",
-      "correct_choice": "B"
-    }
-  },
-  {
-    "model": "pramlearnapp.question",
-    "pk": 56,
-    "fields": {
-      "quiz": 2,
-      "text": "Dalam konteks jaringan nirkabel, mengapa penggunaan password yang kuat dan terenkripsi dianggap sebagai langkah keamanan yang fundamental?",
-      "choice_a": "Agar koneksi menjadi lebih cepat",
-      "choice_b": "Untuk mencegah pengguna tidak sah mengakses jaringan dan mencuri data",
-      "choice_c": "Agar nama Wi-Fi (SSID) bisa disembunyikan",
-      "choice_d": "Untuk meningkatkan jangkauan sinyal Wi-Fi",
-      "correct_choice": "B"
-    }
-  },
-  {
-    "model": "pramlearnapp.question",
-    "pk": 57,
-    "fields": {
-      "quiz": 2,
-      "text": "Dua kantor kecil ingin berbagi satu koneksi internet. Kantor A menggunakan Hub, Kantor B menggunakan Switch. Jaringan kantor manakah yang akan memiliki performa lebih baik dan mengapa?",
-      "choice_a": "Kantor A, karena Hub lebih sederhana",
-      "choice_b": "Kantor B, karena Switch mengurangi tabrakan data",
-      "choice_c": "Keduanya sama saja, karena kecepatan internetnya sama",
-      "choice_d": "Kantor A, karena Hub bisa terhubung ke lebih banyak komputer",
-      "correct_choice": "B"
-    }
-  },
-  {
-    "model": "pramlearnapp.question",
-    "pk": 58,
-    "fields": {
-      "quiz": 2,
-      "text": "Analogi yang menyatakan bahwa \"Router adalah polisi lalu lintas di perempatan jalan\" paling tepat menggambarkan fungsi router dalam hal apa?",
-      "choice_a": "Kemampuannya untuk menghentikan semua data",
-      "choice_b": "Kemampuannya untuk mencatat semua pelanggaran",
-      "choice_c": "Kemampuannya untuk mengarahkan data ke jaringan tujuan yang benar",
-      "choice_d": "Kemampuannya untuk mempercepat laju semua data",
-      "correct_choice": "C"
-    }
-  },
-  {
-    "model": "pramlearnapp.question",
-    "pk": 59,
-    "fields": {
-      "quiz": 2,
-      "text": "Anda diminta merancang jaringan untuk acara live streaming di aula sekolah dengan kebutuhan koneksi stabil untuk 3 PC panitia dan koneksi nirkabel untuk tamu. Rancangan manakah yang paling efektif?",
-      "choice_a": "Menghubungkan semua perangkat ke satu Hub besar",
-      "choice_b": "Menggunakan satu Router Wi-Fi rumahan untuk semua perangkat",
-      "choice_c": "Menghubungkan 3 PC panitia ke Switch via kabel, lalu Switch dihubungkan ke Router. Untuk tamu, dipasang Access Point yang juga terhubung ke Router.",
-      "choice_d": "Hanya menyediakan koneksi Wi-Fi untuk semua perangkat agar lebih praktis",
-      "correct_choice": "C"
-    }
-  },
-  {
-    "model": "pramlearnapp.question",
-    "pk": 60,
-    "fields": {
-      "quiz": 2,
-      "text": "Sebuah kafe ingin menyediakan Wi-Fi untuk pelanggan, namun ingin transaksi kasir menggunakan koneksi kabel yang lebih aman dan stabil. Desain manakah yang paling efektif?",
-      "choice_a": "Menghubungkan kasir dan pelanggan ke satu Hub yang sama",
-      "choice_b": "Menghubungkan kasir via kabel ke Switch, dan pelanggan via Wi-Fi ke AP, di mana Switch dan AP terhubung ke satu Router",
-      "choice_c": "Hanya menyediakan koneksi kabel untuk semua perangkat",
-      "choice_d": "Hanya menyediakan koneksi Wi-Fi untuk semua perangkat",
-      "correct_choice": "B"
-    }
-  },
-  {
-    "model": "pramlearnapp.question",
-    "pk": 61,
-    "fields": {
-      "quiz": 2,
       "text": "Jaringan di sebuah sekolah seringkali lambat pada jam istirahat karena banyak siswa mengakses video. Usulan teknis apakah yang paling logis untuk diajukan guna mengatasi masalah ini?",
       "choice_a": "Mengurangi jumlah komputer di sekolah",
       "choice_b": "Mematikan jaringan pada jam istirahat",
@@ -1879,22 +1680,22 @@
   },
   {
     "model": "pramlearnapp.question",
-    "pk": 62,
+    "pk": 49,
     "fields": {
-      "quiz": 2,
-      "text": "Untuk melindungi data penting pada file server di sebuah kantor kecil dari risiko kerusakan hard disk, strategi backup data paling dasar apakah yang bisa Anda usulkan?",
-      "choice_a": "Menyimpan semua data hanya di server tanpa backup",
-      "choice_b": "Meminta setiap karyawan menyimpan data di komputernya masing-masing",
-      "choice_c": "Menjadwalkan backup otomatis setiap malam ke hard disk eksternal atau cloud storage",
-      "choice_d": "Mencetak semua data penting setiap hari",
-      "correct_choice": "C"
+      "quiz": 1,
+      "text": "Anda diminta merancang strategi backup data untuk file server di kantor kecil untuk antisipasi kerusakan hard disk. Rencana backup data yang paling efektif dan otomatis adalah...",
+      "choice_a": "Menginstruksikan setiap karyawan untuk menyalin file penting ke komputer mereka setiap sore hari.",
+      "choice_b": "Mengkonfigurasi server untuk melakukan sinkronisasi data secara otomatis ke layanan cloud storage setiap malam.",
+      "choice_c": "Menyediakan satu hard disk eksternal besar yang digunakan secara bergantian oleh karyawan untuk backup manual.",
+      "choice_d": "Mengaktifkan fitur System Restore pada sistem operasi server agar bisa kembali ke kondisi sebelumnya.",
+      "correct_choice": "B"
     }
   },
   {
     "model": "pramlearnapp.question",
-    "pk": 63,
+    "pk": 50,
     "fields": {
-      "quiz": 2,
+      "quiz": 1,
       "text": "Anda diminta membuat 3 aturan kebijakan keamanan paling dasar untuk jaringan Wi-Fi di rumah. Kombinasi kebijakan manakah yang paling efektif?",
       "choice_a": "Membiarkan nama Wi-Fi default, tanpa password, dan menyala 24 jam",
       "choice_b": "Mengganti nama Wi-Fi (SSID) agar tidak mudah ditebak, menggunakan password yang kuat, dan tidak membagikannya secara sembarangan",
@@ -1905,10 +1706,10 @@
   },
   {
     "model": "pramlearnapp.question",
-    "pk": 64,
+    "pk": 51,
     "fields": {
-      "quiz": 2,
-      "text": "Sebuah rumah bertingkat tiga ingin semua lantainya ter-cover sinyal Wi-Fi yang kuat dari satu sumber internet. Kombinasi perangkat apakah yang paling sesuai untuk menciptakan jaringan seperti ini?",
+      "quiz": 1,
+      "text": "Sebuah rumah bertingkat tiga ingin semua lantainya tercover sinyal Wi-Fi yang kuat dari satu sumber internet. Kombinasi perangkat apakah yang paling sesuai untuk menciptakan jaringan seperti ini?",
       "choice_a": "Satu Router di lantai 1, dan satu Access Point di lantai 2 dan 3",
       "choice_b": "Tiga modem internet terpisah untuk setiap lantai",
       "choice_c": "Tiga Hub di setiap lantai",
@@ -1918,9 +1719,9 @@
   },
   {
     "model": "pramlearnapp.question",
-    "pk": 65,
+    "pk": 52,
     "fields": {
-      "quiz": 3,
+      "quiz": 1,
       "text": "Jika Anda diminta merancang jaringan untuk sebuah perpustakaan baru, urutan langkah analisis kebutuhan manakah yang paling logis?",
       "choice_a": "Membeli router, menghitung pengguna, menentukan anggaran",
       "choice_b": "Menentukan anggaran, menghitung pengguna, menentukan jenis layanan",
@@ -1931,119 +1732,28 @@
   },
   {
     "model": "pramlearnapp.question",
-    "pk": 66,
+    "pk": 53,
     "fields": {
-      "quiz": 3,
-      "text": "Untuk sebuah kantor dengan 10 staf yang semuanya perlu akses cepat ke server file dan internet, desain koneksi manakah yang paling masuk akal?",
-      "choice_a": "Semua staf terhubung ke Hub, lalu Hub ke internet",
-      "choice_b": "Semua staf terhubung ke Router secara nirkabel",
-      "choice_c": "Semua staf dan server terhubung ke satu Switch menggunakan kabel, lalu Switch terhubung ke Router untuk akses internet",
-      "choice_d": "Setiap staf terhubung langsung ke modem internet",
+      "quiz": 1,
+      "text": "Anda diminta merancang topologi untuk kantor dengan 10 staf dan 1 server file. Prioritasnya adalah koneksi internal yang cepat dan stabil serta akses internet untuk semua. Desain yang paling optimal adalah...",
+      "choice_a": "Menghubungkan semua staf dan server ke sebuah Hub, kemudian Hub dihubungkan ke Router untuk akses internet.",
+      "choice_b": "Menghubungkan semua staf dan server secara nirkabel ke satu Router Wi-Fi berkecepatan tinggi.",
+      "choice_c": "Menghubungkan semua staf dan server via kabel ke sebuah Switch, kemudian Switch dihubungkan ke Router.",
+      "choice_d": "Menghubungkan server ke Router, lalu semua staf terhubung ke server untuk mendapatkan akses internet.",
       "correct_choice": "C"
     }
   },
   {
     "model": "pramlearnapp.question",
-    "pk": 67,
+    "pk": 54,
     "fields": {
-      "quiz": 3,
+      "quiz": 1,
       "text": "Mengingat risiko kegagalan server pusat adalah salah satu kerugian jaringan, rencana mitigasi atau pencegahan apakah yang paling tepat untuk sebuah perusahaan?",
       "choice_a": "Mematikan server setiap malam untuk menghemat listrik",
       "choice_b": "Membuat jadwal backup data secara rutin ke lokasi yang berbeda",
       "choice_c": "Membatasi jumlah pengguna yang bisa mengakses server",
       "choice_d": "Tidak menyimpan data apapun di server",
       "correct_choice": "B"
-    }
-  },
-  {
-    "model": "pramlearnapp.question",
-    "pk": 68,
-    "fields": {
-      "quiz": 3,
-      "text": "Jenis jaringan komputer apakah yang memiliki skala jangkauan paling kecil untuk menghubungkan perangkat pribadi seperti smartphone dengan headset bluetooth?",
-      "choice_a": "LAN",
-      "choice_b": "MAN",
-      "choice_c": "WAN",
-      "choice_d": "PAN",
-      "correct_choice": "D"
-    }
-  },
-  {
-    "model": "pramlearnapp.question",
-    "pk": 69,
-    "fields": {
-      "quiz": 3,
-      "text": "Perangkat keras apakah yang berfungsi untuk menghubungkan dua atau lebih jaringan yang berbeda, seperti menghubungkan LAN ke internet?",
-      "choice_a": "Switch",
-      "choice_b": "Hub",
-      "choice_c": "Router",
-      "choice_d": "Repeater",
-      "correct_choice": "C"
-    }
-  },
-  {
-    "model": "pramlearnapp.question",
-    "pk": 70,
-    "fields": {
-      "quiz": 3,
-      "text": "Apakah sebutan untuk alamat fisik unik yang tidak bisa diubah dan menjadi identitas pada setiap kartu jaringan (NIC)?",
-      "choice_a": "IP Address",
-      "choice_b": "Subnet Mask",
-      "choice_c": "Gateway",
-      "choice_d": "MAC Address",
-      "correct_choice": "D"
-    }
-  },
-  {
-    "model": "pramlearnapp.question",
-    "pk": 71,
-    "fields": {
-      "quiz": 3,
-      "text": "Apakah nama kumpulan protokol yang menjadi aturan standar untuk komunikasi data di seluruh jaringan internet?",
-      "choice_a": "HTTP/FTP",
-      "choice_b": "TCP/IP",
-      "choice_c": "POP3/SMTP",
-      "choice_d": "LAN/WAN",
-      "correct_choice": "B"
-    }
-  },
-  {
-    "model": "pramlearnapp.question",
-    "pk": 72,
-    "fields": {
-      "quiz": 3,
-      "text": "Dalam model client-server, apakah sebutan untuk komputer yang meminta atau mengakses layanan dari komputer lain?",
-      "choice_a": "Server",
-      "choice_b": "Host",
-      "choice_c": "Client",
-      "choice_d": "Node",
-      "correct_choice": "C"
-    }
-  },
-  {
-    "model": "pramlearnapp.question",
-    "pk": 73,
-    "fields": {
-      "quiz": 3,
-      "text": "Manakah di bawah ini yang merupakan contoh dari media transmisi jaringan yang menggunakan kabel?",
-      "choice_a": "Bluetooth",
-      "choice_b": "Wi-Fi",
-      "choice_c": "Infrared",
-      "choice_d": "UTP dan Fiber Optic",
-      "correct_choice": "D"
-    }
-  },
-  {
-    "model": "pramlearnapp.question",
-    "pk": 74,
-    "fields": {
-      "quiz": 3,
-      "text": "Apakah nama proyek penelitian di Amerika Serikat pada tahun 1960-an yang menjadi cikal bakal lahirnya internet?",
-      "choice_a": "ETHERNET",
-      "choice_b": "WWW",
-      "choice_c": "ARPANET",
-      "choice_d": "NSFNET",
-      "correct_choice": "C"
     }
   },
   {
@@ -2097,7 +1807,7 @@
       "choice_b": "Opsi B untuk soal analisis 2",
       "choice_c": "Opsi C untuk soal analisis 2",
       "choice_d": "Opsi D untuk soal analisis 2",
-      "correct_choice": "C"
+      "correct_choice": "B"
     }
   },
   {
@@ -2111,7 +1821,7 @@
       "choice_b": "Opsi B untuk soal analisis 3",
       "choice_c": "Opsi C untuk soal analisis 3",
       "choice_d": "Opsi D untuk soal analisis 3",
-      "correct_choice": "A"
+      "correct_choice": "B"
     }
   },
   {
@@ -2125,7 +1835,7 @@
       "choice_b": "Opsi B untuk soal analisis 4",
       "choice_c": "Opsi C untuk soal analisis 4",
       "choice_d": "Opsi D untuk soal analisis 4",
-      "correct_choice": "C"
+      "correct_choice": "D"
     }
   },
   {
@@ -2139,7 +1849,7 @@
       "choice_b": "Opsi B untuk soal analisis 5",
       "choice_c": "Opsi C untuk soal analisis 5",
       "choice_d": "Opsi D untuk soal analisis 5",
-      "correct_choice": "B"
+      "correct_choice": "C"
     }
   },
   {
@@ -2153,7 +1863,7 @@
       "choice_b": "Opsi B untuk soal analisis 6",
       "choice_c": "Opsi C untuk soal analisis 6",
       "choice_d": "Opsi D untuk soal analisis 6",
-      "correct_choice": "D"
+      "correct_choice": "B"
     }
   },
   {
@@ -2167,7 +1877,7 @@
       "choice_b": "Opsi B untuk soal analisis 7",
       "choice_c": "Opsi C untuk soal analisis 7",
       "choice_d": "Opsi D untuk soal analisis 7",
-      "correct_choice": "B"
+      "correct_choice": "D"
     }
   },
   {
@@ -2181,7 +1891,7 @@
       "choice_b": "Opsi B untuk soal analisis 8",
       "choice_c": "Opsi C untuk soal analisis 8",
       "choice_d": "Opsi D untuk soal analisis 8",
-      "correct_choice": "B"
+      "correct_choice": "D"
     }
   },
   {
@@ -2195,7 +1905,7 @@
       "choice_b": "Opsi B untuk soal analisis 9",
       "choice_c": "Opsi C untuk soal analisis 9",
       "choice_d": "Opsi D untuk soal analisis 9",
-      "correct_choice": "C"
+      "correct_choice": "B"
     }
   },
   {
@@ -2209,7 +1919,7 @@
       "choice_b": "Opsi B untuk soal analisis 10",
       "choice_c": "Opsi C untuk soal analisis 10",
       "choice_d": "Opsi D untuk soal analisis 10",
-      "correct_choice": "C"
+      "correct_choice": "A"
     }
   },
   {
@@ -2223,7 +1933,7 @@
       "choice_b": "Opsi B untuk soal perancangan 1",
       "choice_c": "Opsi C untuk soal perancangan 1",
       "choice_d": "Opsi D untuk soal perancangan 1",
-      "correct_choice": "C"
+      "correct_choice": "B"
     }
   },
   {
@@ -2237,7 +1947,7 @@
       "choice_b": "Opsi B untuk soal perancangan 2",
       "choice_c": "Opsi C untuk soal perancangan 2",
       "choice_d": "Opsi D untuk soal perancangan 2",
-      "correct_choice": "D"
+      "correct_choice": "C"
     }
   },
   {
@@ -2279,7 +1989,7 @@
       "choice_b": "Opsi B untuk soal perancangan 5",
       "choice_c": "Opsi C untuk soal perancangan 5",
       "choice_d": "Opsi D untuk soal perancangan 5",
-      "correct_choice": "C"
+      "correct_choice": "A"
     }
   },
   {
@@ -2293,7 +2003,7 @@
       "choice_b": "Opsi B untuk soal perancangan 6",
       "choice_c": "Opsi C untuk soal perancangan 6",
       "choice_d": "Opsi D untuk soal perancangan 6",
-      "correct_choice": "D"
+      "correct_choice": "B"
     }
   },
   {
@@ -2307,7 +2017,7 @@
       "choice_b": "Opsi B untuk soal perancangan 7",
       "choice_c": "Opsi C untuk soal perancangan 7",
       "choice_d": "Opsi D untuk soal perancangan 7",
-      "correct_choice": "C"
+      "correct_choice": "B"
     }
   },
   {
@@ -2321,7 +2031,7 @@
       "choice_b": "Opsi B untuk soal perancangan 8",
       "choice_c": "Opsi C untuk soal perancangan 8",
       "choice_d": "Opsi D untuk soal perancangan 8",
-      "correct_choice": "A"
+      "correct_choice": "C"
     }
   },
   {
@@ -2335,7 +2045,7 @@
       "choice_b": "Opsi B untuk soal perancangan 9",
       "choice_c": "Opsi C untuk soal perancangan 9",
       "choice_d": "Opsi D untuk soal perancangan 9",
-      "correct_choice": "D"
+      "correct_choice": "B"
     }
   },
   {
@@ -2349,7 +2059,7 @@
       "choice_b": "Opsi B untuk soal perancangan 10",
       "choice_c": "Opsi C untuk soal perancangan 10",
       "choice_d": "Opsi D untuk soal perancangan 10",
-      "correct_choice": "A"
+      "correct_choice": "C"
     }
   },
   {

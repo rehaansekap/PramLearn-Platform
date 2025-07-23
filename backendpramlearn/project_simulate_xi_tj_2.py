@@ -298,11 +298,13 @@ def generate_youtube_videos():
 
 
 def parse_soal_file():
-    """Parse soal.txt and process questions with correct answer = e"""
+    """Parse Instrument Soal.txt and process questions"""
     questions = []
 
     try:
-        with open("Soal.txt", "r", encoding="utf-8") as f:
+        with open(
+            "Instrument Soal.txt", "r", encoding="utf-8"
+        ) as f:  # Changed from "Soal.txt"
             content = f.read()
 
         # Split by lines and process
@@ -331,14 +333,14 @@ def parse_soal_file():
                     "choices": {},
                     "correct_answer": None,
                 }
-            elif line.startswith(("a. ", "b. ", "c. ", "d. ", "e. ")):
+            elif line.startswith(("A. ", "B. ", "C. ", "D. ", "E. ")):
                 if current_question is not None:
                     choice_letter = line[0].upper()
                     choice_text = line[3:]
                     current_question["choices"][choice_letter] = choice_text
-            elif line.startswith("correct answer = "):
+            elif line.startswith("correct answer: "):
                 if current_question is not None:
-                    current_question["correct_answer"] = line.split("= ")[1].upper()
+                    current_question["correct_answer"] = line.split(": ")[1].upper()
 
         # Add last question
         if (
@@ -349,39 +351,23 @@ def parse_soal_file():
             questions.append(current_question)
 
     except FileNotFoundError:
-        print("⚠️  Soal.txt not found, generating sample questions instead")
+        print("⚠️  Instrument Soal.txt not found, generating sample questions instead")
         return generate_sample_questions()
     except Exception as e:
-        print(f"⚠️  Error parsing Soal.txt: {e}, generating sample questions instead")
+        print(
+            f"⚠️  Error parsing Instrument Soal.txt: {e}, generating sample questions instead"
+        )
         return generate_sample_questions()
 
-    # Process questions with correct answer = E
+    # Process questions - keep all options including E
     processed_questions = []
     for q in questions:
-        if q.get("correct_answer") == "E":
-            # Remove option E
-            if "E" in q["choices"]:
-                del q["choices"]["E"]
-
-            # Randomly remove one more option and update correct answer
-            remaining_options = [k for k in q["choices"].keys() if k != "E"]
-            if len(remaining_options) > 3:
-                # Remove one random option
-                to_remove = random.choice(remaining_options)
-                del q["choices"][to_remove]
-                remaining_options.remove(to_remove)
-
-            # Set new correct answer
-            if remaining_options:
-                q["correct_answer"] = random.choice(remaining_options)
-            else:
-                q["correct_answer"] = "A"  # fallback
-
+        # Don't remove option E for this version - keep all original options
         processed_questions.append(q)
 
     if not processed_questions:
         print(
-            "⚠️  No valid questions found in Soal.txt, generating sample questions instead"
+            "⚠️  No valid questions found in Instrument Soal.txt, generating sample questions instead"
         )
         return generate_sample_questions()
 
@@ -428,135 +414,42 @@ def generate_sample_questions():
 
 
 def generate_quiz():
-    """Generate 3 quizzes"""
-    quizzes = [
+    """Generate 1 quiz with all questions from Instrument Soal"""
+    return [
         {
             "model": "pramlearnapp.quiz",
             "pk": 1,
             "fields": {
                 "material": 1,
-                "title": "Instrumen Soal Jaringan Komputer",
-                "content": "Kuis komprehensif tentang konsep dasar jaringan komputer",
+                "title": "Kuis Jaringan Komputer - XI TJ 2",
+                "content": "Kuis komprehensif tentang konsep dasar jaringan komputer dengan 54 soal",
                 "created_at": "2025-07-01T10:00:00Z",
                 "is_group_quiz": True,
                 "end_time": "2025-08-02T23:59:59Z",
-                "slug": "instrumen-soal-jaringan-komputer",
-                "duration": 120,
+                "slug": "kuis-jaringan-komputer-xi-tj-2",
+                "duration": 150,  # 2.5 hours for 54 questions
                 "is_active": True,
             },
-        },
-        {
-            "model": "pramlearnapp.quiz",
-            "pk": 2,
-            "fields": {
-                "material": 1,
-                "title": "Konsep Dasar Jaringan",
-                "content": "Evaluasi pemahaman konsep dasar jaringan komputer",
-                "created_at": "2025-07-01T11:00:00Z",
-                "is_group_quiz": True,
-                "end_time": "2025-08-02T23:59:59Z",
-                "slug": "konsep-dasar-jaringan",
-                "duration": 60,
-                "is_active": True,
-            },
-        },
-        {
-            "model": "pramlearnapp.quiz",
-            "pk": 3,
-            "fields": {
-                "material": 1,
-                "title": "Perangkat dan Protokol Jaringan",
-                "content": "Evaluasi pemahaman perangkat dan protokol jaringan",
-                "created_at": "2025-07-01T12:00:00Z",
-                "is_group_quiz": True,
-                "end_time": "2025-08-02T23:59:59Z",
-                "slug": "perangkat-dan-protokol-jaringan",
-                "duration": 60,
-                "is_active": True,
-            },
-        },
+        }
     ]
-
-    return quizzes
 
 
 def generate_quiz_questions():
-    """Generate questions for all quizzes"""
+    """Generate all questions for the single quiz"""
     questions = parse_soal_file()
     quiz_questions = []
     question_id = 1
 
-    print(f"📝 Parsed {len(questions)} questions from file")
+    print(f"📝 Parsed {len(questions)} questions from Instrument Soal.txt")
 
-    # Ensure we have enough questions
-    if len(questions) < 60:
-        print("⚠️  Not enough questions, duplicating some questions...")
-        # Duplicate questions to reach at least 60
-        while len(questions) < 60:
-            questions.extend(questions[: min(len(questions), 60 - len(questions))])
-
-    # Quiz 1: First 54 questions from soal.txt
-    quiz1_questions = questions[:54] if len(questions) >= 54 else questions
-    for i, q in enumerate(quiz1_questions, 1):
+    # Use all questions for the single quiz
+    for i, q in enumerate(questions, 1):
         quiz_questions.append(
             {
                 "model": "pramlearnapp.question",
                 "pk": question_id,
                 "fields": {
                     "quiz": 1,
-                    "text": q["text"],
-                    "choice_a": q["choices"].get("A", ""),
-                    "choice_b": q["choices"].get("B", ""),
-                    "choice_c": q["choices"].get("C", ""),
-                    "choice_d": q["choices"].get("D", ""),
-                    "correct_choice": q["correct_answer"],
-                },
-            }
-        )
-        question_id += 1
-
-    # Quiz 2: Next 10 questions
-    quiz2_start = min(40, len(questions))
-    quiz2_end = min(50, len(questions))
-    quiz2_questions = (
-        questions[quiz2_start:quiz2_end]
-        if len(questions) > quiz2_start
-        else questions[:10]
-    )
-
-    for i, q in enumerate(quiz2_questions, 1):
-        quiz_questions.append(
-            {
-                "model": "pramlearnapp.question",
-                "pk": question_id,
-                "fields": {
-                    "quiz": 2,
-                    "text": q["text"],
-                    "choice_a": q["choices"].get("A", ""),
-                    "choice_b": q["choices"].get("B", ""),
-                    "choice_c": q["choices"].get("C", ""),
-                    "choice_d": q["choices"].get("D", ""),
-                    "correct_choice": q["correct_answer"],
-                },
-            }
-        )
-        question_id += 1
-
-    # Quiz 3: Last 10 questions
-    quiz3_start = min(50, len(questions))
-    quiz3_questions = (
-        questions[quiz3_start : quiz3_start + 10]
-        if len(questions) > quiz3_start
-        else questions[-10:]
-    )
-
-    for i, q in enumerate(quiz3_questions, 1):
-        quiz_questions.append(
-            {
-                "model": "pramlearnapp.question",
-                "pk": question_id,
-                "fields": {
-                    "quiz": 3,
                     "text": q["text"],
                     "choice_a": q["choices"].get("A", ""),
                     "choice_b": q["choices"].get("B", ""),
@@ -771,7 +664,7 @@ def generate_student_attendance():
 
 def main():
     """Main function to generate comprehensive initial data"""
-    print("🚀 Generating PramLearn Simulation Data")
+    print("🚀 Generating PramLearn Simulation Data for XI TJ 2")
     print("=" * 50)
 
     data = []
@@ -798,7 +691,7 @@ def main():
     data.extend(generate_materials())
     data.extend(generate_youtube_videos())
 
-    print("🧩 Generating quizzes...")
+    print("🧩 Generating quiz...")
     data.extend(generate_quiz())
     data.extend(generate_quiz_questions())
 
@@ -826,27 +719,26 @@ def main():
     print("\n📋 Summary:")
     print("  • 1 Admin user")
     print("  • 1 Teacher user (Raihan Syeka Pramukastie)")
-    print("  • 35 Student users (from XI TJ 1.csv)")
-    print("  • 1 Class (XI TJ 1)")
+    print("  • 35 Student users (from XI TJ 2.csv)")
+    print("  • 1 Class (XI TJ 2)")
     print("  • 1 Subject (Administrasi Sistem Jaringan)")
     print("  • 1 Material (Pengenalan Jaringan Komputer)")
-    print("  • 1 PDF file + 3 YouTube videos")
-    print("  • 3 Individual quizzes (BELUM DIKERJAKAN)")
-    print("    - Quiz 1: Instrumen Soal Jaringan Komputer (54 soal)")
-    print("    - Quiz 2: Konsep Dasar Jaringan (10 soal)")
-    print("    - Quiz 3: Perangkat dan Protokol Jaringan (10 soal)")
+    print("  • 3 YouTube videos")
+    print("  • 1 GROUP QUIZ (BELUM DIKERJAKAN)")
+    print("    - Quiz: Kuis Jaringan Komputer - XI TJ 2 (54 soal dari Instrument Soal)")
     print("  • 2 Assignments (BELUM DIKERJAKAN)")
     print("    - Assignment 1: Analisis Jaringan Dasar (10 soal)")
     print("    - Assignment 2: Perancangan Jaringan Sederhana (10 soal)")
     print("  • 1 ARCS pre-assessment (20 pertanyaan)")
     print("\n⚠️  CATATAN:")
+    print("  • Quiz adalah GROUP QUIZ dengan 54 soal dari Instrument Soal.txt")
     print("  • Quiz belum dikerjakan siswa")
     print("  • Assignment belum dikerjakan siswa")
     print("  • Group belum dibentuk")
     print("  • ARCS responses belum dibuat")
     print("  • Student motivation profiles belum dibuat")
-    print("  • Attendance records TIDAK DIBUAT (biarkan default)")
     print("  • Semua deadline: 2 Agustus 2025")
+    print("  • Duration quiz: 150 menit (2.5 jam)")
     print(
         "\n🎉 Ready to load with: python manage.py loaddata pramlearnapp/fixtures/initial_data_xi_tj_2.json"
     )
