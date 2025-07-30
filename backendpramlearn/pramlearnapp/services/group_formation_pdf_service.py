@@ -936,316 +936,382 @@ class GroupFormationPDFService:
 
     def _create_group_distribution_stacked_chart(self, groups_data):
         """Create a stacked bar chart showing motivation distribution per group"""
-        try:
-            from reportlab.graphics.shapes import Drawing, Rect, String
-            from reportlab.lib import colors
+        from reportlab.graphics.shapes import Drawing, Rect, String, Line
+        from reportlab.lib import colors
 
-            # Chart dimensions
-            width = 500
-            height = 350
-            drawing = Drawing(width, height)
+        width = 7.5 * inch
+        height = 5 * inch
 
-            # Chart area
-            chart_x = 80
-            chart_y = 60
-            chart_width = 350
-            chart_height = 200
+        drawing = Drawing(width, height)
 
-            # Colors for different motivation levels
-            color_map = {
-                "High": colors.Color(0.2, 0.8, 0.4),  # Green
-                "Medium": colors.Color(0.8, 0.6, 0.2),  # Orange
-                "Low": colors.Color(0.8, 0.2, 0.2),  # Red
-            }
+        # Batasi hanya menampilkan maksimal 8 kelompok untuk kejelasan chart
+        display_groups = groups_data[:8] if len(groups_data) > 8 else groups_data
 
-            # Prepare data
-            n_groups = len(groups_data)
-            if n_groups == 0:
-                return None
-
-            # Limit to maximum 6 groups for better visibility
-            display_groups = groups_data[:6]
-            n_display_groups = len(display_groups)
-
-            # Calculate bar dimensions
-            bar_width = chart_width / n_display_groups * 0.8
-            bar_spacing = chart_width / n_display_groups
-
-            # Find maximum total for scaling
-            max_total = max(group.get("size", 0) for group in display_groups)
-            if max_total == 0:
-                max_total = 1
-
-            # Draw bars for each group
-            for i, group in enumerate(display_groups):
-                group_name = group.get("name", f"Kelompok {i+1}")
-                motivation_dist = group.get("motivation_distribution", {})
-
-                # Get counts for each motivation level
-                high_count = motivation_dist.get("High", 0)
-                medium_count = motivation_dist.get("Medium", 0)
-                low_count = motivation_dist.get("Low", 0)
-                total_count = high_count + medium_count + low_count
-
-                if total_count == 0:
-                    continue
-
-                # Calculate bar position
-                bar_x = chart_x + i * bar_spacing + (bar_spacing - bar_width) / 2
-
-                # Calculate segment heights
-                scale_factor = chart_height / max_total
-                high_height = high_count * scale_factor
-                medium_height = medium_count * scale_factor
-                low_height = low_count * scale_factor
-
-                # Draw stacked segments (bottom to top: Low, Medium, High)
-                current_y = chart_y
-
-                # Low segment (bottom)
-                if low_count > 0:
-                    drawing.add(
-                        Rect(
-                            bar_x,
-                            current_y,
-                            bar_width,
-                            low_height,
-                            fillColor=color_map["Low"],
-                            strokeColor=colors.black,
-                            strokeWidth=1,
-                        )
-                    )
-                    # Add count label if significant height
-                    if low_height > 15:
-                        label_y = current_y + low_height / 2
-                        drawing.add(
-                            String(
-                                bar_x + bar_width / 2,
-                                label_y,
-                                str(low_count),
-                                fontSize=9,
-                                textAnchor="middle",
-                                fontName="Helvetica-Bold",
-                                fillColor=colors.white,
-                            )
-                        )
-                    current_y += low_height
-
-                # Medium segment (middle)
-                if medium_count > 0:
-                    drawing.add(
-                        Rect(
-                            bar_x,
-                            current_y,
-                            bar_width,
-                            medium_height,
-                            fillColor=color_map["Medium"],
-                            strokeColor=colors.black,
-                            strokeWidth=1,
-                        )
-                    )
-                    # Add count label if significant height
-                    if medium_height > 15:
-                        label_y = current_y + medium_height / 2
-                        drawing.add(
-                            String(
-                                bar_x + bar_width / 2,
-                                label_y,
-                                str(medium_count),
-                                fontSize=9,
-                                textAnchor="middle",
-                                fontName="Helvetica-Bold",
-                                fillColor=colors.white,
-                            )
-                        )
-                    current_y += medium_height
-
-                # High segment (top)
-                if high_count > 0:
-                    drawing.add(
-                        Rect(
-                            bar_x,
-                            current_y,
-                            bar_width,
-                            high_height,
-                            fillColor=color_map["High"],
-                            strokeColor=colors.black,
-                            strokeWidth=1,
-                        )
-                    )
-                    # Add count label if significant height
-                    if high_height > 15:
-                        label_y = current_y + high_height / 2
-                        drawing.add(
-                            String(
-                                bar_x + bar_width / 2,
-                                label_y,
-                                str(high_count),
-                                fontSize=9,
-                                textAnchor="middle",
-                                fontName="Helvetica-Bold",
-                                fillColor=colors.white,
-                            )
-                        )
-
-                # Add group label below bar
-                drawing.add(
-                    String(
-                        bar_x + bar_width / 2,
-                        chart_y - 15,
-                        group_name.replace("Kelompok ", "Kel."),
-                        fontSize=9,
-                        textAnchor="middle",
-                        fontName="Helvetica",
-                    )
-                )
-
-                # Add total count above bar
-                total_height = high_height + medium_height + low_height
-                drawing.add(
-                    String(
-                        bar_x + bar_width / 2,
-                        chart_y + total_height + 5,
-                        f"Total: {total_count}",
-                        fontSize=8,
-                        textAnchor="middle",
-                        fontName="Helvetica-Bold",
-                    )
-                )
-
-            # Draw axes
-            from reportlab.graphics.shapes import Line
-
-            # X-axis
-            drawing.add(
-                Line(
-                    chart_x,
-                    chart_y,
-                    chart_x + chart_width,
-                    chart_y,
-                    strokeColor=colors.black,
-                    strokeWidth=2,
-                )
-            )
-            # Y-axis
-            drawing.add(
-                Line(
-                    chart_x,
-                    chart_y,
-                    chart_x,
-                    chart_y + chart_height,
-                    strokeColor=colors.black,
-                    strokeWidth=2,
-                )
-            )
-
-            # Y-axis labels (student count)
-            for i in range(6):
-                y_value = i * max_total / 5
-                y_pos = chart_y + i * chart_height / 5
-                if y_value % 1 == 0:  # Only show integer values
-                    drawing.add(
-                        String(
-                            chart_x - 5,
-                            y_pos - 3,
-                            str(int(y_value)),
-                            fontSize=8,
-                            textAnchor="end",
-                            fontName="Helvetica",
-                        )
-                    )
-
-            # Chart title
+        if not display_groups:
             drawing.add(
                 String(
                     width / 2,
-                    height - 30,
-                    "Distribusi Motivasi Siswa per Kelompok",
-                    fontSize=14,
-                    textAnchor="middle",
-                    fontName="Helvetica-Bold",
-                )
-            )
-
-            # Y-axis title
-            drawing.add(
-                String(
-                    20,
                     height / 2,
-                    "Jumlah Siswa",
-                    fontSize=10,
+                    "Tidak ada data kelompok",
+                    fontSize=12,
                     textAnchor="middle",
-                    fontName="Helvetica-Bold",
                 )
             )
-
-            # Legend
-            legend_y = 20
-            legend_spacing = 100
-            legend_items = [
-                ("Motivasi Tinggi", color_map["High"]),
-                ("Motivasi Sedang", color_map["Medium"]),
-                ("Motivasi Rendah", color_map["Low"]),
-            ]
-
-            for i, (label, color) in enumerate(legend_items):
-                legend_x = chart_x + i * legend_spacing
-                # Legend color box
-                drawing.add(
-                    Rect(
-                        legend_x,
-                        legend_y,
-                        15,
-                        10,
-                        fillColor=color,
-                        strokeColor=colors.black,
-                    )
-                )
-                # Legend text
-                drawing.add(
-                    String(
-                        legend_x + 20,
-                        legend_y + 2,
-                        label,
-                        fontSize=9,
-                        fontName="Helvetica",
-                    )
-                )
-
-            # Add summary statistics
-            summary_y = height - 50
-            total_students = sum(group.get("size", 0) for group in display_groups)
-            total_high = sum(
-                group.get("motivation_distribution", {}).get("High", 0)
-                for group in display_groups
-            )
-            total_medium = sum(
-                group.get("motivation_distribution", {}).get("Medium", 0)
-                for group in display_groups
-            )
-            total_low = sum(
-                group.get("motivation_distribution", {}).get("Low", 0)
-                for group in display_groups
-            )
-
-            summary_text = f"Total: {total_students} siswa | Tinggi: {total_high} | Sedang: {total_medium} | Rendah: {total_low}"
-            drawing.add(
-                String(
-                    width / 2,
-                    summary_y,
-                    summary_text,
-                    fontSize=10,
-                    textAnchor="middle",
-                    fontName="Helvetica",
-                    fillColor=colors.darkblue,
-                )
-            )
-
             return drawing
 
-        except Exception as e:
-            logger.error(f"Error creating stacked bar chart: {str(e)}")
-            return None
+        # Setup chart dimensions dengan margin yang lebih baik
+        chart_x = 80
+        chart_y = 100
+        chart_width = width - 160
+        chart_height = height - 200
+
+        # Cari nilai maksimum untuk scaling
+        max_students = max([group.get("member_count", 0) for group in display_groups])
+        if max_students == 0:
+            max_students = 5  # Default fallback
+
+        # Warna yang lebih menarik dan kontras
+        colors_map = {
+            "High": colors.Color(0.2, 0.7, 0.3),  # Green yang lebih cerah
+            "Medium": colors.Color(0.9, 0.6, 0.1),  # Orange yang lebih cerah
+            "Low": colors.Color(0.8, 0.2, 0.2),  # Red yang lebih cerah
+        }
+
+        # Gambar chart untuk setiap kelompok
+        group_width = chart_width / len(display_groups)
+        bar_width = min(group_width * 0.6, 60)  # Maksimal 60 points lebar
+
+        for i, group in enumerate(display_groups):
+            x_pos = chart_x + i * group_width
+            group_size = group.get("member_count", 0)
+
+            # Gunakan motivation_distribution yang sudah dihitung
+            dist = group.get(
+                "motivation_distribution", {"High": 0, "Medium": 0, "Low": 0}
+            )
+
+            # Gambar stacked bars
+            current_y = chart_y
+            total_height = (
+                (group_size / max_students) * chart_height if max_students > 0 else 0
+            )
+
+            # Proporsi setiap tingkat motivasi
+            high_height = (
+                (dist["High"] / group_size * total_height) if group_size > 0 else 0
+            )
+            medium_height = (
+                (dist["Medium"] / group_size * total_height) if group_size > 0 else 0
+            )
+            low_height = (
+                (dist["Low"] / group_size * total_height) if group_size > 0 else 0
+            )
+
+            bar_x = x_pos + (group_width - bar_width) / 2
+
+            # Gambar High (hijau) - paling bawah
+            if high_height > 0:
+                drawing.add(
+                    Rect(
+                        bar_x,
+                        current_y,
+                        bar_width,
+                        high_height,
+                        fillColor=colors_map["High"],
+                        strokeColor=colors.black,
+                        strokeWidth=0.5,
+                    )
+                )
+                # Label angka di tengah segment jika cukup tinggi
+                if high_height > 20 and dist["High"] > 0:
+                    drawing.add(
+                        String(
+                            bar_x + bar_width / 2,
+                            current_y + high_height / 2,
+                            str(dist["High"]),
+                            fontSize=9,
+                            textAnchor="middle",
+                            fontName="Helvetica-Bold",
+                            fillColor=colors.white,
+                        )
+                    )
+                current_y += high_height
+
+            # Gambar Medium (orange) - tengah
+            if medium_height > 0:
+                drawing.add(
+                    Rect(
+                        bar_x,
+                        current_y,
+                        bar_width,
+                        medium_height,
+                        fillColor=colors_map["Medium"],
+                        strokeColor=colors.black,
+                        strokeWidth=0.5,
+                    )
+                )
+                if medium_height > 20 and dist["Medium"] > 0:
+                    drawing.add(
+                        String(
+                            bar_x + bar_width / 2,
+                            current_y + medium_height / 2,
+                            str(dist["Medium"]),
+                            fontSize=9,
+                            textAnchor="middle",
+                            fontName="Helvetica-Bold",
+                            fillColor=colors.white,
+                        )
+                    )
+                current_y += medium_height
+
+            # Gambar Low (merah) - paling atas
+            if low_height > 0:
+                drawing.add(
+                    Rect(
+                        bar_x,
+                        current_y,
+                        bar_width,
+                        low_height,
+                        fillColor=colors_map["Low"],
+                        strokeColor=colors.black,
+                        strokeWidth=0.5,
+                    )
+                )
+                if low_height > 20 and dist["Low"] > 0:
+                    drawing.add(
+                        String(
+                            bar_x + bar_width / 2,
+                            current_y + low_height / 2,
+                            str(dist["Low"]),
+                            fontSize=9,
+                            textAnchor="middle",
+                            fontName="Helvetica-Bold",
+                            fillColor=colors.white,
+                        )
+                    )
+
+            # Label kelompok di bawah - yang lebih pendek
+            group_name = group["name"].replace("Kelompok ", "Kel ")
+            drawing.add(
+                String(
+                    x_pos + group_width / 2,
+                    chart_y - 25,
+                    group_name,
+                    fontSize=10,
+                    textAnchor="middle",
+                    fontName="Helvetica-Bold",
+                )
+            )
+
+            # Total siswa di atas bar dengan background
+            # total_y = chart_y + total_height + 15
+            # drawing.add(
+            #     String(
+            #         x_pos + group_width / 2,
+            #         total_y,
+            #         f"Total: {group_size}",
+            #         fontSize=8,
+            #         textAnchor="middle",
+            #         fontName="Helvetica",
+            #         fillColor=colors.darkblue,
+            #     )
+            # )
+
+        # Gambar sumbu Y dengan grid lines
+        drawing.add(
+            Line(
+                chart_x,
+                chart_y,
+                chart_x,
+                chart_y + chart_height,
+                strokeColor=colors.black,
+                strokeWidth=1,
+            )
+        )
+
+        # Y-axis labels dengan grid horizontal
+        for i in range(6):
+            y_value = (max_students * i) / 5
+            y_pos = chart_y + i * chart_height / 5
+
+            # Grid line horizontal
+            if i > 0:
+                drawing.add(
+                    Line(
+                        chart_x,
+                        y_pos,
+                        chart_x + chart_width,
+                        y_pos,
+                        strokeColor=colors.lightgrey,
+                        strokeWidth=0.5,
+                        strokeDashArray=[2, 2],
+                    )
+                )
+
+            if y_value % 1 == 0:  # Only show integer values
+                drawing.add(
+                    String(
+                        chart_x - 10,
+                        y_pos - 3,
+                        str(int(y_value)),
+                        fontSize=9,
+                        textAnchor="end",
+                        fontName="Helvetica",
+                    )
+                )
+
+        # Gambar sumbu X
+        drawing.add(
+            Line(
+                chart_x,
+                chart_y,
+                chart_x + chart_width,
+                chart_y,
+                strokeColor=colors.black,
+                strokeWidth=1,
+            )
+        )
+
+        # Chart title yang lebih besar dan menarik
+        drawing.add(
+            String(
+                width / 2,
+                height - 40,
+                "Distribusi Motivasi Siswa per Kelompok",
+                fontSize=16,
+                textAnchor="middle",
+                fontName="Helvetica-Bold",
+                fillColor=colors.darkblue,
+            )
+        )
+
+        # Y-axis title
+        drawing.add(
+            String(
+                25,
+                height / 2,
+                "Jumlah Siswa",
+                fontSize=11,
+                textAnchor="middle",
+                fontName="Helvetica-Bold",
+                fillColor=colors.darkblue,
+            )
+        )
+
+        # Legend yang lebih rapi dengan box background
+        legend_y = height - 80
+        legend_x_start = chart_x
+
+        # Background untuk legend
+        drawing.add(
+            Rect(
+                legend_x_start - 10,
+                legend_y - 10,
+                chart_width + 20,
+                30,
+                fillColor=colors.Color(0.95, 0.95, 0.95),
+                strokeColor=colors.lightgrey,
+                strokeWidth=0.5,
+            )
+        )
+
+        legend_items = [
+            ("Motivasi Tinggi", colors_map["High"]),
+            ("Motivasi Sedang", colors_map["Medium"]),
+            ("Motivasi Rendah", colors_map["Low"]),
+        ]
+
+        legend_item_width = chart_width / 3
+        for i, (label, color) in enumerate(legend_items):
+            x_pos = legend_x_start + i * legend_item_width
+
+            # Legend box
+            drawing.add(
+                Rect(
+                    x_pos,
+                    legend_y,
+                    18,
+                    12,
+                    fillColor=color,
+                    strokeColor=colors.black,
+                    strokeWidth=0.5,
+                )
+            )
+
+            # Legend text
+            drawing.add(
+                String(
+                    x_pos + 25,
+                    legend_y + 3,
+                    label,
+                    fontSize=10,
+                    fontName="Helvetica",
+                    fillColor=colors.black,
+                )
+            )
+
+        # Summary statistics dengan styling yang lebih baik
+        total_students = sum(group.get("member_count", 0) for group in display_groups)
+        total_high = sum(
+            group.get("motivation_distribution", {}).get("High", 0)
+            for group in display_groups
+        )
+        total_medium = sum(
+            group.get("motivation_distribution", {}).get("Medium", 0)
+            for group in display_groups
+        )
+        total_low = sum(
+            group.get("motivation_distribution", {}).get("Low", 0)
+            for group in display_groups
+        )
+
+        # Background untuk summary
+        summary_y = chart_y - 60
+        drawing.add(
+            Rect(
+                chart_x - 10,
+                summary_y - 10,
+                chart_width + 20,
+                25,
+                fillColor=colors.Color(0.9, 0.95, 1.0),
+                strokeColor=colors.darkblue,
+                strokeWidth=0.5,
+            )
+        )
+
+        summary_text = f"Total: {total_students} siswa | Tinggi: {total_high} | Sedang: {total_medium} | Rendah: {total_low}"
+        drawing.add(
+            String(
+                width / 2,
+                summary_y,
+                summary_text,
+                fontSize=11,
+                textAnchor="middle",
+                fontName="Helvetica-Bold",
+                fillColor=colors.darkblue,
+            )
+        )
+
+        # Tambahan informasi distribusi persentase
+        if total_students > 0:
+            high_pct = (total_high / total_students) * 100
+            medium_pct = (total_medium / total_students) * 100
+            low_pct = (total_low / total_students) * 100
+
+            percentage_text = f"Persentase: Tinggi {high_pct:.1f}% | Sedang {medium_pct:.1f}% | Rendah {low_pct:.1f}%"
+            drawing.add(
+                String(
+                    width / 2,
+                    summary_y - 20,
+                    percentage_text,
+                    fontSize=9,
+                    textAnchor="middle",
+                    fontName="Helvetica",
+                    fillColor=colors.darkgrey,
+                )
+            )
+
+        return drawing
 
     def _add_detailed_group_analysis(self, groups_data, quality_analysis):
         """Add detailed analysis for each group"""

@@ -11,7 +11,7 @@ const useSessionQuizRanking = (materialSlug, quizId) => {
   const [wsConnected, setWsConnected] = useState(false);
   const [error, setError] = useState(null);
   const [lastUpdate, setLastUpdate] = useState(null);
-  const [materialId, setMaterialId] = useState(null); // Tambahkan state untuk materialId
+  const [materialId, setMaterialId] = useState(null);
   const wsRef = useRef(null);
 
   // Get materialId from materialSlug
@@ -124,10 +124,13 @@ const useSessionQuizRanking = (materialSlug, quizId) => {
           type: "request_ranking_update",
         })
       );
+    } else {
+      // Fallback to HTTP if WebSocket not available
+      fetchRankingHttp();
     }
   };
 
-  // Fetch ranking via HTTP (fallback)
+  // Fetch ranking via HTTP (fallback) - PERBAIKAN UTAMA
   const fetchRankingHttp = async () => {
     if (!materialSlug || !quizId || !token) return;
 
@@ -135,50 +138,68 @@ const useSessionQuizRanking = (materialSlug, quizId) => {
       setLoading(true);
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
+      // PERBAIKAN: Gunakan endpoint yang sama dengan data API yang Anda tunjukkan
       const response = await api.get(
-        `teacher/sessions/material/${materialSlug}/quizzes/${quizId}/`
+        `teacher/sessions/material/${materialSlug}/quizzes/`
       );
 
-      // Transform response data to expected format
-      const transformedRankings =
-        response.data.results?.map((result, index) => {
-          // Calculate time spent in seconds if both start_time and submitted_at exist
-          let timeSpent = 0;
-          if (result.start_time && result.submitted_at) {
-            const startTime = new Date(result.start_time);
-            const endTime = new Date(result.submitted_at);
-            timeSpent = Math.floor((endTime - startTime) / 1000); // time in seconds
-          }
+      console.log("📊 Raw API response:", response.data);
 
-          // Determine status based on completion
-          let status = "not_started";
-          if (result.is_completed) {
-            status = "completed";
-          } else if (result.answers && result.answers.length > 0) {
-            status = "in_progress";
-          }
+      // PERBAIKAN: Transform data dari format API yang benar
+      const quiz = response.data.quizzes?.find(
+        (q) => q.id === parseInt(quizId)
+      );
 
-          return {
-            group_id: result.group_id,
-            group_name: result.group_name,
-            group_code: result.group_code,
-            score: result.score || 0,
-            status: status,
-            member_count: result.members?.length || 0,
-            member_names:
-              result.members?.map(
-                (m) => `${m.first_name} ${m.last_name}`.trim() || m.username
-              ) || [],
-            start_time: result.start_time,
-            end_time: result.end_time,
-            submitted_at: result.submitted_at,
-            completed_at: result.completed_at || result.submitted_at,
-            time_spent: timeSpent,
-            correct_answers: result.correct_answers || 0,
-            total_questions: result.total_questions || 0,
-            answers: result.answers || [],
-          };
-        }) || [];
+      if (!quiz || !quiz.assigned_groups) {
+        console.warn("Quiz or assigned groups not found");
+        setRankings([]);
+        return;
+      }
+
+      // Transform assigned_groups data to rankings format
+      const transformedRankings = quiz.assigned_groups.map((group, index) => {
+        // Calculate time spent in seconds
+        let timeSpent = 0;
+        if (group.start_time && group.submitted_at) {
+          const startTime = new Date(group.start_time);
+          const endTime = new Date(group.submitted_at);
+          timeSpent = Math.floor((endTime - startTime) / 1000);
+        }
+
+        // Determine status
+        let status = "not_started";
+        if (group.is_completed && group.submitted_at) {
+          status = "completed";
+        } else if (group.submissions_count > 0) {
+          status = "in_progress";
+        }
+
+        // Get group details from groups array
+        const groupDetails = response.data.groups?.find(
+          (g) => g.id === group.group_id
+        );
+
+        return {
+          group_id: group.group_id,
+          group_name: group.group_name,
+          group_code: group.group_code,
+          score: Math.round(group.score || 0),
+          status: status,
+          member_count: groupDetails?.member_count || 0,
+          member_names:
+            groupDetails?.members?.map(
+              (m) => `${m.first_name} ${m.last_name}`.trim() || m.username
+            ) || [],
+          start_time: group.start_time,
+          end_time: group.end_time,
+          submitted_at: group.submitted_at,
+          completed_at: group.submitted_at,
+          time_spent: timeSpent,
+          correct_answers: 0, // Will be calculated if needed
+          total_questions: quiz.question_count || 0,
+          answers: [],
+        };
+      });
 
       // Sort by score (descending), then by submission time (ascending for completed)
       transformedRankings.sort((a, b) => {
@@ -197,6 +218,8 @@ const useSessionQuizRanking = (materialSlug, quizId) => {
         // For incomplete tasks, sort by score
         return b.score - a.score;
       });
+
+      console.log("📊 Transformed rankings:", transformedRankings);
 
       setRankings(transformedRankings);
       setLastUpdate(new Date());
@@ -221,16 +244,22 @@ const useSessionQuizRanking = (materialSlug, quizId) => {
     };
   }, [quizId, materialSlug, token]);
 
-  // Fallback to HTTP if WebSocket fails
+  // Fallback to HTTP if WebSocket fails or immediate load
   useEffect(() => {
-    if (quizId && materialSlug && !wsConnected && !loading) {
+    if (quizId && materialSlug) {
+      // Always try to fetch via HTTP first for immediate data
+      fetchRankingHttp();
+
+      // Then setup fallback timer for WebSocket failures
       const timer = setTimeout(() => {
-        fetchRankingHttp();
-      }, 2000);
+        if (!wsConnected && !loading) {
+          fetchRankingHttp();
+        }
+      }, 3000);
 
       return () => clearTimeout(timer);
     }
-  }, [quizId, materialSlug, wsConnected, loading]);
+  }, [quizId, materialSlug]);
 
   return {
     rankings,

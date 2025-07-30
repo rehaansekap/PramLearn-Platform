@@ -116,7 +116,7 @@ class TeacherSessionAutoGroupFormationView(APIView):
 
             for group in groups:
                 members = GroupMember.objects.filter(group=group).select_related(
-                    "student"
+                    "student", "student__studentmotivationprofile"
                 )
                 group_members = []
                 group_students = []
@@ -139,7 +139,7 @@ class TeacherSessionAutoGroupFormationView(APIView):
                             "name": f"{student.first_name} {student.last_name}".strip()
                             or student.username,
                             "email": student.email,
-                            "motivation_level": motivation_level,
+                            "motivation_level": motivation_level,  # Ini yang penting untuk PDF
                         }
                     )
 
@@ -160,6 +160,7 @@ class TeacherSessionAutoGroupFormationView(APIView):
                         "name": group.name,
                         "code": group.code,
                         "size": len(group_members),
+                        "member_count": len(group_members),  # Tambahkan untuk konsistensi
                         "members": group_members,
                         "motivation_distribution": motivation_dist,
                     }
