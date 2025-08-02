@@ -200,6 +200,29 @@ yarn-error.log
 # Azure/Cloud specific
 .azure/
 
+# ENVIRONMENT VARIABLES & SECRETS (CRITICAL!)
+.env
+.env.*
+!.env.example
+!.env.template
+*.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.staging
+
+# Azure secrets (additional protection)
+**/.*env*
+**/.env*
+**/config.local*
+**/local_settings.py
+
+# Make sure these are ignored
+backendpramlearn/.env
+backendpramlearn/.env.production
+frontendpramlearn/.env*
+
 # Testing files
 coverage/
 .nyc_output/
