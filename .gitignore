@@ -1,12 +1,26 @@
-# Byte-compiled / optimized / DLL files
+# =============================================================================
+# GITIGNORE UNTUK PRAMLEARN PROJECT - PUBLIC REPOSITORY
+# =============================================================================
+
+# SECURITY - Environment & Secrets
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.crt
+*.p12
+*.pfx
+secrets/
+config/local.*
+local_settings.py
+settings.local.py
+
+# PYTHON
 __pycache__/
 *.py[cod]
 *$py.class
-
-# C extensions
 *.so
-
-# Distribution / packaging
 .Python
 build/
 develop-eggs/
@@ -22,25 +36,41 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
-venv~
-venv~/
-.venv/
-venv/
+MANIFEST
 
-# Django stuff:
+# VIRTUAL ENVIRONMENTS
+venv/
+.venv/
+env/
+ENV/
+.env/
+env.bak/
+venv.bak/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# DJANGO
 *.log
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
-
-# Static files (akan di-generate saat deployment)
 staticfiles/
-static/
-
-# Media files (upload files - biasanya di-handle terpisah di production)
 media/
 
-# Unit test / coverage reports
+# NODE.JS / REACT / VITE
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+dist/
+.npm
+.yarn-integrity
+*.tgz
+.eslintcache
+
+# TESTING & COVERAGE
 htmlcov/
 .tox/
 .nox/
@@ -53,78 +83,38 @@ coverage.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
-*.pyc
-__pycache__/
+.nyc_output/
+junit.xml
+test-results/
+test-output/
 
-# Environment variables (PENTING: jangan push environment secrets)
-.env
-.env.local
-.env.development
-.env.test
-# .env.production - akan di-include untuk Azure
-
-# VSCode & IDE files
+# IDE & EDITORS
 .vscode/
 .idea/
 *.sublime-workspace
 *.sublime-project
 *.code-workspace
-
-# Node.js / React / Vite
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-# dist/ - akan di-include untuk production build
-
-# MacOS & system files
-.DS_Store
-Thumbs.db
-*.tmp
-*.temp
-
-# Misc development files
 *.swp
 *.swo
-*.bak
-*.backup
-*~
 
-# Documentation and planning files (EXPANDED)
-steps.txt
-hehe
-*.txt.bak
-1.txt*
-2.txt*
-3.txt*
-*actionlog.txt
-*azurelog.txt
-*log.txt
-notes.txt
-todo.txt
-README.backup
-documentation/
-docs/
-planning/
+# OS FILES
+.DS_Store
+Thumbs.db
+Desktop.ini
+$RECYCLE_BIN/
+.Trashes
+ehthumbs.db
 
-# Development scripts (tidak perlu di production)
-start-pramlearn.sh
-stop-pramlearn.sh
-pramlearn-service.sh
-setup-git-aliases.sh
-switch-branch.sh
-manage-deployment-files.sh
-check-deployment-status.sh
-setupcodespaces.sh
-deploy.sh
-setup.sh
-install.sh
-run.sh
-test.sh
+# DEPLOYMENT FILES (Azure specific - tidak perlu di repo publik)
+backend-deploy.zip
+frontend-deploy.zip
+*.zip
+*.tar.gz
+*.rar
+*.7z
+.azure/
 
-# Backup files (EXPANDED)
+# BACKUP FILES
 *.bak
 *.backup
 *.old
@@ -134,14 +124,7 @@ test.sh
 .gitignore.backup
 .gitignore.azure.bak
 
-# Local database files
-*.sqlite3
-*.db
-
-# Redis dump files
-dump.rdb
-
-# Logs (EXPANDED)
+# LOGS
 log/
 logs/
 *.log
@@ -149,25 +132,14 @@ access.log
 error.log
 django.log
 debug.log
-npm-debug.log
-yarn-error.log
 
-# Azure specific
-.azure/
+# DATABASE FILES
+*.sqlite3
+*.db
+dump.rdb
+pramlearn_db_backup.sql
 
-# Testing files (EXPANDED)
-coverage/
-.nyc_output/
-junit.xml
-test-results/
-.coverage
-htmlcov/
-.pytest_cache/
-test-output/
-coverage.xml
-*.cover
-
-# Temporary files (EXPANDED)
+# TEMPORARY FILES
 tmp/
 temp/
 .tmp/
@@ -175,164 +147,49 @@ temp/
 *.pid
 *.lock
 
-# Certificate files
-*.pem
-*.key
-*.crt
-*.p12
-*.pfx
+# DOCUMENTATION DRAFTS
+steps.txt
+notes.txt
+todo.txt
+*.txt.bak
+*actionlog.txt
+*azurelog.txt
+*log.txt
+documentation/drafts/
+planning/
 
-# Frontend build artifacts
-dist-ssr/
+# DEPLOYMENT SCRIPTS (sebaiknya tidak di repo publik)
+azure-setup.sh
+linuxzipdeploy-*.sh
+zipdeploy-*.bat
+pramlearn-service.sh
+start-pramlearn.sh
+stop-pramlearn.sh
+setupcodespaces.sh
+setup-git-aliases.sh
+switch-branch.sh
+manage-deployment-files.sh
+deploy.sh
+setup.sh
+install.sh
+
+# CACHE DIRECTORIES
+.cache/
+.parcel-cache/
 .nuxt/
 .next/
 out/
-.cache/
-.parcel-cache/
-
-# Python virtual environments
-env/
-ENV/
-venv/
-.venv/
-.env/
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# pyenv
-.python-version
-
-# pipenv
-Pipfile.lock
-
-# Poetry
-poetry.lock
-
-# Celery
-celerybeat-schedule
-celerybeat.pid
-
-# SageMath parsed files
-*.sage.py
-
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-# Pyre type checker
-.pyre/
-
-# Editor directories and files
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-# Local configuration files
-config.local.js
-config.local.json
-settings.local.py
-local_settings.py
-
-# OS generated files
-Desktop.ini
-$RECYCLE.BIN/
-.Trashes
-ehthumbs.db
-
-# Archive files
-*.zip
-*.tar.gz
-*.rar
-*.7z
-
-# Image files (jika tidak diperlukan di production)
-*.psd
-*.ai
-*.sketch
-
-# Font files (jika tidak diperlukan)
-*.otf
-*.ttf
-*.woff
-*.woff2
-*.eot
-
-# Compiled binary addons
-build/Release
-
-# Dependency directories
-jspm_packages/
-
-# Optional npm cache directory
-.npm
-
-# Optional eslint cache
-.eslintcache
-
-# Microbundle cache
 .rpt2_cache/
 .rts2_cache_cjs/
 .rts2_cache_es/
 .rts2_cache_umd/
 
-# Optional REPL history
-.node_repl_history
-
-# Output of 'npm pack'
-*.tgz
-
-# Yarn Integrity file
-.yarn-integrity
-
-# dotenv environment variables file
-.env.test.local
-.env.production.local
-
-# Storybook build outputs
-.out
-.storybook-out
-
-# Miscellaneous
+# MISC
 *.tsbuildinfo
 *.njsproj
 *.sln
 *.suo
-
-# Local Netlify folder
 .netlify
-
-# FuseBox cache
 .fusebox/
-
-# DynamoDB Local files
 .dynamodb/
-
-# TernJS port file
 .tern-port
-
-# Stores VSCode versions used for testing VSCode extensions
-.vscode-test
-
-# yarn v2
-.yarn/cache
-.yarn/unplugged
-.yarn/build-state.yml
-.yarn/install-state.gz
-.pnp.*

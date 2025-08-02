@@ -25,63 +25,49 @@ logger = logging.getLogger(__name__)
 
 class StudentARCSQuestionnaireListView(APIView):
     """
-    API untuk mendapatkan daftar kuesioner ARCS yang aktif untuk material tertentu
+    API untuk mendapatkan daftar kuesioner ARCS yang tersedia untuk siswa
+
+    Endpoint ini menampilkan semua kuesioner ARCS dalam suatu material beserta
+    status penyelesaian dan ketersediaan untuk diisi oleh siswa
     """
 
     permission_classes = [IsAuthenticated, IsStudentUser]
 
     def get(self, request, material_slug):
+        """
+        Mengambil daftar kuesioner ARCS untuk material tertentu
+
+        Args:
+            material_slug (str): Slug identifier untuk material pembelajaran
+
+        Returns:
+            Response: Daftar kuesioner dengan status dan informasi terkait
+        """
         try:
-            logger.info(f"Fetching ARCS questionnaires for material: {material_slug}")
+            logger.info(
+                f"Siswa {request.user.username} mengakses kuesioner ARCS untuk material: {material_slug}"
+            )
 
+            # Mencari material berdasarkan slug
             material = get_object_or_404(Material, slug=material_slug)
-            logger.info(f"Material found: {material.id} - {material.title}")
+            logger.info(f"Material ditemukan: {material.id} - {material.title}")
 
-            # Get questionnaires for this material (including inactive for status check)
+            # Mengambil semua kuesioner untuk material ini (termasuk yang tidak aktif untuk pengecekan status)
             questionnaires = ARCSQuestionnaire.objects.filter(
                 material=material
             ).prefetch_related("questions")
 
-            logger.info(f"Found {questionnaires.count()} questionnaires")
+            logger.info(f"Ditemukan {questionnaires.count()} kuesioner")
 
-            # Check which questionnaires student has already completed
+            # Memproses setiap kuesioner untuk mendapatkan status lengkap
             questionnaires_data = []
             for questionnaire in questionnaires:
-                try:
-                    response = ARCSResponse.objects.get(
-                        questionnaire=questionnaire, student=request.user
-                    )
-                    is_completed = response.is_completed
-                    completed_at = response.completed_at
-                except ARCSResponse.DoesNotExist:
-                    is_completed = False
-                    completed_at = None
-
-                # Check availability
-                is_available, status_message = questionnaire.is_available_for_submission
-
-                questionnaires_data.append(
-                    {
-                        "id": questionnaire.id,
-                        "slug": questionnaire.slug,
-                        "title": questionnaire.title,
-                        "description": questionnaire.description,
-                        "questionnaire_type": questionnaire.questionnaire_type,
-                        "start_date": questionnaire.start_date,
-                        "end_date": questionnaire.end_date,
-                        "duration_minutes": questionnaire.duration_minutes,
-                        "total_questions": questionnaire.questions.count(),
-                        "is_completed": is_completed,
-                        "completed_at": completed_at,
-                        "is_available": is_available,
-                        "status_message": status_message,
-                        "time_remaining": questionnaire.time_remaining,
-                        "estimated_time": questionnaire.questions.count()
-                        * 2,  # 2 minutes per question
-                    }
+                questionnaire_info = self._process_questionnaire_status(
+                    questionnaire, request.user
                 )
+                questionnaires_data.append(questionnaire_info)
 
-            logger.info(f"Returning {len(questionnaires_data)} questionnaires")
+            logger.info(f"Mengembalikan {len(questionnaires_data)} kuesioner ke siswa")
 
             return Response(
                 {
@@ -92,26 +78,83 @@ class StudentARCSQuestionnaireListView(APIView):
             )
 
         except Exception as e:
-            logger.error(f"Error fetching questionnaires: {str(e)}")
+            logger.error(f"Error saat mengambil daftar kuesioner: {str(e)}")
             return Response(
                 {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
+    def _process_questionnaire_status(self, questionnaire, student):
+        """
+        Memproses status kuesioner untuk siswa tertentu
 
-# Update StudentARCSQuestionnaireDetailView untuk check availability
+        Args:
+            questionnaire (ARCSQuestionnaire): Objek kuesioner
+            student (CustomUser): Siswa yang mengakses
+
+        Returns:
+            dict: Informasi lengkap kuesioner dengan status
+        """
+        # Mengecek apakah siswa sudah menyelesaikan kuesioner ini
+        try:
+            response = ARCSResponse.objects.get(
+                questionnaire=questionnaire, student=student
+            )
+            is_completed = response.is_completed
+            completed_at = response.completed_at
+        except ARCSResponse.DoesNotExist:
+            is_completed = False
+            completed_at = None
+
+        # Mengecek ketersediaan kuesioner untuk diisi
+        is_available, status_message = questionnaire.is_available_for_submission
+
+        return {
+            "id": questionnaire.id,
+            "slug": questionnaire.slug,
+            "title": questionnaire.title,
+            "description": questionnaire.description,
+            "questionnaire_type": questionnaire.questionnaire_type,
+            "start_date": questionnaire.start_date,
+            "end_date": questionnaire.end_date,
+            "duration_minutes": questionnaire.duration_minutes,
+            "total_questions": questionnaire.questions.count(),
+            "is_completed": is_completed,
+            "completed_at": completed_at,
+            "is_available": is_available,
+            "status_message": status_message,
+            "time_remaining": questionnaire.time_remaining,
+            "estimated_time": questionnaire.questions.count()
+            * 2,  # 2 menit per pertanyaan
+        }
+
+
 class StudentARCSQuestionnaireDetailView(APIView):
     """
     API untuk mendapatkan detail kuesioner ARCS beserta pertanyaan-pertanyaannya
+
+    Endpoint ini digunakan ketika siswa akan mengisi kuesioner dan membutuhkan
+    semua pertanyaan beserta opsi jawabannya
     """
 
     permission_classes = [IsAuthenticated, IsStudentUser]
 
     def get(self, request, material_slug, questionnaire_id):
+        """
+        Mengambil detail kuesioner ARCS untuk pengisian
+
+        Args:
+            material_slug (str): Slug material pembelajaran
+            questionnaire_id (int): ID kuesioner yang akan diakses
+
+        Returns:
+            Response: Detail kuesioner dengan semua pertanyaan
+        """
         try:
             logger.info(
-                f"Fetching questionnaire detail: {questionnaire_id} for material: {material_slug}"
+                f"Siswa {request.user.username} mengakses detail kuesioner {questionnaire_id}"
             )
 
+            # Validasi material dan kuesioner
             material = get_object_or_404(Material, slug=material_slug)
             questionnaire = get_object_or_404(
                 ARCSQuestionnaire,
@@ -119,104 +162,191 @@ class StudentARCSQuestionnaireDetailView(APIView):
                 material=material,
             )
 
-            logger.info(f"Questionnaire found: {questionnaire.title}")
+            logger.info(f"Kuesioner ditemukan: {questionnaire.title}")
 
-            # Check availability
-            is_available, status_message = questionnaire.is_available_for_submission
-            if not is_available:
+            # Mengecek ketersediaan kuesioner
+            if not self._validate_questionnaire_availability(questionnaire):
+                is_available, status_message = questionnaire.is_available_for_submission
                 return Response(
                     {"error": status_message},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
-            # Check if student has already completed this questionnaire
-            try:
-                existing_response = ARCSResponse.objects.get(
-                    questionnaire=questionnaire, student=request.user
+            # Mengecek apakah siswa sudah menyelesaikan kuesioner
+            if self._check_questionnaire_completion(questionnaire, request.user):
+                logger.warning(
+                    f"Siswa {request.user.username} sudah menyelesaikan kuesioner {questionnaire_id}"
                 )
-                if existing_response.is_completed:
-                    logger.warning(
-                        f"Student {request.user.username} already completed questionnaire {questionnaire_id}"
-                    )
-                    return Response(
-                        {"error": "Kuesioner ini sudah pernah Anda selesaikan"},
-                        status=status.HTTP_400_BAD_REQUEST,
-                    )
-            except ARCSResponse.DoesNotExist:
-                logger.info("No existing response found")
+                return Response(
+                    {"error": "Kuesioner ini sudah pernah Anda selesaikan"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
-            # Get questions with their data
-            questions = questionnaire.questions.all().order_by("order")
-            logger.info(f"Found {questions.count()} questions")
+            # Mengambil dan memproses pertanyaan
+            questions_data = self._get_questionnaire_questions(questionnaire)
 
-            questions_data = []
-            for question in questions:
-                # Determine question type and set scale values
-                if question.question_type == "likert_5":
-                    scale_min, scale_max = 1, 5
-                elif question.question_type == "likert_7":
-                    scale_min, scale_max = 1, 7
-                else:
-                    scale_min = scale_max = None
-
-                question_data = {
-                    "id": question.id,
-                    "text": question.text,
-                    "dimension": question.dimension,
-                    "order": question.order,
-                    "question_type": question.question_type,
-                    "is_required": question.is_required,
-                    "choices": (
-                        question.choices
-                        if question.question_type == "multiple_choice"
-                        else None
-                    ),
-                    "scale_min": scale_min,
-                    "scale_max": scale_max,
-                    "scale_labels": (
-                        question.scale_labels
-                        if question.question_type in ["likert_5", "likert_7"]
-                        else None
-                    ),
-                }
-                questions_data.append(question_data)
-                logger.debug(f"Question {question.id}: {question.text[:50]}...")
-
-            serializer_data = {
-                "id": questionnaire.id,
-                "title": questionnaire.title,
-                "description": questionnaire.description,
-                "questionnaire_type": questionnaire.questionnaire_type,
-                "material_title": material.title,
-                "start_date": questionnaire.start_date,
-                "end_date": questionnaire.end_date,
-                "duration_minutes": questionnaire.duration_minutes,
-                "time_remaining": questionnaire.time_remaining,
-                "questions": questions_data,
-                "total_questions": len(questions_data),
-            }
+            # Menyiapkan data response
+            questionnaire_data = self._prepare_questionnaire_response(
+                questionnaire, material, questions_data
+            )
 
             logger.info(
-                f"Returning questionnaire detail with {len(questions_data)} questions"
+                f"Mengembalikan detail kuesioner dengan {len(questions_data)} pertanyaan"
             )
-            return Response(serializer_data, status=status.HTTP_200_OK)
+            return Response(questionnaire_data, status=status.HTTP_200_OK)
 
         except Exception as e:
-            logger.error(f"Error fetching questionnaire detail: {str(e)}")
+            logger.error(f"Error saat mengambil detail kuesioner: {str(e)}")
             return Response(
                 {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
+    def _validate_questionnaire_availability(self, questionnaire):
+        """
+        Memvalidasi apakah kuesioner tersedia untuk diisi
+
+        Args:
+            questionnaire (ARCSQuestionnaire): Objek kuesioner
+
+        Returns:
+            bool: True jika tersedia, False jika tidak
+        """
+        is_available, _ = questionnaire.is_available_for_submission
+        return is_available
+
+    def _check_questionnaire_completion(self, questionnaire, student):
+        """
+        Mengecek apakah siswa sudah menyelesaikan kuesioner
+
+        Args:
+            questionnaire (ARCSQuestionnaire): Objek kuesioner
+            student (CustomUser): Siswa yang mengakses
+
+        Returns:
+            bool: True jika sudah selesai, False jika belum
+        """
+        try:
+            existing_response = ARCSResponse.objects.get(
+                questionnaire=questionnaire, student=student
+            )
+            return existing_response.is_completed
+        except ARCSResponse.DoesNotExist:
+            return False
+
+    def _get_questionnaire_questions(self, questionnaire):
+        """
+        Mengambil dan memproses semua pertanyaan dalam kuesioner
+
+        Args:
+            questionnaire (ARCSQuestionnaire): Objek kuesioner
+
+        Returns:
+            list: Daftar pertanyaan yang sudah diproses
+        """
+        questions = questionnaire.questions.all().order_by("order")
+        logger.info(f"Ditemukan {questions.count()} pertanyaan")
+
+        questions_data = []
+        for question in questions:
+            question_data = self._process_question_data(question)
+            questions_data.append(question_data)
+            logger.debug(f"Pertanyaan {question.id}: {question.text[:50]}...")
+
+        return questions_data
+
+    def _process_question_data(self, question):
+        """
+        Memproses data pertanyaan individual
+
+        Args:
+            question (ARCSQuestion): Objek pertanyaan
+
+        Returns:
+            dict: Data pertanyaan yang sudah diproses
+        """
+        # Menentukan tipe pertanyaan dan mengatur nilai skala
+        if question.question_type == "likert_5":
+            scale_min, scale_max = 1, 5
+        elif question.question_type == "likert_7":
+            scale_min, scale_max = 1, 7
+        else:
+            scale_min = scale_max = None
+
+        return {
+            "id": question.id,
+            "text": question.text,
+            "dimension": question.dimension,
+            "order": question.order,
+            "question_type": question.question_type,
+            "is_required": question.is_required,
+            "choices": (
+                question.choices
+                if question.question_type == "multiple_choice"
+                else None
+            ),
+            "scale_min": scale_min,
+            "scale_max": scale_max,
+            "scale_labels": (
+                question.scale_labels
+                if question.question_type in ["likert_5", "likert_7"]
+                else None
+            ),
+        }
+
+    def _prepare_questionnaire_response(self, questionnaire, material, questions_data):
+        """
+        Menyiapkan data response untuk kuesioner
+
+        Args:
+            questionnaire (ARCSQuestionnaire): Objek kuesioner
+            material (Material): Objek material
+            questions_data (list): Data pertanyaan yang sudah diproses
+
+        Returns:
+            dict: Data response yang lengkap
+        """
+        return {
+            "id": questionnaire.id,
+            "title": questionnaire.title,
+            "description": questionnaire.description,
+            "questionnaire_type": questionnaire.questionnaire_type,
+            "material_title": material.title,
+            "start_date": questionnaire.start_date,
+            "end_date": questionnaire.end_date,
+            "duration_minutes": questionnaire.duration_minutes,
+            "time_remaining": questionnaire.time_remaining,
+            "questions": questions_data,
+            "total_questions": len(questions_data),
+        }
+
 
 class StudentARCSResponseSubmitView(APIView):
     """
-    API untuk submit jawaban kuesioner ARCS dari student
+    API untuk submit jawaban kuesioner ARCS dari siswa
+
+    Endpoint ini menangani penyimpanan jawaban kuesioner dan memicu
+    proses clustering otomatis untuk memperbarui profil motivasi siswa
     """
 
     permission_classes = [IsAuthenticated, IsStudentUser]
 
     def post(self, request, material_slug, arcs_slug):
+        """
+        Menyimpan jawaban kuesioner ARCS dan memproses clustering
+
+        Args:
+            material_slug (str): Slug material pembelajaran
+            arcs_slug (str): Slug kuesioner ARCS
+
+        Returns:
+            Response: Konfirmasi penyimpanan dan hasil clustering
+        """
         try:
+            logger.info(
+                f"Siswa {request.user.username} submit kuesioner ARCS: {arcs_slug}"
+            )
+
+            # Validasi material dan kuesioner
             material = get_object_or_404(Material, slug=material_slug)
             questionnaire = get_object_or_404(
                 ARCSQuestionnaire,
@@ -225,142 +355,272 @@ class StudentARCSResponseSubmitView(APIView):
                 is_active=True,
             )
 
-            # Check if student has already completed this questionnaire
-            try:
-                existing_response = ARCSResponse.objects.get(
-                    questionnaire=questionnaire, student=request.user
+            # Mengecek apakah siswa sudah menyelesaikan kuesioner
+            if self._check_existing_completion(questionnaire, request.user):
+                return Response(
+                    {"error": "Kuesioner ini sudah pernah Anda selesaikan"},
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
-                if existing_response.is_completed:
-                    return Response(
-                        {"error": "Kuesioner ini sudah pernah Anda selesaikan"},
-                        status=status.HTTP_400_BAD_REQUEST,
-                    )
-            except ARCSResponse.DoesNotExist:
-                pass
 
+            # Memvalidasi data jawaban
             answers_data = request.data.get("answers", [])
-            if not answers_data:
+            if not self._validate_answers_data(answers_data):
                 return Response(
                     {"error": "Jawaban tidak boleh kosong"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
-            # Create or get response
-            response, created = ARCSResponse.objects.get_or_create(
-                questionnaire=questionnaire,
-                student=request.user,
-                defaults={"submitted_at": timezone.now(), "is_completed": False},
+            # Menyimpan jawaban dan memproses clustering
+            response = self._save_questionnaire_response(
+                questionnaire, request.user, answers_data
             )
 
-            # Save answers
-            saved_answers = []
-            for answer_data in answers_data:
-                question_id = answer_data.get("question_id")
-
-                try:
-                    question = ARCSQuestion.objects.get(
-                        id=question_id, questionnaire=questionnaire
-                    )
-                except ARCSQuestion.DoesNotExist:
-                    continue
-
-                # Create or update answer
-                answer, answer_created = ARCSAnswer.objects.get_or_create(
-                    response=response,
-                    question=question,
-                    defaults={
-                        "text_value": answer_data.get("text_value"),
-                        "choice_value": answer_data.get("choice_value"),
-                        "likert_value": answer_data.get("likert_value"),
-                    },
-                )
-
-                if not answer_created:
-                    # Update existing answer
-                    answer.text_value = answer_data.get("text_value")
-                    answer.choice_value = answer_data.get("choice_value")
-                    answer.likert_value = answer_data.get("likert_value")
-                    answer.save()
-
-                saved_answers.append(answer)
-
-            # Mark response as completed
-            response.is_completed = True
-            response.completed_at = timezone.now()
-            response.save()
-
-            # Process ARCS scores and update motivation profile
-            self._process_arcs_scores(request.user, questionnaire, saved_answers)
+            logger.info(f"Kuesioner berhasil diselesaikan oleh {request.user.username}")
 
             return Response(
                 {
-                    "message": "Kuesioner berhasil diselesaikan",
+                    "message": "Kuesioner berhasil diselesaikan dan profil motivasi telah diperbarui",
                     "response_id": response.id,
                 },
                 status=status.HTTP_201_CREATED,
             )
 
         except Exception as e:
-            logger.error(f"Error submitting questionnaire: {str(e)}")
+            logger.error(f"Error saat submit kuesioner: {str(e)}")
             return Response(
                 {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-    def _process_arcs_scores(self, student, questionnaire, answers):
+    def _check_existing_completion(self, questionnaire, student):
         """
-        Process ARCS scores and update student motivation profile using KMeans
-        """
-        from pramlearnapp.models.user import StudentMotivationProfile
-        from pramlearnapp.views.student.arcs.arcs_processor import ARCSProcessor
+        Mengecek apakah siswa sudah menyelesaikan kuesioner
 
+        Args:
+            questionnaire (ARCSQuestionnaire): Objek kuesioner
+            student (CustomUser): Siswa yang mengakses
+
+        Returns:
+            bool: True jika sudah selesai, False jika belum
+        """
         try:
-            # Calculate dimension scores
-            dimension_scores = {}
-            dimensions = ["attention", "relevance", "confidence", "satisfaction"]
+            existing_response = ARCSResponse.objects.get(
+                questionnaire=questionnaire, student=student
+            )
+            return existing_response.is_completed
+        except ARCSResponse.DoesNotExist:
+            return False
 
-            for dimension in dimensions:
-                dimension_answers = [
-                    answer
-                    for answer in answers
-                    if answer.question.dimension == dimension
-                    and answer.likert_value is not None
-                ]
+    def _validate_answers_data(self, answers_data):
+        """
+        Memvalidasi data jawaban yang dikirim
 
-                if dimension_answers:
-                    total_score = sum(
-                        answer.likert_value for answer in dimension_answers
-                    )
-                    avg_score = total_score / len(dimension_answers)
-                    dimension_scores[dimension] = round(avg_score, 2)
-                else:
-                    dimension_scores[dimension] = 0.0
+        Args:
+            answers_data (list): Data jawaban dari request
 
-            # Get or create motivation profile
-            profile, created = StudentMotivationProfile.objects.get_or_create(
-                student=student,
+        Returns:
+            bool: True jika valid, False jika tidak
+        """
+        return answers_data and len(answers_data) > 0
+
+    def _save_questionnaire_response(self, questionnaire, student, answers_data):
+        """
+        Menyimpan response kuesioner dan jawaban-jawabannya
+
+        Args:
+            questionnaire (ARCSQuestionnaire): Objek kuesioner
+            student (CustomUser): Siswa yang menjawab
+            answers_data (list): Data jawaban
+
+        Returns:
+            ARCSResponse: Objek response yang telah disimpan
+        """
+        # Membuat atau mengambil response object
+        response, created = ARCSResponse.objects.get_or_create(
+            questionnaire=questionnaire,
+            student=student,
+            defaults={"submitted_at": timezone.now(), "is_completed": False},
+        )
+
+        # Menyimpan jawaban-jawaban
+        saved_answers = self._save_individual_answers(
+            response, questionnaire, answers_data
+        )
+
+        # Menandai response sebagai selesai
+        response.is_completed = True
+        response.completed_at = timezone.now()
+        response.save()
+
+        # Memproses skor ARCS dan memperbarui profil motivasi
+        self._process_arcs_scores_and_clustering(student, questionnaire, saved_answers)
+
+        return response
+
+    def _save_individual_answers(self, response, questionnaire, answers_data):
+        """
+        Menyimpan jawaban individual untuk setiap pertanyaan
+
+        Args:
+            response (ARCSResponse): Objek response
+            questionnaire (ARCSQuestionnaire): Objek kuesioner
+            answers_data (list): Data jawaban
+
+        Returns:
+            list: Daftar objek ARCSAnswer yang telah disimpan
+        """
+        saved_answers = []
+
+        for answer_data in answers_data:
+            question_id = answer_data.get("question_id")
+
+            try:
+                question = ARCSQuestion.objects.get(
+                    id=question_id, questionnaire=questionnaire
+                )
+            except ARCSQuestion.DoesNotExist:
+                logger.warning(f"Pertanyaan dengan ID {question_id} tidak ditemukan")
+                continue
+
+            # Membuat atau memperbarui jawaban
+            answer, answer_created = ARCSAnswer.objects.get_or_create(
+                response=response,
+                question=question,
                 defaults={
-                    "attention": dimension_scores["attention"],
-                    "relevance": dimension_scores["relevance"],
-                    "confidence": dimension_scores["confidence"],
-                    "satisfaction": dimension_scores["satisfaction"],
+                    "text_value": answer_data.get("text_value"),
+                    "choice_value": answer_data.get("choice_value"),
+                    "likert_value": answer_data.get("likert_value"),
                 },
             )
 
-            if not created:
-                # Update existing profile with new scores
-                profile.attention = dimension_scores["attention"]
-                profile.relevance = dimension_scores["relevance"]
-                profile.confidence = dimension_scores["confidence"]
-                profile.satisfaction = dimension_scores["satisfaction"]
-                profile.save()
+            if not answer_created:
+                # Memperbarui jawaban yang sudah ada
+                answer.text_value = answer_data.get("text_value")
+                answer.choice_value = answer_data.get("choice_value")
+                answer.likert_value = answer_data.get("likert_value")
+                answer.save()
 
-            # Process with KMeans to determine motivation level
-            processor = ARCSProcessor()
-            processor.update_all_motivation_levels()
+            saved_answers.append(answer)
+
+        logger.info(f"Berhasil menyimpan {len(saved_answers)} jawaban")
+        return saved_answers
+
+    def _process_arcs_scores_and_clustering(self, student, questionnaire, answers):
+        """
+        Memproses skor ARCS dan memperbarui profil motivasi menggunakan clustering
+
+        Proses yang dilakukan:
+        1. Menghitung skor rata-rata untuk setiap dimensi ARCS
+        2. Menyimpan/memperbarui profil motivasi siswa
+        3. Menjalankan clustering untuk semua siswa
+
+        Args:
+            student (CustomUser): Siswa yang mengisi kuesioner
+            questionnaire (ARCSQuestionnaire): Objek kuesioner
+            answers (list): Daftar objek ARCSAnswer
+        """
+        try:
+            logger.info(f"Memproses skor ARCS untuk siswa {student.username}")
+
+            # Menghitung skor dimensi ARCS
+            dimension_scores = self._calculate_arcs_dimension_scores(answers)
+
+            # Menyimpan/memperbarui profil motivasi siswa
+            self._update_student_motivation_profile(student, dimension_scores)
+
+            # Menjalankan clustering untuk semua siswa
+            self._trigger_motivation_clustering()
+
+            logger.info(f"Profil motivasi siswa {student.username} berhasil diperbarui")
 
         except Exception as e:
-            # Log error but don't fail the main request
-            logger.error(f"Error processing ARCS scores: {str(e)}")
+            # Log error tapi tidak gagalkan request utama
+            logger.error(f"Error saat memproses skor ARCS: {str(e)}")
+
+    def _calculate_arcs_dimension_scores(self, answers):
+        """
+        Menghitung skor rata-rata untuk setiap dimensi ARCS
+
+        Args:
+            answers (list): Daftar objek ARCSAnswer
+
+        Returns:
+            dict: Skor rata-rata per dimensi ARCS
+        """
+        dimension_scores = {}
+        dimensions = ["attention", "relevance", "confidence", "satisfaction"]
+
+        for dimension in dimensions:
+            # Mengambil jawaban untuk dimensi tertentu
+            dimension_answers = [
+                answer
+                for answer in answers
+                if answer.question.dimension == dimension
+                and answer.likert_value is not None
+            ]
+
+            if dimension_answers:
+                # Menghitung rata-rata skor untuk dimensi ini
+                total_score = sum(answer.likert_value for answer in dimension_answers)
+                avg_score = total_score / len(dimension_answers)
+                dimension_scores[dimension] = round(avg_score, 2)
+            else:
+                dimension_scores[dimension] = 0.0
+
+        logger.info(f"Skor dimensi ARCS: {dimension_scores}")
+        return dimension_scores
+
+    def _update_student_motivation_profile(self, student, dimension_scores):
+        """
+        Menyimpan atau memperbarui profil motivasi siswa
+
+        Args:
+            student (CustomUser): Siswa yang mengisi kuesioner
+            dimension_scores (dict): Skor dimensi ARCS
+        """
+        from pramlearnapp.models.user import StudentMotivationProfile
+
+        # Membuat atau mengambil profil motivasi siswa
+        profile, created = StudentMotivationProfile.objects.get_or_create(
+            student=student,
+            defaults={
+                "attention": dimension_scores["attention"],
+                "relevance": dimension_scores["relevance"],
+                "confidence": dimension_scores["confidence"],
+                "satisfaction": dimension_scores["satisfaction"],
+            },
+        )
+
+        if not created:
+            # Memperbarui profil yang sudah ada dengan skor baru
+            profile.attention = dimension_scores["attention"]
+            profile.relevance = dimension_scores["relevance"]
+            profile.confidence = dimension_scores["confidence"]
+            profile.satisfaction = dimension_scores["satisfaction"]
+            profile.save()
+
+        logger.info(
+            f"Profil motivasi {'dibuat' if created else 'diperbarui'} untuk siswa {student.username}"
+        )
+
+    def _trigger_motivation_clustering(self):
+        """
+        Menjalankan proses clustering untuk memperbarui level motivasi semua siswa
+        """
+        from pramlearnapp.views.student.arcs.arcs_processor import ARCSProcessor
+
+        try:
+            logger.info("Memulai proses clustering motivasi siswa")
+
+            processor = ARCSProcessor()
+            clustering_result = processor.update_all_motivation_levels()
+
+            if clustering_result:
+                logger.info(f"Clustering berhasil: {clustering_result}")
+            else:
+                logger.warning("Clustering tidak dijalankan (data tidak cukup)")
+
+        except Exception as e:
+            logger.error(f"Error saat menjalankan clustering: {str(e)}")
 
 
 class StudentARCSBySlugView(APIView):
