@@ -28,12 +28,8 @@ const useSessionsARCSAnalysisExport = () => {
       console.log("📡 Making API request...");
 
       const response = await api.get("teacher/sessions/arcs-analysis/export/", {
-        // Hapus params: { format: "pdf" },
         responseType: "blob",
         timeout: 60000,
-        // headers: {
-        //   Accept: "application/pdf",
-        // },
       });
 
       console.log("✅ API Response received:", {
@@ -91,6 +87,54 @@ const useSessionsARCSAnalysisExport = () => {
         "📄 Laporan analisis clustering ARCS berhasil didownload!"
       );
       console.log("🎉 Export completed successfully!");
+      try {
+        const svgResp = await api.get(
+          "teacher/sessions/arcs-analysis/export/?export_format=svg",
+          { responseType: "blob", timeout: 30000 }
+        );
+
+        const svgData = svgResp.data;
+        if (!svgData || svgData.size === 0) {
+          throw new Error("File SVG kosong");
+        }
+
+        const svgDisposition =
+          svgResp.headers?.get?.("Content-Disposition") ||
+          svgResp.headers?.["content-disposition"];
+        let svgFilename = `scatter_plot_clustering_arcs_${
+          new Date().toISOString().split("T")[0]
+        }.svg`;
+
+        if (svgDisposition) {
+          const svgMatch = svgDisposition.match(
+            /filename[^;=\n]*=["']?([^"';]+)["']?/
+          );
+          if (svgMatch && svgMatch[1]) {
+            svgFilename = svgMatch[1];
+          }
+        }
+
+        const svgUrl = window.URL.createObjectURL(svgData);
+        const svgLink = document.createElement("a");
+        svgLink.style.display = "none";
+        svgLink.href = svgUrl;
+        svgLink.download = svgFilename;
+        document.body.appendChild(svgLink);
+        svgLink.click();
+        setTimeout(() => {
+          window.URL.revokeObjectURL(svgUrl);
+          document.body.removeChild(svgLink);
+        }, 100);
+
+        message.success(
+          "📈 Scatter plot clustering (SVG) berhasil didownload!"
+        );
+      } catch (e) {
+        console.warn("Gagal mengunduh SVG scatter plot:", e);
+        message.warning(
+          "PDF berhasil diunduh. Namun, scatter plot (SVG) gagal diunduh."
+        );
+      }
     } catch (error) {
       console.error("❌ Error exporting ARCS analysis:", error);
 

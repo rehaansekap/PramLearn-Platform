@@ -5,6 +5,9 @@ from django.http import HttpResponse
 from rest_framework.permissions import IsAuthenticated
 from pramlearnapp.permissions import IsTeacherUser
 from pramlearnapp.services.arcs_clustering_pdf_service import ARCSClusteringPDFService
+from pramlearnapp.services.arcs_clustering_visualization_service import (
+    ARCSClusteringVisualizationService,
+)
 from datetime import datetime
 import logging
 
@@ -41,6 +44,11 @@ class TeacherSessionsARCSAnalysisExportView(APIView):
         try:
             # Langkah 1: Validasi parameter request
             export_format = self._validate_export_parameters(request)
+
+            # Jika diminta SVG scatter plot, kembalikan file SVG
+            if export_format == "svg":
+                svg_content = self._generate_scatter_plot_svg()
+                return self._create_svg_response(svg_content)
 
             # Langkah 2: Generate konten PDF
             pdf_content = self._generate_pdf_report()
@@ -81,18 +89,45 @@ class TeacherSessionsARCSAnalysisExportView(APIView):
         Raises:
             ValueError: Jika parameter tidak valid
         """
-        # Parameter format opsional, default ke PDF
-        export_format = request.GET.get("format", "pdf").lower()
+        # Gunakan export_format untuk menghindari konflik dengan DRF ?format=...
+        export_format = (
+            request.GET.get("export_format")
+            or request.GET.get("format")  # fallback untuk kompatibilitas lama
+            or "pdf"
+        )
+        export_format = export_format.lower()
         logger.info(f"Requested export format: {export_format}")
 
-        # Validasi format yang didukung
-        supported_formats = ["pdf", ""]
+        supported_formats = ["pdf", "svg", ""]
         if export_format not in supported_formats:
             raise ValueError(
-                "Format tidak didukung. Gunakan format=pdf atau kosongkan parameter format"
+                "Format tidak didukung. Gunakan export_format=pdf atau export_format=svg"
             )
 
         return export_format
+
+    def _generate_scatter_plot_svg(self):
+        """
+        Generate konten SVG scatter plot clustering
+        """
+        logger.info("Generating SVG scatter plot content...")
+        viz_service = ARCSClusteringVisualizationService()
+        return viz_service.generate_scatter_plot_svg()
+
+    def _create_svg_response(self, svg_content: bytes):
+        """
+        Membuat HTTP response untuk download SVG
+        """
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M")
+        filename = f"scatter_plot_clustering_arcs_{timestamp}.svg"
+        response = HttpResponse(svg_content, content_type="image/svg+xml")
+        response["Content-Disposition"] = f'attachment; filename="{filename}"'
+        response["Content-Length"] = len(svg_content)
+        response["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        response["Pragma"] = "no-cache"
+        response["Expires"] = "0"
+        logger.info(f"SVG response prepared - filename: {filename}")
+        return response
 
     def _generate_pdf_report(self):
         """
