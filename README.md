@@ -1,5 +1,3 @@
-Collecting workspace information# PramLearn - Adaptive Learning Platform
-
 ![PramLearn Logo](https://img.shields.io/badge/PramLearn-Educational%20Platform-blue?style=for-the-badge)
 ![React](https://img.shields.io/badge/React-18.x-61DAFB?style=flat&logo=react)
 ![Django](https://img.shields.io/badge/Django-4.x-092E20?style=flat&logo=django)
@@ -1019,7 +1017,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 For questions or support, please open an issue on GitHub repository or contact:
 
 - Email: rehaansekap@gmail.com
-- Website: https://pramlearn.tech
+- Website: https://pramlearn.tech (Maintenance)
 
 ---
 
