@@ -134,6 +134,7 @@ deploy*.sh
 *.bat
 manage-*.sh
 check-*.sh
+azure-setup.sh
 
 # Documentation and planning files
 steps.txt
@@ -149,7 +150,7 @@ notes.txt
 todo.txt
 README.backup
 documentation/
-docs/
+# docs/
 access.log
 log/
 planning/
@@ -163,7 +164,7 @@ XI TJ 2.csv
 requirements.local.txt
 requirements.txt.bak
 diagram/
-fixtures/
+# fixtures/
 linuxzipdeploy-backend.sh
 linuxzipdeploy-frontend.sh
 package-lock.json

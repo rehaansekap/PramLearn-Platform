@@ -117,7 +117,7 @@ else:
             "ENGINE": "django.db.backends.postgresql",
             "NAME": "pramlearn_db",
             "USER": "postgres",
-            "PASSWORD": "",
+            "PASSWORD": "123123123",
             "HOST": "localhost",
             "PORT": "5432",
         }

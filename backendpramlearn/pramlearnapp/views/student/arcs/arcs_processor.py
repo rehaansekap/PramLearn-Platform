@@ -181,7 +181,7 @@ class ARCSProcessor:
         # Inisialisasi dan menjalankan K-Means clustering
         kmeans = KMeans(
             n_clusters=self.n_clusters,
-            random_state=42,  # Untuk reproducibility
+            random_state=42,  # Bisa angka apa saja (42, 123, 999, dll) - hanya untuk reproducibility
             n_init=10,  # Jumlah inisialisasi untuk mendapatkan hasil terbaik
         )
 

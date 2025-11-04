@@ -160,7 +160,9 @@ class TeacherSessionAutoGroupFormationView(APIView):
                         "name": group.name,
                         "code": group.code,
                         "size": len(group_members),
-                        "member_count": len(group_members),  # Tambahkan untuk konsistensi
+                        "member_count": len(
+                            group_members
+                        ),  # Tambahkan untuk konsistensi
                         "members": group_members,
                         "motivation_distribution": motivation_dist,
                     }
