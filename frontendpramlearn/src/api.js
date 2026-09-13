@@ -2,8 +2,12 @@ import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
 const API_URL_FALLBACK = import.meta.env.VITE_API_URL_FALLBACK;
-const WS_URL = import.meta.env.VITE_WS_URL;
-const WS_URL_FALLBACK = import.meta.env.VITE_WS_URL_FALLBACK;
+const rawWsUrl = import.meta.env.VITE_WS_URL || "";
+const WS_URL = rawWsUrl.endsWith("/") ? rawWsUrl.slice(0, -1) : rawWsUrl;
+const rawWsFallback = import.meta.env.VITE_WS_URL_FALLBACK || "";
+const WS_URL_FALLBACK = rawWsFallback.endsWith("/")
+  ? rawWsFallback.slice(0, -1)
+  : rawWsFallback;
 
 const api = axios.create({
   baseURL: API_URL,

@@ -74,7 +74,11 @@ const antdTheme = {
 };
 
 // Helper function untuk mendapatkan role path
-const getRolePath = (roleId) => {
+const getRolePath = (userOrRoleId) => {
+  const roleId = typeof userOrRoleId === "object" && userOrRoleId !== null
+    ? userOrRoleId.role || (userOrRoleId.is_superuser || userOrRoleId.is_staff ? 1 : null)
+    : userOrRoleId;
+
   switch (roleId) {
     case 1:
       return "admin";
@@ -83,7 +87,7 @@ const getRolePath = (roleId) => {
     case 3:
       return "student";
     default:
-      return "user";
+      return "admin";
   }
 };
 
@@ -94,12 +98,13 @@ const RedirectIfAuthenticated = ({ children }) => {
   if (loading) return null;
 
   if (token && user) {
-    const rolePath = getRolePath(user.role);
-    // Redirect berdasarkan role
-    if (user.role === 3) {
+    const roleId = user.role || (user.is_superuser || user.is_staff ? 1 : 1);
+    if (roleId === 3) {
       return <Navigate to="/student" replace />;
-    } else if (user.role === 1 || user.role === 2) {
-      return <Navigate to={`/${rolePath}`} replace />;
+    } else if (roleId === 2) {
+      return <Navigate to="/teacher" replace />;
+    } else {
+      return <Navigate to="/admin" replace />;
     }
   }
 

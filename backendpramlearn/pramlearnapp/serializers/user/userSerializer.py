@@ -29,6 +29,13 @@ class CustomUserSerializer(serializers.ModelSerializer):
     def get_class_ids(self, obj):
         return list(ClassStudent.objects.filter(student=obj).values_list('class_id', flat=True))
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        # Fallback role 1 (Admin) untuk superuser/staff jika role kosong
+        if (instance.is_superuser or instance.is_staff) and data.get('role') is None:
+            data['role'] = 1
+        return data
+
 
 class UserDetailSerializer(serializers.ModelSerializer):
     """
@@ -39,3 +46,9 @@ class UserDetailSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'email', 'first_name',
                   'last_name', 'role', 'date_joined', 'last_login',
                   'is_online', 'last_activity']  # Tambahkan field ini juga
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if (instance.is_superuser or instance.is_staff) and data.get('role') is None:
+            data['role'] = 1
+        return data

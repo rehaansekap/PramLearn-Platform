@@ -121,3 +121,28 @@ def update_progress_on_assignment_submission(sender, instance, **kwargs):
 
         except Exception as e:
             logger.error(f"❌ Error updating progress for {instance.student}: {e}")
+
+
+from django.db.models.signals import post_migrate
+
+@receiver(post_migrate)
+def create_default_roles(sender, **kwargs):
+    """Ensure default roles exist and superusers are assigned to Admin role"""
+    if sender.name == "pramlearnapp":
+        try:
+            from .models import Role, CustomUser
+            roles = [
+                (1, "Admin", "Administrator with full access"),
+                (2, "Teacher", "Teacher with limited access"),
+                (3, "Student", "Student with view access"),
+            ]
+            for pk, name, desc in roles:
+                Role.objects.get_or_create(id=pk, defaults={"name": name, "description": desc})
+
+            admin_role = Role.objects.filter(id=1).first()
+            if admin_role:
+                CustomUser.objects.filter(is_superuser=True, role__isnull=True).update(role=admin_role)
+                CustomUser.objects.filter(is_staff=True, role__isnull=True).update(role=admin_role)
+        except Exception as e:
+            logger.warning(f"Note on seeding roles: {e}")
+

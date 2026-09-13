@@ -35,8 +35,10 @@ const PrivateRoute = ({ children, allowedRoles = [1, 2] }) => {
     return <Navigate to="/login" replace />;
   }
 
-  if (allowedRoles && !allowedRoles.includes(user.role)) {
-    switch (user.role) {
+  const userRole = user.role || (user.is_superuser || user.is_staff ? 1 : null);
+
+  if (allowedRoles && !allowedRoles.includes(userRole)) {
+    switch (userRole) {
       case 1:
         return <Navigate to="/admin" replace />;
       case 2:

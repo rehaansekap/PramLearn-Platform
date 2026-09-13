@@ -15,11 +15,18 @@ const Login = () => {
     setError(null);
 
     try {
-      await login(values.username, values.password);
+      const userData = await login(values.username, values.password);
       message.success("Login berhasil! Selamat datang di PramLearn");
 
-      // Redirect berdasarkan role akan dihandle di AuthContext
-      // Tidak perlu navigate manual karena akan auto redirect
+      // Redirect berdasarkan role
+      const roleId = userData?.role || (userData?.is_superuser || userData?.is_staff ? 1 : 1);
+      if (roleId === 3) {
+        navigate("/student", { replace: true });
+      } else if (roleId === 2) {
+        navigate("/teacher", { replace: true });
+      } else {
+        navigate("/admin", { replace: true });
+      }
     } catch (error) {
       console.error("Login error:", error);
       const errorMessage =
