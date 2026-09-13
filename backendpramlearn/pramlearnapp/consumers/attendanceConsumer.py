@@ -13,19 +13,21 @@ class AttendanceConsumer(AsyncWebsocketConsumer):
         self.material_id = self.scope['url_route']['kwargs']['material_id']
         self.group_name = f"attendance_{self.material_id}"
 
-        await self.channel_layer.group_add(
-            self.group_name,
-            self.channel_name
-        )
         await self.accept()
+        if self.channel_layer is not None:
+            await self.channel_layer.group_add(
+                self.group_name,
+                self.channel_name
+            )
         print(
             f"🔗 WebSocket connected to attendance for material {self.material_id}")
 
     async def disconnect(self, close_code):
-        await self.channel_layer.group_discard(
-            self.group_name,
-            self.channel_name
-        )
+        if self.channel_layer is not None:
+            await self.channel_layer.group_discard(
+                self.group_name,
+                self.channel_name
+            )
         print(
             f"❌ WebSocket disconnected from attendance for material {self.material_id}")
 

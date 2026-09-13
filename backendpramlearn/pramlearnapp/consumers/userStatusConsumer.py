@@ -20,12 +20,14 @@ class UserStatusConsumer(AsyncWebsocketConsumer):
         try:
             self.group_name = "user_status"
 
-            # Join group SEBELUM accept
-            await self.channel_layer.group_add(self.group_name, self.channel_name)
-
-            # Accept connection
-            await self.channel_layer.group_add("user_status_global", self.channel_name)
+            # Accept connection first
             await self.accept()
+
+            # Join channel groups if channel layer exists
+            if self.channel_layer is not None:
+                await self.channel_layer.group_add(self.group_name, self.channel_name)
+                await self.channel_layer.group_add("user_status_global", self.channel_name)
+
             print(f"✅ UserStatus WebSocket connected: {self.channel_name}")
 
         except Exception as e:
@@ -34,10 +36,11 @@ class UserStatusConsumer(AsyncWebsocketConsumer):
 
     async def disconnect(self, close_code):
         try:
-            await self.channel_layer.group_discard(
-                "user_status_global", self.channel_name
-            )
-            await self.channel_layer.group_discard(self.group_name, self.channel_name)
+            if self.channel_layer is not None:
+                await self.channel_layer.group_discard(
+                    "user_status_global", self.channel_name
+                )
+                await self.channel_layer.group_discard(self.group_name, self.channel_name)
             print(f"❌ UserStatus WebSocket disconnected: {self.channel_name}")
         except Exception as e:
             print(f"❌ Error in UserStatus disconnect: {e}")
