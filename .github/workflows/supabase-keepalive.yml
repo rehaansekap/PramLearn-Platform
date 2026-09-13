@@ -12,34 +12,44 @@ jobs:
     name: Keep Supabase Active
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Supabase REST API
+      - name: Ping Supabase REST API & Auth Service
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          # Mendukung SUPABASE_SERVICE_ROLE_KEY, SUPABASE_KEY, atau SUPABASE_ANON_KEY
+          SUPABASE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY || secrets.SUPABASE_KEY || secrets.SUPABASE_ANON_KEY }}
         run: |
-          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
-            echo "::error::SUPABASE_URL atau SUPABASE_ANON_KEY belum diatur di GitHub Secrets repository Anda."
-            echo "Silakan tambahkan di Settings -> Secrets and variables -> Actions"
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_KEY" ]; then
+            echo "::error::SUPABASE_URL atau SUPABASE_SERVICE_ROLE_KEY belum diatur di GitHub Secrets."
+            echo "Silakan pastikan SUPABASE_URL dan SUPABASE_SERVICE_ROLE_KEY sudah ditambahkan di GitHub Secrets."
             exit 1
           fi
 
-          # Bersihkan trailing slash jika ada
+          # Bersihkan trailing slash dari URL
           CLEAN_URL="${SUPABASE_URL%/}"
 
-          echo "Mengirim ping ke Supabase REST API endpoint: ${CLEAN_URL}/rest/v1/ ..."
-
-          HTTP_RESPONSE=$(curl -s -o response_body.txt -w "%{http_code}" \
+          echo "Mengirim ping ke Supabase REST API (${CLEAN_URL}/rest/v1/) ..."
+          REST_RESPONSE=$(curl -s -o rest_response.txt -w "%{http_code}" \
             -X GET "${CLEAN_URL}/rest/v1/" \
-            -H "apikey: ${SUPABASE_ANON_KEY}" \
-            -H "Authorization: Bearer ${SUPABASE_ANON_KEY}")
+            -H "apikey: ${SUPABASE_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_KEY}")
 
-          echo "HTTP Status Code: $HTTP_RESPONSE"
+          echo "REST API Status Code: $REST_RESPONSE"
 
-          if [ "$HTTP_RESPONSE" -ge 200 ] && [ "$HTTP_RESPONSE" -lt 400 ]; then
-            echo "✅ Supabase berhasil di-ping! Aktivitas tercatat dan timer auto-pause (7 hari) telah di-reset."
+          echo "Mengirim ping ke Supabase Auth Health (${CLEAN_URL}/auth/v1/health) ..."
+          AUTH_RESPONSE=$(curl -s -o auth_response.txt -w "%{http_code}" \
+            -X GET "${CLEAN_URL}/auth/v1/health" \
+            -H "apikey: ${SUPABASE_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_KEY}")
+
+          echo "Auth Health Status Code: $AUTH_RESPONSE"
+
+          if [ "$REST_RESPONSE" -eq 200 ] || [ "$AUTH_RESPONSE" -eq 200 ]; then
+            echo "============================================================"
+            echo "✅ SUKSES: Supabase berhasil di-ping dengan status 200 OK!"
+            echo "Aktivitas tercatat dan timer auto-pause (7 hari) telah di-reset."
+            echo "============================================================"
           else
-            echo "⚠️ Response code: $HTTP_RESPONSE"
-            echo "Body response:"
-            cat response_body.txt
-            echo "Walaupun status bukan 2xx/3xx, request tetap sampai ke server Supabase dan mencatat aktivitas."
+            echo "⚠️ Response REST: $REST_RESPONSE, Response Auth: $AUTH_RESPONSE"
+            cat rest_response.txt
+            exit 1
           fi
