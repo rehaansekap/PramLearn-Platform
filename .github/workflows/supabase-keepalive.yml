@@ -1,0 +1,45 @@
+name: Supabase Keep-Alive
+
+on:
+  schedule:
+    # Berjalan otomatis setiap 3 hari sekali pada pukul 00:00 UTC (07:00 WIB)
+    # Ini mencegah database Supabase Free Tier ter-pause/suspend setelah 7 hari tidak aktif
+    - cron: '0 0 */3 * *'
+  workflow_dispatch: # Memungkinkan eksekusi manual via tombol "Run workflow" di GitHub Actions
+
+jobs:
+  ping-supabase:
+    name: Keep Supabase Active
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase REST API
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "::error::SUPABASE_URL atau SUPABASE_ANON_KEY belum diatur di GitHub Secrets repository Anda."
+            echo "Silakan tambahkan di Settings -> Secrets and variables -> Actions"
+            exit 1
+          fi
+
+          # Bersihkan trailing slash jika ada
+          CLEAN_URL="${SUPABASE_URL%/}"
+
+          echo "Mengirim ping ke Supabase REST API endpoint: ${CLEAN_URL}/rest/v1/ ..."
+
+          HTTP_RESPONSE=$(curl -s -o response_body.txt -w "%{http_code}" \
+            -X GET "${CLEAN_URL}/rest/v1/" \
+            -H "apikey: ${SUPABASE_ANON_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_ANON_KEY}")
+
+          echo "HTTP Status Code: $HTTP_RESPONSE"
+
+          if [ "$HTTP_RESPONSE" -ge 200 ] && [ "$HTTP_RESPONSE" -lt 400 ]; then
+            echo "✅ Supabase berhasil di-ping! Aktivitas tercatat dan timer auto-pause (7 hari) telah di-reset."
+          else
+            echo "⚠️ Response code: $HTTP_RESPONSE"
+            echo "Body response:"
+            cat response_body.txt
+            echo "Walaupun status bukan 2xx/3xx, request tetap sampai ke server Supabase dan mencatat aktivitas."
+          fi

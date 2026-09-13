@@ -10,16 +10,22 @@ DEBUG = os.getenv("DEBUG", "False") == "True"
 SECRET_KEY = os.getenv(
     "SECRET_KEY", "django-insecure-4kh_a6m4m)l@eeg0%3#0#@!m)efo%otu@jp^z2qucjr9pt@y@9"
 )
-ALLOWED_HOSTS = [
-    "localhost",
-    "127.0.0.1",
-    "0.0.0.0",
-    "pramlearn-frontend.azurewebsites.net",
-    "pramlearn-backend.azurewebsites.net",
-    "api.pramlearn.tech",
-    "app.pramlearn.tech",
-    "pramlearn.tech",
-]
+ALLOWED_HOSTS_ENV = os.getenv("ALLOWED_HOSTS")
+if ALLOWED_HOSTS_ENV:
+    ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_ENV.split(",") if host.strip()]
+else:
+    ALLOWED_HOSTS = [
+        "localhost",
+        "127.0.0.1",
+        "0.0.0.0",
+        ".vercel.app",
+        ".onrender.com",
+        "pramlearn-frontend.azurewebsites.net",
+        "pramlearn-backend.azurewebsites.net",
+        "api.pramlearn.tech",
+        "app.pramlearn.tech",
+        "pramlearn.tech",
+    ]
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -110,7 +116,11 @@ ASGI_APPLICATION = "pramlearn_api.asgi.application"
 
 # Database
 if os.getenv("DATABASE_URL"):
-    DATABASES = {"default": dj_database_url.parse(os.getenv("DATABASE_URL"))}
+    db_config = dj_database_url.parse(os.getenv("DATABASE_URL"), conn_max_age=600)
+    # Enable SSL by default for cloud databases (like Supabase) unless explicitly turned off or local
+    if os.getenv("DB_SSL_REQUIRE", "True").lower() in ("true", "1") and "localhost" not in str(db_config.get("HOST", "")):
+        db_config.setdefault("OPTIONS", {})["sslmode"] = "require"
+    DATABASES = {"default": db_config}
 else:
     DATABASES = {
         "default": {
@@ -295,11 +305,17 @@ LOGGING = {
     },
 }
 
-CSRF_TRUSTED_ORIGINS = [
-    "https://pramlearn-backend.azurewebsites.net",
-    "https://api.pramlearn.tech",  # Custom domain backend
-    "https://www.pramlearn.tech",  # Custom domain frontend
-    "https://pramlearn.tech",  # Root domain    # Backend API
-    "https://app.pramlearn.tech",
-    "http://app.pramlearn.tech",
-]
+CSRF_TRUSTED_ORIGINS_ENV = os.getenv("CSRF_TRUSTED_ORIGINS")
+if CSRF_TRUSTED_ORIGINS_ENV:
+    CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in CSRF_TRUSTED_ORIGINS_ENV.split(",") if origin.strip()]
+else:
+    CSRF_TRUSTED_ORIGINS = [
+        "https://pramlearn-backend.azurewebsites.net",
+        "https://api.pramlearn.tech",  # Custom domain backend
+        "https://www.pramlearn.tech",  # Custom domain frontend
+        "https://pramlearn.tech",  # Root domain    # Backend API
+        "https://app.pramlearn.tech",
+        "http://app.pramlearn.tech",
+        "https://*.vercel.app",
+        "https://*.onrender.com",
+    ]
