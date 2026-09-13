@@ -1,6 +1,5 @@
 FROM python:3.12-slim
 
-# Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
@@ -21,11 +20,13 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copy backend project code
 COPY . .
 
+# Ensure start.sh is executable
+RUN chmod +x start.sh
+
 # Run collectstatic
 RUN python manage.py collectstatic --noinput || true
 
-# Expose port (Railway will set PORT env var automatically)
+# Expose port (Railway will map PORT env var automatically)
 EXPOSE 8000
 
-# Start with Daphne (ASGI + WebSockets support)
-CMD ["sh", "-c", "daphne -b 0.0.0.0 -p ${PORT:-8000} pramlearn_api.asgi:application"]
+CMD ["./start.sh"]
