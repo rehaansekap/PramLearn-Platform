@@ -15,17 +15,25 @@ if ALLOWED_HOSTS_ENV:
     ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_ENV.split(",") if host.strip()]
 else:
     ALLOWED_HOSTS = [
+        "*",
         "localhost",
         "127.0.0.1",
         "0.0.0.0",
         ".vercel.app",
+        ".railway.app",
+        ".up.railway.app",
         ".onrender.com",
-        "pramlearn-frontend.azurewebsites.net",
-        "pramlearn-backend.azurewebsites.net",
+        "pramlearn.vercel.app",
+        "pramlearn-backend.up.railway.app",
         "api.pramlearn.tech",
         "app.pramlearn.tech",
         "pramlearn.tech",
     ]
+
+# Proxy and HTTPS headers for reverse proxies (Railway, Render, etc.)
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+USE_X_FORWARDED_HOST = True
+USE_X_FORWARDED_PORT = True
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -310,12 +318,15 @@ if CSRF_TRUSTED_ORIGINS_ENV:
     CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in CSRF_TRUSTED_ORIGINS_ENV.split(",") if origin.strip()]
 else:
     CSRF_TRUSTED_ORIGINS = [
-        "https://pramlearn-backend.azurewebsites.net",
-        "https://api.pramlearn.tech",  # Custom domain backend
-        "https://www.pramlearn.tech",  # Custom domain frontend
-        "https://pramlearn.tech",  # Root domain    # Backend API
+        "https://*.vercel.app",
+        "https://*.railway.app",
+        "https://*.up.railway.app",
+        "https://*.onrender.com",
+        "https://pramlearn.vercel.app",
+        "https://pramlearn-backend.up.railway.app",
+        "https://api.pramlearn.tech",
+        "https://www.pramlearn.tech",
+        "https://pramlearn.tech",
         "https://app.pramlearn.tech",
         "http://app.pramlearn.tech",
-        "https://*.vercel.app",
-        "https://*.onrender.com",
     ]
