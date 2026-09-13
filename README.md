@@ -7,6 +7,22 @@
 
 **PramLearn** is an adaptive web-based learning platform that integrates the ARCS model (Attention, Relevance, Confidence, Satisfaction) with the Teams Games Tournament (TGT) method to enhance student motivation and engagement in learning.
 
+---
+
+## 🌐 Live Demo & Demo Accounts
+
+🚀 **Live Demo URL**: [https://pramlearn.vercel.app/](https://pramlearn.vercel.app/)
+
+You can test and explore the platform using the pre-seeded demo accounts below:
+
+| Role | Username | Password | Features & Access |
+| :--- | :--- | :--- | :--- |
+| 👑 **Administrator** | `admin` / `admin1` | `123123123` | Full control: User management, classes, subjects, analytics, and system administration |
+| 👨‍🏫 **Teacher** | `guru1` | `123123123` | Material management, quiz & assignment creation, ARCS questionnaire analysis, TGT monitoring |
+| 🎓 **Student** | `siswa1` s/d `siswa35` | `123123123` | Access learning materials, ARCS submission, collaborative group quizzes, and progress tracking |
+
+> 💡 *Tip: 35 student accounts are available (`siswa1`, `siswa2`, ..., `siswa35`) all sharing the same password `123123123`.*
+
 ### 🎯 Main Objectives
 
 - Measure and improve student learning motivation using the ARCS model

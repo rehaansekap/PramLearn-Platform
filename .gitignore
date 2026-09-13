@@ -179,6 +179,9 @@ package-lock.json
 .gitignore.backup
 .gitignore.azure.bak
 
+# Allow fixture backups
+!backendpramlearn/pramlearnapp/fixtures/*.bak
+
 # DATABASE FILES
 *.sqlite3
 *.db
