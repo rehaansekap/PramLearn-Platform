@@ -17,6 +17,7 @@ import os
 from rest_framework.routers import DefaultRouter
 from rest_framework import routers
 from pramlearnapp.views import (
+    health_check,
     RoleViewSet,
     UserViewSet,
     RegisterView,
@@ -192,6 +193,8 @@ urlpatterns = [
         TeacherSessionsARCSSampleView.as_view(),
         name="sessions-arcs-sample",
     ),
+    path("api/health/", health_check, name="api-health"),
+    path("health/", health_check, name="health"),
     path("api/users/me/", CurrentUserView.as_view(), name="current-user"),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),

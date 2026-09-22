@@ -53,9 +53,12 @@ from pramlearnapp.views.student.studentSubjectsView import StudentSubjectsView
 from pramlearnapp.views.student.quizViewSet import (
     StudentGroupQuizListView, GroupQuizDetailView, SubmitGroupQuizView, GroupQuizResultsView,
 )
+from pramlearnapp.views.healthView import health_check
 #     Custom permissions that allow access to a view based on the model's permissions
 
 __all__ = [
+    # Health Check
+    "health_check",
     # Admin
     "UserViewSet", "RegisterView", "RoleViewSet", "LoginView",
     # Student
@@ -78,3 +81,4 @@ __all__ = [
     "SubmitAssignmentView", "RelatedUsersForTeacherView", "CurrentUserView", "QuizRankingView", "StudentDashboardView",
     "StudentSubjectsView",
 ]
+

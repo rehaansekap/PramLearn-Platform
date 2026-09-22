@@ -2,54 +2,62 @@ name: Supabase Keep-Alive
 
 on:
   schedule:
-    # Berjalan otomatis setiap 3 hari sekali pada pukul 00:00 UTC (07:00 WIB)
-    # Ini mencegah database Supabase Free Tier ter-pause/suspend setelah 7 hari tidak aktif
-    - cron: '0 0 */3 * *'
-  workflow_dispatch: # Memungkinkan eksekusi manual via tombol "Run workflow" di GitHub Actions
+    # Berjalan otomatis setiap 2 hari sekali pada pukul 00:00 UTC (07:00 WIB)
+    # Menjaga database Supabase Free Tier tetap aktif dan mencegah auto-pause (7 hari inaktivitas)
+    - cron: '0 0 */2 * *'
+  workflow_dispatch: # Memungkinkan trigger manual via tombol "Run workflow" di GitHub Actions
 
 jobs:
-  ping-supabase:
-    name: Keep Supabase Active
+  keep-alive:
+    name: Keep Supabase & Backend Active
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Supabase REST API & Auth Service
+      - name: Ping Supabase Database & Auth API
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          # Mendukung SUPABASE_SERVICE_ROLE_KEY, SUPABASE_KEY, atau SUPABASE_ANON_KEY
           SUPABASE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY || secrets.SUPABASE_KEY || secrets.SUPABASE_ANON_KEY }}
+          BACKEND_URL: ${{ secrets.BACKEND_URL }}
         run: |
-          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_KEY" ]; then
-            echo "::error::SUPABASE_URL atau SUPABASE_SERVICE_ROLE_KEY belum diatur di GitHub Secrets."
-            echo "Silakan pastikan SUPABASE_URL dan SUPABASE_SERVICE_ROLE_KEY sudah ditambahkan di GitHub Secrets."
-            exit 1
-          fi
+          echo "============================================================"
+          echo "🚀 MEMULAI PROSES KEEP-ALIVE SUPABASE & BACKEND"
+          echo "============================================================"
 
-          # Bersihkan trailing slash dari URL
-          CLEAN_URL="${SUPABASE_URL%/}"
+          if [ -n "$SUPABASE_URL" ] && [ -n "$SUPABASE_KEY" ]; then
+            CLEAN_SUPABASE_URL="${SUPABASE_URL%/}"
 
-          echo "Mengirim ping ke Supabase REST API (${CLEAN_URL}/rest/v1/) ..."
-          REST_RESPONSE=$(curl -s -o rest_response.txt -w "%{http_code}" \
-            -X GET "${CLEAN_URL}/rest/v1/" \
-            -H "apikey: ${SUPABASE_KEY}" \
-            -H "Authorization: Bearer ${SUPABASE_KEY}")
+            echo "1. Mengirim Query Nyata ke Tabel Supabase (${CLEAN_SUPABASE_URL}/rest/v1/pramlearnapp_role?select=id&limit=1) ..."
+            TABLE_HTTP_CODE=$(curl -s -o table_res.txt -w "%{http_code}" \
+              -X GET "${CLEAN_SUPABASE_URL}/rest/v1/pramlearnapp_role?select=id&limit=1" \
+              -H "apikey: ${SUPABASE_KEY}" \
+              -H "Authorization: Bearer ${SUPABASE_KEY}")
+            echo "   Status Code Table Query: $TABLE_HTTP_CODE"
 
-          echo "REST API Status Code: $REST_RESPONSE"
+            echo "2. Mengirim Ping ke Auth Health (${CLEAN_SUPABASE_URL}/auth/v1/health) ..."
+            AUTH_HTTP_CODE=$(curl -s -o auth_res.txt -w "%{http_code}" \
+              -X GET "${CLEAN_SUPABASE_URL}/auth/v1/health" \
+              -H "apikey: ${SUPABASE_KEY}" \
+              -H "Authorization: Bearer ${SUPABASE_KEY}")
+            echo "   Status Code Auth Health: $AUTH_HTTP_CODE"
 
-          echo "Mengirim ping ke Supabase Auth Health (${CLEAN_URL}/auth/v1/health) ..."
-          AUTH_RESPONSE=$(curl -s -o auth_response.txt -w "%{http_code}" \
-            -X GET "${CLEAN_URL}/auth/v1/health" \
-            -H "apikey: ${SUPABASE_KEY}" \
-            -H "Authorization: Bearer ${SUPABASE_KEY}")
-
-          echo "Auth Health Status Code: $AUTH_RESPONSE"
-
-          if [ "$REST_RESPONSE" -eq 200 ] || [ "$AUTH_RESPONSE" -eq 200 ]; then
-            echo "============================================================"
-            echo "✅ SUKSES: Supabase berhasil di-ping dengan status 200 OK!"
-            echo "Aktivitas tercatat dan timer auto-pause (7 hari) telah di-reset."
-            echo "============================================================"
+            if [ "$TABLE_HTTP_CODE" -eq 200 ] || [ "$TABLE_HTTP_CODE" -eq 206 ] || [ "$AUTH_HTTP_CODE" -eq 200 ]; then
+              echo "   ✅ SUKSES: Supabase berhasil di-query dan timer auto-pause berhasil di-reset!"
+            else
+              echo "   ⚠️ Supabase response warning (Table: $TABLE_HTTP_CODE, Auth: $AUTH_HTTP_CODE)"
+              cat table_res.txt || true
+            fi
           else
-            echo "⚠️ Response REST: $REST_RESPONSE, Response Auth: $AUTH_RESPONSE"
-            cat rest_response.txt
-            exit 1
+            echo "ℹ️ SUPABASE_URL atau SUPABASE_KEY belum diisi di GitHub Secrets (akan menggunakan ping backend jika tersedia)."
           fi
+
+          if [ -n "$BACKEND_URL" ]; then
+            CLEAN_BACKEND_URL="${BACKEND_URL%/}"
+            echo "3. Mengirim Ping ke Backend Health API (${CLEAN_BACKEND_URL}/api/health/) ..."
+            BACKEND_HTTP_CODE=$(curl -s -o backend_res.txt -w "%{http_code}" \
+              -X GET "${CLEAN_BACKEND_URL}/api/health/")
+            echo "   Status Code Backend Health: $BACKEND_HTTP_CODE"
+            cat backend_res.txt || true
+          fi
+
+          echo "============================================================"
+          echo "🎉 PROSES SELESAI"
+          echo "============================================================"
